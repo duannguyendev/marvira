@@ -1,0 +1,109 @@
+================================================================================
+MARVIRA â€” GO-LIVE CHECKLIST (NEXT STEPS ONLY)
+================================================================================
+Updated: 2026-07-20
+Reference: requirement_all.txt | docs/deployment.md | docs/backup-restore.md
+
+Legend:
+  [P0] = Must do before public launch
+  [P1] = Required for production scale / store release
+
+================================================================================
+0. FEEDBACK FEATURE â€” DATABASE (P0)
+================================================================================
+
+[P0] Apply feedback migration on staging and production
+  - Migration: apps/api/prisma/migrations/20260720140000_add_feedback/
+  - Creates: feedback table + FeedbackCategory / FeedbackSource / FeedbackStatus enums
+  - Local: VERIFIED (prisma migrate status â†’ "Database schema is up to date", 11 migrations)
+  - Staging/production: run from apps/api after deploy:
+      pnpm exec prisma migrate deploy
+  - Verify:
+      pnpm exec prisma migrate status   â†’ no pending migrations
+      \dt feedback                      â†’ table exists (psql)
+      POST /feedback (website or mobile) â†’ 201/200 success
+      GET /admin/feedback (staff login) â†’ 200 with paginated list
+
+[P0] Marketing feedback form env (if /support is live)
+  - NEXT_PUBLIC_API_URL must point to staging/production API (not localhost)
+  - Rebuild marketing site after setting env (pnpm build)
+
+================================================================================
+1. PRODUCTION DEPLOY
+================================================================================
+
+[P0] Set production secrets (API + dashboard)
+  - JWT_SECRET, JWT_REFRESH_SECRET (32+ random chars each)
+  - DATABASE_URL with connection_limit
+  - REDIS_URL (REDIS_DISABLED must be false)
+  - OAUTH_DEV_BYPASS=false
+  - Rotate or remove seed passwords (demo@marvira.com / admin@marvira.com)
+
+[P0] Deploy API and dashboard with HTTPS
+  - API: https://api.yourdomain.com
+  - Dashboard: https://admin.yourdomain.com
+  - CORS_ORIGIN on API = dashboard origin only
+  - Run: prisma migrate deploy
+  - Health probes: GET /health, GET /ready
+
+[P0] Configure mobile production API URL
+  - marvira_mobile/src/utils/constants.ts â†’ https://api.yourdomain.com
+  - USE_MOCK_DATA=false in release builds
+  - Android: usesCleartextTraffic=false, release signing keystore
+
+[P1] Production infrastructure
+  - 2+ API instances behind load balancer
+  - Managed PostgreSQL (+ PostGIS if available)
+  - Shared Redis
+  - S3 bucket + CDN_URL for image uploads
+  - NEXT_PUBLIC_API_URL and NEXT_PUBLIC_CDN_URL on dashboard build
+  - NEXT_PUBLIC_API_URL on marketing build (for /support feedback form)
+
+================================================================================
+2. PRE-LAUNCH VERIFICATION
+================================================================================
+
+[P0] End-to-end smoke test on staging/production
+  - Register / login on mobile
+  - Nearby events â†’ open event â†’ unlock place 1 (GPS) â†’ answer â†’ next place
+  - Complete event â†’ completion screen shows score and time
+  - Admin: events list â†’ participants page (search, sort)
+  - Feedback: submit from mobile (Settings â†’ Send feedback) and website (/support)
+  - Admin: Feedback inbox â†’ open message â†’ mark READ / RESOLVED
+
+[P1] Run load test before live event
+  - k6 run scripts/load-test.k6.js (set API_URL to staging)
+  - Target: p95 < 500ms on gameplay endpoints; fix bottlenecks if failed
+
+[P1] Enable database backups
+  - Daily snapshots + point-in-time recovery on managed Postgres
+  - See docs/backup-restore.md
+
+================================================================================
+3. STORE RELEASE (if shipping to App Store / Play)
+================================================================================
+
+[P1] Android Play Store
+  - Create upload keystore (not in repo)
+  - android/app/key.properties + signingConfigs.release
+  - Restrict Google Maps API key by package + SHA-1
+  - Build release AAB and upload to Play Console
+
+[P1] iOS App Store (requires Mac + Xcode)
+  - Run marvira_mobile/scripts/setup-ios.ps1 on Mac
+  - pod install, configure signing & provisioning
+  - Info.plist: location permission text, Maps API key
+  - TestFlight â†’ App Store review
+
+================================================================================
+4. AUTH (when credentials are ready)
+================================================================================
+
+[P1] Google / Apple sign-in on mobile
+  - Obtain GOOGLE_CLIENT_ID, Apple Sign-In credentials
+  - Add sign-in buttons on LoginScreen
+  - Wire to POST /auth/google and POST /auth/apple
+
+================================================================================
+END
+================================================================================

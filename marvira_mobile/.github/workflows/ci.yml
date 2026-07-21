@@ -1,0 +1,36 @@
+name: Mobile CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'marvira_mobile/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'marvira_mobile/**'
+
+defaults:
+  run:
+    working-directory: marvira_mobile
+
+jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: marvira_mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint

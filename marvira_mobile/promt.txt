@@ -1,0 +1,147 @@
+You are a senior mobile engineer and product designer.
+
+Generate a COMPLETE, PRODUCTION-READY React Native application using:
+- Latest stable React Native
+- TypeScript
+- Clean, scalable architecture
+- Best practices for navigation, state management, API layer, and UI
+
+The app is a LOCATION-BASED GAME APP with EVENTS and PLACES.
+
+===================================
+TECH STACK REQUIREMENTS
+===================================
+- React Native (latest)
+- TypeScript
+- React Navigation (stack + bottom tabs)
+- Google Maps (react-native-maps with Google provider)
+- Location services (background + foreground)
+- Axios for API calls
+- React Query or similar for server state
+- Secure authentication handling
+- Modern UI libraries (e.g. React Native Paper, Tamagui, NativeWind, or similar)
+- Styled for iOS & Android
+- Well-structured folders and reusable components
+
+===================================
+CORE FEATURES
+===================================
+
+1️⃣ AUTHENTICATION
+- User can Register / Login using SSO (OAuth-style flow)
+- Store auth token securely
+- Auth guard for protected screens
+
+2️⃣ HOME / EVENTS LIST SCREEN
+- Display list of events fetched from API
+- Each event shows:
+  - Title
+  - Description
+  - Distance from user (based on current location)
+  - Status (Not Started / In Progress / Completed)
+- Search and filter events based on:
+  - Current user location
+  - Distance radius
+- Pull-to-refresh
+- Beautiful modern UI (inspired by top Dribbble / Behance mobile designs)
+
+3️⃣ EVENT DETAILS SCREEN
+- Map at the top (Google Maps)
+- Show:
+  - User current location
+  - All places for the event
+  - Highlight current active place
+- Event progress indicator
+- List of places (locked/unlocked)
+
+4️⃣ PLACE GAME FLOW
+For each place in the event:
+- Each place has:
+  - Coordinates (lat/lng)
+  - Question
+  - Answer validation via API
+- App must:
+  - Detect when user is within 100 meters of the place
+  - Only then unlock place details & question
+  - Prevent skipping places
+- User answers the question:
+  - POST answer to API
+  - If correct → unlock next place
+  - If incorrect → show error and allow retry
+
+5️⃣ EVENT COMPLETION
+- When last place is completed:
+  - Show completion screen
+  - Celebration animation
+  - Mark event as completed
+
+6️⃣ USER PROFILE SCREEN
+- Basic user information
+- Completed events list
+- Logout option
+
+===================================
+API INTEGRATION
+===================================
+- Events list API
+- Event details API
+- Place details API
+- Answer submission API
+- Use proper error handling, loading states, retry logic
+- Centralized API service layer
+
+===================================
+LOCATION & MAP LOGIC
+===================================
+- Request location permission properly
+- Continuously track user location
+- Calculate distance to places
+- Unlock place when user is within ~100 meters
+- Show user position live on map
+
+===================================
+PROJECT STRUCTURE
+===================================
+Use a clean, scalable structure, for example:
+- src/
+  - api/
+  - components/
+  - screens/
+  - navigation/
+  - hooks/
+  - services/
+  - store/
+  - utils/
+  - types/
+  - theme/
+
+Make it easy to:
+- Add new screens
+- Add new features
+- Maintain long-term
+
+===================================
+UI / UX
+===================================
+- Extremely beautiful UI
+- Inspired by award-winning mobile designs
+- Smooth animations
+- Clean typography
+- Modern cards, gradients, spacing
+- Polished map UI
+
+===================================
+DELIVERABLE
+===================================
+- Full source code
+- Fully typed (TypeScript)
+- Clear comments where needed
+- Ready to run project
+- Include setup instructions
+- Include example mock API responses if needed
+
+DO NOT provide partial code.
+DO NOT skip screens.
+DO NOT simplify logic.
+
+Generate the full project.

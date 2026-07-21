@@ -1,0 +1,242 @@
+import React from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, TextInput} from 'react-native';
+import {useTranslation} from 'react-i18next';
+import {CreateQuestionInput, QuestionType} from '../types';
+import {Input} from './Input';
+import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
+
+const QUESTION_TYPES: QuestionType[] = [
+  'TEXT',
+  'TRUE_FALSE',
+  'MULTIPLE_CHOICE',
+];
+
+interface QuestionFormProps {
+  value: CreateQuestionInput;
+  onChange: (value: CreateQuestionInput) => void;
+  errors?: Partial<Record<keyof CreateQuestionInput | 'options', string>>;
+}
+
+export const QuestionForm: React.FC<QuestionFormProps> = ({
+  value,
+  onChange,
+  errors,
+}) => {
+  const {t} = useTranslation();
+
+  const setField = <K extends keyof CreateQuestionInput>(
+    key: K,
+    fieldValue: CreateQuestionInput[K],
+  ) => {
+    onChange({...value, [key]: fieldValue});
+  };
+
+  const handleTypeChange = (type: QuestionType) => {
+    if (type === 'TRUE_FALSE') {
+      onChange({...value, type, answer: 'True', options: undefined});
+      return;
+    }
+    if (type === 'MULTIPLE_CHOICE') {
+      onChange({
+        ...value,
+        type,
+        options: value.options?.length ? value.options : ['', ''],
+        answer: '',
+      });
+      return;
+    }
+    onChange({...value, type, options: undefined, answer: ''});
+  };
+
+  const updateOption = (index: number, text: string) => {
+    const options = [...(value.options ?? ['', ''])];
+    options[index] = text;
+    onChange({...value, options});
+  };
+
+  const addOption = () => {
+    onChange({...value, options: [...(value.options ?? []), '']});
+  };
+
+  const removeOption = (index: number) => {
+    const options = (value.options ?? []).filter((_, i) => i !== index);
+    onChange({...value, options});
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.sectionTitle}>{t('createEvent.questionSection')}</Text>
+
+      <Text style={styles.label}>{t('createEvent.questionType')}</Text>
+      <View style={styles.typeRow}>
+        {QUESTION_TYPES.map(type => (
+          <TouchableOpacity
+            key={type}
+            style={[
+              styles.typeButton,
+              value.type === type && styles.typeButtonActive,
+            ]}
+            onPress={() => handleTypeChange(type)}>
+            <Text
+              style={[
+                styles.typeButtonText,
+                value.type === type && styles.typeButtonTextActive,
+              ]}>
+              {t(`createEvent.questionTypes.${type}`)}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <Input
+        label={t('createEvent.questionText')}
+        value={value.question}
+        onChangeText={text => setField('question', text)}
+        placeholder={t('createEvent.questionTextPlaceholder')}
+        multiline
+        error={errors?.question}
+      />
+
+      {value.type === 'MULTIPLE_CHOICE' ? (
+        <View>
+          <Text style={styles.label}>{t('createEvent.options')}</Text>
+          {(value.options ?? []).map((option, index) => (
+            <View key={index} style={styles.optionRow}>
+              <TextInput
+                style={styles.optionInput}
+                value={option}
+                onChangeText={text => updateOption(index, text)}
+                placeholder={t('createEvent.optionPlaceholder', {n: index + 1})}
+                placeholderTextColor={colors.textLight}
+              />
+              {(value.options?.length ?? 0) > 2 ? (
+                <TouchableOpacity onPress={() => removeOption(index)}>
+                  <Text style={styles.removeOption}>✕</Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          ))}
+          <TouchableOpacity onPress={addOption} style={styles.addOption}>
+            <Text style={styles.addOptionText}>{t('createEvent.addOption')}</Text>
+          </TouchableOpacity>
+          {errors?.options ? (
+            <Text style={styles.errorText}>{errors.options}</Text>
+          ) : null}
+        </View>
+      ) : null}
+
+      {value.type === 'TRUE_FALSE' ? (
+        <View>
+          <Text style={styles.label}>{t('createEvent.correctAnswer')}</Text>
+          <View style={styles.typeRow}>
+            {(['True', 'False'] as const).map(option => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.typeButton,
+                  value.answer === option && styles.typeButtonActive,
+                ]}
+                onPress={() => setField('answer', option)}>
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    value.answer === option && styles.typeButtonTextActive,
+                  ]}>
+                  {t(option === 'True' ? 'common.true' : 'common.false')}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      ) : (
+        <Input
+          label={t('createEvent.correctAnswer')}
+          value={value.answer}
+          onChangeText={text => setField('answer', text)}
+          placeholder={t('createEvent.answerPlaceholder')}
+          error={errors?.answer}
+        />
+      )}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: spacing.sm,
+  },
+  sectionTitle: {
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.textDark,
+    marginBottom: spacing.md,
+  },
+  label: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+    color: colors.textDark,
+    marginBottom: spacing.sm,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  typeButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.backgroundGray,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  typeButtonActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  typeButtonText: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    fontWeight: fontWeight.medium,
+  },
+  typeButtonTextActive: {
+    color: colors.background,
+  },
+  optionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
+  },
+  optionInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    fontSize: fontSize.md,
+    color: colors.textDark,
+    backgroundColor: colors.background,
+  },
+  removeOption: {
+    fontSize: fontSize.lg,
+    color: colors.error,
+    padding: spacing.xs,
+  },
+  addOption: {
+    alignSelf: 'flex-start',
+    marginBottom: spacing.md,
+  },
+  addOptionText: {
+    color: colors.primary,
+    fontWeight: fontWeight.semibold,
+    fontSize: fontSize.sm,
+  },
+  errorText: {
+    fontSize: fontSize.xs,
+    color: colors.error,
+    marginBottom: spacing.sm,
+  },
+});

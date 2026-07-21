@@ -1,0 +1,2029 @@
+You are a principal mobile architect, senior full-stack engineer, senior DevOps engineer, and enterprise UI/UX architect.
+
+Your task is to generate a COMPLETE, PRODUCTION-READY monorepo platform for a location-based scavenger hunt / event exploration application.
+
+The platform includes:
+
+1. React Native mobile app
+2. Node.js backend API
+3. Next.js admin dashboard
+4. Next.js public marketing website (consumer-facing, separate from admin)
+5. Shared packages
+6. Full database layer
+7. Full Docker setup
+8. CI/CD
+9. Unit + integration + E2E tests
+10. Seed scripts
+11. Mock environments
+12. Production deployment setup
+
+The generated project MUST:
+- compile immediately
+- run immediately
+- include no TODOs
+- include no pseudo code
+- use strict TypeScript
+- use enterprise-grade architecture
+- be fully production-ready
+
+====================================================
+GLOBAL REQUIREMENTS
+====================================================
+
+ALL CODE MUST:
+- use TypeScript
+- use strict typing
+- follow clean architecture
+- follow scalable modular architecture
+- include reusable abstractions
+- include proper error handling
+- include logging
+- include validation
+- include security best practices
+- compile successfully
+- run successfully
+
+====================================================
+MONOREPO REQUIREMENTS
+====================================================
+
+Use:
+- Turborepo
+
+Generate EXACT structure:
+
+root/
+â”œâ”€â”€ apps/
+â”‚   â”œâ”€â”€ mobile/
+â”‚   â”œâ”€â”€ api/
+â”‚   â”œâ”€â”€ dashboard/
+â”‚   â””â”€â”€ marketing/          # public consumer site (www); not admin
+â”‚
+â”œâ”€â”€ packages/
+â”‚   â”œâ”€â”€ shared-types/
+â”‚   â”œâ”€â”€ shared-utils/
+â”‚   â”œâ”€â”€ eslint-config/
+â”‚   â”œâ”€â”€ tsconfig/
+â”‚   â””â”€â”€ ui/
+â”‚
+â”œâ”€â”€ docker/
+â”œâ”€â”€ scripts/
+â”œâ”€â”€ .github/
+â”œâ”€â”€ package.json
+â”œâ”€â”€ turbo.json
+â”œâ”€â”€ pnpm-workspace.yaml
+â””â”€â”€ README.md
+
+Use:
+- pnpm
+
+====================================================
+MOBILE APP REQUIREMENTS
+====================================================
+
+Generate a FULL, RUNNABLE React Native application.
+
+====================================================
+MANDATORY MOBILE STACK
+====================================================
+
+Use EXACT versions compatible with:
+- React Native 0.83.x
+- React 19.x
+
+Mandatory dependencies:
+- react-native
+- react
+- react-dom
+- typescript
+- styled-components
+- react-native-maps
+- react-navigation
+- axios
+- @tanstack/react-query
+- lottie-react-native
+- zustand
+
+ALL dependencies MUST be compatible with:
+- React Native 0.83
+- React 19
+
+====================================================
+MOBILE PLATFORM SETUP
+====================================================
+
+Generate COMPLETE native projects.
+
+ANDROID
+Generate:
+- android/ folder
+- Gradle configuration
+- release + debug configs
+- AndroidManifest permissions:
+  - ACCESS_FINE_LOCATION
+  - ACCESS_COARSE_LOCATION
+- Google Maps setup
+- placeholder API key
+- build configs
+
+IOS
+Generate:
+- ios/ folder
+- Podfile
+- Info.plist permissions:
+  - NSLocationWhenInUseUsageDescription
+  - NSLocationAlwaysAndWhenInUseUsageDescription
+- Google Maps setup
+- placeholder key
+- iOS 14+
+
+====================================================
+MOBILE APP STRUCTURE
+====================================================
+
+apps/mobile/src/
+
+Generate EXACT structure:
+
+src/
+â”œâ”€â”€ api/
+â”œâ”€â”€ mocks/
+â”œâ”€â”€ components/
+â”œâ”€â”€ screens/
+â”‚   â”œâ”€â”€ practice/          (PracticeList, Training, AddQuestion)
+â”‚   â”œâ”€â”€ favorites/         (FavoritesScreen)
+â”‚   â””â”€â”€ settings/          (SettingsScreen â€” language picker; FeedbackScreen â€” send feedback)
+â”œâ”€â”€ navigation/
+â”‚   â”œâ”€â”€ MainNavigator.tsx  (4 tabs: Events | Practice | Favorites | Profile)
+â”‚   â”œâ”€â”€ PracticeNavigator.tsx
+â”‚   â””â”€â”€ FavoritesNavigator.tsx
+â”œâ”€â”€ i18n/
+â”‚   â””â”€â”€ locales/
+â”œâ”€â”€ hooks/
+â”œâ”€â”€ services/
+â”œâ”€â”€ store/
+â”œâ”€â”€ theme/
+â”œâ”€â”€ utils/
+â”œâ”€â”€ types/
+â”œâ”€â”€ constants/
+â”œâ”€â”€ providers/
+â”œâ”€â”€ assets/
+â””â”€â”€ animations/
+
+====================================================
+MOBILE MOCK DATA REQUIREMENTS
+====================================================
+
+The app MUST run WITHOUT backend.
+
+Generate:
+
+src/mocks/
+- events.mock.ts
+- eventDetails.mock.ts
+- places.mock.ts
+- questions.mock.ts
+- user.mock.ts
+
+Generate:
+src/api/mockServer.ts
+
+Features:
+- simulated REST endpoints
+- artificial delay (500â€“1200ms)
+- success + failure responses
+- stateful logic
+
+Mock endpoints:
+- POST /auth/login
+- GET /events
+- GET /events/:id
+- GET /events/:id/places
+- POST /events/:id/join
+- GET /places/:id/question
+- POST /places/:id/answer
+- GET /profile
+- GET /practice/questions
+- GET /practice/questions/:id
+- POST /practice/questions/:id/answer
+- GET /practice/questions/mine
+- POST /practice/questions
+- PATCH /practice/questions/:id
+- DELETE /practice/questions/:id
+- GET /favorites/events
+- GET /favorites/questions
+- POST /favorites/events/:id
+- DELETE /favorites/events/:id
+- POST /favorites/questions/:id
+- DELETE /favorites/questions/:id
+
+Mock logic:
+- track unlocked places
+- validate answers
+- mark events completed
+
+Generate:
+USE_MOCK_API=true
+
+====================================================
+MOBILE APP FLOW
+====================================================
+
+AUTH
+- mock SSO login
+- token persistence
+- auto-login
+
+HOME SCREEN
+- events list
+- nearby search
+- pull-to-refresh
+- distance calculation
+- modern cards
+- loading skeletons
+
+EVENT DETAILS
+- Google Map
+- user location
+- place markers
+- active place highlight
+- animated camera
+- radius overlays
+- bottom sheet
+- password-protected events: lock badge in list; if !hasAccess show title/description/city and
+  locked state (no place map/coordinates); bottom sheet "Enter password to play" â†’ POST join;
+  after success refresh and show full map + places
+
+PLACE GAMEPLAY
+- detect user within radius_meters (default 100m, configurable per place)
+- unlock place only within radius
+- show question after unlock (TEXT / MC / TF / IMAGE with image_url)
+- submit answer
+- on correct answer: advance current_place_index, return nextPlaceId
+- linear sequence enforced server-side (cannot skip stops)
+
+EVENT COMPLETION
+- celebration screen
+- Lottie animation
+- completion persistence
+
+PROFILE
+- user profile
+- completed events
+- my created events (draft + published) â€” see DELIVERED SCOPE Â§14
+- logout
+- settings screen (language selection)
+
+====================================================
+PRACTICE & FAVORITES (MOBILE)
+====================================================
+
+BOTTOM NAVIGATION (4 tabs, left to right):
+1. Events (existing)
+2. Practice (new)
+3. Favorites (new)
+4. Profile (existing)
+
+----------------------------------------------------
+PRACTICE TAB
+----------------------------------------------------
+
+Purpose:
+- Home practice mode â€” no GPS, no location unlock, no event progression impact
+- Users can train with questions when they have time at home
+
+Main screen â€” 2 sub-tabs:
+| Sub-tab       | Content                                              |
+|---------------|------------------------------------------------------|
+| To Practice   | Questions NOT yet completed in training mode         |
+| Completed     | Questions the user finished in training mode         |
+
+Training completion rule:
+- Once a user completes training on a question, it is removed from "To Practice"
+  so they do not see the same question again for training
+- Completed questions appear under the "Completed" sub-tab
+
+Question sources (Practice public pool):
+| Source                         | In Practice pool? |
+|--------------------------------|-------------------|
+| Standalone community questions | Yes â€” all users   |
+| Event-linked questions         | No â€” My Questions only (author management) |
+
+Training screen:
+- View question and submit answer (TEXT, MULTIPLE_CHOICE, TRUE_FALSE, IMAGE)
+- No location check
+- Wrong answers: allow retry; no leaderboard or event score impact
+- On successful training completion â†’ mark training completed â†’ move to Completed tab
+- Favorite icon on question (see Favorites section)
+
+Add question:
+- Entry points: FAB on Practice tab + Profile â†’ My Questions
+- Creates standalone question (no event required)
+- After publish â†’ visible in Practice "To Practice" for other users
+
+Empty states:
+- To Practice: friendly message when no questions available
+- Completed: friendly message when user has not completed any practice yet
+
+----------------------------------------------------
+FAVORITES TAB
+----------------------------------------------------
+
+Purpose:
+- Quick access to saved events and questions
+
+2 sub-tabs:
+| Sub-tab   | Content                                      |
+|-----------|----------------------------------------------|
+| Events    | Favorited events â†’ tap opens Event Details   |
+| Questions | Favorited questions â†’ tap opens Training     |
+
+Favorite toggle behavior:
+| Action              | Behavior                                        |
+|---------------------|-------------------------------------------------|
+| Favorite (â˜† â†’ â˜…)    | Immediate, no confirmation dialog               |
+| Unfavorite (â˜… â†’ â˜†)  | Bottom sheet confirmation before removing       |
+
+Favorite icon locations:
+- Event cards and event detail screen
+- Question list items and training screen
+
+Empty states:
+- Events: no favorite events yet
+- Questions: no favorite questions yet
+
+----------------------------------------------------
+PROFILE â€” MY QUESTIONS
+----------------------------------------------------
+
+Entry: menu row on Profile (same pattern as My Events)
+
+Shows all questions created by the current user:
+| Type                              | Included |
+|-----------------------------------|----------|
+| Standalone community questions    | Yes      |
+| Questions from events they created| Yes      |
+
+Actions: view, edit, delete/unpublish, add new (same form as Practice)
+
+----------------------------------------------------
+PRACTICE & FAVORITES â€” MOBILE API CONTRACT
+----------------------------------------------------
+
+Mobile client calls these endpoints (see BACKEND API ENDPOINTS).
+
+GET    /practice/questions?status=unfinished|completed
+GET    /practice/questions/:id
+POST   /practice/questions/:id/answer
+GET    /practice/questions/mine
+POST   /practice/questions
+PATCH  /practice/questions/:id
+DELETE /practice/questions/:id
+GET    /favorites/events
+GET    /favorites/questions
+POST   /favorites/events/:id
+DELETE /favorites/events/:id
+POST   /favorites/questions/:id
+DELETE /favorites/questions/:id
+
+Mobile implementation:
+- UI, navigation, i18n: IMPLEMENTED (marvira_mobile)
+- Real API when USE_MOCK_DATA=false; mock layer when USE_MOCK_DATA=true
+
+Mock mode (USE_MOCK_API / USE_MOCK_DATA):
+- Stateful in-memory + AsyncStorage for favorites/training completion
+- Seed standalone community practice questions
+- Validate training answers in mock layer
+
+----------------------------------------------------
+PRACTICE & FAVORITES â€” i18n (MOBILE)
+----------------------------------------------------
+
+Translate in vi, en, zh, ja:
+- Tab labels: Practice, Favorites
+- Sub-tab labels, screen titles, empty states
+- Add/edit question form, training feedback, unfavorite confirmation
+- My Questions screen
+
+====================================================
+MOBILE INTERNATIONALIZATION (i18n) REQUIREMENTS
+====================================================
+
+The mobile app MUST support multiple languages with in-app language switching.
+
+Supported languages:
+- Vietnamese (vi) â€” DEFAULT
+- English (en)
+- Chinese / Simplified Chinese (zh)
+- Japanese (ja)
+
+Stack:
+- i18next
+- react-i18next
+- @react-native-async-storage/async-storage (persist user language choice)
+
+Structure:
+src/i18n/
+â”œâ”€â”€ index.ts              (init, load/save language)
+â””â”€â”€ locales/
+    â”œâ”€â”€ vi.json
+    â”œâ”€â”€ en.json
+    â”œâ”€â”€ zh.json
+    â””â”€â”€ ja.json
+
+Provider:
+- I18nProvider wraps the app; loads saved language on startup before main UI.
+- Default language on first launch: Vietnamese (vi).
+- Fallback language: English (en).
+
+Settings screen:
+- Route: Profile tab â†’ Settings (ProfileNavigator stack).
+- User selects language from a list (Tiáº¿ng Viá»‡t, English, ä¸­æ–‡, æ—¥æœ¬èªž).
+- Selection applies immediately and persists to AsyncStorage (@marvira/language).
+- Link: Send feedback â†’ FeedbackScreen (ProfileNavigator stack).
+
+Feedback screen:
+- Route: Profile tab â†’ Settings â†’ Send feedback.
+- Authenticated users submit feedback; name/email taken from account (JWT).
+- Fields: category (FEEDBACK | SUGGESTION | BUG | OTHER), subject (optional), message (required, min 10 chars).
+- Source sent as MOBILE; success/error alerts; i18n in vi, en, zh, ja.
+
+Translation scope (MUST be translated in all 4 languages):
+- Navigation titles and tab labels
+- Auth screens (login, register, forgot/reset password)
+- Buttons, labels, placeholders, validation messages
+- Alert dialogs and error messages
+- Events list filters, empty states, search placeholder
+- Event details, place game, completion screens
+- Leaderboards (event + global), profile, offline banner, error boundary
+- Practice, Favorites, My Questions screens (create-event / my-events â€” see Â§14â€“15)
+- Settings + Feedback screens (see Â§20)
+
+NOT translated (server-provided content):
+- Event titles, descriptions, city names
+- Place names and descriptions
+- Question text and multiple-choice options from API
+
+Special rules:
+- TRUE_FALSE answers MUST still submit "True" / "False" to the API (UI labels
+  may be translated; submitted values stay English).
+- Navigation headers and tab labels MUST refresh when language changes
+  (re-render on i18n.language change).
+
+====================================================
+LOCATION REQUIREMENTS
+====================================================
+
+Implement:
+- foreground location tracking
+- mock GPS movement mode
+- smooth camera animations
+- radius calculations
+- map overlays
+- distance utility
+
+====================================================
+MOBILE UI REQUIREMENTS
+====================================================
+
+IMPORTANT:
+ALL styling MUST use:
+- styled-components ONLY
+
+STRICTLY FORBIDDEN:
+- inline styles
+- StyleSheet API
+
+Generate:
+src/theme/
+- colors.ts
+- typography.ts
+- spacing.ts
+- shadows.ts
+- theme.ts
+
+Theme:
+- gradient primary (#6A5AE0 â†’ #8F7CFF)
+- rounded cards
+- soft shadows
+- modern typography
+- animated transitions
+
+Generate reusable components:
+- Button
+- Card
+- Header
+- ProgressBar
+- DistanceBadge
+- MapOverlay
+- LoadingSkeleton
+- BottomSheet
+- QuestionCard
+- SegmentedControl (Practice / Favorites sub-tabs)
+- FavoriteButton
+- UnfavoriteConfirmBottomSheet
+- PracticeQuestionCard
+
+====================================================
+MOBILE STATE MANAGEMENT
+====================================================
+
+Use:
+- Zustand
+- React Query
+
+====================================================
+MOBILE TESTING
+====================================================
+
+Generate:
+- unit tests
+- integration tests
+
+====================================================
+BACKEND REQUIREMENTS
+====================================================
+
+====================================================
+BACKEND STACK
+====================================================
+
+Use:
+- Node.js 22 LTS
+- NestJS
+- TypeScript
+- PostgreSQL 16+
+- Prisma ORM
+- PostGIS
+- Redis
+- BullMQ
+- JWT auth
+- Passport.js
+- class-validator
+- Swagger/OpenAPI
+- WebSockets
+- Docker
+
+====================================================
+BACKEND STRUCTURE
+====================================================
+
+apps/api/src/
+
+Generate:
+
+src/
+â”œâ”€â”€ auth/
+â”œâ”€â”€ users/
+â”œâ”€â”€ events/
+â”œâ”€â”€ places/
+â”œâ”€â”€ questions/
+â”œâ”€â”€ practice/
+â”œâ”€â”€ favorites/
+â”œâ”€â”€ progress/
+â”œâ”€â”€ analytics/
+â”œâ”€â”€ uploads/
+â”œâ”€â”€ notifications/
+â”œâ”€â”€ websocket/
+â”œâ”€â”€ admin/
+â”œâ”€â”€ common/
+â”œâ”€â”€ config/
+â”œâ”€â”€ prisma/
+â””â”€â”€ main.ts
+
+====================================================
+DATABASE REQUIREMENTS
+====================================================
+
+Use PostgreSQL + PostGIS.
+
+Generate FULL Prisma schema.
+
+====================================================
+DATABASE TABLES
+====================================================
+
+users
+- id
+- email
+- name
+- avatar
+- provider
+- role
+- created_at
+- updated_at
+
+events
+- id
+- title
+- description
+- city
+- cover_image
+- difficulty
+- reward_points
+- is_active
+- join_password_hash (nullable â€” bcrypt hash; null = public event, anyone can play)
+- created_by
+- created_at
+- updated_at
+
+places
+- id
+- event_id
+- title
+- description
+- latitude
+- longitude
+- radius_meters
+- order_index
+- hint
+- question_id (optional FK â€” each place has at most ONE question for gameplay)
+- created_at
+
+questions (reusable question bank â€” NOT tied 1:1 to a single place)
+- id
+- question
+- type (TEXT | MULTIPLE_CHOICE | TRUE_FALSE | IMAGE)
+- image_url (required when type = IMAGE)
+- options (JSON, for MULTIPLE_CHOICE / TRUE_FALSE)
+- answer (admin-only in public API responses)
+- explanation
+- points
+- created_by (FK users, nullable â€” author for COMMUNITY practice questions)
+- source (enum COMMUNITY | EVENT â€” default EVENT)
+- is_published (boolean â€” default false; true = visible in Practice pool)
+- created_at
+- updated_at
+
+Rules:
+- COMMUNITY + is_published=true + no Place link â†’ appears in Practice "To Practice" pool
+- EVENT source â†’ linked to Place and/or EventQuestion; shown in My Questions for author
+- `answer` field MUST NOT be returned in practice list/detail public DTOs (training submit only)
+- Admin may create COMMUNITY questions with created_by null (system seed)
+
+user_practice_completions (Practice training â€” per user)
+- id
+- user_id (FK users)
+- question_id (FK questions â€” COMMUNITY published only)
+- completed_at (set on first correct training answer)
+- UNIQUE (user_id, question_id)
+- Practice mode MUST NOT mutate user_event_progress or user_place_completion
+
+user_favorite_events
+- id
+- user_id (FK users)
+- event_id (FK events)
+- created_at
+- UNIQUE (user_id, event_id)
+
+user_favorite_questions
+- id
+- user_id (FK users)
+- question_id (FK questions)
+- created_at
+- UNIQUE (user_id, question_id)
+- May favorite COMMUNITY questions and EVENT-linked questions
+
+feedback (user messages â€” support / suggestions / bugs)
+- id
+- user_id (FK users, nullable â€” null for guest website submissions)
+- name
+- email
+- category (enum FEEDBACK | SUGGESTION | BUG | OTHER)
+- subject (optional)
+- message
+- source (enum WEB | MOBILE)
+- status (enum NEW | READ | RESOLVED | ARCHIVED â€” default NEW)
+- admin_note (optional â€” internal staff note; not visible to user)
+- created_at
+- updated_at
+- Indexes: status, category, source, created_at
+
+event_questions (many-to-many: events â†” questions)
+- id
+- event_id
+- question_id
+- order_index
+- UNIQUE(event_id, question_id)
+
+A question MAY be linked to multiple events.
+An event MAY have many questions in its pool, but each PLACE assigns exactly one question via question_id.
+When assigning a question to a place, it MUST already be linked to that event (or be auto-linked on assign).
+
+user_event_progress
+- id
+- user_id
+- event_id
+- current_place_index
+- completed
+- score
+- started_at
+- completed_at
+
+user_event_access (password-protected events â€” join grant)
+- id
+- user_id (FK users)
+- event_id (FK events)
+- granted_at
+- UNIQUE (user_id, event_id)
+- Created when a player successfully verifies the event join password via POST /events/:id/join
+- Event creator (created_by) ALWAYS has access without a row in this table
+- Users with existing user_event_progress for an event are grandfathered if creator later adds a password
+
+user_place_completion
+- id
+- user_id
+- place_id
+- completed
+- answer
+- completed_at
+
+sessions
+- id
+- user_id
+- refresh_token
+- expires_at
+
+analytics_events
+- id
+- user_id
+- event_name
+- payload
+- created_at
+
+====================================================
+GAMEPLAY DATA MODEL (CRITICAL)
+====================================================
+
+EVENT STRUCTURE:
+- An event has MANY ordered places (order_index 0, 1, 2, â€¦).
+- Each place has exactly ONE question (via question_id).
+- Questions live in a reusable bank and can be used in multiple events.
+
+MOBILE GAMEPLAY (linear â€” API enforced):
+1. If event is password-protected (join_password_hash IS NOT NULL), player MUST have access
+   before gameplay: creator, user_event_access row, or existing user_event_progress (grandfathered).
+   Other players call POST /events/:id/join with the password once; no re-prompt on return visits.
+2. Player travels to Place #1 (first stop by order_index).
+3. POST /places/:id/unlock â€” GPS must be within radius_meters; server rejects if no play access.
+4. GET /places/:id/question â€” show question (no answer field); server rejects if no play access.
+5. POST /places/:id/answer â€” on correct answer, response includes nextPlaceId; server rejects
+   if no play access.
+6. Repeat for Place #2, #3, â€¦ until event completed.
+
+Progress is tracked via user_event_progress.current_place_index.
+Players CANNOT skip ahead to later places until previous stops are completed.
+
+PASSWORD-PROTECTED EVENTS (access model):
+- join_password_hash null â†’ public event (default); all authenticated users may play.
+- join_password_hash set â†’ private event; only users with play access may unlock/answer.
+- Public API MUST expose isPasswordProtected (boolean) on event list/detail DTOs.
+- Public API MUST NOT return join_password_hash or plain-text password.
+- When JWT present, event detail MAY include hasAccess (boolean): true if public, creator,
+  user_event_access grant, or grandfathered progress exists.
+- GET /events/:id/places for private events without access: return redacted payload (e.g. place
+  count only, no coordinates/questions) OR 403 â€” implementation MUST prevent map scraping
+  before join.
+- Rate-limit POST /events/:id/join (e.g. 5 failed attempts per user+event per 15 minutes via Redis).
+- Wrong-password response MUST be generic ("Incorrect password"); do not leak event existence.
+
+TIMING (for leaderboards and future rewards):
+- Per place: answer_duration_ms = time from unlock to first correct answer at that stop.
+- Per event: total_duration_ms = time from first unlock to final place completed.
+- Progress starts on first unlock (no separate "start event" endpoint).
+
+ADMIN DASHBOARD (non-linear â€” full visibility):
+- Admin sees ALL places, coordinates, hints, and questions for an event at once.
+- NO unlock restrictions on admin pages â€” configure the complete hunt trail.
+- Sequential unlock applies ONLY in the mobile app via API calls.
+- Event edit UI is PLACE-FIRST: each stop card shows location fields + inline question
+  (add / edit / pick from library). Do NOT use a separate â€œevent questions poolâ€ as the
+  primary admin workflow.
+
+====================================================
+QUESTION TYPES
+====================================================
+
+TEXT
+- Free-text answer from player.
+
+MULTIPLE_CHOICE
+- options[] required (min 2).
+- answer must match one of the options.
+
+TRUE_FALSE
+- options: True / False.
+- answer must be True or False.
+
+IMAGE
+- image_url required (upload via POST /uploads).
+- question field = caption shown with the image.
+- answer is text (same validation as TEXT).
+
+Public API MUST expose image_url but NEVER expose answer on player endpoints.
+
+====================================================
+GEOSPATIAL REQUIREMENTS
+====================================================
+
+Production target: PostGIS (ST_DWithin, ST_Distance, geo indexes).
+
+Windows-native / local dev MAY use haversine distance in application code when PostGIS
+is unavailable. Nearby event queries and radius checks MUST still work.
+
+Implement:
+- ST_DWithin (or haversine fallback)
+- ST_Distance (or haversine fallback)
+- geo indexes (when PostGIS enabled)
+- nearby event queries
+
+====================================================
+AUTH REQUIREMENTS
+====================================================
+
+Implement:
+- JWT access token
+- refresh token
+- Google OAuth
+- Apple placeholder
+- RBAC
+- admin guard
+- refresh token rotation
+
+====================================================
+BACKEND API ENDPOINTS
+====================================================
+
+AUTH
+POST /auth/login
+POST /auth/google
+POST /auth/refresh
+POST /auth/logout
+GET /auth/me
+
+EVENTS
+GET /events
+GET /events/mine (paginated â€” events created by current user; JWT required)
+GET /events/nearby
+GET /events/:id (includes isPasswordProtected; hasAccess when JWT present)
+POST /events
+PATCH /events/:id (creator may set/clear joinPassword on create, update, or publish)
+DELETE /events/:id
+POST /events/:id/join (JWT required â€” body: { password }; grants user_event_access on success)
+
+PLACES
+GET /events/:id/places
+POST /places
+PATCH /places/:id (includes question_id assign/clear)
+DELETE /places/:id
+
+QUESTIONS (admin â€” question bank)
+POST /questions
+PATCH /questions/:id
+DELETE /questions/:id
+
+ADMIN QUESTIONS
+GET /admin/questions (list, search, pagination)
+GET /admin/questions/:id (detail + linked events)
+
+ADMIN EVENT â†” QUESTION LINKING
+POST /admin/events/:eventId/questions (link existing question to event)
+DELETE /admin/events/:eventId/questions/:questionId (unlink; clears place assignments)
+
+ADMIN EVENTS
+GET /admin/events/:id (full event: all places with questions including answers)
+
+UPLOADS
+POST /uploads (admin â€” multipart image upload)
+GET /uploads/:filename (public â€” serve uploaded images)
+
+GAMEPLAY
+POST /places/:id/unlock
+GET /places/:id/question
+POST /places/:id/answer
+
+PROFILE
+GET /profile
+GET /profile/completed-events
+
+PRACTICE (mobile â€” JWT required)
+GET /practice/questions?status=unfinished|completed&page=&pageSize=
+GET /practice/questions/:id
+POST /practice/questions/:id/answer
+GET /practice/questions/mine
+POST /practice/questions
+PATCH /practice/questions/:id
+DELETE /practice/questions/:id
+
+FAVORITES (mobile â€” JWT required)
+GET /favorites/events
+GET /favorites/questions
+POST /favorites/events/:id
+DELETE /favorites/events/:id
+POST /favorites/questions/:id
+DELETE /favorites/questions/:id
+
+LEADERBOARD (public)
+GET /events/:id/leaderboard?limit=50
+  - Ranked by score DESC, then totalDurationMs ASC (fastest finish wins ties)
+GET /leaderboard/global?limit=50
+  - Total score across completed events DESC, events completed DESC,
+    avg totalDurationMs ASC
+
+ANALYTICS
+GET /analytics/overview
+GET /analytics/events
+
+ADMIN
+GET /admin/users
+GET /admin/events
+GET /admin/events/:id
+GET /admin/events/:id/participants (list users who joined event; search, sort, pagination)
+GET /admin/questions
+GET /admin/questions/:id
+POST /admin/events/:eventId/questions
+DELETE /admin/events/:eventId/questions/:questionId
+GET /admin/analytics
+GET /admin/practice/questions?page=&pageSize=&search=&published=
+PATCH /admin/practice/questions/:id
+PATCH /admin/practice/questions/:id/publish
+DELETE /admin/practice/questions/:id
+GET /admin/practice/stats
+
+FEEDBACK (public submit + admin inbox)
+POST /feedback (public â€” guest or authenticated; optional JWT links user_id)
+  - Guest (website): name + email required in body
+  - Authenticated (mobile): name/email from JWT if omitted
+  - Body: category, subject?, message, source (WEB | MOBILE)
+  - Rate limit: e.g. 5 requests/min per IP (ThrottlerGuard)
+GET /admin/feedback?page=&pageSize=&search=&status=&category=&source=&dateFrom=&dateTo=
+GET /admin/feedback/:id
+PATCH /admin/feedback/:id (status, adminNote â€” staff/admin only; no user reply in v1)
+
+====================================================
+PRACTICE & FAVORITES â€” BACKEND API (DETAIL)
+====================================================
+
+NestJS modules:
+apps/api/src/practice/ (practice.module, controller, service, dto/)
+apps/api/src/favorites/ (favorites.module, controller, service, dto/)
+Register PracticeModule and FavoritesModule in app.module.ts.
+Auth: all practice/favorites endpoints require JWT (USER role minimum).
+Swagger: tag groups `practice`, `favorites`.
+
+PRACTICE ENDPOINTS (behavior):
+- GET /practice/questions â€” published COMMUNITY questions only; unfinished = no
+  user_practice_completions row; completed = has row; MUST NOT include `answer`
+- GET /practice/questions/:id â€” training detail; 404 if not published COMMUNITY
+- POST /practice/questions/:id/answer â€” validate answer server-side; correct â†’ upsert
+  user_practice_completions; incorrect â†’ no row; MUST NOT affect event progress/score
+- GET /practice/questions/mine â€” all questions where created_by = current user
+  (COMMUNITY + EVENT-linked via user's created events)
+- POST /practice/questions â€” created_by = user, source = COMMUNITY, is_published = true
+- PATCH /practice/questions/:id â€” author or ADMIN; COMMUNITY only from mobile flow
+- DELETE /practice/questions/:id â€” author (COMMUNITY) or ADMIN; cascade favorites +
+  practice completions; reject if linked to active Place
+
+FAVORITES ENDPOINTS (behavior):
+- GET lists reuse event / practice question DTO shapes with isFavorite flags
+- POST add â€” idempotent; DELETE â€” 404 if not favorited
+
+ADMIN PRACTICE:
+- Moderate COMMUNITY questions; publish/unpublish controls Practice pool visibility
+- GET /admin/practice/stats â€” counts: total/published community questions,
+  completions (7d/30d), favorites
+
+BUSINESS RULES (SERVER):
+- Practice pool: source=COMMUNITY AND is_published=true
+- Training completion independent of event gameplay
+- Rate limit POST /practice/questions/:id/answer (e.g. 30/min per user)
+- Rate limit POST /practice/questions (e.g. 10/hour per user)
+- Optional analytics_events: practice_question_completed, practice_question_created,
+  favorite_event_added, favorite_question_added
+
+PRISMA:
+- enum QuestionSource { COMMUNITY, EVENT }
+- Migration under apps/api/prisma/migrations/
+- User relations: practiceCompletions, favoriteEvents, favoriteQuestions, createdQuestions, feedbackMessages
+
+BACKEND TESTING (PRACTICE & FAVORITES):
+- Unit: answer validation (all types), unfinished/completed filtering, author-only enforcement
+- Integration: create community question â†’ train â†’ completed list; favorites CRUD + idempotency
+
+SHARED TYPES (packages/shared-types):
+- PracticeQuestionListItem, PracticeQuestionStatus, QuestionSource
+- TrainingAnswerResponse, FavoriteEvent / FavoriteQuestion list shapes
+- FeedbackCategory, FeedbackSource, FeedbackStatus, FeedbackItem, SubmitFeedbackDto, UpdateFeedbackDto
+
+====================================================
+FEEDBACK â€” BACKEND API (DETAIL)
+====================================================
+
+NestJS module:
+apps/api/src/feedback/ (feedback.module, controller, service, dto/)
+Register FeedbackModule in app.module.ts; export FeedbackService for AdminModule.
+Swagger: tag group `feedback`.
+
+Public submit:
+- POST /feedback â€” @Public() with optional JWT (JwtAuthGuard allows missing/invalid token)
+- Validate: message min 10 / max 5000 chars; guest MUST provide name + email
+- Returns { success, data, message: "Thank you for your feedback!" }
+
+Admin inbox (ADMIN + STAFF via @Roles):
+- GET /admin/feedback â€” paginated list; search name/email/subject/message;
+  filters: status, category, source, dateFrom, dateTo
+- GET /admin/feedback/:id â€” detail with linked user (if user_id set)
+- PATCH /admin/feedback/:id â€” update status and/or adminNote only (no email reply v1)
+
+PRISMA:
+- enums FeedbackCategory, FeedbackSource, FeedbackStatus
+- model Feedback mapped to `feedback` table
+- Migration: apps/api/prisma/migrations/*_add_feedback/
+
+====================================================
+GPS VALIDATION
+====================================================
+
+Backend MUST:
+- validate coordinates server-side
+- validate sequence
+- validate radius
+- prevent cheating
+- reject spoofing attempts
+
+Implement:
+- speed validation
+- cooldowns
+- anti-spam
+- throttling
+
+====================================================
+REDIS REQUIREMENTS
+====================================================
+
+Use Redis for:
+- cache
+- sessions
+- websocket scaling
+- queues
+- rate limiting
+
+====================================================
+QUEUE REQUIREMENTS
+====================================================
+
+Use BullMQ.
+
+Queues:
+- notifications
+- analytics
+- image processing
+- cleanup
+
+====================================================
+WEBSOCKET REQUIREMENTS
+====================================================
+
+Events:
+- event_progress_updated
+- place_unlocked
+- event_completed
+- admin_live_analytics
+
+====================================================
+FILE UPLOAD REQUIREMENTS
+====================================================
+
+Implement:
+- local uploads stored in apps/api/uploads (NOT inside dist/ build output)
+- public GET /uploads/:filename for image serving
+- Cross-Origin-Resource-Policy: cross-origin (Helmet) for cross-port dashboard preview
+- Dashboard proxies /uploads/* to API via Next.js rewrites (same-origin preview)
+- signed URLs / S3-R2 compatibility (optional production path)
+- JPEG, PNG, WebP; max 5 MB per file
+
+====================================================
+LOCAL DEVELOPMENT (WINDOWS-NATIVE)
+====================================================
+
+The platform MUST run without Docker for local development:
+- PostgreSQL installed natively (e.g. winget)
+- Redis OPTIONAL (REDIS_DISABLED=true uses in-memory cache fallback)
+- PostGIS OPTIONAL (haversine fallback in API)
+- scripts/setup-windows.cmd, scripts/manual-test.ps1 for smoke tests
+- pnpm dev:api (port 3001), pnpm dev:dashboard (port 3000)
+
+Docker remains optional for production-like environments.
+
+====================================================
+SWAGGER REQUIREMENTS
+====================================================
+
+Generate:
+- /docs endpoint
+
+====================================================
+BACKEND TESTING
+====================================================
+
+Generate:
+- unit tests
+- integration tests
+- e2e tests
+
+Use:
+- Jest
+- Supertest
+
+====================================================
+SEED REQUIREMENTS
+====================================================
+
+Generate:
+- realistic events
+- realistic places
+- realistic questions (event-linked)
+- community practice questions (COMMUNITY source, is_published=true)
+- sample user_practice_completions
+- sample user_favorite_events / user_favorite_questions
+- admin account
+- demo users
+
+Generate scripts:
+- seed db
+- reset db
+- create admin
+
+====================================================
+ADMIN DASHBOARD REQUIREMENTS
+====================================================
+
+====================================================
+DASHBOARD STACK
+====================================================
+
+Use:
+- Next.js 15+
+- React 19
+- TypeScript
+- App Router
+- shadcn/ui
+- TailwindCSS
+- TanStack Query
+- TanStack Table
+- Zustand
+- React Hook Form
+- Zod
+- Recharts
+
+====================================================
+DASHBOARD STRUCTURE
+====================================================
+
+apps/dashboard/src/
+
+Generate:
+
+src/
+â”œâ”€â”€ app/
+â”œâ”€â”€ components/
+â”œâ”€â”€ features/
+â”œâ”€â”€ hooks/
+â”œâ”€â”€ services/
+â”œâ”€â”€ store/
+â”œâ”€â”€ lib/
+â”œâ”€â”€ types/
+â””â”€â”€ styles/
+
+====================================================
+DASHBOARD FEATURES
+====================================================
+
+NAVIGATION (sidebar)
+- Overview
+- Events
+- Questions (question bank â€” list, search, create, edit, delete)
+- Practice (community practice questions â€” moderation)
+- Feedback (user messages inbox â€” see Â§20)
+- Users
+- Analytics
+
+AUTH
+- admin login
+- session persistence
+- protected routes
+
+EVENT MANAGEMENT
+- create/edit/delete events
+- upload cover images
+- publish/unpublish
+- edit event page shows FULL hunt data (all stops visible)
+
+PLACE MANAGEMENT (primary event-edit workflow)
+- map picker showing ALL places at once
+- per-place card: title, description, order_index, lat/lng, radius, hint
+- drag-drop ordering (optional enhancement)
+- coordinate editing
+
+QUESTION MANAGEMENT
+- global Questions page: CRUD for reusable question bank
+- per-place on event edit:
+  - inline question preview (type, points, answer, image preview for IMAGE)
+  - "Add Question" dialog â€” creates question, links to event, assigns to place
+  - pick existing question from library dropdown
+  - edit question in dialog
+  - remove question from place (clear question_id)
+- question types: TEXT, MULTIPLE_CHOICE, TRUE_FALSE, IMAGE
+- image upload in question form with live preview
+
+PRACTICE QUESTION MANAGEMENT (community pool)
+- Route: /dashboard/practice, /dashboard/practice/new, /dashboard/practice/[id]
+- List COMMUNITY practice questions (search, published filter, pagination)
+- Publish / unpublish (controls Practice pool visibility on mobile)
+- Edit / delete community questions; view completion and favorite counts
+- Create admin-seeded practice questions
+- Keep /dashboard/questions for event-linked question bank (do not merge workflows)
+
+FEEDBACK INBOX (user messages)
+- Route: /dashboard/feedback, /dashboard/feedback/[id]
+- Sidebar nav item: "Feedback"
+- List: search (name, email, subject, message), filters (status, category, source,
+  date from/to), pagination (same pattern as Practice / Users pages)
+- Detail: read full message; update status (NEW | READ | RESOLVED | ARCHIVED);
+  internal admin note (not sent to user)
+- RBAC: ADMIN + STAFF (read/update); no staff reply-to-user or email thread in v1
+
+USER MANAGEMENT
+- user table
+- progress tracking
+- deactivate users
+
+ANALYTICS
+- active users
+- completion charts
+- engagement charts
+- heatmaps (optional enhancement)
+- practice completions trend (7d) â€” extend /dashboard/analytics
+- top practiced questions â€” extend /dashboard/analytics
+- community questions created (user vs admin) â€” extend /dashboard/analytics
+
+====================================================
+DASHBOARD UI REQUIREMENTS
+====================================================
+
+Generate:
+- modern SaaS UI
+- dark mode
+- responsive layout
+- skeleton loaders
+- toast notifications
+
+====================================================
+FORM REQUIREMENTS
+====================================================
+
+Use:
+- React Hook Form
+- Zod validation
+
+====================================================
+CHART REQUIREMENTS
+====================================================
+
+Use Recharts.
+
+Generate:
+- completion charts
+- engagement charts
+- activity charts
+
+====================================================
+MAP REQUIREMENTS
+====================================================
+
+Generate:
+- interactive map
+- radius overlays
+- route visualization
+- marker management
+
+====================================================
+SECURITY REQUIREMENTS
+====================================================
+
+Implement:
+- Helmet
+- CORS
+- CSRF
+- rate limiting
+- secure cookies
+- sanitization
+
+====================================================
+PERFORMANCE REQUIREMENTS
+====================================================
+
+Implement:
+- Redis caching
+- pagination
+- DB indexing
+- optimized queries
+- image optimization
+- lazy loading
+
+====================================================
+DOCKER REQUIREMENTS
+====================================================
+
+Generate:
+- Dockerfiles
+- docker-compose.yml
+
+Services:
+- mobile metro config
+- api
+- postgres
+- redis
+- dashboard
+
+====================================================
+CI/CD REQUIREMENTS
+====================================================
+
+Generate GitHub Actions workflows:
+- lint
+- test
+- build
+- docker build
+
+====================================================
+ENVIRONMENT VARIABLES
+====================================================
+
+Generate:
+.env.example
+
+Include:
+
+DATABASE_URL=
+REDIS_URL=
+REDIS_DISABLED=true
+JWT_SECRET=
+JWT_REFRESH_SECRET=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+S3_BUCKET=
+NEXT_PUBLIC_API_URL=
+USE_MOCK_API=
+GOOGLE_MAPS_API_KEY=
+
+====================================================
+README REQUIREMENTS
+====================================================
+
+Generate COMPLETE documentation.
+
+Include:
+- architecture overview
+- mobile setup
+- Android setup
+- iOS setup
+- backend setup
+- dashboard setup
+- docker setup
+- production deployment
+- environment variables
+- testing
+- Prisma commands
+- troubleshooting
+- scaling recommendations
+
+====================================================
+IMPLEMENTATION RULES
+====================================================
+
+CRITICAL:
+- DO NOT leave TODOs
+- DO NOT generate pseudo code
+- DO NOT omit files
+- DO NOT simplify architecture
+- EVERYTHING must compile
+- EVERYTHING must run
+- Use strict TypeScript
+- Generate production-quality code
+- Generate reusable architecture
+- Generate proper logging
+- Generate proper validation
+- Generate enterprise-grade patterns
+- Follow best practices
+- Follow clean architecture
+- Follow scalable modular design
+
+====================================================
+DELIVERED SCOPE & USER-REQUESTED UPDATES
+====================================================
+
+This section records requirements clarified and implemented during dashboard/API
+development (mobile app remains a separate project).
+
+1. PLATFORM SCOPE (initial)
+   - Monorepo: NestJS API + Next.js admin dashboard + shared packages.
+   - Mobile app in separate project; API at http://localhost:3001.
+   - Windows-native local dev without Docker (Postgres required; Redis optional).
+
+2. QUESTION BANK + EVENT/PLACE MODEL
+   - Questions are standalone entities in a reusable bank.
+   - event_questions links questions to events (many-to-many).
+   - Each place has one question via question_id.
+   - Gameplay: ordered places â†’ unlock â†’ answer â†’ next place (mobile/API only).
+
+3. IMAGE QUESTIONS
+   - QuestionType.IMAGE with image_url field.
+   - Admin uploads via POST /uploads; preview on dashboard.
+   - Public/player APIs return image_url but hide answer.
+
+4. ADMIN QUESTIONS PAGE
+   - Sidebar menu item "Questions".
+   - Routes: /dashboard/questions, /dashboard/questions/new, /dashboard/questions/[id].
+   - List, search, create, edit, delete; show which events use each question.
+
+5. EVENT EDIT â€” PLACE-FIRST UI
+   - Removed separate "Event Questions pool" as primary UX.
+   - Each place card: full location data + inline question editor.
+   - "Add Question" dialog: create question, auto-link to event, assign to place.
+   - Option to pick existing question from library.
+   - Admin sees ALL stops and questions (no linear unlock on dashboard).
+
+6. LINEAR UNLOCK SPLIT
+   - Admin dashboard: configure complete event data; show everything.
+   - Mobile app: sequential unlock via POST /places/:id/unlock, progress API, nextPlaceId.
+
+7. UPLOAD / IMAGE SERVING
+   - Uploads directory: apps/api/uploads (shared constant, not dist/uploads).
+   - GET /uploads/:filename public endpoint.
+   - Helmet CORP cross-origin; Next.js rewrite /uploads â†’ API for dashboard preview.
+
+8. MANUAL TESTING
+   - scripts/manual-test.ps1 â€” API + dashboard smoke tests.
+   - Seed: admin@marvira.com / admin123, demo@marvira.com / demo123.
+
+9. OUT OF SCOPE FOR CURRENT DASHBOARD/API DELIVERY
+   - React Native mobile app (separate repo).
+   - Docker required for local dev (optional only).
+   - PostGIS required for local dev (optional; haversine fallback).
+
+10. MOBILE APP â†” API INTEGRATION (separate marvira_mobile project)
+   - Mobile uses real REST API (USE_MOCK_DATA=false); no client-side startEvent.
+   - Progress begins on first POST /places/:id/unlock at place order_index 0.
+   - Flow per place: unlock (GPS) â†’ GET question â†’ POST answer (GPS) â†’ nextPlaceId.
+   - Event status derived client-side: no progress = not_started; completed flag = completed;
+     else in_progress.
+   - JWT refresh interceptor; tokens in react-native-keychain (release).
+   - QuestionRenderer supports TEXT, MULTIPLE_CHOICE, TRUE_FALSE, IMAGE.
+
+11. GAMEPLAY TIMING & LEADERBOARDS (server-authoritative)
+   - user_place_completion.unlocked_at â€” set on first GPS unlock at that place.
+   - user_place_completion.answer_duration_ms â€” ms from unlock to first CORRECT answer
+     (wrong attempts do not reset the timer).
+   - user_event_progress.total_duration_ms â€” ms from first unlock (started_at) to event
+     completion (last place answered correctly).
+   - POST /places/:id/answer returns answerDurationMs; eventTotalDurationMs when done.
+   - GET /events/:id/leaderboard for public ranking (score, then fastest time).
+   - Mobile completion screen shows total time and points; profile completed-events include
+     totalDurationMs.
+
+12. ADMIN â€” EVENT PARTICIPANTS PAGE
+   - Route: /dashboard/events/[id]/participants
+   - From Events list: click event row (or Participants action) to open participant list.
+   - Shows ALL users who joined the event (any user_event_progress row for that event).
+   - Columns: name, email, status (in progress / completed), score, places progress,
+     started at, completed at, total duration.
+   - Search: filter by user name or email (case-insensitive).
+   - Sort: fastest finish (completed + totalDurationMs ASC), slowest, highest score,
+     recently started, name Aâ€“Z.
+   - Paginated table consistent with Users / Events admin pages.
+   - API: GET /admin/events/:id/participants?page&pageSize&search&sortBy
+
+13. MOBILE â€” LEADERBOARDS (event + global)
+   - Per-event leaderboard screen reachable from Event Details and Event Completion.
+   - Global (all-gameplay) leaderboard screen reachable from Profile (and optionally Home).
+   - API â€” event (existing, enriched response):
+     GET /events/:id/leaderboard?limit=50
+     Returns { event: { id, title, city }, entries: EventLeaderboardEntry[] }
+     Ranking: highest score first, then fastest totalDurationMs (completed players only).
+   - API â€” global (new):
+     GET /leaderboard/global?limit=50
+     Returns { entries: GlobalLeaderboardEntry[] }
+     Ranking: total score across all completed events DESC, then events completed DESC,
+     then average totalDurationMs ASC.
+   - GlobalLeaderboardEntry: rank, userId, userName, totalScore, eventsCompleted,
+     avgDurationMs (nullable).
+   - Mobile UI: ranked list with rank badge, player name, score, time; highlight current
+     user row when authenticated.
+   - Pull-to-refresh on both leaderboard screens.
+   - No automated unit tests required for mobile or dashboard (explicit project decision).
+
+14. MOBILE â€” USER EVENT CREATION (wizard â€” Option A)
+   - Authenticated users (role USER or ADMIN) can create location-based hunt events from the
+     mobile app; creators manage only events they created (createdBy), except ADMIN.
+   - API (user-facing, JWT required):
+     GET /events/mine â€” paginated list of events created by the current user (draft + published)
+     POST /events â€” create event draft (isActive: false); optional joinPassword
+     PATCH /events/:id â€” update/publish own event (isActive: true requires all places have questions);
+       optional joinPassword to set/clear private access
+     POST /events/:id/join â€” verify password and grant play access (see Â§15)
+     POST /places â€” add place to own event
+     PATCH /places/:id â€” update place on own event (e.g. assign questionId)
+     POST /questions â€” create question for event-creation flow
+     POST /events/:eventId/questions â€” link question to own event
+   - Wizard flow (Home stack):
+     Step 1 â€” Event info: title, description, city, difficulty, reward points â†’ POST /events
+     Step 2 â€” Place + question (repeat): map pin picker (tap, drag, use my location), place
+       title/description/radius, question form (TEXT, TRUE_FALSE, MULTIPLE_CHOICE) â†’ question +
+       link + place APIs; CTAs: "Add another place" / "This is the last place"
+     Step 3 â€” Review: map with all pins, place list, validation checklist, Access section
+       (public vs password-required; password + confirm when private) â†’ Publish or keep draft;
+       joinPassword sent on PATCH when publishing (or on draft save if creator sets access early)
+     Step 4 â€” Success: confirmation with links to My Events and event details; if private, show
+       one-time password reminder with copy/share actions (password not shown again on server)
+   - Entry points: FAB "+" on Events List; "My Events" link on Profile
+   - My Events screen (Profile stack): list user's created events with draft/published badge,
+     place count, lock icon when password-protected, pull-to-refresh; tap opens Event Details
+     (owner can view draft events and always has play access)
+   - i18n: all create-event and my-events UI strings in vi/en/zh/ja locale files
+
+15. MOBILE â€” PASSWORD-PROTECTED EVENTS (private hunts)
+   - Creators (mobile wizard Step 3 â€” Review) choose access:
+     * Public â€” anyone can discover and play (join_password_hash null).
+     * Password required â€” player must enter the shared password once to play.
+   - Create/update API: optional joinPassword on POST /events and PATCH /events/:id; empty string
+     or explicit null clears protection. Server stores bcrypt hash only (reuse auth password hasher).
+   - Validation: min password length 4; confirm must match when setting on publish; creator-only.
+   - Discovery UX: private events remain visible in Events list / nearby with lock badge on EventCard
+     ("Invite only" or equivalent); not hidden from browse â€” only gameplay is gated.
+   - Event Details (player, !hasAccess): show marketing info (title, description, city, difficulty,
+     place count); hide map pins, coordinates, and place cards; primary CTA opens password bottom
+     sheet (single field, show/hide toggle, submit on Done).
+   - Join flow: POST /events/:id/join â†’ on success dismiss sheet, invalidate event queries, reveal
+     full details; on 403 show inline error; rate-limited after repeated failures.
+   - Gameplay enforcement: ProgressService (unlock, answer, get question) MUST call shared
+     assertCanPlay(userId, event) â€” client UI alone is insufficient.
+   - Returning players: user_event_access persists; no re-prompt unless creator changes password
+     (changing password SHOULD invalidate existing user_event_access rows except creator).
+   - Success screen: copy password + share invite message for creator.
+   - Phase 2 (optional): owner edit/remove password from My Events event detail.
+   - shared-types: Event adds isPasswordProtected; authenticated detail adds hasAccess.
+   - i18n keys: createEvent.access.*, events.join.*, events.passwordProtected.* in vi/en/zh/ja.
+   - Manual tests: docs/MANUAL_TEST_CASES.md â€” create private event, wrong password, join success,
+     play after join, creator bypass, list badge, places redacted before join.
+   - Implementation status: PENDING (DB migration, API, mobile create/join UI, gameplay enforcement)
+
+16. MOBILE â€” INTERNATIONALIZATION (i18n)
+   - Languages: Vietnamese (default), English, Chinese (Simplified), Japanese.
+   - Stack: i18next + react-i18next; persistence via AsyncStorage.
+   - Files: src/i18n/index.ts, src/i18n/locales/{vi,en,zh,ja}.json, I18nProvider.
+   - Settings: Profile â†’ Settings screen; user picks language; choice saved and restored
+     on next app launch.
+   - All client UI strings translated (nav, auth, buttons, alerts, validation, filters,
+     empty states, leaderboards, profile, offline banner, error boundary, practice,
+     favorites, my questions, settings, feedback, create-event / my-events, password-protected events / join).
+   - Server content (event/place/question text from API) is NOT translated client-side.
+   - TRUE_FALSE: display localized labels; submit "True"/"False" to API unchanged.
+   - Navigation titles and tab labels update when language changes.
+
+17. PRACTICE & FAVORITES (full-stack)
+   - Mobile: 4-tab nav (Events | Practice | Favorites | Profile); Practice sub-tabs
+     To Practice / Completed; Favorites sub-tabs Events / Questions; Profile â†’ My Questions.
+   - Training: no GPS; wrong answers retry; completion independent of event gameplay.
+   - Favorites: instant add; unfavorite confirmation bottom sheet.
+   - Database: QuestionSource enum; questions.created_by, source, is_published;
+     user_practice_completions, user_favorite_events, user_favorite_questions.
+   - API: /practice/*, /favorites/*, /admin/practice/* (see BACKEND API ENDPOINTS).
+   - Dashboard: /dashboard/practice list + CRUD; sidebar "Practice" nav item.
+   - Seed: sample COMMUNITY practice questions + sample favorites/completions.
+   - Mobile uses real API when USE_MOCK_DATA=false (marvira_mobile).
+   - Implementation status:
+     * Mobile UI + API client: IMPLEMENTED
+     * Prisma schema + migration + seed: IMPLEMENTED
+     * NestJS practice + favorites modules: IMPLEMENTED
+     * Dashboard practice pages: IMPLEMENTED
+     * Analytics practice widgets on /dashboard/analytics: see Â§18.7
+     * Backend unit/integration tests for practice: see Â§18.8
+   - Full implementation order: DB â†’ API â†’ shared-types â†’ mobile wire-up â†’ dashboard â†’ analytics widgets â†’ tests.
+
+18. HARDENING & QUALITY (code review follow-up â€” 2026-07-05)
+   Priority fixes identified during full-stack review of gameplay, dashboard, and mobile.
+
+   18.1 GAMEPLAY â€” IDEMPOTENT ANSWER SUBMISSION (P0)
+   - POST /places/:id/answer MUST NOT re-score or mutate progress when:
+     * user_event_progress.completed is true for the event, OR
+     * user_place_completion.completed is true for that place.
+   - Completed-event replay: return 403 Forbidden with clear message.
+   - Already-completed place replay: return 200 with idempotent payload (correct: true,
+     points: 0, totalScore: current cumulative score, no DB writes).
+   - POST /places/:id/unlock MUST reject when event is already completed (403).
+   - E2E test: complete event, then attempt re-answer on earlier place â†’ 403 or idempotent.
+   - Unit tests: ProgressService scoring, completion, replay rejection.
+
+   18.2 GAMEPLAY â€” CUMULATIVE SCORE ON COMPLETION (P0)
+   - AnswerPlaceResponse adds totalScore: number â€” cumulative event score after this answer.
+   - On eventCompleted, totalScore MUST equal user_event_progress.score (not last-answer
+     points + reward only).
+   - Mobile EventCompletion screen MUST display totalScore (not response.points alone).
+   - shared-types + mobile ApiAnswerResponse / AnswerResponse updated.
+
+   18.3 GAMEPLAY â€” GPS UNLOCK VS SEQUENCE ACCESS (P0)
+   - Place list API separates semantics:
+     * accessible â€” player may attempt this place in linear order (index <= currentPlaceIndex
+       or first place before progress exists).
+     * unlocked â€” GPS unlock succeeded (user_place_completion.unlocked_at IS NOT NULL).
+   - GET /places/:id/question requires GPS unlock (unlocked_at), not merely accessible.
+   - Mobile maps unlocked â†’ isUnlocked; does NOT pre-fetch question until POST /unlock succeeds.
+   - Mobile MUST NOT initialize isUnlocked from accessible alone.
+
+   18.4 DASHBOARD â€” QUERY ERROR STATES (P1)
+   - All dashboard data pages using TanStack Query MUST handle isError:
+     show user-visible error message + Retry button (not blank tables/charts).
+   - Shared QueryState (or equivalent) component: loading â†’ Skeleton, error â†’ Alert + retry,
+     empty â†’ empty state, success â†’ children.
+   - Apply at minimum to /dashboard, /dashboard/analytics, list pages (events, users, questions).
+
+   18.5 DASHBOARD â€” SERVER-SIDE ROUTE PROTECTION (P1)
+   - Next.js middleware.ts guards /dashboard/* before HTML render.
+   - Auth session cookie (e.g. marvira-auth=1) set on successful login, cleared on logout.
+   - Unauthenticated requests to /dashboard/* redirect to /login.
+   - Complements existing client-side DashboardLayout guard (BUG-008).
+
+   18.6 DASHBOARD â€” PRODUCTION LOGIN SAFETY (P1)
+   - Login form MUST NOT pre-fill admin@marvira.com / admin123 outside development.
+   - Gate defaultValues with NODE_ENV === 'development' only.
+   - Logout MUST explicitly router.replace('/login') after clearing session.
+   - Login page: reject non-ADMIN role before navigating to /dashboard (inline error).
+
+   18.7 DASHBOARD â€” PRACTICE ANALYTICS WIDGETS (P2 â€” closes BUG-009)
+   - /dashboard/analytics MUST call GET /admin/practice/stats and display:
+     * Community questions total / published count
+     * Practice completions (7-day and 30-day)
+     * Top practiced questions (ranked list or bar chart)
+   - Use same QueryState error/loading pattern as other analytics cards.
+
+   18.8 AUTOMATED TEST COVERAGE (P1)
+   - API unit: progress.service.spec.ts â€” scoring, idempotent replay, completion guards.
+   - API e2e: gameplay replay-after-completion scenario in gameplay.e2e-spec.ts.
+   - Mobile: unit tests for place unlock mapping (accessible vs gpsUnlocked).
+   - Dashboard: vitest or Playwright smoke â€” login redirect, analytics error state (phase 2
+     acceptable if vitest + one api/auth-store test added in first pass).
+   - Update docs/BUGS.md when BUG-009, BUG-005, BUG-011 items are addressed.
+
+   Implementation status (section 18):
+     * 18.1â€“18.3 API + mobile: IN PROGRESS
+     * 18.4â€“18.7 Dashboard: IN PROGRESS
+     * 18.8 Tests: IN PROGRESS
+
+19. PUBLIC MARKETING WEBSITE (consumer site â€” separate from admin dashboard)
+   Purpose: Public marketing site for players and hunt creators (not admin staff).
+   Position as GPS scavenger-hunt / city exploration + community quiz.
+   Copy themes: adventure, hunt, explore, discovery â€” not gambling/sportsbook.
+   Location in monorepo: apps/marketing (@marvira/marketing) under marvira_dashboard_api
+   (or equivalent Turborepo apps/marketing). Deploy as www.*; keep admin and API separate.
+
+   19.1 STACK & SCAFFOLD
+   - Next.js 15+ App Router + React 19 + TypeScript + TailwindCSS (aligned with dashboard).
+   - Dev: pnpm --filter @marvira/marketing dev â†’ http://localhost:3002
+   - Docker: docker/marketing.Dockerfile
+   - Env: NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_APP_STORE_URL, NEXT_PUBLIC_PLAY_STORE_URL,
+     NEXT_PUBLIC_API_URL (for /support feedback form POST /feedback)
+     (placeholders until stores are live).
+   - globals.css MUST include Tailwind directives (@tailwind base/components/utilities)
+     so utility classes (layout, z-index, typography) ship in production CSS. Without
+     them, fill hero images cover the page and copy/CTAs appear missing.
+   - package.json prestart: `next build` before `next start` to avoid stale CSS hashes.
+   - Brand direction distinct from admin purple UI: city adventure / outdoor explore.
+     CSS variables (--ink, --mist, --fog, --forest, --canopy, --sun, --trail) + brand notes.
+     Display + body fonts (not Inter/Roboto/system-only default stack).
+
+   19.2 PAGE MAP (required routes)
+   - /                 Home + store CTAs
+   - /how-it-works     Player flow (3â€“4 steps: find hunt â†’ walk â†’ answer â†’ leaderboard)
+   - /create           For organizers (value props + waitlist)
+   - /download         Store badges + QR + deep-link notes
+   - /explore          Explore listing â€” Admin/Staff articles (renamed from /hunts; see Â§21)
+   - /press            Press / partner one-pager
+   - /support          FAQ + guest feedback form (wired to POST /feedback)
+   - /e/{id}           Public event invite / social share page
+   - /privacy          Privacy Policy
+   - /terms            Terms of Service
+   - /sitemap.xml + /robots.txt
+
+   19.3 HOME (/)
+   - Brand as hero-level signal (not nav-only).
+   - One headline + one short supporting sentence.
+   - App Store / Play Store CTAs (or Get the app / How it works when stores not ready).
+   - One dominant real-world hunt / adventure visual (full-bleed).
+   - First viewport lean: no stats strip, feature cards, or secondary promos.
+
+   19.4 DOWNLOAD (/download)
+   - Store badges; QR codes for install (must encode real store/download URLs â€” not
+     decorative placeholder grids only).
+   - Deep-link hooks when apps are live; fallback copy when stores are not ready yet.
+
+   19.5 LEGAL (/privacy, /terms)
+   - Draft Privacy Policy + Terms with Marvira-specific clauses (location/GPS, gameplay,
+     public invite pages never expose answers/GPS spoilers/private participants).
+   - Counsel note: final legal review required before go-live.
+
+   19.6 ORGANIZERS (/create)
+   - Why create a hunt: events/teams, tourism/venues, schools.
+   - CTA: creator waitlist / contact form + download-to-create.
+   - Form fields: name, email, org (optional), use case; success message.
+   - Client form OK for MVP; MUST wire to email/CRM before go-live.
+
+   19.7 FEATURED HUNTS (/hunts) + EVENT INVITES (/e/{id})
+   - NOTE: /hunts is SUPERSEDED by the Explore article CMS (route renamed /hunts â†’ /explore;
+     dynamic Admin/Staff articles instead of a static featured pack) â€” see Â§21. The /e/{id}
+     event invite pages below remain as described.
+   - Static featured pack from seed events (e.g. Downtown Discovery Hunt, Golden Gate
+     Adventure): title, blurb, city, difficulty, distinct cover images per hunt.
+   - Switch to live public API later (fields: id/slug, title, description, city, dates,
+     cover image, public vs invite-only â€” no spoilers/answers).
+   - Share URL /e/{id}: open app if installed (marvira://e/{id}), else store / download.
+   - Per-event share pack: social title, OG description, long-form invite body, when/where/
+     how to join, Join + Download CTAs.
+   - Public leaderboard copy for empty / live / ended states (wire scores when public API
+     exists). Never expose answers, exact GPS spoilers, or private participant data.
+
+   19.8 PRESS (/press) + SUPPORT (/support)
+   - â€œWhat is Marviraâ€ one-pager + boilerplate for cities, venues, schools, organizers.
+   - Optional PDF outline / downloadable asset brief.
+   - FAQ: common player + organizer questions.
+   - Guest feedback form below FAQ (name, email, category, subject optional, message).
+   - POST to API /feedback with source WEB; EN + VI copy in content packs (support.form).
+   - Optional future: email capture for launch-city / new hunt alerts (wire to email/CRM).
+
+   19.9 SEO & LOCALIZATION
+   - Page titles + meta descriptions for all public routes.
+   - Open Graph / Twitter share titles, descriptions, images.
+   - Keywords: scavenger hunt app, GPS scavenger hunt, city exploration, etc.
+   - Locales: EN + VI at launch (content packs under apps/marketing/src/content/).
+     Align tone with app locales (en, vi, zh, ja) where useful; expand zh/ja later (optional).
+   - Locale switching MUST preserve lang on in-page CTAs/nav (e.g. ?lang=vi), set
+     <html lang> appropriately, and keep cookie/query locale consistent.
+   - Legal page bodies SHOULD be localized when locale packs exist (not titles-only).
+
+   19.10 UX / QUALITY (marketing site)
+   - Mobile: primary nav reachable on small screens (not desktop-only hidden nav).
+   - Out of scope on marketing site: admin dashboard features, login as main CTA
+     (store install first), dense product tour of every screen.
+   - Optional growth (Phase 4): blog/guides, case studies, additional locales.
+
+   19.11 CONTENT DELIVERY
+   - Prefer one content pack per locale (e.g. en.ts, vi.ts) + events.ts for demos.
+   - Event invite pages: static draft OK for demos; live API for production events.
+   - Before go-live: set store URLs, wire /create waitlist to email/CRM, counsel legal review,
+     connect /e/{id} to live public API when available.
+   - Feedback form on /support: wired to API (see Â§20); requires NEXT_PUBLIC_API_URL on build.
+
+   Implementation status (section 19):
+     * 19.1â€“19.11 Phase 1â€“3 MVP + content packs: IMPLEMENTED (apps/marketing)
+     * /support guest feedback form â†’ POST /feedback: IMPLEMENTED (see Â§20)
+     * Tailwind globals directives + prestart rebuild: REQUIRED (production CSS must include utilities)
+     * Phase 4 growth content (blog / case studies / zh+ja): OPTIONAL / NOT STARTED
+     * Go-live stubs remaining: real store URLs, real QR encoding, /create formâ†’CRM, live /e API
+
+20. FEEDBACK INBOX (full-stack â€” user messages)
+   Purpose: One-way feedback from website visitors and app users â†’ staff/admin inbox.
+   Not a ticket/chat system in v1 (no staff reply email, no attachments, no SLA fields).
+
+   20.1 SCOPE (v1 â€” IMPLEMENTED)
+   - Guest feedback on marketing /support (name + email required)
+   - Authenticated feedback in mobile app (Profile â†’ Settings â†’ Send feedback)
+   - Admin/staff inbox on dashboard with search + filters
+   - Categories: FEEDBACK, SUGGESTION, BUG, OTHER
+   - Status workflow: NEW â†’ READ â†’ RESOLVED â†’ ARCHIVED
+   - Internal admin note on detail page (staff-only, not visible to user)
+
+   20.2 OUT OF SCOPE (v1 â€” defer)
+   - Staff reply that emails the user
+   - Attachments / screenshots
+   - Real-time notifications to staff (Socket/BullMQ email)
+   - User-facing ticket history or reply thread
+
+   20.3 DATABASE
+   - Prisma model Feedback + enums FeedbackCategory, FeedbackSource, FeedbackStatus
+   - user_id nullable (guest website submissions); ON DELETE SET NULL
+   - Migration: 20260720140000_add_feedback (or equivalent)
+
+   20.4 API (apps/api/src/feedback/)
+   - POST /feedback â€” public; optional JWT; source WEB or MOBILE; throttled
+   - GET /admin/feedback â€” paginated + search + filters (status, category, source, dates)
+   - GET /admin/feedback/:id â€” detail
+   - PATCH /admin/feedback/:id â€” status + adminNote
+   - RBAC: ADMIN + STAFF on admin routes
+
+   20.5 SHARED TYPES (packages/shared-types)
+   - FeedbackCategory, FeedbackSource, FeedbackStatus enums
+   - FeedbackItem, SubmitFeedbackDto, UpdateFeedbackDto
+
+   20.6 MARKETING SITE (apps/marketing)
+   - /support: FAQ + guest feedback form below FAQs
+   - Form fields: name, email, category, subject (optional), message
+   - POST to NEXT_PUBLIC_API_URL/feedback with source WEB
+   - EN + VI copy in content packs (support.form); success/error states
+   - Env: NEXT_PUBLIC_API_URL must point to API (e.g. http://localhost:3001)
+
+   20.7 MOBILE (marvira_mobile)
+   - src/api/feedback.ts â€” submit via POST /feedback (source MOBILE)
+   - src/screens/settings/FeedbackScreen.tsx
+   - ProfileNavigator: Settings + Feedback routes
+   - SettingsScreen: "Send feedback" menu item
+   - i18n: feedback.* keys in vi, en, zh, ja
+
+   20.8 DASHBOARD (apps/dashboard)
+   - /dashboard/feedback â€” inbox table + filters + pagination
+   - /dashboard/feedback/[id] â€” message detail + status/admin note editor
+   - Sidebar: Feedback nav item (MessageSquareText icon)
+   - TanStack Query + buildQuery + debounced search (same pattern as Practice/Users)
+
+   20.9 OPERATIONS NOTE (marketing CSS)
+   - Do NOT run `next dev` and `next start` simultaneously on apps/marketing â€” they
+     share .next and port 3002; mixed artifacts cause missing CSS (homepage shows image only).
+   - Use `pnpm dev` for development OR `pnpm start` (with prestart rebuild) for prod preview.
+   - globals.css MUST keep @tailwind base/components/utilities (see Â§19.1).
+
+   Implementation status (section 20):
+     * Prisma schema + migration: IMPLEMENTED
+     * API feedback module + admin routes: IMPLEMENTED
+     * shared-types: IMPLEMENTED
+     * Marketing /support form: IMPLEMENTED
+     * Mobile FeedbackScreen + API client: IMPLEMENTED
+     * Dashboard inbox + detail + sidebar: IMPLEMENTED
+     * Staff email reply / notifications: NOT STARTED (v2)
+
+21. ARTICLES / EXPLORE â€” MARKETING CONTENT (full-stack; public "Hunts" renamed to "Explore")
+   Purpose: Admin/Staff author marketing "articles" in the dashboard to promote events and
+   places; published articles power the public Explore page (renamed from Hunts). Articles are
+   EDITORIAL content DECOUPLED from gameplay â€” an article MAY optionally link to a gameplay event
+   for a "Play" CTA, but is not required to. Shareable to social networks (OG/Twitter cards).
+
+   21.1 SCOPE
+   - New Article CMS entity (not tied 1:1 to events); optional event link for Play CTA.
+   - Public Explore listing with search (title, place, city) + numbered pagination.
+   - Article detail page: markdown body, SEO/OG metadata, prev/next article navigation.
+   - Dashboard CRUD (Admin/Staff): cover image upload, status draft/published, optional event link.
+   - Renamed public "Hunts" â†’ "Explore"; route /hunts â†’ /explore (list + /explore/[slug]).
+
+   21.2 DATABASE
+   - Prisma model Article + enum ArticleStatus { DRAFT, PUBLISHED }.
+   - Fields: id, title, slug (unique), place_name, city (nullable), excerpt, body (markdown),
+     cover_image (nullable), status, published_at (nullable), event_id (nullable FK â†’ events
+     ON DELETE SET NULL), created_by (FK users), created_at, updated_at.
+   - Indexes: status, slug, published_at, place_name, city.
+   - Migration: apps/api/prisma/migrations/*_add_articles.
+   - published_at stamped when status â†’ PUBLISHED; null for DRAFT.
+
+   21.3 API (apps/api/src/articles/)
+   - Public (@Public()):
+     GET /articles?search=&page=&pageSize= â€” PUBLISHED only; search title/placeName/city
+       (case-insensitive contains); ordered [published_at desc, id desc]; default pageSize 12.
+     GET /articles/:slug â€” PUBLISHED only; 404 for draft/missing; response includes prev/next
+       neighbor links ({ slug, title } | null) via indexed composite-cursor on published_at
+       (prev = newer article before it in the list; next = older one after it).
+   - Admin (@Roles(ADMIN, STAFF)) on AdminController:
+     GET /admin/articles?search=&page=&pageSize=&status= (all statuses);
+     GET /admin/articles/:id; POST /admin/articles; PATCH /admin/articles/:id;
+     DELETE /admin/articles/:id.
+   - Slug: slugify(title); ensure uniqueness with -2/-3 suffix; custom slug honored if provided.
+   - eventId validated as @IsString (Event.id is a String and MAY be non-UUID, e.g. seed ids);
+     existence validated in service (400 "Linked event not found"). MUST NOT use @IsUUID.
+
+   21.4 SHARED TYPES (packages/shared-types)
+   - ArticleStatus enum; Article (admin), PublicArticle, CreateArticleDto, UpdateArticleDto.
+
+   21.5 DASHBOARD (apps/dashboard)
+   - Sidebar "Articles" nav item (Newspaper icon).
+   - /dashboard/articles â€” list (search, status filter, DataTablePagination); row actions:
+     edit, delete, view public (NEXT_PUBLIC_MARKETING_URL/explore/:slug).
+   - /dashboard/articles/new + /dashboard/articles/[id] â€” ArticleForm (react-hook-form + Zod
+     articleSchema): title, slug, placeName, city, excerpt, body (markdown), cover upload
+     (reuse api.upload), optional event-link dropdown, status. Published copy: "visible on
+     Explore page".
+
+   21.6 MARKETING (apps/marketing)
+   - /explore â€” server component (force-dynamic); fetches PUBLISHED articles page-by-page
+     (PAGE_SIZE 24); ExploreSearch (debounced; deletes page param so new search resets to page 1);
+     numbered pagination (Previous / windowed page numbers with gaps / Next, "Page X of Y");
+     links preserve lang + search.
+   - /explore/[slug] â€” markdown body (react-markdown + remark-gfm); generateMetadata OG/Twitter
+     cards; "Back to Explore" link; prev/next article nav (preserves lang; placeholder span at
+     boundaries).
+   - Branded no-cover placeholder: apps/marketing/public/images/article-placeholder.png
+     (Marvira map/pin illustration) used on list cards, detail hero, and OG image when
+     coverImage empty (ARTICLE_PLACEHOLDER_IMAGE in lib/articles.ts).
+   - lib/articles.ts: fetchArticles, fetchArticleBySlug, resolveArticleImage (relative /uploads
+     â†’ API host, or NEXT_PUBLIC_CDN_URL when set).
+   - Nav + sitemap: /hunts â†’ /explore; sitemap includes seeded article slugs.
+   - Env: NEXT_PUBLIC_API_URL, NEXT_PUBLIC_CDN_URL (optional); next.config remotePatterns allow
+     the API/upload host (e.g. http://localhost:3001).
+
+   21.7 WORDING (public voice)
+   - "Article" = internal/dashboard CMS entity; "Explore" = public page name.
+   - Public Explore item-level copy NEUTRALIZED: "Back to Explore"; "Previous"/"Next";
+     "Nothing published yet"; "No results match your search" â€” NOT "hunt" (avoid conflating
+     editorial articles with gameplay hunts) and NOT internal jargon "article".
+   - "Hunt" RETAINED as the product/gameplay term everywhere else (home, SEO, how-it-works,
+     create, legal, event invites, dashboard Events) and in "Play this hunt in the app" CTA
+     (deep-links the linked gameplay event).
+   - Locales: EN + VI content packs updated (explore.*).
+
+   21.8 CORS / CONFIG
+   - API CORS_ORIGIN includes marketing origin (e.g. http://localhost:3002).
+   - Dashboard: NEXT_PUBLIC_MARKETING_URL for "view public article" links.
+
+   21.9 SEED
+   - Seed sample published articles (linked to seed events) for the Explore demo dataset.
+
+   21.10 SCALE NOTES
+   - Explore list/detail use LIMIT/OFFSET pagination; pageSize clamped to 100 (parsePagination).
+   - Non-search browse uses the published_at index (O(limit)); search uses ILIKE '%term%'
+     (sequential scan) â€” fine for expected hand-authored volumes; if scaling to 100k+ rows,
+     add a pg_trgm GIN index or full-text search (isolated migration, no app changes).
+
+   Implementation status (section 21):
+     * Prisma Article model + migration: IMPLEMENTED
+     * shared-types: IMPLEMENTED
+     * API public + admin endpoints (incl. prev/next neighbors): IMPLEMENTED
+     * Dashboard Articles list + create/edit form + sidebar: IMPLEMENTED
+     * Marketing /explore list + search + numbered pagination: IMPLEMENTED
+     * Marketing /explore/[slug] detail + markdown + OG + prev/next nav: IMPLEMENTED
+     * Hunts â†’ Explore rename (routes, nav, sitemap, wording): IMPLEMENTED
+     * Branded no-cover placeholder image: IMPLEMENTED
+     * eventId @IsString validation fix: IMPLEMENTED
+     * Seed articles: IMPLEMENTED
+
+====================================================
+EXPECTED OUTPUT
+====================================================
+
+Generate COMPLETE source code for:
+1. NestJS backend API (implemented)
+2. Next.js admin dashboard (implemented)
+3. Next.js public marketing website (implemented â€” apps/marketing)
+4. Prisma schema + migrations (includes feedback â€” see Â§20)
+5. Shared packages (shared-types, shared-utils)
+6. Docker setup (optional; include marketing.Dockerfile)
+7. Seed scripts + manual-test scripts
+8. Environment configs + README (Windows-native path documented)
+9. React Native mobile app (separate project â€” use API at NEXT_PUBLIC_API_URL)
+
+The final result MUST be:
+- production-ready
+- enterprise-quality
+- fully typed
+- secure
+- scalable
+- geospatially optimized
+- visually polished
+- immediately runnable
+- fully tested
+
+Generate ALL files now.
+
+================================================================================
+BRAND / DESIGN COLORS (Marvira) â€” single source of truth
+================================================================================
+Source of truth: marvira_mobile/src/theme/colors.ts
+Mirrored in web CSS variables: marvira_dashboard_api/apps/marketing/src/app/globals.css
+
+The project's MAIN color is INDIGO (#6366F1). It is NOT green/yellow.
+The accent color is PINK (#EC4899). App icon and marketing assets must use this palette.
+
+Primary (brand):
+- primary        #6366F1  (Indigo)   <-- MAIN COLOR
+- primaryDark    #4F46E5
+- primaryLight   #818CF8
+
+Secondary (accent):
+- secondary      #EC4899  (Pink)
+- secondaryDark  #DB2777
+- secondaryLight #F472B6
+
+Neutrals / text / surfaces:
+- text (ink)     #1E293B
+- textSecondary  #64748B
+- textLight      #94A3B8
+- background     #FFFFFF
+- backgroundLight#F8FAFC
+- backgroundGray #F1F5F9
+- border         #E2E8F0
+
+Status:
+- success #10B981 | error #EF4444 | warning #F59E0B | info #3B82F6
+
+Marketing CSS variable mapping (metaphor names, same hex values):
+- --ink #1E293B | --mist #F8FAFC | --fog #E2E8F0
+- --forest #6366F1 (= primary indigo) | --canopy #4F46E5 | --sun #EC4899 (= accent pink) | --trail #F8FAFC
+
+App icon: indigo gradient background (#6366F1 -> #4F46E5), white location pin,
+indigo "M" mark, pink (#EC4899) route accents. Master: assets/marvira-icon-master.png.

@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: marvira
+          POSTGRES_PASSWORD: marvira
+          POSTGRES_DB: marvira
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build shared packages
+        run: |
+          pnpm --filter @marvira/shared-types build
+          pnpm --filter @marvira/shared-utils build
+
+      - name: Generate Prisma client
+        run: pnpm --filter @marvira/api exec prisma generate
+        env:
+          DATABASE_URL: postgresql://marvira:marvira@localhost:5432/marvira?schema=public
+
+      - name: Run migrations
+        run: pnpm --filter @marvira/api exec prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://marvira:marvira@localhost:5432/marvira?schema=public
+
+      - name: Build API
+        run: pnpm --filter @marvira/api build
+
+      - name: Seed database
+        run: pnpm --filter @marvira/api seed
+        env:
+          DATABASE_URL: postgresql://marvira:marvira@localhost:5432/marvira?schema=public
+
+      - name: Test API
+        run: pnpm --filter @marvira/api test
+        env:
+          DATABASE_URL: postgresql://marvira:marvira@localhost:5432/marvira?schema=public
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-min-32-chars-for-validation
+          JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
+
+      - name: E2E tests
+        run: pnpm --filter @marvira/api test:e2e
+        env:
+          DATABASE_URL: postgresql://marvira:marvira@localhost:5432/marvira?schema=public
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-min-32-chars-for-validation
+          JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
+
+      - name: Build Dashboard
+        run: pnpm --filter @marvira/dashboard build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build API Docker image
+        run: docker build -f docker/api.Dockerfile -t marvira-api .
+
+      - name: Build Dashboard Docker image
+        run: docker build -f docker/dashboard.Dockerfile -t marvira-dashboard .

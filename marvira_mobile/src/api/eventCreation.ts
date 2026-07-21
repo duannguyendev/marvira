@@ -1,0 +1,142 @@
+import {AxiosError} from 'axios';
+import {
+  ApiEvent,
+  ApiPaginated,
+  ApiPlace,
+  ApiQuestionPublic,
+  QuestionType,
+} from '../types/api';
+import {
+  ApiResponse,
+  CreateEventInput,
+  CreatePlaceInput,
+  CreateQuestionInput,
+  MyCreatedEvent,
+  PublishEventInput,
+} from '../types';
+import {apiClient} from './client';
+import {mapEvent} from './mappers';
+
+function mapMyCreatedEvent(apiEvent: ApiEvent): MyCreatedEvent {
+  const base = mapEvent(apiEvent);
+  const firstPlace = apiEvent.places?.[0];
+  return {
+    ...base,
+    isPublished: apiEvent.isActive,
+    difficulty: (apiEvent.difficulty as MyCreatedEvent['difficulty']) ?? 'MEDIUM',
+    location: firstPlace
+      ? {latitude: firstPlace.latitude, longitude: firstPlace.longitude}
+      : base.location,
+    totalPlaces: apiEvent._count?.places ?? base.totalPlaces,
+  };
+}
+
+export const eventCreationApi = {
+  getMyEvents: async (): Promise<ApiResponse<MyCreatedEvent[]>> => {
+    const response = await apiClient.get<{
+      success: boolean;
+      data: ApiPaginated<ApiEvent>;
+    }>('/events/mine', {params: {page: 1, pageSize: 50}});
+
+    return {
+      success: true,
+      data: response.data.data.items.map(mapMyCreatedEvent),
+    };
+  },
+
+  createEvent: async (
+    input: CreateEventInput,
+  ): Promise<ApiResponse<ApiEvent>> => {
+    const response = await apiClient.post<{success: boolean; data: ApiEvent}>(
+      '/events',
+      {...input, isActive: false},
+    );
+    return {success: true, data: response.data.data};
+  },
+
+  createQuestion: async (
+    input: CreateQuestionInput,
+  ): Promise<ApiQuestionPublic> => {
+    const response = await apiClient.post<{
+      success: boolean;
+      data: ApiQuestionPublic & {answer: string};
+    }>('/questions', {
+      question: input.question,
+      type: input.type,
+      answer: input.answer,
+      options: input.options,
+      points: input.points ?? 10,
+    });
+    return response.data.data;
+  },
+
+  linkQuestionToEvent: async (
+    eventId: string,
+    questionId: string,
+    orderIndex: number,
+  ): Promise<void> => {
+    try {
+      await apiClient.post(`/events/${eventId}/questions`, {
+        questionId,
+        orderIndex,
+      });
+    } catch (error) {
+      const status = (error as AxiosError)?.response?.status;
+      if (status !== 409) {
+        throw error;
+      }
+    }
+  },
+
+  createPlace: async (
+    eventId: string,
+    orderIndex: number,
+    input: CreatePlaceInput,
+    questionId: string,
+  ): Promise<ApiPlace> => {
+    const response = await apiClient.post<{success: boolean; data: ApiPlace}>(
+      '/places',
+      {
+        eventId,
+        title: input.title,
+        description: input.description,
+        latitude: input.latitude,
+        longitude: input.longitude,
+        radiusMeters: input.radiusMeters,
+        orderIndex,
+        hint: input.hint,
+        questionId,
+      },
+    );
+    return response.data.data;
+  },
+
+  createPlaceWithQuestion: async (
+    eventId: string,
+    orderIndex: number,
+    placeInput: CreatePlaceInput,
+    questionInput: CreateQuestionInput,
+  ): Promise<ApiPlace> => {
+    const question = await eventCreationApi.createQuestion(questionInput);
+    await eventCreationApi.linkQuestionToEvent(eventId, question.id, orderIndex);
+    return eventCreationApi.createPlace(
+      eventId,
+      orderIndex,
+      placeInput,
+      question.id,
+    );
+  },
+
+  publishEvent: async (
+    eventId: string,
+    input?: PublishEventInput,
+  ): Promise<ApiEvent> => {
+    const response = await apiClient.patch<{success: boolean; data: ApiEvent}>(
+      `/events/${eventId}`,
+      {isActive: true, ...input},
+    );
+    return response.data.data;
+  },
+};
+
+export type {QuestionType};

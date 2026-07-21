@@ -1,0 +1,7 @@
+# Copy to android/key.properties and fill in before release builds.
+# Do NOT commit key.properties to version control.
+
+storeFile=../release.keystore
+storePassword=your-store-password
+keyAlias=marvira-upload
+keyPassword=your-key-password

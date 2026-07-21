@@ -1,0 +1,110 @@
+apply plugin: "com.android.application"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "com.facebook.react"
+
+def enableProguardInReleaseBuilds = false
+def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+
+def keystorePropertiesFile = rootProject.file('key.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def mapsApiKey = project.findProperty('GOOGLE_MAPS_API_KEY') ?: 'YOUR_GOOGLE_MAPS_API_KEY'
+
+react {
+    autolinkLibrariesWithApp()
+}
+
+android {
+    ndkVersion rootProject.ext.ndkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.compileSdkVersion
+
+    namespace "com.marvira"
+
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/**/libreanimated.so'
+        pickFirst 'lib/**/libhermestooling.so'
+        pickFirst 'lib/**/libhermes.so'
+
+        jniLibs {
+            pickFirsts += ['**/libc++_shared.so', 'lib/**/libreanimated.so', 'lib/**/libhermestooling.so', 'lib/**/libhermes.so']
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.marvira"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        manifestPlaceholders = [GOOGLE_MAPS_API_KEY: mapsApiKey]
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+            }
+        }
+    }
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig keystorePropertiesFile.exists()
+                ? signingConfigs.release
+                : signingConfigs.debug
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+dependencies {
+    implementation("com.facebook.react:react-android")
+
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        implementation jscFlavor
+    }
+
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.sqlite:sqlite-bundled:2.6.2'
+    }
+}
+
+afterEvaluate {
+    tasks.matching { it.name.startsWith("externalNativeBuildClean") }.configureEach { task ->
+        task.actions.clear()
+        task.doLast {
+            delete file("${project.projectDir}/.cxx")
+        }
+    }
+}

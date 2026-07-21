@@ -1,0 +1,251 @@
+================================================================================
+MARVIRA — MONETIZATION TODO (IAP + ADS)
+================================================================================
+Updated: 2026-07-20
+Purpose: In-app purchase + advertising with best benefit, least annoyance, best UX.
+Status: Plan only — implement after core gameplay is stable / near store release.
+
+Legend:
+  [ ] = Not started
+  [~] = In progress
+  [x] = Done
+
+================================================================================
+DECISIONS SUMMARY (locked for planning)
+================================================================================
+
+ONE PRODUCT: Marvira Plus (subscription)
+  - Do NOT sell separate “Organizer Pro” at launch — bundle into Plus
+  - Free users: play everything + create/draft freely + up to 10 PUBLISHED events
+  - Plus: no ads + unlimited published + badge + practice/share perks
+
+PRICING (balanced — keep users, slight revenue; not set to match server bill)
+
+  Launch default:
+    Monthly  $3.99 / month
+    Yearly   $29.99 / year   ← highlight on paywall (“best value”)
+
+  Allowed to test later:
+    Monthly  $4.99
+    Yearly   $39.99
+
+  Avoid at launch: $6.99+/mo, tiny “+5 publish” packs as main offer
+  Regional store pricing OK (SEA can be lower)
+
+FREE vs PLUS
+
+  Free
+    - Full hunts, leaderboards, basic practice
+    - Create events + unlimited drafts
+    - Up to 10 concurrent PUBLISHED events (unpublish frees a slot)
+    - Hub banners + optional rewarded + rare post-session interstitial
+
+  Plus ($3.99/mo or $29.99/yr)
+    - Remove all ads
+    - Unlimited published events
+    - Plus badge (cosmetic)
+    - Exclusive practice packs / daily challenge
+    - Exclusive share / certificate themes
+    - Optional later: early access to featured hunts
+
+ADS (least annoying)
+
+  Never during outdoor hunt (map / unlock / answer / between places)
+  Banner: Home, Practice list, Profile, Favorites
+  Practice = best ad surface (list banner + after round / session)
+  Rewarded: cosmetics or extra practice set (NOT hints)
+  Interstitial: only after hunt completed OR practice session ended (cooldown)
+
+NOT monetized with hints
+  Place hint is optional / often empty — never sell or reward “hints”
+
+EXPECTATIONS (honest)
+
+  Ops cost lean ~$80–200/mo; full prod ~$150–300/mo
+  ~1,000 MAU → ads may partly cover hosting; not a salary
+  ~25k–50k MAU + ads + Plus → shot at ~$3k/mo after tax
+  Flappy Bird-level ad money needs viral millions + constant retries — not this genre
+  Practice helps ad revenue more than outdoor hunts; still needs enough users
+
+================================================================================
+IMPORTANT PRODUCT CONSTRAINT
+================================================================================
+
+  Place “hint” is optional and often empty / low value.
+  Do NOT use hints as the main rewarded-ad reward or Plus benefit.
+  Monetize with: ad-free, cosmetics, practice perks, publish-slot unlock.
+
+================================================================================
+RECOMMENDED MODEL (read first)
+================================================================================
+
+Principle: Never sell or interrupt the core hunt loop.
+  Core loop = find event → walk → GPS unlock → answer → next place → finish.
+  That loop stays free and ad-free during play.
+
+Hybrid:
+
+  1) FREE forever
+     - Join public / invite events, play full hunt, leaderboards, basic practice
+     - Create + draft freely; max 10 concurrent PUBLISHED events
+
+  2) ADS — practice-weighted, hunt-safe
+     - Banner on hubs (especially Practice list)
+     - After practice round / practice session end (stronger $ than hunt)
+     - Rewarded: frame / extra practice set / post-hunt share theme
+     - Optional interstitial after hunt OR practice session (cooldown)
+     - Never on map, unlock, answer, active route
+
+  3) IAP — Marvira Plus only at launch
+     - $3.99/mo or $29.99/yr (yearly default highlight)
+     - No ads + unlimited publish + badge + practice/share perks
+     - Skip consumable packs at launch
+     - B2B web billing later (schools/cities) — separate from consumer Plus
+
+Do NOT do:
+  - Monetize place hints
+  - Pay to unlock places / skip GPS / buy leaderboard rank
+  - Forced video while walking or before answering
+  - Ads on map / navigation
+  - Nickel-and-dime “+1 publish” as the main IAP
+  - Block first publish or block drafts
+
+================================================================================
+PHASE M0 — POLICY & PRODUCT RULES
+================================================================================
+
+[ ] M0.1 Write monetization product rules (short internal doc)
+  - Free core loop definition
+  - Ad screen allowlist
+  - No pay-to-win; hints not a monetization surface
+  - Free = 10 published concurrent; Plus = unlimited
+
+[ ] M0.2 Store products + regional prices ($3.99 / $29.99 defaults)
+[ ] M0.3 Privacy / consent: ATT (iOS), UMP/GDPR for ads
+[ ] M0.4 Update Privacy Policy + Terms (ads, subscriptions)
+
+================================================================================
+PHASE M1 — ADS
+================================================================================
+Order: Practice surfaces → Hub banners → Rewarded → Rare interstitial
+
+[ ] M1.1 Ad SDK (e.g. react-native-google-mobile-ads / AdMob)
+[ ] M1.2 Ad units: banner, rewarded; interstitial optional
+[ ] M1.3 Consent + age/region gating
+
+[ ] M1.4 Practice ad surfaces (priority — best benefit for Marvira)
+  - Banner on Practice list
+  - After answer result / end of practice session (cooldown)
+  - Rewarded: “Watch for an extra practice set today”
+
+[ ] M1.5 Other hub banners
+  - Allowed: Home, Profile, Favorites
+  - Forbidden: Map, unlock, answer, active hunt
+
+[ ] M1.6 Rewarded cosmetics (optional with practice)
+  - Profile frame / post-completion share theme
+  - Never hint-based rewards
+
+[ ] M1.7 Interstitial (optional)
+  - Only after hunt completed OR practice session ended
+  - Cooldown ≥ 3–5 minutes; never for Plus users
+
+[ ] M1.8 Kill switch / remote config per ad type
+
+================================================================================
+PHASE M2 — IAP (Marvira Plus)
+================================================================================
+
+[ ] M2.1 Billing stack (react-native-iap or RevenueCat)
+[ ] M2.2 Products
+  - marvira_plus_monthly  → $3.99 (test $4.99 later)
+  - marvira_plus_yearly   → $29.99 (test $39.99 later; highlight as best value)
+  - No hint packs; cosmetic packs optional later only
+
+[ ] M2.3 Backend entitlements
+  - GET /me: isPlus, adFree, publishedEventLimit (10 or unlimited)
+  - Server-side receipt / webhook verify
+
+[ ] M2.4 Paywall UX
+  - Profile → Go Plus / Remove ads / Publish limit reached
+  - Benefits: No ads · Unlimited publish · Plus badge · Extra practice · Share themes
+  - Restore purchases required; never block starting a hunt
+
+[ ] M2.5 Wire Plus benefits (ads off, limit lifted, badge, practice/share unlocks)
+
+================================================================================
+PHASE M3 — PUBLISH LIMIT (bundled into Plus)
+================================================================================
+
+Decision:
+  Free: 10 concurrent PUBLISHED events (unpublish frees a slot)
+  Drafts: unlimited
+  Plus: unlimited published
+  Prefer concurrent cap over lifetime “10 ever”
+
+[ ] M3.1 Enforce publish cap in API + mobile create flow
+[ ] M3.2 At cap UX: “Free: 10/10 published. Unpublish one or go Plus.”
+[ ] M3.3 Show usage (e.g. 7/10 published) in My Events / Profile
+[ ] M3.4 Anti-abuse rate limits / admin tools
+[ ] M3.5 Later: B2B web plans for schools/cities (not required for consumer launch)
+
+================================================================================
+PHASE M4 — ANALYTICS & GUARDRAILS
+================================================================================
+
+[ ] M4.1 Track ad impressions, rewarded completes, paywall, purchase, cancel
+[ ] M4.2 Remote disable ads if complaints spike
+[ ] M4.3 Later A/B: $3.99 vs $4.99; $29.99 vs $39.99 yearly
+[ ] M4.4 Store guideline review (subscriptions, ads, kids policies if needed)
+
+================================================================================
+IMPLEMENTATION ORDER
+================================================================================
+
+  1. M0 rules + legal
+  2. M1.4 Practice ads (banner + after session)
+  3. M1.5 Other hub banners
+  4. M2 Plus ($3.99 / $29.99) + M3 publish cap (10 → unlimited)
+  5. M1.6–M1.7 Rewarded + rare interstitial
+  6. M4 analytics; B2B later
+
+================================================================================
+SCREEN ALLOWLIST (ADS)
+================================================================================
+
+  Banner:        Home | Practice list | Profile | Favorites
+  Rewarded:      Practice bonus | Profile frame | Post-completion share theme
+  Interstitial:  After hunt complete | After practice session (cooldown)
+  Never:         Map | GPS unlock | Answering | Between places on route
+  Never reward:  Place hints
+
+================================================================================
+IAP VALUE LADDER
+================================================================================
+
+  Free  → Full play, basic practice, ≤10 published, hub/practice ads
+  Plus  → $3.99/mo or $29.99/yr: no ads, unlimited publish, badge, practice/share perks
+  Later → Cosmetic packs (optional); B2B web for institutions
+
+================================================================================
+OUT OF SCOPE / ANTI-PATTERNS
+================================================================================
+
+  - Hint-based IAP or rewarded ads
+  - Energy/lives that stop walking mid-hunt
+  - Pay-to-win score or paid GPS skip
+  - Ads on every screen / mid-hunt
+  - Main IAP = small publish packs
+  - Hiding restore purchases
+
+================================================================================
+NOTES
+================================================================================
+
+  - Ship after core hunt UX is solid (see go_live_update_checklist.txt)
+  - Legal pages: requirement_all.txt §19.5 (marketing site /privacy + /terms)
+  - Mark [~] when started, [x] when done
+
+================================================================================
+END
+================================================================================
