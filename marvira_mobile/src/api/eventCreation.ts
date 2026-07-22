@@ -137,6 +137,21 @@ export const eventCreationApi = {
     );
     return response.data.data;
   },
+
+  updateEventGifts: async (
+    eventId: string,
+    input: {
+      completionMessage?: string | null;
+      giftTeaser?: string | null;
+      giftCodes?: string[];
+    },
+  ): Promise<ApiEvent> => {
+    const response = await apiClient.patch<{success: boolean; data: ApiEvent}>(
+      `/events/${eventId}`,
+      input,
+    );
+    return response.data.data;
+  },
 };
 
 export type {QuestionType};

@@ -36,6 +36,11 @@ export interface ApiEvent {
   isActive: boolean;
   isPasswordProtected?: boolean;
   hasAccess?: boolean;
+  hasGift?: boolean;
+  giftCount?: number;
+  giftTeaser?: string | null;
+  giftCodes?: string[];
+  completionMessage?: string | null;
   createdAt: string;
   updatedAt: string;
   distanceMeters?: number;
@@ -79,6 +84,41 @@ export interface ApiAnswerResponse {
   answerDurationMs?: number | null;
   eventTotalDurationMs?: number | null;
   alreadyCompleted?: boolean;
+  finishRank?: number | null;
+  completionMessage?: string | null;
+  giftTeaser?: string | null;
+  giftCode?: string | null;
+  giftCount?: number;
+  giftsAllClaimed?: boolean;
+}
+
+export interface ApiEventCompletion {
+  eventCompleted: true;
+  finishRank: number | null;
+  completionMessage: string | null;
+  giftTeaser: string | null;
+  giftCode: string | null;
+  giftCount: number;
+  giftsAllClaimed: boolean;
+  score?: number;
+  totalDurationMs?: number | null;
+}
+
+export interface ApiEventFinisher {
+  userId: string;
+  userName: string;
+  completedAt: string;
+  totalDurationMs: number | null;
+  score: number;
+  finishRank: number | null;
+  giftCodeAwarded: string | null;
+}
+
+export interface ApiEventFinishersResponse {
+  event: {id: string; title: string; city: string};
+  giftCount: number;
+  giftAssignedCount: number;
+  finishers: ApiEventFinisher[];
 }
 
 export interface ApiUnlockResponse {

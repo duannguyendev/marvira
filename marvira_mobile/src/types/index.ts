@@ -48,6 +48,13 @@ export interface Event {
   totalDurationMs?: number | null;
   isPasswordProtected?: boolean;
   hasAccess?: boolean;
+  hasGift?: boolean;
+  giftCount?: number;
+  giftTeaser?: string | null;
+  /** Owner-only */
+  giftCodes?: string[];
+  /** Owner-only on detail; also on completion payload */
+  completionMessage?: string | null;
 }
 
 export interface EventDetails extends Event {
@@ -111,6 +118,12 @@ export interface AnswerResponse {
   answerDurationMs?: number | null;
   eventTotalDurationMs?: number | null;
   warnings?: LocationWarning[];
+  finishRank?: number | null;
+  completionMessage?: string | null;
+  giftTeaser?: string | null;
+  giftCode?: string | null;
+  giftCount?: number;
+  giftsAllClaimed?: boolean;
 }
 
 export interface UnlockPlaceRequest {
@@ -167,11 +180,28 @@ export interface CreateEventInput {
   city: string;
   difficulty: EventDifficulty;
   rewardPoints: number;
+  completionMessage?: string | null;
+  giftTeaser?: string | null;
+  giftCodes?: string[];
 }
 
 export interface PublishEventInput {
   joinPassword?: string;
   clearJoinPassword?: boolean;
+  completionMessage?: string | null;
+  giftTeaser?: string | null;
+  giftCodes?: string[];
+}
+
+export interface EventCompletionInfo {
+  finishRank: number | null;
+  completionMessage: string | null;
+  giftTeaser: string | null;
+  giftCode: string | null;
+  giftCount: number;
+  giftsAllClaimed: boolean;
+  score?: number;
+  totalDurationMs?: number | null;
 }
 
 export interface CreatePlaceInput {

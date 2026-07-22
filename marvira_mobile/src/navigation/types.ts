@@ -61,11 +61,23 @@ export type HomeStackParamList = {
   EventsList: undefined;
   EventDetails: {eventId: string};
   PlaceGame: {eventId: string; placeId: string};
-  EventCompletion: {eventId: string; score?: number; totalDurationMs?: number | null};
+  EventCompletion: {
+    eventId: string;
+    score?: number;
+    totalDurationMs?: number | null;
+    finishRank?: number | null;
+    completionMessage?: string | null;
+    giftTeaser?: string | null;
+    giftCode?: string | null;
+    giftCount?: number;
+    giftsAllClaimed?: boolean;
+  };
   EventLeaderboard: {eventId: string};
+  EventFinishers: {eventId: string};
   GlobalLeaderboard: undefined;
   CreateEventInfo: undefined;
   CreateEventPlace: {eventId: string; placeIndex: number};
   CreateEventReview: {eventId: string};
   CreateEventSuccess: {eventId: string; published: boolean; joinPassword?: string};
+  EditEventGifts: {eventId: string};
 };

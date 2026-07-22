@@ -209,6 +209,17 @@ export const EventDetailsScreen: React.FC = () => {
 
         <Text style={styles.description}>{event.description}</Text>
 
+        {event.hasGift ? (
+          <View style={styles.giftTeaserCard}>
+            <Text style={styles.giftTeaserTitle}>
+              🎁 {event.giftTeaser || t('events.giftLabel')}
+            </Text>
+            <Text style={styles.giftTeaserText}>
+              {t('events.giftsForFirst', {count: event.giftCount ?? 0})}
+            </Text>
+          </View>
+        ) : null}
+
         {isLocked ? (
           <View style={styles.lockedCard}>
             <Text style={styles.lockedTitle}>{t('events.passwordProtected.title')}</Text>
@@ -224,6 +235,18 @@ export const EventDetailsScreen: React.FC = () => {
         <Text style={styles.hint}>{t('events.visitHint')}</Text>
 
         <View style={styles.leaderboardSection}>
+          {event.status === 'completed' ? (
+            <Button
+              title={
+                event.hasGift
+                  ? t('events.viewYourGift')
+                  : t('events.viewCompletion')
+              }
+              onPress={() => navigation.navigate('EventCompletion', {eventId})}
+              fullWidth
+              style={styles.detailButton}
+            />
+          ) : null}
           <Button
             title={t('events.viewLeaderboard')}
             onPress={() => navigation.navigate('EventLeaderboard', {eventId})}
@@ -370,6 +393,22 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: spacing.md,
   },
+  giftTeaserCard: {
+    backgroundColor: colors.infoLight,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  giftTeaserTitle: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+    color: colors.textDark,
+    marginBottom: spacing.xs,
+  },
+  giftTeaserText: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+  },
   hint: {
     fontSize: fontSize.sm,
     color: colors.primary,
@@ -378,6 +417,10 @@ const styles = StyleSheet.create({
   },
   leaderboardSection: {
     marginBottom: spacing.lg,
+    gap: spacing.sm,
+  },
+  detailButton: {
+    marginBottom: spacing.sm,
   },
   placesSection: {
     marginTop: spacing.md,

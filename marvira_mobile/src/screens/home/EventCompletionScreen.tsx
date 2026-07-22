@@ -1,24 +1,28 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Animated,
   Dimensions,
-  TouchableOpacity,
+  Alert,
+  ScrollView,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
+import {useQuery} from '@tanstack/react-query';
+import Clipboard from '@react-native-clipboard/clipboard';
 import {useEventDetails} from '../../hooks/useEvents';
+import {eventsApi} from '../../api/events';
 import {Button} from '../../components/Button';
 import {LoadingSpinner} from '../../components/LoadingSpinner';
 import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
 import {formatDuration} from '../../utils/formatDuration';
 import {HomeStackParamList} from '../../navigation/types';
 
-const {width, height} = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 
 type EventCompletionScreenRouteProp = RouteProp<
   HomeStackParamList,
@@ -34,16 +38,49 @@ export const EventCompletionScreen: React.FC = () => {
   const {t} = useTranslation();
   const route = useRoute<EventCompletionScreenRouteProp>();
   const navigation = useNavigation<EventCompletionScreenNavigationProp>();
-  const {eventId, score, totalDurationMs} = route.params;
+  const {
+    eventId,
+    score: scoreParam,
+    totalDurationMs: durationParam,
+    finishRank: rankParam,
+    completionMessage: messageParam,
+    giftTeaser: teaserParam,
+    giftCode: codeParam,
+    giftCount: countParam,
+    giftsAllClaimed: claimedParam,
+  } = route.params;
 
   const {data, isLoading} = useEventDetails(eventId);
+  const needsFetch =
+    rankParam === undefined &&
+    messageParam === undefined &&
+    codeParam === undefined;
+
+  const completionQuery = useQuery({
+    queryKey: ['eventCompletion', eventId],
+    queryFn: () => eventsApi.getEventCompletion(eventId),
+    enabled: needsFetch,
+  });
+
+  const completion = completionQuery.data?.data;
+  const score = scoreParam ?? completion?.score;
+  const totalDurationMs = durationParam ?? completion?.totalDurationMs;
+  const finishRank = rankParam ?? completion?.finishRank ?? null;
+  const completionMessage =
+    messageParam ?? completion?.completionMessage ?? null;
+  const giftTeaser = teaserParam ?? completion?.giftTeaser ?? null;
+  const giftCode = codeParam ?? completion?.giftCode ?? null;
+  const giftCount = countParam ?? completion?.giftCount ?? 0;
+  const giftsAllClaimed =
+    claimedParam ?? completion?.giftsAllClaimed ?? false;
+
+  const [copied, setCopied] = useState(false);
 
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const confettiAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Celebration animation
     Animated.parallel([
       Animated.spring(scaleAnim, {
         toValue: 1,
@@ -62,107 +99,175 @@ export const EventCompletionScreen: React.FC = () => {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [scaleAnim, fadeAnim, confettiAnim]);
 
   const event = data?.data;
 
-  if (isLoading || !event) {
+  if (isLoading || !event || (needsFetch && completionQuery.isLoading)) {
     return <LoadingSpinner fullScreen />;
   }
 
-  const handleGoHome = () => {
-    navigation.navigate('EventsList');
+  const handleCopyCode = () => {
+    if (!giftCode) return;
+    try {
+      Clipboard.setString(giftCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      Alert.alert(t('common.error'), t('completion.copyFailed'));
+    }
   };
 
-  const handleViewEvent = () => {
-    navigation.navigate('EventDetails', {eventId});
-  };
+  const showGiftBlock = giftCount > 0;
 
   return (
     <LinearGradient
       colors={[colors.primary, colors.secondary]}
       style={styles.container}>
-      <Animated.View
-        style={[
-          styles.content,
-          {
-            opacity: fadeAnim,
-            transform: [{scale: scaleAnim}],
-          },
-        ]}>
-        <Animated.Text
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
+        <Animated.View
           style={[
-            styles.celebrationIcon,
+            styles.content,
             {
-              transform: [
-                {
-                  rotate: confettiAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['0deg', '360deg'],
-                  }),
-                },
-              ],
+              opacity: fadeAnim,
+              transform: [{scale: scaleAnim}],
             },
           ]}>
-          🎉
-        </Animated.Text>
+          <Animated.Text
+            style={[
+              styles.celebrationIcon,
+              {
+                transform: [
+                  {
+                    rotate: confettiAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg'],
+                    }),
+                  },
+                ],
+              },
+            ]}>
+            🎉
+          </Animated.Text>
 
-        <Text style={styles.title}>{t('completion.congratulations')}</Text>
-        <Text style={styles.subtitle}>{t('completion.youCompleted')}</Text>
-        <Text style={styles.eventName}>{event.title}</Text>
+          <Text style={styles.title}>{t('completion.congratulations')}</Text>
+          <Text style={styles.subtitle}>{t('completion.youCompleted')}</Text>
+          <Text style={styles.eventName}>{event.title}</Text>
 
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{event.totalPlaces}</Text>
-            <Text style={styles.statLabel}>{t('completion.placesVisited')}</Text>
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{event.totalPlaces}</Text>
+              <Text style={styles.statLabel}>{t('completion.placesVisited')}</Text>
+            </View>
+            {totalDurationMs != null ? (
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>
+                  {formatDuration(totalDurationMs)}
+                </Text>
+                <Text style={styles.statLabel}>{t('completion.totalTime')}</Text>
+              </View>
+            ) : (
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>100%</Text>
+                <Text style={styles.statLabel}>{t('completion.completion')}</Text>
+              </View>
+            )}
+            {score != null ? (
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>{score}</Text>
+                <Text style={styles.statLabel}>{t('completion.points')}</Text>
+              </View>
+            ) : null}
           </View>
-          {totalDurationMs != null ? (
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{formatDuration(totalDurationMs)}</Text>
-              <Text style={styles.statLabel}>{t('completion.totalTime')}</Text>
-            </View>
-          ) : (
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>100%</Text>
-              <Text style={styles.statLabel}>{t('completion.completion')}</Text>
-            </View>
-          )}
-          {score != null ? (
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{score}</Text>
-              <Text style={styles.statLabel}>{t('completion.points')}</Text>
+
+          {completionMessage ? (
+            <View style={styles.messageBlock}>
+              <Text style={styles.messageLabel}>
+                {t('completion.fromCreator')}
+              </Text>
+              <Text style={styles.messageText}>{completionMessage}</Text>
             </View>
           ) : null}
-        </View>
 
-        <View style={styles.buttonContainer}>
-          <Button
-            title={t('completion.viewLeaderboard')}
-            onPress={() =>
-              navigation.navigate('EventLeaderboard', {eventId})
-            }
-            variant="outline"
-            fullWidth
-            style={styles.button}
-          />
-          <Button
-            title={t('completion.backToEvents')}
-            onPress={handleGoHome}
-            variant="secondary"
-            fullWidth
-            style={styles.button}
-          />
-          <Button
-            title={t('completion.viewEventDetails')}
-            onPress={handleViewEvent}
-            variant="outline"
-            fullWidth
-            style={styles.button}
-          />
-        </View>
-      </Animated.View>
+          {showGiftBlock ? (
+            <View style={styles.giftBlock}>
+              {giftCode ? (
+                <>
+                  <Text style={styles.giftTitle}>
+                    {t('completion.finisherRank', {rank: finishRank})}
+                  </Text>
+                  {giftTeaser ? (
+                    <Text style={styles.giftTeaser}>
+                      {t('completion.yourGift', {teaser: giftTeaser})}
+                    </Text>
+                  ) : null}
+                  <Text style={styles.giftCodeLabel}>
+                    {t('completion.giftCode')}
+                  </Text>
+                  <Text style={styles.giftCode} selectable>
+                    {giftCode}
+                  </Text>
+                  <Button
+                    title={
+                      copied
+                        ? t('completion.codeCopied')
+                        : t('completion.copyCode')
+                    }
+                    onPress={handleCopyCode}
+                    fullWidth
+                    style={styles.giftButton}
+                  />
+                </>
+              ) : giftsAllClaimed || (finishRank != null && finishRank > giftCount) ? (
+                <>
+                  <Text style={styles.giftTitle}>
+                    {t('completion.giftsWentToFirst', {count: giftCount})}
+                  </Text>
+                  <Text style={styles.giftTeaser}>
+                    {t('completion.youFinishedRank', {rank: finishRank})}
+                  </Text>
+                  <Button
+                    title={t('completion.exploreMore')}
+                    onPress={() => navigation.navigate('EventsList')}
+                    variant="outline"
+                    fullWidth
+                    style={styles.giftButton}
+                  />
+                </>
+              ) : null}
+            </View>
+          ) : null}
 
-      {/* Confetti effect */}
+          <View style={styles.buttonContainer}>
+            <Button
+              title={t('completion.viewLeaderboard')}
+              onPress={() =>
+                navigation.navigate('EventLeaderboard', {eventId})
+              }
+              variant="outline"
+              fullWidth
+              style={styles.button}
+            />
+            <Button
+              title={t('completion.backToEvents')}
+              onPress={() => navigation.navigate('EventsList')}
+              variant="secondary"
+              fullWidth
+              style={styles.button}
+            />
+            <Button
+              title={t('completion.viewEventDetails')}
+              onPress={() => navigation.navigate('EventDetails', {eventId})}
+              variant="outline"
+              fullWidth
+              style={styles.button}
+            />
+          </View>
+        </Animated.View>
+      </ScrollView>
+
       {[...Array(20)].map((_, i) => (
         <Animated.View
           key={i}
@@ -197,9 +302,13 @@ export const EventCompletionScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.xl,
+    paddingVertical: spacing.xxl,
   },
   content: {
     alignItems: 'center',
@@ -242,7 +351,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
     paddingVertical: spacing.lg,
     borderTopWidth: 1,
     borderBottomWidth: 1,
@@ -262,6 +371,58 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: fontWeight.medium,
   },
+  messageBlock: {
+    width: '100%',
+    backgroundColor: colors.backgroundLight,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  messageLabel: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+  },
+  messageText: {
+    fontSize: fontSize.md,
+    color: colors.textDark,
+    lineHeight: 22,
+  },
+  giftBlock: {
+    width: '100%',
+    backgroundColor: colors.infoLight,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  giftTitle: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+    color: colors.textDark,
+    marginBottom: spacing.xs,
+  },
+  giftTeaser: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+  },
+  giftCodeLabel: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.medium,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+  },
+  giftCode: {
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    color: colors.primary,
+    letterSpacing: 1,
+    marginBottom: spacing.md,
+  },
+  giftButton: {
+    marginBottom: 0,
+  },
   buttonContainer: {
     width: '100%',
     gap: spacing.md,
@@ -277,4 +438,3 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 });
-

@@ -14,12 +14,23 @@ import { EventDifficulty } from '@marvira/shared-types';
 import type { Event } from '@marvira/shared-types';
 import { newEventSchema, type EventFormValues } from '@/lib/validation/schemas';
 
+function normalizeGiftFields(data: EventFormValues): EventFormValues {
+  return {
+    ...data,
+    completionMessage: data.completionMessage?.trim() || null,
+    giftTeaser: data.giftTeaser?.trim() || null,
+    giftCodes: (data.giftCodes ?? []).map((c) => c.trim()).filter(Boolean),
+  };
+}
+
 export default function NewEventPage() {
   const router = useRouter();
 
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<EventFormValues>({
     resolver: zodResolver(newEventSchema),
@@ -27,11 +38,16 @@ export default function NewEventPage() {
       difficulty: EventDifficulty.MEDIUM,
       rewardPoints: 100,
       isActive: false,
+      completionMessage: '',
+      giftTeaser: '',
+      giftCodes: [],
     },
   });
 
+  const giftCodesText = (watch('giftCodes') ?? []).join('\n');
+
   const mutation = useMutation({
-    mutationFn: (data: EventFormValues) => api.post<Event>('/events', data),
+    mutationFn: (data: EventFormValues) => api.post<Event>('/events', normalizeGiftFields(data)),
     onSuccess: (event) => {
       toast.success('Event created');
       router.push(`/dashboard/events/${event.id}`);
@@ -100,6 +116,69 @@ export default function NewEventPage() {
                 <p className="text-sm text-destructive">{errors.rewardPoints.message}</p>
               )}
             </div>
+
+            <div className="space-y-4 border-t pt-4">
+              <div>
+                <h3 className="text-sm font-medium">Completion gifts</h3>
+                <p className="text-xs text-muted-foreground">
+                  Optional. Soonest finishers receive codes in order (1st → first code). Max 10.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="giftTeaser">Gift teaser</Label>
+                <Input
+                  id="giftTeaser"
+                  placeholder="e.g. Free drink, 10% off"
+                  maxLength={80}
+                  {...register('giftTeaser')}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Public description of the gift (not the code). Required when codes are set.
+                </p>
+                {errors.giftTeaser && (
+                  <p className="text-sm text-destructive">{errors.giftTeaser.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="completionMessage">Completion message</Label>
+                <textarea
+                  id="completionMessage"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  placeholder="Thanks for playing! Show this code at the counter to redeem..."
+                  maxLength={2000}
+                  {...register('completionMessage')}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Shown after finish — thanks, story, and how to redeem.
+                </p>
+                {errors.completionMessage && (
+                  <p className="text-sm text-destructive">{errors.completionMessage.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="giftCodes">Gift codes</Label>
+                <textarea
+                  id="giftCodes"
+                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
+                  placeholder={'CODE-FIRST\nCODE-SECOND\nCODE-THIRD'}
+                  value={giftCodesText}
+                  onChange={(e) =>
+                    setValue('giftCodes', e.target.value.split('\n'), { shouldValidate: true })
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  One code per line, up to 10. Leave empty for no gifts.
+                </p>
+                {errors.giftCodes && (
+                  <p className="text-sm text-destructive">
+                    {typeof errors.giftCodes.message === 'string'
+                      ? errors.giftCodes.message
+                      : 'Invalid gift codes'}
+                  </p>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="isActive" {...register('isActive')} className="h-4 w-4" />

@@ -187,6 +187,12 @@ export const PlaceGameScreen: React.FC = () => {
                     eventId,
                     score: response.data.totalScore ?? response.data.points,
                     totalDurationMs: response.data.eventTotalDurationMs,
+                    finishRank: response.data.finishRank,
+                    completionMessage: response.data.completionMessage,
+                    giftTeaser: response.data.giftTeaser,
+                    giftCode: response.data.giftCode,
+                    giftCount: response.data.giftCount,
+                    giftsAllClaimed: response.data.giftsAllClaimed,
                   });
                 } else if (response.data.nextPlaceId) {
                   navigation.replace('PlaceGame', {

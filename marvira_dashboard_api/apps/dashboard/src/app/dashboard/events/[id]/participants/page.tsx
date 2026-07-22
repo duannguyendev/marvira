@@ -84,9 +84,16 @@ export default function EventParticipantsPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Participants</h1>
             {data?.event ? (
-              <p className="text-muted-foreground">
-                {data.event.title} · {data.event.city}
-              </p>
+              <div className="space-y-1">
+                <p className="text-muted-foreground">
+                  {data.event.title} · {data.event.city}
+                </p>
+                {data.event.giftCount > 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    {data.event.giftAssignedCount}/{data.event.giftCount} gifts assigned
+                  </p>
+                )}
+              </div>
             ) : (
               <p className="text-muted-foreground">Users who joined this event</p>
             )}
@@ -153,6 +160,8 @@ export default function EventParticipantsPage() {
                     <TableHead>Started</TableHead>
                     <TableHead>Finished</TableHead>
                     <TableHead className="text-right">Duration</TableHead>
+                    <TableHead className="text-right">Finish rank</TableHead>
+                    <TableHead>Gift code</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className={isFetching ? 'opacity-60' : undefined}>
@@ -183,6 +192,12 @@ export default function EventParticipantsPage() {
                       </TableCell>
                       <TableCell className="text-right font-medium">
                         {p.completed ? formatDuration(p.totalDurationMs) : '—'}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {p.finishRank ?? '—'}
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {p.giftCodeAwarded ?? '—'}
                       </TableCell>
                     </TableRow>
                   ))}

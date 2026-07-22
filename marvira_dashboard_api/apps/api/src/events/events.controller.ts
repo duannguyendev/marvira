@@ -85,6 +85,25 @@ export class EventsController {
     return { success: true, data };
   }
 
+  @Get(':id/completion')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Re-open completion / gift snapshot for a finished event' })
+  async completion(@Param('id') id: string, @Req() req: { user: RequestUser }) {
+    const data = await this.progressService.getEventCompletion(req.user.id, id);
+    return { success: true, data };
+  }
+
+  @Get(':id/finishers')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List finishers with gift assignment (owner or staff)' })
+  async finishers(@Param('id') id: string, @Req() req: { user: RequestUser }) {
+    await this.ownershipService.assertCanManage(id, req.user);
+    const data = await this.progressService.getEventFinishers(id);
+    return { success: true, data };
+  }
+
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get event by ID' })

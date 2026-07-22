@@ -184,6 +184,12 @@ export const placesApi = {
         answerDurationMs: result.answerDurationMs,
         eventTotalDurationMs: result.eventTotalDurationMs,
         warnings: response.data.warnings,
+        finishRank: result.finishRank,
+        completionMessage: result.completionMessage,
+        giftTeaser: result.giftTeaser,
+        giftCode: result.giftCode,
+        giftCount: result.giftCount,
+        giftsAllClaimed: result.giftsAllClaimed,
       },
     };
   },

@@ -10,6 +10,8 @@ import {
   IsNotEmpty,
   IsNumber,
   IsInt,
+  IsArray,
+  ArrayMaxSize,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventDifficulty } from '@prisma/client';
@@ -69,6 +71,29 @@ export class CreateEventDto {
   @IsOptional()
   @IsBoolean()
   clearJoinPassword?: boolean;
+
+  @ApiPropertyOptional({ description: 'Message shown on completion (thanks + redeem how-to)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  completionMessage?: string | null;
+
+  @ApiPropertyOptional({ description: 'Short public gift teaser; required when giftCodes is non-empty' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  giftTeaser?: string | null;
+
+  @ApiPropertyOptional({
+    description: 'Ordered gift codes for soonest finishers (max 10)',
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @IsString({ each: true })
+  @MaxLength(64, { each: true })
+  giftCodes?: string[];
 }
 
 export class UpdateEventDto {
@@ -130,6 +155,29 @@ export class UpdateEventDto {
   @IsOptional()
   @IsBoolean()
   clearJoinPassword?: boolean;
+
+  @ApiPropertyOptional({ description: 'Message shown on completion (thanks + redeem how-to)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  completionMessage?: string | null;
+
+  @ApiPropertyOptional({ description: 'Short public gift teaser; required when giftCodes is non-empty' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  giftTeaser?: string | null;
+
+  @ApiPropertyOptional({
+    description: 'Ordered gift codes for soonest finishers (max 10)',
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @IsString({ each: true })
+  @MaxLength(64, { each: true })
+  giftCodes?: string[];
 }
 
 export class JoinEventDto {

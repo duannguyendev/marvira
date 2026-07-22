@@ -14,9 +14,16 @@ import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
 interface MyEventCardProps {
   event: MyCreatedEvent;
   onPress: () => void;
+  onFinishersPress?: () => void;
+  onEditGiftsPress?: () => void;
 }
 
-export const MyEventCard: React.FC<MyEventCardProps> = ({event, onPress}) => {
+export const MyEventCard: React.FC<MyEventCardProps> = ({
+  event,
+  onPress,
+  onFinishersPress,
+  onEditGiftsPress,
+}) => {
   const {t} = useTranslation();
 
   return (
@@ -54,10 +61,41 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({event, onPress}) => {
         <Text style={styles.meta}>
           {event.city} · {t(`createEvent.difficulties.${event.difficulty}`)} ·{' '}
           {event.totalPlaces} {t('common.places')}
+          {event.hasGift
+            ? ` · 🎁 ${t('events.giftLabel')}`
+            : ''}
         </Text>
         <Text style={styles.description} numberOfLines={2}>
           {event.description}
         </Text>
+        <View style={styles.actions}>
+          {onEditGiftsPress ? (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onEditGiftsPress();
+              }}
+              style={styles.actionLink}
+              accessibilityRole="button">
+              <Text style={styles.actionLinkText}>
+                {t('myEvents.editGifts')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {event.isPublished && onFinishersPress ? (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onFinishersPress();
+              }}
+              style={styles.actionLink}
+              accessibilityRole="button">
+              <Text style={styles.actionLinkText}>
+                {t('myEvents.viewFinishers')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -120,5 +158,19 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     color: colors.textSecondary,
     lineHeight: 20,
+  },
+  actions: {
+    marginTop: spacing.sm,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+  },
+  actionLink: {
+    alignSelf: 'flex-start',
+  },
+  actionLinkText: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.primary,
   },
 });

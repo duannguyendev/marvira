@@ -80,6 +80,13 @@ export const EventCard: React.FC<EventCardProps> = ({
                 <Text style={styles.lockBadgeText}>🔒</Text>
               </View>
             ) : null}
+            {event.hasGift ? (
+              <View
+                style={styles.giftBadge}
+                accessibilityLabel={t('events.giftLabel')}>
+                <Text style={styles.giftBadgeText}>🎁</Text>
+              </View>
+            ) : null}
           </View>
           <View
             style={[styles.statusBadge, {backgroundColor: getStatusColor()}]}>
@@ -176,6 +183,13 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   lockBadgeText: {
+    fontSize: fontSize.sm,
+  },
+  giftBadge: {
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
+  },
+  giftBadgeText: {
     fontSize: fontSize.sm,
   },
   statusBadge: {

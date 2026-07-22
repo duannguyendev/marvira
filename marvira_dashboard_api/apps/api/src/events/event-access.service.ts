@@ -124,15 +124,40 @@ export class EventAccessService {
     await this.prisma.client.userEventAccess.deleteMany({ where: { eventId } });
   }
 
-  toPublicFields<T extends { joinPasswordHash?: string | null }>(
+  toPublicFields<
+    T extends {
+      joinPasswordHash?: string | null;
+      giftCodes?: string[] | null;
+      completionMessage?: string | null;
+      giftTeaser?: string | null;
+    },
+  >(
     event: T,
-    hasAccess?: boolean,
-  ): Omit<T, 'joinPasswordHash'> & { isPasswordProtected: boolean; hasAccess?: boolean } {
-    const { joinPasswordHash, ...rest } = event;
+    options?: { hasAccess?: boolean; includeOwnerGiftFields?: boolean },
+  ): Omit<T, 'joinPasswordHash' | 'giftCodes' | 'completionMessage'> & {
+    isPasswordProtected: boolean;
+    hasAccess?: boolean;
+    hasGift: boolean;
+    giftCount: number;
+    giftTeaser: string | null;
+    giftCodes?: string[];
+    completionMessage?: string | null;
+  } {
+    const { joinPasswordHash, giftCodes, completionMessage, ...rest } = event;
+    const codes = giftCodes ?? [];
+    const hasAccess = options?.hasAccess;
+    const includeOwner = options?.includeOwnerGiftFields === true;
+
     return {
       ...rest,
       isPasswordProtected: joinPasswordHash != null,
+      hasGift: codes.length > 0,
+      giftCount: codes.length,
+      giftTeaser: rest.giftTeaser ?? null,
       ...(hasAccess !== undefined ? { hasAccess } : {}),
+      ...(includeOwner
+        ? { giftCodes: codes, completionMessage: completionMessage ?? null }
+        : {}),
     };
   }
 

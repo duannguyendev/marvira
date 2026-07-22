@@ -29,6 +29,8 @@
     "eventDetails": "Event Details",
     "placeChallenge": "Place Challenge",
     "leaderboard": "Leaderboard",
+    "finishers": "Finishers",
+    "editGifts": "Edit gifts",
     "globalRankings": "Global Rankings",
     "settings": "Settings",
     "globalLeaderboardA11y": "Global leaderboard",
@@ -148,6 +150,10 @@
     "progressComplete": "{{progress}}% Complete ({{completed}}/{{total}} places)",
     "visitHint": "Visit places in order. Move within each stop's radius to unlock and answer the question.",
     "viewLeaderboard": "View Leaderboard",
+    "viewYourGift": "View your gift",
+    "viewCompletion": "View completion",
+    "giftLabel": "Gift",
+    "giftsForFirst": "Gifts for the first {{count}} finishers",
     "placesCount": "Places ({{count}})",
     "passwordProtected": {
       "badge": "Invite only",
@@ -218,7 +224,17 @@
     "points": "Points",
     "viewLeaderboard": "View Leaderboard",
     "backToEvents": "Back to Events",
-    "viewEventDetails": "View Event Details"
+    "viewEventDetails": "View Event Details",
+    "fromCreator": "Message from the creator",
+    "finisherRank": "You're finisher #{{rank}}",
+    "yourGift": "Your gift: {{teaser}}",
+    "giftCode": "Gift code",
+    "copyCode": "Copy code",
+    "codeCopied": "Copied!",
+    "copyFailed": "Could not copy code",
+    "giftsWentToFirst": "Gifts went to the first {{count}} finishers.",
+    "youFinishedRank": "You finished #{{rank}}.",
+    "exploreMore": "Explore more events"
   },
   "leaderboard": {
     "loadFailed": "Failed to load leaderboard",
@@ -328,6 +344,32 @@
         "passwordMismatch": "Passwords do not match"
       }
     },
+    "gifts": {
+      "heading": "Completion gifts",
+      "subheading": "Add gifts to reward the fastest finishers and drive more completions.",
+      "editSubheading": "Update teaser, redeem message, and append gift codes. Awarded codes cannot be changed.",
+      "teaserLabel": "Gift teaser",
+      "teaserPlaceholder": "Free drink, 10% off, Merch code…",
+      "messageLabel": "Completion message",
+      "messagePlaceholder": "Thanks for playing! Show this code at the counter.",
+      "codesLabel": "Gift codes (one per line)",
+      "codesPlaceholder": "CODE1\nCODE2\nCODE3",
+      "codePlaceholder": "Code {{n}}",
+      "addCode": "+ Add gift code",
+      "awarded": "Assigned",
+      "freezeHint": "The first {{count}} code(s) are already assigned and locked. You can only append new codes.",
+      "helper": "Codes go to the soonest finishers in order (1st code → 1st finisher, …). Max 10.",
+      "preview": "Players will see: {{teaser}} · Gifts for the first {{count}} finishers",
+      "save": "Save gifts",
+      "saved": "Gifts updated",
+      "saveFailed": "Failed to update gifts",
+      "validation": {
+        "maxCodes": "At most 10 gift codes are allowed",
+        "teaserRequired": "Gift teaser is required when codes are set",
+        "unique": "Gift codes must be unique",
+        "appendOnly": "Existing gift codes cannot be changed or removed; append new codes only"
+      }
+    },
     "validation": {
       "titleMin": "Title must be at least 3 characters",
       "descriptionMin": "Description must be at least 10 characters",
@@ -350,7 +392,16 @@
     "emptyMessage": "Create a location-based hunt and share it with others.",
     "loadFailed": "Failed to load your events",
     "published": "Published",
-    "draft": "Draft"
+    "draft": "Draft",
+    "viewFinishers": "View finishers",
+    "editGifts": "Edit gifts"
+  },
+  "finishers": {
+    "loadFailed": "Failed to load finishers",
+    "assignedSummary": "{{assigned}}/{{total}} gifts assigned",
+    "noGifts": "No gifts configured for this event",
+    "empty": "No one has finished yet",
+    "code": "Gift code"
   },
   "practice": {
     "heading": "Practice",

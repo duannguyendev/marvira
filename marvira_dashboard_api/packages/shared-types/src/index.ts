@@ -51,6 +51,16 @@ export interface Event {
   isActive: boolean;
   isPasswordProtected: boolean;
   hasAccess?: boolean;
+  /** Derived: giftCodes.length > 0 — safe for public list/detail */
+  hasGift?: boolean;
+  /** Derived: giftCodes.length — safe for public (“first N” finishers) */
+  giftCount?: number;
+  /** Short public description of the gift; never a code */
+  giftTeaser?: string | null;
+  /** Owner/admin only — omitted on public list/detail */
+  giftCodes?: string[];
+  /** Owner/admin or completion payload — omitted on public list/detail */
+  completionMessage?: string | null;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -141,6 +151,38 @@ export interface UserEventProgress {
   startedAt: string;
   completedAt: string | null;
   totalDurationMs?: number | null;
+  finishRank?: number | null;
+  giftCodeAwarded?: string | null;
+}
+
+/** Payload for EventCompletionScreen / GET /events/:id/completion */
+export interface EventCompletionPayload {
+  eventCompleted: true;
+  finishRank: number | null;
+  completionMessage: string | null;
+  giftTeaser: string | null;
+  giftCode: string | null;
+  giftCount: number;
+  giftsAllClaimed: boolean;
+  score?: number;
+  totalDurationMs?: number | null;
+}
+
+export interface EventFinisher {
+  userId: string;
+  userName: string;
+  completedAt: string;
+  totalDurationMs: number | null;
+  score: number;
+  finishRank: number | null;
+  giftCodeAwarded: string | null;
+}
+
+export interface EventFinishersResponse {
+  event: { id: string; title: string; city: string };
+  giftCount: number;
+  giftAssignedCount: number;
+  finishers: EventFinisher[];
 }
 
 export interface UserPlaceCompletion {
@@ -226,6 +268,12 @@ export interface AnswerPlaceResponse {
   eventTotalDurationMs?: number | null;
   warnings?: LocationWarning[];
   alreadyCompleted?: boolean;
+  finishRank?: number | null;
+  completionMessage?: string | null;
+  giftTeaser?: string | null;
+  giftCode?: string | null;
+  giftCount?: number;
+  giftsAllClaimed?: boolean;
 }
 
 export interface EventLeaderboardEntry {
@@ -274,10 +322,12 @@ export interface EventParticipant {
   startedAt: string;
   completedAt: string | null;
   totalDurationMs: number | null;
+  finishRank: number | null;
+  giftCodeAwarded: string | null;
 }
 
 export interface EventParticipantsResponse {
-  event: { id: string; title: string; city: string };
+  event: { id: string; title: string; city: string; giftCount: number; giftAssignedCount: number };
   participants: PaginatedResponse<EventParticipant>;
 }
 
@@ -310,6 +360,9 @@ export interface CreateEventDto {
   difficulty: EventDifficulty;
   rewardPoints: number;
   isActive?: boolean;
+  completionMessage?: string | null;
+  giftTeaser?: string | null;
+  giftCodes?: string[];
 }
 
 export interface UpdateEventDto extends Partial<CreateEventDto> {}
@@ -512,6 +565,10 @@ export interface WebSocketEvents {
     userId: string;
     eventId: string;
     score: number;
+    finishRank?: number | null;
+    giftCode?: string | null;
+    giftCount?: number;
+    giftsAllClaimed?: boolean;
   };
   admin_live_analytics: AnalyticsOverview;
 }

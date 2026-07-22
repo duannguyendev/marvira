@@ -15,6 +15,8 @@ interface NearbyEventRow {
   updated_at: Date;
   distance_meters: number;
   join_password_hash: string | null;
+  gift_teaser: string | null;
+  gift_codes: string[];
 }
 
 @Injectable()
@@ -64,6 +66,8 @@ export class GeoQueryService {
         e.reward_points,
         e.is_active,
         e.join_password_hash,
+        e.gift_teaser,
+        e.gift_codes,
         e.created_by,
         e.created_at,
         e.updated_at,

@@ -7,6 +7,10 @@ import { GeoQueryService } from './geo-query.service';
 import { AuthService } from '../auth/auth.service';
 import { EventAccessService } from './event-access.service';
 import { CreateEventDto, UpdateEventDto } from './dto/event.dto';
+import {
+  assertGiftCodesAppendOnly,
+  validateGiftFields,
+} from './gift-codes.util';
 
 export interface CreateEventInput {
   title: string;
@@ -19,6 +23,9 @@ export interface CreateEventInput {
   createdBy: string;
   joinPassword?: string;
   clearJoinPassword?: boolean;
+  completionMessage?: string | null;
+  giftTeaser?: string | null;
+  giftCodes?: string[];
 }
 
 const publicQuestionSelect = {
@@ -99,6 +106,8 @@ export class EventsService {
             rewardPoints: row.reward_points,
             isActive: row.is_active,
             joinPasswordHash: row.join_password_hash,
+            giftTeaser: row.gift_teaser,
+            giftCodes: row.gift_codes,
             createdBy: row.created_by,
             createdAt: row.created_at,
             updatedAt: row.updated_at,
@@ -156,7 +165,9 @@ export class EventsService {
     ]);
 
     return buildPaginatedResponse(
-      items.map((item) => this.eventAccess.toPublicFields(item)),
+      items.map((item) =>
+        this.eventAccess.toPublicFields(item, { includeOwnerGiftFields: true }),
+      ),
       total,
       page,
       pageSize,
@@ -210,7 +221,14 @@ export class EventsService {
     if (!event) throw new NotFoundException('Event not found');
 
     const hasAccess = await this.eventAccess.hasAccess(userId, event);
-    const publicEvent = this.eventAccess.toPublicFields(event, hasAccess);
+    const includeOwnerGiftFields =
+      !!userId &&
+      (event.createdBy === userId ||
+        (await this.isStaffOrAdmin(userId)));
+    const publicEvent = this.eventAccess.toPublicFields(event, {
+      hasAccess,
+      includeOwnerGiftFields,
+    });
 
     if (!hasAccess && this.eventAccess.isPasswordProtected(event)) {
       return {
@@ -221,6 +239,14 @@ export class EventsService {
     }
 
     return publicEvent;
+  }
+
+  private async isStaffOrAdmin(userId: string): Promise<boolean> {
+    const user = await this.prisma.client.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    return user?.role === 'ADMIN' || user?.role === 'STAFF';
   }
 
   async findOneAdmin(id: string) {
@@ -239,24 +265,26 @@ export class EventsService {
       },
     });
     if (!event) throw new NotFoundException('Event not found');
-    return event;
+    return this.eventAccess.toPublicFields(event, { includeOwnerGiftFields: true });
   }
 
   async create(data: CreateEventInput) {
     if (data.isActive) {
       await this.validateEventForPublish(null, data);
     }
-    const { joinPassword, clearJoinPassword, ...rest } = data;
+    const { joinPassword, clearJoinPassword, giftCodes, giftTeaser, completionMessage, ...rest } =
+      data;
     const createData = await this.applyJoinPasswordFields(
       { joinPasswordHash: null },
       joinPassword,
       clearJoinPassword,
     );
+    const giftFields = validateGiftFields({ giftCodes, giftTeaser, completionMessage });
     const event = await this.prisma.client.event.create({
-      data: { ...rest, ...createData },
+      data: { ...rest, ...createData, ...giftFields },
     });
     await this.invalidateCache();
-    return this.eventAccess.toPublicFields(event);
+    return this.eventAccess.toPublicFields(event, { includeOwnerGiftFields: true });
   }
 
   async update(id: string, data: Partial<CreateEventInput>) {
@@ -264,7 +292,8 @@ export class EventsService {
     if (data.isActive) {
       await this.validateEventForPublish(id);
     }
-    const { joinPassword, clearJoinPassword, ...rest } = data;
+    const { joinPassword, clearJoinPassword, giftCodes, giftTeaser, completionMessage, ...rest } =
+      data;
     const passwordFields = await this.applyJoinPasswordFields(
       existing,
       joinPassword,
@@ -273,12 +302,83 @@ export class EventsService {
     if (passwordFields.joinPasswordHash !== existing.joinPasswordHash) {
       await this.eventAccess.invalidateAccessGrants(id);
     }
+
+    const giftPatch = this.buildGiftUpdatePatch(existing, {
+      giftCodes,
+      giftTeaser,
+      completionMessage,
+    });
+
     const event = await this.prisma.client.event.update({
       where: { id },
-      data: { ...rest, ...passwordFields },
+      data: { ...rest, ...passwordFields, ...giftPatch },
     });
     await this.invalidateCache();
-    return this.eventAccess.toPublicFields(event);
+    return this.eventAccess.toPublicFields(event, { includeOwnerGiftFields: true });
+  }
+
+  private buildGiftUpdatePatch(
+    existing: {
+      giftCodes: string[];
+      giftTeaser: string | null;
+      completionMessage: string | null;
+    },
+    input: {
+      giftCodes?: string[];
+      giftTeaser?: string | null;
+      completionMessage?: string | null;
+    },
+  ): {
+    giftCodes?: string[];
+    giftTeaser?: string | null;
+    completionMessage?: string | null;
+  } {
+    const touchingGifts =
+      input.giftCodes !== undefined ||
+      input.giftTeaser !== undefined ||
+      input.completionMessage !== undefined;
+
+    if (!touchingGifts) {
+      return {};
+    }
+
+    const nextCodes =
+      input.giftCodes !== undefined ? input.giftCodes : existing.giftCodes;
+    const nextTeaser =
+      input.giftTeaser !== undefined ? input.giftTeaser : existing.giftTeaser;
+    const nextMessage =
+      input.completionMessage !== undefined
+        ? input.completionMessage
+        : existing.completionMessage;
+
+    const validated = validateGiftFields({
+      giftCodes: nextCodes,
+      giftTeaser: nextTeaser,
+      completionMessage: nextMessage,
+    });
+
+    if (input.giftCodes !== undefined) {
+      assertGiftCodesAppendOnly(existing.giftCodes, validated.giftCodes);
+    }
+
+    const patch: {
+      giftCodes?: string[];
+      giftTeaser?: string | null;
+      completionMessage?: string | null;
+    } = {};
+
+    if (input.giftCodes !== undefined) patch.giftCodes = validated.giftCodes;
+    if (input.giftTeaser !== undefined) patch.giftTeaser = validated.giftTeaser;
+    if (input.completionMessage !== undefined) {
+      patch.completionMessage = validated.completionMessage;
+    }
+
+    // If codes already exist / are being set, ensure teaser stays valid when only codes change
+    if (input.giftCodes !== undefined && input.giftTeaser === undefined) {
+      patch.giftTeaser = validated.giftTeaser;
+    }
+
+    return patch;
   }
 
   async remove(id: string) {

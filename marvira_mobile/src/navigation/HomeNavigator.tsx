@@ -12,6 +12,8 @@ import {CreateEventInfoScreen} from '../screens/create/CreateEventInfoScreen';
 import {CreateEventPlaceScreen} from '../screens/create/CreateEventPlaceScreen';
 import {CreateEventReviewScreen} from '../screens/create/CreateEventReviewScreen';
 import {CreateEventSuccessScreen} from '../screens/create/CreateEventSuccessScreen';
+import {EditEventGiftsScreen} from '../screens/create/EditEventGiftsScreen';
+import {EventFinishersScreen} from '../screens/home/EventFinishersScreen';
 import {withScreenSafeArea} from '../components/Screen';
 import {HomeStackParamList} from './types';
 import {colors} from '../theme';
@@ -74,6 +76,11 @@ export const HomeNavigator: React.FC = () => {
         options={{title: t('nav.leaderboard')}}
       />
       <Stack.Screen
+        name="EventFinishers"
+        component={EventFinishersScreen}
+        options={{title: t('nav.finishers')}}
+      />
+      <Stack.Screen
         name="GlobalLeaderboard"
         component={GlobalLeaderboardScreen}
         options={{title: t('nav.globalRankings')}}
@@ -97,6 +104,11 @@ export const HomeNavigator: React.FC = () => {
         name="CreateEventSuccess"
         component={CreateEventSuccessScreen}
         options={{title: t('nav.eventCreated')}}
+      />
+      <Stack.Screen
+        name="EditEventGifts"
+        component={EditEventGiftsScreen}
+        options={{title: t('nav.editGifts')}}
       />
     </Stack.Navigator>
   );

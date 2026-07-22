@@ -177,4 +177,20 @@ export const eventsApi = {
     }>(`/events/${eventId}/join`, {password});
     return {success: true, data: response.data.data};
   },
+
+  getEventCompletion: async (eventId: string) => {
+    const response = await apiClient.get<{
+      success: boolean;
+      data: import('../types/api').ApiEventCompletion;
+    }>(`/events/${eventId}/completion`);
+    return {success: true as const, data: response.data.data};
+  },
+
+  getEventFinishers: async (eventId: string) => {
+    const response = await apiClient.get<{
+      success: boolean;
+      data: import('../types/api').ApiEventFinishersResponse;
+    }>(`/events/${eventId}/finishers`);
+    return {success: true as const, data: response.data.data};
+  },
 };

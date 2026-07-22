@@ -124,18 +124,21 @@ model PasswordResetToken {
 }
 
 model Event {
-  id           String          @id @default(uuid())
-  title        String
-  description  String
-  city         String
-  coverImage   String?         @map("cover_image")
-  difficulty   EventDifficulty @default(MEDIUM)
-  rewardPoints Int             @default(100) @map("reward_points")
-  isActive     Boolean         @default(false) @map("is_active")
-  joinPasswordHash String?     @map("join_password_hash")
-  createdBy    String          @map("created_by")
-  createdAt    DateTime        @default(now()) @map("created_at")
-  updatedAt    DateTime        @updatedAt @map("updated_at")
+  id                String          @id @default(uuid())
+  title             String
+  description       String
+  city              String
+  coverImage        String?         @map("cover_image")
+  difficulty        EventDifficulty @default(MEDIUM)
+  rewardPoints      Int             @default(100) @map("reward_points")
+  isActive          Boolean         @default(false) @map("is_active")
+  joinPasswordHash  String?         @map("join_password_hash")
+  completionMessage String?         @map("completion_message")
+  giftTeaser        String?         @map("gift_teaser")
+  giftCodes         String[]        @default([]) @map("gift_codes")
+  createdBy         String          @map("created_by")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
 
   creator        User              @relation("EventCreator", fields: [createdBy], references: [id])
   places         Place[]
@@ -222,6 +225,10 @@ model UserEventProgress {
   completedAt       DateTime? @map("completed_at")
   /// Wall-clock ms from first place unlock to event completion (for leaderboards)
   totalDurationMs   Int?      @map("total_duration_ms")
+  /// 1-based finish rank by soonest completedAt (gift assignment); snapshot at finish
+  finishRank        Int?      @map("finish_rank")
+  /// Gift code assigned at finish, if any; immutable snapshot
+  giftCodeAwarded   String?   @map("gift_code_awarded")
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -230,6 +237,7 @@ model UserEventProgress {
   @@index([userId])
   @@index([eventId])
   @@index([eventId, completed, score, totalDurationMs])
+  @@index([eventId, completed, completedAt])
   @@map("user_event_progress")
 }
 

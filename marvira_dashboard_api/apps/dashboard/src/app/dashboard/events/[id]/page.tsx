@@ -18,6 +18,15 @@ import { AddPlaceForm } from '@/features/events/add-place-form';
 import { EventDifficulty, type AdminEvent } from '@marvira/shared-types';
 import { createEditEventSchema, eventSchema, type EventFormValues } from '@/lib/validation/schemas';
 
+function normalizeGiftFields(data: EventFormValues): EventFormValues {
+  return {
+    ...data,
+    completionMessage: data.completionMessage?.trim() || null,
+    giftTeaser: data.giftTeaser?.trim() || null,
+    giftCodes: (data.giftCodes ?? []).map((c) => c.trim()).filter(Boolean),
+  };
+}
+
 export default function EditEventPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -40,6 +49,8 @@ export default function EditEventPage() {
     handleSubmit,
     reset,
     setError,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -50,6 +61,9 @@ export default function EditEventPage() {
       difficulty: EventDifficulty.MEDIUM,
       rewardPoints: 0,
       isActive: false,
+      completionMessage: '',
+      giftTeaser: '',
+      giftCodes: [],
     },
   });
 
@@ -62,8 +76,13 @@ export default function EditEventPage() {
       difficulty: event.difficulty as EventDifficulty,
       rewardPoints: event.rewardPoints,
       isActive: event.isActive,
+      completionMessage: event.completionMessage ?? '',
+      giftTeaser: event.giftTeaser ?? '',
+      giftCodes: event.giftCodes ?? [],
     });
   }, [event, reset]);
+
+  const giftCodesText = (watch('giftCodes') ?? []).join('\n');
 
   const invalidateEvent = () => {
     queryClient.invalidateQueries({ queryKey: ['admin-event', id] });
@@ -72,7 +91,7 @@ export default function EditEventPage() {
   };
 
   const updateMutation = useMutation({
-    mutationFn: (data: EventFormValues) => api.patch(`/events/${id}`, data),
+    mutationFn: (data: EventFormValues) => api.patch(`/events/${id}`, normalizeGiftFields(data)),
     onSuccess: () => {
       invalidateEvent();
       toast.success('Event saved');
@@ -208,6 +227,70 @@ export default function EditEventPage() {
                 )}
               </div>
             </div>
+
+            <div className="space-y-4 border-t pt-4">
+              <div>
+                <h3 className="text-sm font-medium">Completion gifts</h3>
+                <p className="text-xs text-muted-foreground">
+                  Optional. Soonest finishers receive codes in order (1st → first code). Max 10.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="giftTeaser">Gift teaser</Label>
+                <Input
+                  id="giftTeaser"
+                  placeholder="e.g. Free drink, 10% off"
+                  maxLength={80}
+                  {...register('giftTeaser')}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Public description of the gift (not the code). Required when codes are set.
+                </p>
+                {errors.giftTeaser && (
+                  <p className="text-sm text-destructive">{errors.giftTeaser.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="completionMessage">Completion message</Label>
+                <textarea
+                  id="completionMessage"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  placeholder="Thanks for playing! Show this code at the counter to redeem..."
+                  maxLength={2000}
+                  {...register('completionMessage')}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Shown after finish — thanks, story, and how to redeem.
+                </p>
+                {errors.completionMessage && (
+                  <p className="text-sm text-destructive">{errors.completionMessage.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="giftCodes">Gift codes</Label>
+                <textarea
+                  id="giftCodes"
+                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
+                  placeholder={'CODE-FIRST\nCODE-SECOND\nCODE-THIRD'}
+                  value={giftCodesText}
+                  onChange={(e) =>
+                    setValue('giftCodes', e.target.value.split('\n'), { shouldValidate: true })
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  One code per line, up to 10. Awarded codes are append-only — you cannot change or
+                  remove a code that has already been assigned; you may only add new codes at the end.
+                </p>
+                {errors.giftCodes && (
+                  <p className="text-sm text-destructive">
+                    {typeof errors.giftCodes.message === 'string'
+                      ? errors.giftCodes.message
+                      : 'Invalid gift codes'}
+                  </p>
+                )}
+              </div>
+            </div>
+
             <Button type="submit" disabled={updateMutation.isPending}>
               Save Event
             </Button>

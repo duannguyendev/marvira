@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -48,8 +48,46 @@ export const CreateEventReviewScreen: React.FC = () => {
     joinPassword?: string;
     confirmPassword?: string;
   }>({});
+  const [giftTeaser, setGiftTeaser] = useState('');
+  const [completionMessage, setCompletionMessage] = useState('');
+  const [giftCodesText, setGiftCodesText] = useState('');
+  const [giftError, setGiftError] = useState<string | undefined>();
+  const giftsInitialized = useRef(false);
 
   const event = data?.data;
+
+  useEffect(() => {
+    if (!event || giftsInitialized.current) return;
+    giftsInitialized.current = true;
+    setGiftTeaser(event.giftTeaser ?? '');
+    setCompletionMessage(event.completionMessage ?? '');
+    setGiftCodesText((event.giftCodes ?? []).join('\n'));
+  }, [event]);
+
+  const parseGiftCodes = (text: string): string[] =>
+    text
+      .split(/[\n,]/)
+      .map(c => c.trim())
+      .filter(Boolean);
+
+  const validateGifts = (): boolean => {
+    const codes = parseGiftCodes(giftCodesText);
+    if (codes.length > 10) {
+      setGiftError(t('createEvent.gifts.validation.maxCodes'));
+      return false;
+    }
+    if (codes.length > 0 && !giftTeaser.trim()) {
+      setGiftError(t('createEvent.gifts.validation.teaserRequired'));
+      return false;
+    }
+    const unique = new Set(codes.map(c => c.toLowerCase()));
+    if (unique.size !== codes.length) {
+      setGiftError(t('createEvent.gifts.validation.unique'));
+      return false;
+    }
+    setGiftError(undefined);
+    return true;
+  };
 
   const validateAccess = (): boolean => {
     if (accessMode === 'public') {
@@ -68,15 +106,19 @@ export const CreateEventReviewScreen: React.FC = () => {
   };
 
   const handlePublish = async () => {
-    if (!validateAccess()) {
+    if (!validateAccess() || !validateGifts()) {
       return;
     }
+    const codes = parseGiftCodes(giftCodesText);
     try {
       await publishEvent.mutateAsync({
         eventId,
         ...(accessMode === 'password'
           ? {joinPassword}
           : {clearJoinPassword: true}),
+        giftTeaser: giftTeaser.trim() || null,
+        completionMessage: completionMessage.trim() || null,
+        giftCodes: codes,
       });
       navigation.navigate('CreateEventSuccess', {
         eventId,
@@ -195,6 +237,44 @@ export const CreateEventReviewScreen: React.FC = () => {
               />
               <Text style={styles.accessHint}>{t('createEvent.access.hint')}</Text>
             </>
+          ) : null}
+        </View>
+
+        <View style={styles.accessSection}>
+          <Text style={styles.accessTitle}>{t('createEvent.gifts.heading')}</Text>
+          <Text style={styles.accessSubheading}>
+            {t('createEvent.gifts.subheading')}
+          </Text>
+          <Input
+            label={t('createEvent.gifts.teaserLabel')}
+            value={giftTeaser}
+            onChangeText={setGiftTeaser}
+            placeholder={t('createEvent.gifts.teaserPlaceholder')}
+            maxLength={80}
+          />
+          <Input
+            label={t('createEvent.gifts.messageLabel')}
+            value={completionMessage}
+            onChangeText={setCompletionMessage}
+            placeholder={t('createEvent.gifts.messagePlaceholder')}
+            multiline
+          />
+          <Input
+            label={t('createEvent.gifts.codesLabel')}
+            value={giftCodesText}
+            onChangeText={setGiftCodesText}
+            placeholder={t('createEvent.gifts.codesPlaceholder')}
+            multiline
+            error={giftError}
+          />
+          <Text style={styles.accessHint}>{t('createEvent.gifts.helper')}</Text>
+          {parseGiftCodes(giftCodesText).length > 0 ? (
+            <Text style={styles.previewLine}>
+              {t('createEvent.gifts.preview', {
+                teaser: giftTeaser.trim() || '—',
+                count: parseGiftCodes(giftCodesText).length,
+              })}
+            </Text>
           ) : null}
         </View>
 
@@ -327,6 +407,12 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     color: colors.textSecondary,
     lineHeight: 20,
+  },
+  previewLine: {
+    marginTop: spacing.sm,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+    color: colors.primary,
   },
   checklist: {
     backgroundColor: colors.infoLight,

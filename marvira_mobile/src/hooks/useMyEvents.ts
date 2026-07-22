@@ -67,3 +67,24 @@ export const usePublishEvent = () => {
     },
   });
 };
+
+export const useUpdateEventGifts = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      eventId,
+      ...input
+    }: {
+      eventId: string;
+      completionMessage?: string | null;
+      giftTeaser?: string | null;
+      giftCodes?: string[];
+    }) => eventCreationApi.updateEventGifts(eventId, input),
+    onSuccess: (_data, {eventId}) => {
+      queryClient.invalidateQueries({queryKey: ['myEvents']});
+      queryClient.invalidateQueries({queryKey: ['events']});
+      queryClient.invalidateQueries({queryKey: ['event', eventId]});
+      queryClient.invalidateQueries({queryKey: ['eventFinishers', eventId]});
+    },
+  });
+};

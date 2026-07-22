@@ -16,8 +16,11 @@ import { UnlockPlaceDto, AnswerPlaceDto } from '../places/dto/place.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { EventAccessService } from '../events/event-access.service';
 import { AnticheatService } from '../anticheat/anticheat.service';
+import { buildCompletionPayload } from '../events/gift-codes.util';
 
 const COOLDOWN_SECONDS = 5;
+
+type CompletionGiftFields = ReturnType<typeof buildCompletionPayload>;
 
 @Injectable()
 export class ProgressService {
@@ -123,37 +126,93 @@ export class ProgressService {
       where: { userId_eventId: { userId, eventId: place.eventId } },
     });
     if (!progress) throw new ForbiddenException('Place not unlocked');
-    if (progress.completed) {
-      throw new ForbiddenException('Event already completed');
-    }
 
     const placeIndex = place.event.places.findIndex((p) => p.id === placeId);
-    if (placeIndex > progress.currentPlaceIndex) {
-      throw new ForbiddenException('Place not unlocked yet');
+    const isLastPlace = placeIndex === place.event.places.length - 1;
+
+    // Idempotent: already finished → return stored completion snapshot
+    if (progress.completed) {
+      const giftFields = await this.completionFieldsFromProgress(progress, place.eventId);
+      return {
+        correct: true,
+        points: 0,
+        totalScore: progress.score,
+        explanation: place.question.explanation,
+        nextPlaceId: null,
+        eventCompleted: true,
+        answerDurationMs: null,
+        eventTotalDurationMs: progress.totalDurationMs,
+        warnings: [],
+        alreadyCompleted: true,
+        ...giftFields,
+      };
     }
 
-    if (!isWithinRadius(dto.latitude, dto.longitude, place.latitude, place.longitude, place.radiusMeters)) {
-      throw new BadRequestException('You must be within the place radius to submit an answer');
+    if (placeIndex > progress.currentPlaceIndex) {
+      throw new ForbiddenException('Place not unlocked yet');
     }
 
     const existingCompletion = await this.prisma.client.userPlaceCompletion.findUnique({
       where: { userId_placeId: { userId, placeId } },
     });
 
+    // Place already answered correctly
     if (existingCompletion?.completed) {
-      const isLastPlace = placeIndex === place.event.places.length - 1;
+      // Recover: last place saved but event/gift assign never finished (crash between steps)
+      if (isLastPlace) {
+        const now = new Date();
+        const eventTotalDurationMs = now.getTime() - progress.startedAt.getTime();
+        const totalScore =
+          progress.score + place.question.points + place.event.rewardPoints;
+        const completed = await this.completeEventWithGiftAssign({
+          progressId: progress.id,
+          userId,
+          eventId: place.eventId,
+          totalScore,
+          newIndex: placeIndex,
+          now,
+          eventTotalDurationMs,
+        });
+        const giftFields = completed.giftFields;
+        this.websocket.emitEventCompleted(userId, place.eventId, totalScore, {
+          finishRank: giftFields.finishRank,
+          giftCode: giftFields.giftCode,
+          giftCount: giftFields.giftCount,
+          giftsAllClaimed: giftFields.giftsAllClaimed,
+        });
+        await this.enqueueEventCompletedNotification(userId, place.event.title, totalScore);
+        this.websocket.emitProgressUpdated(userId, place.eventId, placeIndex, totalScore);
+        return {
+          correct: true,
+          points: 0,
+          totalScore,
+          explanation: place.question.explanation,
+          nextPlaceId: null,
+          eventCompleted: true,
+          answerDurationMs: existingCompletion.answerDurationMs,
+          eventTotalDurationMs,
+          warnings: [],
+          alreadyCompleted: true,
+          ...giftFields,
+        };
+      }
+
       return {
         correct: true,
         points: 0,
         totalScore: progress.score,
         explanation: place.question.explanation,
-        nextPlaceId: isLastPlace ? null : (place.event.places[placeIndex + 1]?.id ?? null),
-        eventCompleted: isLastPlace,
+        nextPlaceId: place.event.places[placeIndex + 1]?.id ?? null,
+        eventCompleted: false,
         answerDurationMs: existingCompletion.answerDurationMs,
-        eventTotalDurationMs: isLastPlace ? progress.totalDurationMs : null,
+        eventTotalDurationMs: null,
         warnings: [],
         alreadyCompleted: true,
       };
+    }
+
+    if (!isWithinRadius(dto.latitude, dto.longitude, place.latitude, place.longitude, place.radiusMeters)) {
+      throw new BadRequestException('You must be within the place radius to submit an answer');
     }
 
     const previousPlace = await this.getPreviousPlaceContext(userId, place.event.places, placeIndex);
@@ -204,37 +263,45 @@ export class ProgressService {
     let eventCompleted = false;
     let eventTotalDurationMs: number | null = null;
     let totalScore = progress.score;
+    let giftFields: CompletionGiftFields | Record<string, never> = {};
 
     if (correct) {
-      const isLastPlace = placeIndex === place.event.places.length - 1;
       const rewardBonus = isLastPlace ? place.event.rewardPoints : 0;
       totalScore = progress.score + points + rewardBonus;
       const newIndex = isLastPlace ? placeIndex : placeIndex + 1;
 
-      if (isLastPlace) {
-        eventTotalDurationMs = now.getTime() - progress.startedAt.getTime();
-      }
-
-      await this.prisma.client.userEventProgress.update({
-        where: { id: progress.id },
-        data: {
-          score: totalScore,
-          currentPlaceIndex: newIndex,
-          completed: isLastPlace,
-          completedAt: isLastPlace ? now : null,
-          totalDurationMs: isLastPlace ? eventTotalDurationMs : null,
-        },
-      });
-
       if (!isLastPlace) {
+        await this.prisma.client.userEventProgress.update({
+          where: { id: progress.id },
+          data: {
+            score: totalScore,
+            currentPlaceIndex: newIndex,
+          },
+        });
         nextPlaceId = place.event.places[placeIndex + 1]?.id ?? null;
+        this.websocket.emitProgressUpdated(userId, place.eventId, newIndex, totalScore);
       } else {
+        eventTotalDurationMs = now.getTime() - progress.startedAt.getTime();
+        const completed = await this.completeEventWithGiftAssign({
+          progressId: progress.id,
+          userId,
+          eventId: place.eventId,
+          totalScore,
+          newIndex,
+          now,
+          eventTotalDurationMs,
+        });
         eventCompleted = true;
-        this.websocket.emitEventCompleted(userId, place.eventId, totalScore);
+        giftFields = completed.giftFields;
+        this.websocket.emitEventCompleted(userId, place.eventId, totalScore, {
+          finishRank: giftFields.finishRank,
+          giftCode: giftFields.giftCode,
+          giftCount: giftFields.giftCount,
+          giftsAllClaimed: giftFields.giftsAllClaimed,
+        });
         await this.enqueueEventCompletedNotification(userId, place.event.title, totalScore);
+        this.websocket.emitProgressUpdated(userId, place.eventId, newIndex, totalScore);
       }
-
-      this.websocket.emitProgressUpdated(userId, place.eventId, newIndex, totalScore);
     }
 
     await this.prisma.client.analyticsEvent.create({
@@ -255,6 +322,191 @@ export class ProgressService {
       answerDurationMs,
       eventTotalDurationMs,
       warnings,
+      ...giftFields,
+    };
+  }
+
+  /**
+   * Serialize gift assign per event via row lock so concurrent finishers
+   * never share the same rank/code.
+   */
+  private async completeEventWithGiftAssign(params: {
+    progressId: string;
+    userId: string;
+    eventId: string;
+    totalScore: number;
+    newIndex: number;
+    now: Date;
+    eventTotalDurationMs: number;
+  }): Promise<{ giftFields: CompletionGiftFields }> {
+    return this.prisma.client.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM events WHERE id = ${params.eventId} FOR UPDATE`;
+
+      const current = await tx.userEventProgress.findUnique({
+        where: { id: params.progressId },
+      });
+      if (!current) throw new NotFoundException('Progress not found');
+
+      if (current.completed) {
+        const event = await tx.event.findUnique({
+          where: { id: params.eventId },
+          select: {
+            completionMessage: true,
+            giftTeaser: true,
+            giftCodes: true,
+          },
+        });
+        return {
+          giftFields: buildCompletionPayload({
+            finishRank: current.finishRank,
+            giftCodeAwarded: current.giftCodeAwarded,
+            completionMessage: event?.completionMessage ?? null,
+            giftTeaser: event?.giftTeaser ?? null,
+            giftCount: event?.giftCodes?.length ?? 0,
+          }),
+        };
+      }
+
+      const event = await tx.event.findUnique({
+        where: { id: params.eventId },
+        select: {
+          completionMessage: true,
+          giftTeaser: true,
+          giftCodes: true,
+        },
+      });
+      if (!event) throw new NotFoundException('Event not found');
+
+      const giftCodes = event.giftCodes ?? [];
+
+      await tx.userEventProgress.update({
+        where: { id: params.progressId },
+        data: {
+          score: params.totalScore,
+          currentPlaceIndex: params.newIndex,
+          completed: true,
+          completedAt: params.now,
+          totalDurationMs: params.eventTotalDurationMs,
+        },
+      });
+
+      const finishers = await tx.userEventProgress.findMany({
+        where: { eventId: params.eventId, completed: true },
+        select: { userId: true, completedAt: true, startedAt: true },
+        orderBy: [
+          { completedAt: 'asc' },
+          { startedAt: 'asc' },
+          { userId: 'asc' },
+        ],
+      });
+
+      const finishRank = finishers.findIndex((f) => f.userId === params.userId) + 1;
+      const giftCodeAwarded =
+        finishRank > 0 && finishRank <= giftCodes.length
+          ? giftCodes[finishRank - 1]
+          : null;
+
+      await tx.userEventProgress.update({
+        where: { id: params.progressId },
+        data: {
+          finishRank,
+          giftCodeAwarded,
+        },
+      });
+
+      return {
+        giftFields: buildCompletionPayload({
+          finishRank,
+          giftCodeAwarded,
+          completionMessage: event.completionMessage,
+          giftTeaser: event.giftTeaser,
+          giftCount: giftCodes.length,
+        }),
+      };
+    });
+  }
+
+  private async completionFieldsFromProgress(
+    progress: {
+      finishRank: number | null;
+      giftCodeAwarded: string | null;
+    },
+    eventId: string,
+  ): Promise<CompletionGiftFields> {
+    const event = await this.prisma.client.event.findUnique({
+      where: { id: eventId },
+      select: {
+        completionMessage: true,
+        giftTeaser: true,
+        giftCodes: true,
+      },
+    });
+    return buildCompletionPayload({
+      finishRank: progress.finishRank,
+      giftCodeAwarded: progress.giftCodeAwarded,
+      completionMessage: event?.completionMessage ?? null,
+      giftTeaser: event?.giftTeaser ?? null,
+      giftCount: event?.giftCodes?.length ?? 0,
+    });
+  }
+
+  async getEventCompletion(userId: string, eventId: string) {
+    const progress = await this.prisma.client.userEventProgress.findUnique({
+      where: { userId_eventId: { userId, eventId } },
+    });
+    if (!progress || !progress.completed) {
+      throw new ForbiddenException('Complete this event to view completion details');
+    }
+
+    const giftFields = await this.completionFieldsFromProgress(progress, eventId);
+    return {
+      eventCompleted: true as const,
+      ...giftFields,
+      score: progress.score,
+      totalDurationMs: progress.totalDurationMs,
+    };
+  }
+
+  async getEventFinishers(eventId: string) {
+    const event = await this.prisma.client.event.findUnique({
+      where: { id: eventId },
+      select: {
+        id: true,
+        title: true,
+        city: true,
+        giftCodes: true,
+      },
+    });
+    if (!event) throw new NotFoundException('Event not found');
+
+    const giftCount = event.giftCodes?.length ?? 0;
+
+    const rows = await this.prisma.client.userEventProgress.findMany({
+      where: { eventId, completed: true },
+      include: { user: { select: { id: true, name: true } } },
+      orderBy: [
+        { finishRank: 'asc' },
+        { completedAt: 'asc' },
+        { startedAt: 'asc' },
+        { userId: 'asc' },
+      ],
+    });
+
+    const giftAssignedCount = rows.filter((r) => r.giftCodeAwarded != null).length;
+
+    return {
+      event: { id: event.id, title: event.title, city: event.city },
+      giftCount,
+      giftAssignedCount,
+      finishers: rows.map((row) => ({
+        userId: row.userId,
+        userName: row.user.name,
+        completedAt: row.completedAt!.toISOString(),
+        totalDurationMs: row.totalDurationMs,
+        score: row.score,
+        finishRank: row.finishRank,
+        giftCodeAwarded: row.giftCodeAwarded,
+      })),
     };
   }
 
@@ -432,6 +684,7 @@ export class ProgressService {
 
     const { skip, take } = parsePagination({ page, pageSize });
     const totalPlaces = event._count.places;
+    const giftCount = event.giftCodes?.length ?? 0;
 
     const userFilter = search
       ? {
@@ -466,7 +719,7 @@ export class ProgressService {
         break;
     }
 
-    const [rows, total] = await Promise.all([
+    const [rows, total, giftAssignedCount] = await Promise.all([
       this.prisma.client.userEventProgress.findMany({
         where,
         skip,
@@ -477,6 +730,9 @@ export class ProgressService {
         },
       }),
       this.prisma.client.userEventProgress.count({ where }),
+      this.prisma.client.userEventProgress.count({
+        where: { eventId, giftCodeAwarded: { not: null } },
+      }),
     ]);
 
     const items = rows.map((row) => ({
@@ -491,10 +747,18 @@ export class ProgressService {
       startedAt: row.startedAt.toISOString(),
       completedAt: row.completedAt?.toISOString() ?? null,
       totalDurationMs: row.totalDurationMs,
+      finishRank: row.finishRank,
+      giftCodeAwarded: row.giftCodeAwarded,
     }));
 
     return {
-      event: { id: event.id, title: event.title, city: event.city },
+      event: {
+        id: event.id,
+        title: event.title,
+        city: event.city,
+        giftCount,
+        giftAssignedCount,
+      },
       participants: buildPaginatedResponse(items, total, page, pageSize),
     };
   }

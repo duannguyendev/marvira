@@ -266,6 +266,7 @@ EVENT COMPLETION
 - celebration screen
 - Lottie animation
 - completion persistence
+- optional creator completion message + gift codes for soonest finishers (see Â§22)
 
 PROFILE
 - user profile
@@ -1961,6 +1962,80 @@ development (mobile app remains a separate project).
      * Branded no-cover placeholder image: IMPLEMENTED
      * eventId @IsString validation fix: IMPLEMENTED
      * Seed articles: IMPLEMENTED
+
+22. EVENT COMPLETION GIFTS (full-stack â€” creator message + ordered gift codes)
+   Purpose: After a player finishes an event (correct answer on the last place), extend
+   EventCompletionScreen with an optional creator message and optional gift codes for the
+   soonest finishers. Celebration stays primary; gift UI is secondary.
+
+   Player-facing naming (locked): Gift / gift code. Re-open CTA: "View your gift" (or
+   "View completion" when the event had no gifts). Avoid "prize" / "reward" / "completion reward".
+
+   22.1 SCOPE (v1 â€” IMPLEMENTED)
+   - Optional completionMessage (thanks + how to redeem) shown only on completion / re-open.
+   - Optional ordered giftCodes (max 10); rank i (1-based) gets codes[i-1].
+   - Public giftTeaser required when codes exist (what the gift is; never the code).
+   - Rank by server completedAt ASC; ties: startedAt ASC, then userId.
+   - Snapshot finishRank + giftCodeAwarded on UserEventProgress at finish (stable view-again).
+   - Public list/detail: hasGift, giftCount, giftTeaser only â€” never giftCodes.
+   - Non-winners: transparent rank + "first N" copy + soft next CTA; no code shown.
+   - Winners: rank + code + copy-to-clipboard with success feedback; redeem via completionMessage.
+   - Re-open same payload from completed event details / history.
+   - Owner finishers list (mobile My Events) + admin/staff finishers (dashboard) with assigned codes
+     and assigned/unused summary ({assigned}/{giftCount} = assigned at finish, not venue-redeemed).
+   - Create/edit on mobile wizard + dashboard: framing, teaser, message, codes, player preview.
+   - Edit after assign: freeze awarded slots; append unused codes at end only (max 10).
+   - Concurrent finish: serialize gift assign per event; idempotent if already completed.
+
+   22.2 OUT OF SCOPE (v1 â€” defer)
+   - Live "X gifts left" on search cards
+   - Share / viral "I won a gift" card
+   - Push notifications containing gift codes
+   - Score-based prize ranking
+
+   22.3 DATABASE
+   - Event: completionMessage (String?), giftTeaser (String?), giftCodes (String[]).
+   - UserEventProgress: finishRank (Int?), giftCodeAwarded (String?).
+   - Derived for clients: hasGift = giftCodes.length > 0; giftCount = giftCodes.length.
+
+   22.4 API
+   - Create/update event: completionMessage, giftTeaser, giftCodes (trim; reject blanks;
+     unique within event; max 10; max length per code; teaser required if codes present;
+     freeze awarded indexes on update).
+   - Public list/nearby/search/favorites/detail: hasGift, giftCount, giftTeaser; never codes
+     or completionMessage.
+   - On finish (submitAnswer when eventCompleted): compute rank + assign code + snapshot;
+     return finishRank, completionMessage, giftTeaser, giftCode | null, giftCount,
+     giftsAllClaimed.
+   - GET /events/:id/completion â€” auth, must have completed; same shape from snapshot.
+   - GET /events/:id/finishers â€” event owner only; + claimed/assigned summary.
+   - Admin/staff finishers / participants: same gift-aware columns.
+
+   22.5 UX SURFACES
+   - Create/edit: creator value framing; gift teaser; completion message (redeem helper);
+     gift codes list; "Players will see: {teaser} Â· Gifts for the first {N} finishers".
+   - EventCard: gift icon + a11y label "Gift" when hasGift.
+   - Event details (pre-play): teaser + "Gifts for the first {N} finishers".
+   - EventCompletionScreen: celebration â†’ creator message â†’ gift block (awarded / not awarded /
+     omit if no gifts).
+   - Profile / completed history: re-open entry.
+   - Mobile My Events â†’ Finishers; dashboard admin/staff finishers columns.
+
+   22.6 NON-WINNER / WINNER COPY (locked)
+   - Before play: teaser + first N.
+   - Won: "You're finisher #{rank}" + code + Copy code.
+   - Had gifts, finished after N: "Gifts went to the first {N} finishers. You finished #{rank}."
+     + soft CTA (e.g. Explore more events).
+   - No gifts: never mention gifts.
+
+   Implementation status (section 22):
+     * Prisma fields + migration: IMPLEMENTED
+     * Create/update validation + freeze awarded slots: IMPLEMENTED
+     * Finish rank / assign / snapshot + completion payload: IMPLEMENTED
+     * GET completion + owner finishers + admin/staff columns: IMPLEMENTED
+     * Mobile create/edit + completion UX + gift icon/teaser + re-open: IMPLEMENTED
+     * Dashboard create/edit + finishers gift columns: IMPLEMENTED
+     * Live scarcity / share card: NOT STARTED (v1.1)
 
 ====================================================
 EXPECTED OUTPUT

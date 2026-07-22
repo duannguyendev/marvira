@@ -8,7 +8,7 @@
     "all": "Tất cả",
     "places": "địa điểm",
     "pts": "điểm",
-    "away": "cách xa",
+    "away": "cách đây",
     "you": "(Bạn)",
     "event": "sự kiện",
     "events": "sự kiện",
@@ -29,6 +29,8 @@
     "eventDetails": "Chi tiết sự kiện",
     "placeChallenge": "Thử thách địa điểm",
     "leaderboard": "Bảng xếp hạng",
+    "finishers": "Người hoàn thành",
+    "editGifts": "Chỉnh sửa quà",
     "globalRankings": "Xếp hạng toàn cầu",
     "settings": "Cài đặt",
     "globalLeaderboardA11y": "Bảng xếp hạng toàn cầu",
@@ -77,27 +79,27 @@
     "newPasswordPlaceholder": "Nhập mật khẩu mới",
     "confirmNewPasswordPlaceholder": "Xác nhận mật khẩu mới",
     "updatePassword": "Cập nhật mật khẩu",
-    "tokenPasswordRequired": "Mã và mật khẩu mới là bắt buộc",
-    "passwordUpdated": "Mật khẩu đã được cập nhật. Vui lòng đăng nhập.",
+    "tokenPasswordRequired": "Cần có mã và mật khẩu mới",
+    "passwordUpdated": "Đã cập nhật mật khẩu. Vui lòng đăng nhập.",
     "resetPasswordFailed": "Không thể đặt lại mật khẩu",
     "success": "Thành công"
   },
   "validation": {
-    "emailRequired": "Email là bắt buộc",
+    "emailRequired": "Vui lòng nhập email",
     "emailInvalid": "Email không hợp lệ",
-    "passwordRequired": "Mật khẩu là bắt buộc",
+    "passwordRequired": "Vui lòng nhập mật khẩu",
     "passwordMinLength": "Mật khẩu phải có ít nhất 6 ký tự",
-    "nameRequired": "Tên là bắt buộc",
+    "nameRequired": "Vui lòng nhập tên",
     "passwordsDoNotMatch": "Mật khẩu không khớp"
   },
   "profile": {
     "statistics": "Thống kê",
-    "eventsCompleted": "Sự kiện hoàn thành",
+    "eventsCompleted": "Sự kiện đã hoàn thành",
     "totalScore": "Tổng điểm",
     "globalLeaderboard": "Bảng xếp hạng toàn cầu",
     "completedEvents": "Sự kiện đã hoàn thành",
-    "noCompletedEvents": "Chưa có sự kiện hoàn thành",
-    "startExploring": "Bắt đầu khám phá sự kiện để xem tại đây!",
+    "noCompletedEvents": "Chưa hoàn thành sự kiện nào",
+    "startExploring": "Hãy khám phá sự kiện để xem tại đây!",
     "logout": "Đăng xuất",
     "loggingOut": "Đang đăng xuất...",
     "logoutConfirmTitle": "Đăng xuất",
@@ -111,7 +113,7 @@
     "title": "Cài đặt",
     "sendFeedback": "Gửi phản hồi",
     "language": "Ngôn ngữ",
-    "languageDescription": "Chọn ngôn ngữ ưa thích",
+    "languageDescription": "Chọn ngôn ngữ bạn muốn dùng",
     "languages": {
       "vi": "Tiếng Việt",
       "en": "English",
@@ -121,20 +123,20 @@
   },
   "feedback": {
     "title": "Gửi phản hồi",
-    "description": "Chia sẻ ý kiến, gợi ý cải thiện hoặc báo lỗi.",
+    "description": "Chia sẻ ý kiến, đề xuất cải thiện hoặc báo lỗi.",
     "category": "Danh mục",
-    "subject": "Tiêu đề (tuỳ chọn)",
+    "subject": "Tiêu đề (tùy chọn)",
     "subjectPlaceholder": "Tóm tắt ngắn",
     "message": "Nội dung",
     "messagePlaceholder": "Mô tả chi tiết phản hồi của bạn…",
     "submit": "Gửi tin nhắn",
-    "successTitle": "Cảm ơn",
-    "successMessage": "Tin nhắn của bạn đã được gửi. Chúng tôi đánh giá cao phản hồi của bạn!",
+    "successTitle": "Cảm ơn bạn",
+    "successMessage": "Tin nhắn đã được gửi. Chúng tôi rất trân trọng phản hồi của bạn!",
     "submitFailed": "Không gửi được phản hồi",
     "validationMessageMin": "Nội dung phải có ít nhất 10 ký tự",
     "categories": {
       "feedback": "Phản hồi",
-      "suggestion": "Gợi ý",
+      "suggestion": "Đề xuất",
       "bug": "Báo lỗi",
       "other": "Khác"
     }
@@ -146,17 +148,21 @@
     "loadFailed": "Không thể tải sự kiện",
     "detailsLoadFailed": "Không thể tải chi tiết sự kiện",
     "progressComplete": "Hoàn thành {{progress}}% ({{completed}}/{{total}} địa điểm)",
-    "visitHint": "Ghé thăm các địa điểm theo thứ tự. Di chuyển trong bán kính mỗi điểm để mở khóa và trả lời câu hỏi.",
+    "visitHint": "Ghé thăm các địa điểm theo thứ tự. Đến trong bán kính mỗi điểm để mở khóa và trả lời câu hỏi.",
     "viewLeaderboard": "Xem bảng xếp hạng",
+    "viewYourGift": "Xem quà của bạn",
+    "viewCompletion": "Xem kết quả hoàn thành",
+    "giftLabel": "Quà",
+    "giftsForFirst": "Quà dành cho {{count}} người hoàn thành sớm nhất",
     "placesCount": "Địa điểm ({{count}})",
     "passwordProtected": {
       "badge": "Chỉ mời",
       "title": "Cần mật khẩu",
-      "message": "Sự kiện này là riêng tư. Nhập mật khẩu từ người tổ chức để xem địa điểm và bắt đầu chơi."
+      "message": "Cuộc săn này là riêng tư. Nhập mật khẩu từ người tổ chức để xem địa điểm và bắt đầu chơi."
     },
     "join": {
       "title": "Nhập mật khẩu sự kiện",
-      "message": "Chỉ người có mật khẩu mới có thể tham gia.",
+      "message": "Chỉ người có mật khẩu mới có thể tham gia cuộc săn này.",
       "passwordLabel": "Mật khẩu",
       "passwordPlaceholder": "Nhập mật khẩu",
       "submit": "Tham gia",
@@ -167,10 +173,10 @@
   "eventStatus": {
     "not_started": "Chưa bắt đầu",
     "in_progress": "Đang diễn ra",
-    "completed": "Hoàn thành"
+    "completed": "Đã hoàn thành"
   },
   "placeStatus": {
-    "completed": "Hoàn thành",
+    "completed": "Đã hoàn thành",
     "unlocked": "Đã mở khóa",
     "locked": "Đã khóa"
   },
@@ -187,26 +193,26 @@
     "incorrect": "Sai rồi",
     "tryAgain": "Thử lại!",
     "submitFailed": "Không thể gửi câu trả lời",
-    "placeCompleted": "Địa điểm đã hoàn thành!",
+    "placeCompleted": "Đã hoàn thành địa điểm!",
     "alreadyCompleted": "Bạn đã hoàn thành địa điểm này.",
     "goBack": "Quay lại",
-    "locationUnavailable": "Không có vị trí",
+    "locationUnavailable": "Không lấy được vị trí",
     "locationPermissionDenied": "Quyền truy cập vị trí bị từ chối",
     "distanceAway": "📍 Cách {{distance}}",
-    "getWithinToUnlock": "Đến gần trong {{radius}}m để mở khóa",
+    "getWithinToUnlock": "Đến trong phạm vi {{radius}}m để mở khóa",
     "waitingGps": " (đang chờ GPS chính xác hơn)",
     "question": "Câu hỏi:",
     "couldNotLoadQuestion": "Không thể tải câu hỏi",
     "submitAnswer": "Gửi câu trả lời",
-    "placeLocked": "Địa điểm này đã bị khóa",
-    "completePreviousFirst": "Hoàn thành địa điểm trước đó trước khi bạn có thể mở khóa địa điểm này.",
-    "moveWithinToUnlock": "Di chuyển trong phạm vi {{radius}} mét để mở khóa và trả lời câu hỏi.",
+    "placeLocked": "Địa điểm này đang bị khóa",
+    "completePreviousFirst": "Hãy hoàn thành địa điểm trước để mở khóa địa điểm này.",
+    "moveWithinToUnlock": "Di chuyển vào phạm vi {{radius}} mét để mở khóa và trả lời câu hỏi.",
     "tryUnlockNow": "Thử mở khóa ngay",
     "enterYourAnswer": "Nhập câu trả lời"
   },
   "anticheat": {
     "title": "Thông báo vị trí",
-    "message": "Chúng tôi phát hiện hoạt động vị trí bất thường trên tài khoản của bạn. Vui lòng chơi công bằng. Vi phạm lặp lại có thể dẫn đến xem xét tài khoản.",
+    "message": "Chúng tôi phát hiện hoạt động vị trí bất thường trên tài khoản của bạn. Vui lòng chơi công bằng. Vi phạm nhiều lần có thể dẫn đến xem xét tài khoản.",
     "ok": "OK"
   },
   "completion": {
@@ -218,13 +224,23 @@
     "points": "Điểm",
     "viewLeaderboard": "Xem bảng xếp hạng",
     "backToEvents": "Quay lại sự kiện",
-    "viewEventDetails": "Xem chi tiết sự kiện"
+    "viewEventDetails": "Xem chi tiết sự kiện",
+    "fromCreator": "Lời nhắn từ người tạo",
+    "finisherRank": "Bạn là người hoàn thành thứ #{{rank}}",
+    "yourGift": "Quà của bạn: {{teaser}}",
+    "giftCode": "Mã quà",
+    "copyCode": "Sao chép mã",
+    "codeCopied": "Đã sao chép!",
+    "copyFailed": "Không thể sao chép mã",
+    "giftsWentToFirst": "Quà đã được trao cho {{count}} người hoàn thành sớm nhất.",
+    "youFinishedRank": "Bạn hoàn thành thứ #{{rank}}.",
+    "exploreMore": "Khám phá thêm sự kiện"
   },
   "leaderboard": {
     "loadFailed": "Không thể tải bảng xếp hạng",
     "rankedByScore": "Xếp hạng theo điểm, sau đó theo thời gian nhanh nhất",
     "globalTitle": "Bảng xếp hạng toàn cầu",
-    "topPlayers": "Người chơi hàng đầu trên tất cả sự kiện",
+    "topPlayers": "Người chơi hàng đầu trên mọi sự kiện",
     "rankedGlobal": "Xếp hạng theo tổng điểm, số sự kiện hoàn thành, rồi thời gian trung bình",
     "eventEmpty": "Chưa ai hoàn thành sự kiện này. Hãy là người đầu tiên!",
     "globalEmpty": "Chưa có xếp hạng. Hoàn thành sự kiện để xuất hiện tại đây!",
@@ -309,7 +325,7 @@
     "publishFailed": "Không thể xuất bản sự kiện",
     "access": {
       "heading": "Ai có thể chơi?",
-      "subheading": "Chọn ai có thể tham gia hoặc chỉ người có mật khẩu.",
+      "subheading": "Chọn cho mọi người tham gia hoặc chỉ người có mật khẩu.",
       "modes": {
         "public": "Mọi người",
         "password": "Cần mật khẩu"
@@ -320,12 +336,38 @@
       "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
       "hint": "Chia sẻ mật khẩu này với bạn bè bạn mời.",
       "passwordShareLabel": "Mật khẩu sự kiện",
-      "passwordWarning": "Lưu mật khẩu ngay. Sẽ không hiển thị lại.",
+      "passwordWarning": "Hãy lưu mật khẩu ngay. Sẽ không hiển thị lại.",
       "shareInvite": "Chia sẻ lời mời",
       "shareMessage": "Tham gia cuộc săn kho báu của tôi! Mật khẩu: {{password}}",
       "validation": {
         "passwordMin": "Mật khẩu phải có ít nhất 4 ký tự",
         "passwordMismatch": "Mật khẩu không khớp"
+      }
+    },
+    "gifts": {
+      "heading": "Quà hoàn thành",
+      "subheading": "Thêm quà để khích lệ những người hoàn thành nhanh nhất và tăng số lượt hoàn thành.",
+      "editSubheading": "Cập nhật mô tả quà, lời nhắn đổi quà và thêm mã quà mới. Mã đã trao không thể thay đổi.",
+      "teaserLabel": "Mô tả quà",
+      "teaserPlaceholder": "Nước miễn phí, giảm 10%, mã quà…",
+      "messageLabel": "Lời nhắn khi hoàn thành",
+      "messagePlaceholder": "Cảm ơn bạn đã chơi! Đưa mã này tại quầy để nhận quà.",
+      "codesLabel": "Mã quà (mỗi dòng một mã)",
+      "codesPlaceholder": "CODE1\nCODE2\nCODE3",
+      "codePlaceholder": "Mã {{n}}",
+      "addCode": "+ Thêm mã quà",
+      "awarded": "Đã trao",
+      "freezeHint": "{{count}} mã đầu đã được trao và bị khóa. Bạn chỉ có thể thêm mã mới.",
+      "helper": "Mã được trao theo thứ tự người hoàn thành sớm nhất (mã 1 → người thứ 1, …). Tối đa 10 mã.",
+      "preview": "Người chơi sẽ thấy: {{teaser}} · Quà dành cho {{count}} người hoàn thành sớm nhất",
+      "save": "Lưu quà",
+      "saved": "Đã cập nhật quà",
+      "saveFailed": "Không thể cập nhật quà",
+      "validation": {
+        "maxCodes": "Chỉ được tối đa 10 mã quà",
+        "teaserRequired": "Cần mô tả quà khi đã nhập mã",
+        "unique": "Các mã quà phải khác nhau",
+        "appendOnly": "Không thể sửa hoặc xóa mã đã có; chỉ được thêm mã mới"
       }
     },
     "validation": {
@@ -350,19 +392,28 @@
     "emptyMessage": "Tạo cuộc săn theo vị trí và chia sẻ với mọi người.",
     "loadFailed": "Không thể tải sự kiện của bạn",
     "published": "Đã xuất bản",
-    "draft": "Bản nháp"
+    "draft": "Bản nháp",
+    "viewFinishers": "Xem người hoàn thành",
+    "editGifts": "Chỉnh sửa quà"
+  },
+  "finishers": {
+    "loadFailed": "Không thể tải danh sách người hoàn thành",
+    "assignedSummary": "Đã trao {{assigned}}/{{total}} quà",
+    "noGifts": "Sự kiện này chưa cấu hình quà",
+    "empty": "Chưa ai hoàn thành",
+    "code": "Mã quà"
   },
   "practice": {
     "heading": "Luyện tập",
-    "subheading": "Luyện tập tại nhà — không cần vị trí",
+    "subheading": "Luyện tại nhà — không cần vị trí",
     "toPractice": "Cần luyện",
     "completedTab": "Đã hoàn thành",
     "completed": "Xong",
     "sourceCommunity": "Cộng đồng",
     "sourceEvent": "Từ {{event}}",
     "emptyToPracticeTitle": "Không có câu hỏi để luyện",
-    "emptyToPracticeMessage": "Hãy quay lại sau hoặc thêm câu hỏi cho người khác luyện tập!",
-    "emptyCompletedTitle": "Chưa hoàn thành luyện tập nào",
+    "emptyToPracticeMessage": "Hãy quay lại sau hoặc thêm câu hỏi để người khác luyện tập!",
+    "emptyCompletedTitle": "Chưa hoàn thành bài luyện nào",
     "emptyCompletedMessage": "Hoàn thành một câu hỏi luyện tập để xem tại đây.",
     "addQuestion": "Thêm câu hỏi",
     "editQuestion": "Sửa câu hỏi",
@@ -381,7 +432,7 @@
     "submitFailed": "Không thể gửi câu trả lời",
     "saveFailed": "Không thể lưu câu hỏi",
     "createSuccessTitle": "Đã đăng câu hỏi",
-    "createSuccessMessage": "Câu hỏi của bạn đã sẵn sàng cho người khác luyện tập.",
+    "createSuccessMessage": "Câu hỏi của bạn đã sẵn sàng để người khác luyện tập.",
     "updateSuccessTitle": "Đã cập nhật câu hỏi",
     "updateSuccessMessage": "Thay đổi của bạn đã được lưu."
   },

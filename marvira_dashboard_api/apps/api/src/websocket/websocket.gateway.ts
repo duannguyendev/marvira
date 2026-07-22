@@ -82,7 +82,22 @@ export class WebsocketGateway
       .emit('event_progress_updated', { userId, eventId, currentPlaceIndex, score });
   }
 
-  emitEventCompleted(userId: string, eventId: string, score: number) {
-    this.server.to(`user:${userId}`).emit('event_completed', { userId, eventId, score });
+  emitEventCompleted(
+    userId: string,
+    eventId: string,
+    score: number,
+    gift?: {
+      finishRank?: number | null;
+      giftCode?: string | null;
+      giftCount?: number;
+      giftsAllClaimed?: boolean;
+    },
+  ) {
+    this.server.to(`user:${userId}`).emit('event_completed', {
+      userId,
+      eventId,
+      score,
+      ...(gift ?? {}),
+    });
   }
 }

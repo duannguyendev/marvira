@@ -106,6 +106,18 @@ export const MyEventsScreen: React.FC = () => {
                 params: {eventId: item.id},
               } as MainTabParamList['Home'])
             }
+            onEditGiftsPress={() =>
+              navigation.navigate('Home', {
+                screen: 'EditEventGifts',
+                params: {eventId: item.id},
+              } as MainTabParamList['Home'])
+            }
+            onFinishersPress={() =>
+              navigation.navigate('Home', {
+                screen: 'EventFinishers',
+                params: {eventId: item.id},
+              } as MainTabParamList['Home'])
+            }
           />
         )}
       />

@@ -95,6 +95,11 @@ export function mapEvent(
     rewardPoints: apiEvent.rewardPoints,
     isPasswordProtected: apiEvent.isPasswordProtected ?? false,
     hasAccess: apiEvent.hasAccess,
+    hasGift: apiEvent.hasGift ?? (apiEvent.giftCodes?.length ?? 0) > 0,
+    giftCount: apiEvent.giftCount ?? apiEvent.giftCodes?.length ?? 0,
+    giftTeaser: apiEvent.giftTeaser ?? null,
+    giftCodes: apiEvent.giftCodes,
+    completionMessage: apiEvent.completionMessage ?? null,
   };
 }
 

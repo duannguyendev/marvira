@@ -21,6 +21,21 @@ export const eventSchema = z
       .min(0, 'Reward points cannot be negative')
       .max(100000, 'Reward points cannot exceed 100,000'),
     isActive: z.boolean(),
+    completionMessage: z
+      .string()
+      .max(2000, 'Completion message must be at most 2000 characters')
+      .optional()
+      .nullable()
+      .or(z.literal('')),
+    giftTeaser: z
+      .string()
+      .max(80, 'Gift teaser must be at most 80 characters')
+      .optional()
+      .nullable()
+      .or(z.literal('')),
+    giftCodes: z
+      .array(z.string().max(64, 'Each gift code must be at most 64 characters'))
+      .default([]),
   })
   .superRefine((data, ctx) => {
     if (data.isActive && data.title.length < 3) {
@@ -29,6 +44,35 @@ export const eventSchema = z
         message: 'Title is required to publish',
         path: ['title'],
       });
+    }
+
+    const codes = (data.giftCodes ?? []).map((c) => c.trim()).filter(Boolean);
+    if (codes.length > 10) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Maximum 10 gift codes',
+        path: ['giftCodes'],
+      });
+    }
+    if (codes.length > 0 && !data.giftTeaser?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Gift teaser is required when gift codes are set',
+        path: ['giftTeaser'],
+      });
+    }
+
+    const seen = new Set<string>();
+    for (const code of codes) {
+      if (seen.has(code)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Gift codes must be unique',
+          path: ['giftCodes'],
+        });
+        break;
+      }
+      seen.add(code);
     }
   });
 
