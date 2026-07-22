@@ -41,7 +41,7 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-replace-with-32-char-minimum-refresh-secret}
       OAUTH_DEV_BYPASS: "false"
       PORT: 3001
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3000,http://localhost:3002
       NODE_ENV: production
     depends_on:
       postgres:
@@ -61,6 +61,24 @@ services:
       - '3000:3000'
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:3001
+    depends_on:
+      - api
+
+  marketing:
+    build:
+      context: ..
+      dockerfile: docker/marketing.Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:3001
+        NEXT_PUBLIC_SITE_URL: http://localhost:3002
+        NEXT_PUBLIC_CDN_URL: ''
+        NEXT_PUBLIC_APP_STORE_URL: ''
+        NEXT_PUBLIC_PLAY_STORE_URL: ''
+    ports:
+      - '3002:3002'
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_SITE_URL: http://localhost:3002
     depends_on:
       - api
 

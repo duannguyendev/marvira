@@ -52,7 +52,25 @@ pnpm --filter @marvira/dashboard build
 pnpm --filter @marvira/dashboard start
 ```
 
-Set `CORS_ORIGIN` on the API to the dashboard origin only.
+## Marketing site deploy
+
+```bash
+# apps/marketing/.env.production (or Docker build args)
+NEXT_PUBLIC_SITE_URL=https://www.yourdomain.com
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+NEXT_PUBLIC_CDN_URL=https://cdn.yourdomain.com
+NEXT_PUBLIC_APP_STORE_URL=
+NEXT_PUBLIC_PLAY_STORE_URL=
+```
+
+```bash
+pnpm --filter @marvira/marketing build
+pnpm --filter @marvira/marketing start
+```
+
+Docker Compose includes `marketing` on port **3002** (`docker/marketing.Dockerfile`).
+
+Set `CORS_ORIGIN` on the API to a comma-separated list of browser origins (dashboard + marketing), e.g. `https://admin.yourdomain.com,https://www.yourdomain.com`.
 
 ## Horizontal scaling
 
