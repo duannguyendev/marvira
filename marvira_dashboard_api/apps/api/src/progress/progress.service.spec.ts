@@ -48,10 +48,6 @@ function createProgressService(
   };
 
   const redis = { incr: jest.fn().mockResolvedValue(1), expire: jest.fn() };
-  const websocket = {
-    emitProgressUpdated: jest.fn(),
-    emitEventCompleted: jest.fn(),
-  };
   const moduleRef = { get: jest.fn() };
   const eventAccess = { assertCanPlay: jest.fn() };
   const anticheat = { evaluateAndRecord: jest.fn().mockResolvedValue([]) };
@@ -59,13 +55,12 @@ function createProgressService(
   const service = new ProgressService(
     prisma as never,
     redis as never,
-    websocket as never,
     moduleRef as never,
     eventAccess as never,
     anticheat as never,
   );
 
-  return { service, prisma, websocket };
+  return { service, prisma };
 }
 
 describe('ProgressService', () => {
@@ -193,7 +188,7 @@ describe('ProgressService', () => {
         },
       };
 
-      const { service, prisma, websocket } = createProgressService({
+      const { service, prisma } = createProgressService({
         progress: {
           id: 'prog-1',
           score: 60,
@@ -225,7 +220,6 @@ describe('ProgressService', () => {
       expect(result.alreadyCompleted).toBe(true);
       expect('giftCode' in result && result.giftCode).toBe('CODE1');
       expect('finishRank' in result && result.finishRank).toBe(1);
-      expect(websocket.emitEventCompleted).toHaveBeenCalled();
     });
   });
 });

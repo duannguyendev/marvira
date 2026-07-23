@@ -21,6 +21,7 @@ export const useSubmitAnswer = () => {
       queryClient.invalidateQueries({ queryKey: ['event'] });
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['completed-events'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
     },
   });
 };

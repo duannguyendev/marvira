@@ -14,7 +14,6 @@ import {
 } from '@marvira/shared-utils';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../common/redis/redis.service';
-import { WebsocketGateway } from '../websocket/websocket.gateway';
 import { QuestionType, Prisma } from '@prisma/client';
 import { UnlockPlaceDto, AnswerPlaceDto } from '../places/dto/place.dto';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -31,7 +30,6 @@ export class ProgressService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
-    private readonly websocket: WebsocketGateway,
     private readonly moduleRef: ModuleRef,
     private readonly eventAccess: EventAccessService,
     private readonly anticheat: AnticheatService,
@@ -119,8 +117,6 @@ export class ProgressService {
       update: existingCompletion?.unlockedAt ? {} : { unlockedAt: now },
     });
 
-    this.websocket.emitPlaceUnlocked(userId, placeId, place.eventId);
-
     return {
       unlocked: true,
       placeId,
@@ -202,21 +198,9 @@ export class ProgressService {
           eventTotalDurationMs,
         });
         const giftFields = completed.giftFields;
-        this.websocket.emitEventCompleted(userId, place.eventId, totalScore, {
-          finishRank: giftFields.finishRank,
-          giftCode: giftFields.giftCode,
-          giftCount: giftFields.giftCount,
-          giftsAllClaimed: giftFields.giftsAllClaimed,
-        });
         await this.enqueueEventCompletedNotification(
           userId,
           place.event.title,
-          totalScore,
-        );
-        this.websocket.emitProgressUpdated(
-          userId,
-          place.eventId,
-          placeIndex,
           totalScore,
         );
         return {
@@ -331,12 +315,6 @@ export class ProgressService {
           },
         });
         nextPlaceId = place.event.places[placeIndex + 1]?.id ?? null;
-        this.websocket.emitProgressUpdated(
-          userId,
-          place.eventId,
-          newIndex,
-          totalScore,
-        );
       } else {
         eventTotalDurationMs = now.getTime() - progress.startedAt.getTime();
         const completed = await this.completeEventWithGiftAssign({
@@ -350,21 +328,9 @@ export class ProgressService {
         });
         eventCompleted = true;
         giftFields = completed.giftFields;
-        this.websocket.emitEventCompleted(userId, place.eventId, totalScore, {
-          finishRank: giftFields.finishRank,
-          giftCode: giftFields.giftCode,
-          giftCount: giftFields.giftCount,
-          giftsAllClaimed: giftFields.giftsAllClaimed,
-        });
         await this.enqueueEventCompletedNotification(
           userId,
           place.event.title,
-          totalScore,
-        );
-        this.websocket.emitProgressUpdated(
-          userId,
-          place.eventId,
-          newIndex,
           totalScore,
         );
       }

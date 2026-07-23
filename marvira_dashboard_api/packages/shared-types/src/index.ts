@@ -556,27 +556,3 @@ export interface CreateArticleDto {
 }
 
 export interface UpdateArticleDto extends Partial<CreateArticleDto> {}
-
-export interface WebSocketEvents {
-  event_progress_updated: {
-    userId: string;
-    eventId: string;
-    currentPlaceIndex: number;
-    score: number;
-  };
-  place_unlocked: {
-    userId: string;
-    placeId: string;
-    eventId: string;
-  };
-  event_completed: {
-    userId: string;
-    eventId: string;
-    score: number;
-    finishRank?: number | null;
-    giftCode?: string | null;
-    giftCount?: number;
-    giftsAllClaimed?: boolean;
-  };
-  admin_live_analytics: AnalyticsOverview;
-}

@@ -12,7 +12,6 @@ import { ProgressModule } from './progress/progress.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { NotificationsModule } from './notifications/notifications.module';
-import { WebsocketModule } from './websocket/websocket.module';
 import { AdminModule } from './admin/admin.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './common/redis/redis.module';
@@ -63,7 +62,6 @@ const redisDisabled = process.env.REDIS_DISABLED === 'true';
     AnalyticsModule,
     UploadsModule,
     ...(redisDisabled ? [] : [NotificationsModule]),
-    WebsocketModule,
     AdminModule,
     HealthModule,
     LeaderboardModule,
