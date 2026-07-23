@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {PlaceQuestion} from '../types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
-import {API_BASE_URL} from '../utils/constants';
+import { useTranslation } from 'react-i18next';
+import { PlaceQuestion } from '../types';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
+import { API_BASE_URL } from '../utils/constants';
 
 interface QuestionRendererProps {
   question: PlaceQuestion;
@@ -33,7 +33,7 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   answer,
   onChangeAnswer,
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const imageUri = resolveImageUrl(question.imageUrl);
 
@@ -43,14 +43,14 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
   };
 
   const trueFalseOptions = [
-    {value: 'True', label: t('common.true')},
-    {value: 'False', label: t('common.false')},
+    { value: 'True', label: t('common.true') },
+    { value: 'False', label: t('common.false') },
   ];
 
   return (
     <View>
       {question.type === 'IMAGE' && imageUri ? (
-        <Image source={{uri: imageUri}} style={styles.questionImage} />
+        <Image source={{ uri: imageUri }} style={styles.questionImage} />
       ) : null}
 
       <Text style={styles.question}>{question.text}</Text>

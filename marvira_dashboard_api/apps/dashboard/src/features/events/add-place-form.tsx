@@ -88,19 +88,22 @@ export function AddPlaceForm({
       </CardHeader>
       <CardContent>
         <form
-          onSubmit={handleSubmit((data) => createMutation.mutate(data))}
-          className="grid gap-4 sm:grid-cols-2"
-        >
+          onSubmit={handleSubmit(data => createMutation.mutate(data))}
+          className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Title *</Label>
             <Input placeholder="e.g. Union Square" {...register('title')} />
-            {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+            {errors.title && (
+              <p className="text-sm text-destructive">{errors.title.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Order *</Label>
             <Input type="number" min={0} {...register('orderIndex')} />
             {errors.orderIndex && (
-              <p className="text-sm text-destructive">{errors.orderIndex.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.orderIndex.message}
+              </p>
             )}
           </div>
           <div className="space-y-2 sm:col-span-2">
@@ -111,28 +114,41 @@ export function AddPlaceForm({
               {...register('description')}
             />
             {errors.description && (
-              <p className="text-sm text-destructive">{errors.description.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.description.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
             <Label>Latitude *</Label>
             <Input type="number" step="any" {...register('latitude')} />
             {errors.latitude && (
-              <p className="text-sm text-destructive">{errors.latitude.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.latitude.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
             <Label>Longitude *</Label>
             <Input type="number" step="any" {...register('longitude')} />
             {errors.longitude && (
-              <p className="text-sm text-destructive">{errors.longitude.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.longitude.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
             <Label>Radius (meters) *</Label>
-            <Input type="number" min={10} max={5000} {...register('radiusMeters')} />
+            <Input
+              type="number"
+              min={10}
+              max={5000}
+              {...register('radiusMeters')}
+            />
             {errors.radiusMeters && (
-              <p className="text-sm text-destructive">{errors.radiusMeters.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.radiusMeters.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
@@ -143,7 +159,10 @@ export function AddPlaceForm({
             <Button type="submit" disabled={createMutation.isPending}>
               {createMutation.isPending ? 'Adding...' : 'Create Place'}
             </Button>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}>
               Cancel
             </Button>
           </div>

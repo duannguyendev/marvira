@@ -34,9 +34,15 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: SITE.name,
     title: 'Marvira — City scavenger hunts on foot',
-    description:
-      'Walk real places, answer challenges, and climb leaderboards.',
-    images: [{ url: IMAGES.ogDefault, width: 1200, height: 630, alt: 'Marvira city adventure' }],
+    description: 'Walk real places, answer challenges, and climb leaderboards.',
+    images: [
+      {
+        url: IMAGES.ogDefault,
+        width: 1200,
+        height: 630,
+        alt: 'Marvira city adventure',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -46,7 +52,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
       <body className="font-body antialiased">{children}</body>

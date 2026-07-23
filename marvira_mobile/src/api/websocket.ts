@@ -1,6 +1,6 @@
-import {io, Socket} from 'socket.io-client';
-import {API_BASE_URL} from '../utils/constants';
-import {storage} from '../utils/storage';
+import { io, Socket } from 'socket.io-client';
+import { API_BASE_URL } from '../utils/constants';
+import { storage } from '../utils/storage';
 
 let socket: Socket | null = null;
 
@@ -42,7 +42,7 @@ export async function connectGameSocket(
   }
 
   socket = io(`${wsBaseUrl()}/ws`, {
-    auth: {token},
+    auth: { token },
     transports: ['websocket'],
     reconnection: true,
   });

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,21 +8,27 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
-import {useQuery} from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {useEventDetails} from '../../hooks/useEvents';
-import {eventsApi} from '../../api/events';
-import {Button} from '../../components/Button';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
-import {formatDuration} from '../../utils/formatDuration';
-import {HomeStackParamList} from '../../navigation/types';
+import { useEventDetails } from '../../hooks/useEvents';
+import { eventsApi } from '../../api/events';
+import { Button } from '../../components/Button';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
+import { formatDuration } from '../../utils/formatDuration';
+import { HomeStackParamList } from '../../navigation/types';
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 type EventCompletionScreenRouteProp = RouteProp<
   HomeStackParamList,
@@ -35,7 +41,7 @@ type EventCompletionScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 export const EventCompletionScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<EventCompletionScreenRouteProp>();
   const navigation = useNavigation<EventCompletionScreenNavigationProp>();
   const {
@@ -50,7 +56,7 @@ export const EventCompletionScreen: React.FC = () => {
     giftsAllClaimed: claimedParam,
   } = route.params;
 
-  const {data, isLoading} = useEventDetails(eventId);
+  const { data, isLoading } = useEventDetails(eventId);
   const needsFetch =
     rankParam === undefined &&
     messageParam === undefined &&
@@ -71,8 +77,7 @@ export const EventCompletionScreen: React.FC = () => {
   const giftTeaser = teaserParam ?? completion?.giftTeaser ?? null;
   const giftCode = codeParam ?? completion?.giftCode ?? null;
   const giftCount = countParam ?? completion?.giftCount ?? 0;
-  const giftsAllClaimed =
-    claimedParam ?? completion?.giftsAllClaimed ?? false;
+  const giftsAllClaimed = claimedParam ?? completion?.giftsAllClaimed ?? false;
 
   const [copied, setCopied] = useState(false);
 
@@ -132,7 +137,7 @@ export const EventCompletionScreen: React.FC = () => {
             styles.content,
             {
               opacity: fadeAnim,
-              transform: [{scale: scaleAnim}],
+              transform: [{ scale: scaleAnim }],
             },
           ]}>
           <Animated.Text
@@ -159,19 +164,25 @@ export const EventCompletionScreen: React.FC = () => {
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{event.totalPlaces}</Text>
-              <Text style={styles.statLabel}>{t('completion.placesVisited')}</Text>
+              <Text style={styles.statLabel}>
+                {t('completion.placesVisited')}
+              </Text>
             </View>
             {totalDurationMs != null ? (
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>
                   {formatDuration(totalDurationMs)}
                 </Text>
-                <Text style={styles.statLabel}>{t('completion.totalTime')}</Text>
+                <Text style={styles.statLabel}>
+                  {t('completion.totalTime')}
+                </Text>
               </View>
             ) : (
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>100%</Text>
-                <Text style={styles.statLabel}>{t('completion.completion')}</Text>
+                <Text style={styles.statLabel}>
+                  {t('completion.completion')}
+                </Text>
               </View>
             )}
             {score != null ? (
@@ -196,11 +207,11 @@ export const EventCompletionScreen: React.FC = () => {
               {giftCode ? (
                 <>
                   <Text style={styles.giftTitle}>
-                    {t('completion.finisherRank', {rank: finishRank})}
+                    {t('completion.finisherRank', { rank: finishRank })}
                   </Text>
                   {giftTeaser ? (
                     <Text style={styles.giftTeaser}>
-                      {t('completion.yourGift', {teaser: giftTeaser})}
+                      {t('completion.yourGift', { teaser: giftTeaser })}
                     </Text>
                   ) : null}
                   <Text style={styles.giftCodeLabel}>
@@ -220,13 +231,14 @@ export const EventCompletionScreen: React.FC = () => {
                     style={styles.giftButton}
                   />
                 </>
-              ) : giftsAllClaimed || (finishRank != null && finishRank > giftCount) ? (
+              ) : giftsAllClaimed ||
+                (finishRank != null && finishRank > giftCount) ? (
                 <>
                   <Text style={styles.giftTitle}>
-                    {t('completion.giftsWentToFirst', {count: giftCount})}
+                    {t('completion.giftsWentToFirst', { count: giftCount })}
                   </Text>
                   <Text style={styles.giftTeaser}>
-                    {t('completion.youFinishedRank', {rank: finishRank})}
+                    {t('completion.youFinishedRank', { rank: finishRank })}
                   </Text>
                   <Button
                     title={t('completion.exploreMore')}
@@ -244,7 +256,7 @@ export const EventCompletionScreen: React.FC = () => {
             <Button
               title={t('completion.viewLeaderboard')}
               onPress={() =>
-                navigation.navigate('EventLeaderboard', {eventId})
+                navigation.navigate('EventLeaderboard', { eventId })
               }
               variant="outline"
               fullWidth
@@ -259,7 +271,7 @@ export const EventCompletionScreen: React.FC = () => {
             />
             <Button
               title={t('completion.viewEventDetails')}
-              onPress={() => navigation.navigate('EventDetails', {eventId})}
+              onPress={() => navigation.navigate('EventDetails', { eventId })}
               variant="outline"
               fullWidth
               style={styles.button}
@@ -318,7 +330,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 400,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 8},
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
     elevation: 16,

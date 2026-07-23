@@ -33,8 +33,7 @@ export function SiteHeader({ content }: { content: ContentPack }) {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-5 md:px-8">
         <Link
           href={locale === 'vi' ? '/?lang=vi' : '/'}
-          className="flex items-center gap-2.5 font-display text-2xl font-bold tracking-tight text-forest md:text-[1.75rem]"
-        >
+          className="flex items-center gap-2.5 font-display text-2xl font-bold tracking-tight text-forest md:text-[1.75rem]">
           <Image
             src="/images/marvira-mark.png"
             alt={`${SITE.name} logo`}
@@ -47,7 +46,7 @@ export function SiteHeader({ content }: { content: ContentPack }) {
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
-          {links.map((item) => (
+          {links.map(item => (
             <Link
               key={item.href}
               href={locale === 'vi' ? `${item.href}?lang=vi` : item.href}
@@ -55,8 +54,7 @@ export function SiteHeader({ content }: { content: ContentPack }) {
                 'text-sm font-medium text-ink/70 transition hover:text-forest',
                 pathname === item.href &&
                   'text-forest underline decoration-sun decoration-2 underline-offset-8',
-              )}
-            >
+              )}>
               {content.nav[item.key]}
             </Link>
           ))}
@@ -73,8 +71,7 @@ export function SiteHeader({ content }: { content: ContentPack }) {
                   ? 'bg-forest text-white'
                   : 'opacity-80 hover:opacity-100',
               )}
-              aria-label="English"
-            >
+              aria-label="English">
               EN
             </button>
             <button
@@ -86,15 +83,13 @@ export function SiteHeader({ content }: { content: ContentPack }) {
                   ? 'bg-forest text-white'
                   : 'opacity-80 hover:opacity-100',
               )}
-              aria-label="Tiếng Việt"
-            >
+              aria-label="Tiếng Việt">
               VI
             </button>
           </div>
           <Link
             href={locale === 'vi' ? '/download?lang=vi' : '/download'}
-            className="rounded-full bg-sun px-4 py-2 text-sm font-semibold text-ink shadow-sm transition hover:brightness-105"
-          >
+            className="rounded-full bg-sun px-4 py-2 text-sm font-semibold text-ink shadow-sm transition hover:brightness-105">
             {content.nav.download}
           </Link>
         </div>

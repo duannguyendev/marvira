@@ -16,14 +16,18 @@ import { MapPicker } from '@/features/events/map-picker';
 import { PlaceEditor } from '@/features/events/place-editor';
 import { AddPlaceForm } from '@/features/events/add-place-form';
 import { EventDifficulty, type AdminEvent } from '@marvira/shared-types';
-import { createEditEventSchema, eventSchema, type EventFormValues } from '@/lib/validation/schemas';
+import {
+  createEditEventSchema,
+  eventSchema,
+  type EventFormValues,
+} from '@/lib/validation/schemas';
 
 function normalizeGiftFields(data: EventFormValues): EventFormValues {
   return {
     ...data,
     completionMessage: data.completionMessage?.trim() || null,
     giftTeaser: data.giftTeaser?.trim() || null,
-    giftCodes: (data.giftCodes ?? []).map((c) => c.trim()).filter(Boolean),
+    giftCodes: (data.giftCodes ?? []).map(c => c.trim()).filter(Boolean),
   };
 }
 
@@ -38,11 +42,12 @@ export default function EditEventPage() {
   });
 
   const places = useMemo(
-    () => [...(event?.places ?? [])].sort((a, b) => a.orderIndex - b.orderIndex),
+    () =>
+      [...(event?.places ?? [])].sort((a, b) => a.orderIndex - b.orderIndex),
     [event?.places],
   );
 
-  const placesWithoutQuestion = places.filter((p) => !p.question).length;
+  const placesWithoutQuestion = places.filter(p => !p.question).length;
 
   const {
     register,
@@ -91,7 +96,8 @@ export default function EditEventPage() {
   };
 
   const updateMutation = useMutation({
-    mutationFn: (data: EventFormValues) => api.patch(`/events/${id}`, normalizeGiftFields(data)),
+    mutationFn: (data: EventFormValues) =>
+      api.patch(`/events/${id}`, normalizeGiftFields(data)),
     onSuccess: () => {
       invalidateEvent();
       toast.success('Event saved');
@@ -108,8 +114,15 @@ export default function EditEventPage() {
   });
 
   const updatePlaceMutation = useMutation({
-    mutationFn: ({ placeId, lat, lng }: { placeId: string; lat: number; lng: number }) =>
-      api.patch(`/places/${placeId}`, { latitude: lat, longitude: lng }),
+    mutationFn: ({
+      placeId,
+      lat,
+      lng,
+    }: {
+      placeId: string;
+      lat: number;
+      lng: number;
+    }) => api.patch(`/places/${placeId}`, { latitude: lat, longitude: lng }),
     onSuccess: invalidateEvent,
     onError: (err: Error) => toast.error(err.message || 'Invalid coordinates'),
   });
@@ -138,11 +151,13 @@ export default function EditEventPage() {
           <h1 className="text-3xl font-bold tracking-tight">Edit Event</h1>
           <p className="text-muted-foreground">{event.title}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Configure the full hunt trail — all places and questions are visible here. Sequential unlock
-            applies only in the mobile app.
+            Configure the full hunt trail — all places and questions are visible
+            here. Sequential unlock applies only in the mobile app.
           </p>
         </div>
-        <Button variant="outline" onClick={() => router.push('/dashboard/events')}>
+        <Button
+          variant="outline"
+          onClick={() => router.push('/dashboard/events')}>
           Back to Events
         </Button>
       </div>
@@ -153,7 +168,7 @@ export default function EditEventPage() {
         </CardHeader>
         <CardContent>
           <form
-            onSubmit={handleSubmit((d) => {
+            onSubmit={handleSubmit(d => {
               const publishSchema = createEditEventSchema({
                 placeCount: places.length,
                 placesWithoutQuestion,
@@ -163,26 +178,38 @@ export default function EditEventPage() {
                 for (const issue of result.error.issues) {
                   const field = issue.path[0];
                   if (typeof field === 'string') {
-                    setError(field as keyof EventFormValues, { message: issue.message });
+                    setError(field as keyof EventFormValues, {
+                      message: issue.message,
+                    });
                   }
                 }
-                toast.error(result.error.issues[0]?.message ?? 'Please fix validation errors');
+                toast.error(
+                  result.error.issues[0]?.message ??
+                    'Please fix validation errors',
+                );
                 return;
               }
               updateMutation.mutate(result.data);
             })}
-            className="space-y-4"
-          >
+            className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Title *</Label>
                 <Input {...register('title')} />
-                {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+                {errors.title && (
+                  <p className="text-sm text-destructive">
+                    {errors.title.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>City *</Label>
                 <Input {...register('city')} />
-                {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
+                {errors.city && (
+                  <p className="text-sm text-destructive">
+                    {errors.city.message}
+                  </p>
+                )}
               </div>
             </div>
             <div className="space-y-2">
@@ -192,7 +219,9 @@ export default function EditEventPage() {
                 {...register('description')}
               />
               {errors.description && (
-                <p className="text-sm text-destructive">{errors.description.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.description.message}
+                </p>
               )}
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -200,9 +229,8 @@ export default function EditEventPage() {
                 <Label>Difficulty *</Label>
                 <select
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  {...register('difficulty')}
-                >
-                  {Object.values(EventDifficulty).map((d) => (
+                  {...register('difficulty')}>
+                  {Object.values(EventDifficulty).map(d => (
                     <option key={d} value={d}>
                       {d}
                     </option>
@@ -213,17 +241,26 @@ export default function EditEventPage() {
                 <Label>Reward Points *</Label>
                 <Input type="number" min={0} {...register('rewardPoints')} />
                 {errors.rewardPoints && (
-                  <p className="text-sm text-destructive">{errors.rewardPoints.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.rewardPoints.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label>Status</Label>
                 <div className="flex h-10 items-center gap-2">
-                  <input type="checkbox" id="isActive" {...register('isActive')} className="h-4 w-4" />
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    {...register('isActive')}
+                    className="h-4 w-4"
+                  />
                   <Label htmlFor="isActive">Published</Label>
                 </div>
                 {errors.isActive && (
-                  <p className="text-sm text-destructive">{errors.isActive.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.isActive.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -232,7 +269,8 @@ export default function EditEventPage() {
               <div>
                 <h3 className="text-sm font-medium">Completion gifts</h3>
                 <p className="text-xs text-muted-foreground">
-                  Optional. Soonest finishers receive codes in order (1st → first code). Max 10.
+                  Optional. Soonest finishers receive codes in order (1st →
+                  first code). Max 10.
                 </p>
               </div>
               <div className="space-y-2">
@@ -244,10 +282,13 @@ export default function EditEventPage() {
                   {...register('giftTeaser')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Public description of the gift (not the code). Required when codes are set.
+                  Public description of the gift (not the code). Required when
+                  codes are set.
                 </p>
                 {errors.giftTeaser && (
-                  <p className="text-sm text-destructive">{errors.giftTeaser.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.giftTeaser.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
@@ -263,7 +304,9 @@ export default function EditEventPage() {
                   Shown after finish — thanks, story, and how to redeem.
                 </p>
                 {errors.completionMessage && (
-                  <p className="text-sm text-destructive">{errors.completionMessage.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.completionMessage.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
@@ -273,13 +316,16 @@ export default function EditEventPage() {
                   className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
                   placeholder={'CODE-FIRST\nCODE-SECOND\nCODE-THIRD'}
                   value={giftCodesText}
-                  onChange={(e) =>
-                    setValue('giftCodes', e.target.value.split('\n'), { shouldValidate: true })
+                  onChange={e =>
+                    setValue('giftCodes', e.target.value.split('\n'), {
+                      shouldValidate: true,
+                    })
                   }
                 />
                 <p className="text-xs text-muted-foreground">
-                  One code per line, up to 10. Awarded codes are append-only — you cannot change or
-                  remove a code that has already been assigned; you may only add new codes at the end.
+                  One code per line, up to 10. Awarded codes are append-only —
+                  you cannot change or remove a code that has already been
+                  assigned; you may only add new codes at the end.
                 </p>
                 {errors.giftCodes && (
                   <p className="text-sm text-destructive">
@@ -300,10 +346,12 @@ export default function EditEventPage() {
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold">Places &amp; Questions ({places.length})</h2>
+          <h2 className="text-xl font-semibold">
+            Places &amp; Questions ({places.length})
+          </h2>
           <p className="text-sm text-muted-foreground">
-            Ordered stops — place #1 is the first stop in the mobile hunt. Each place needs a question
-            before publishing.
+            Ordered stops — place #1 is the first stop in the mobile hunt. Each
+            place needs a question before publishing.
           </p>
         </div>
         <AddPlaceForm
@@ -333,7 +381,8 @@ export default function EditEventPage() {
             stopNumber={index + 1}
             onUpdated={invalidateEvent}
             onDelete={() => {
-              if (confirm('Delete this place?')) deletePlaceMutation.mutate(place.id);
+              if (confirm('Delete this place?'))
+                deletePlaceMutation.mutate(place.id);
             }}
           />
         ))}

@@ -64,7 +64,9 @@ export class UsersService {
     }
 
     const email = input.email;
-    const existing = await this.prisma.client.user.findUnique({ where: { email } });
+    const existing = await this.prisma.client.user.findUnique({
+      where: { email },
+    });
     if (existing) {
       throw new ConflictException('Email already registered');
     }

@@ -32,7 +32,7 @@ describe('Marvira API (e2e)', () => {
     return request(app.getHttpServer())
       .get('/health')
       .expect(200)
-      .expect((res) => {
+      .expect(res => {
         expect(res.body.success).toBe(true);
       });
   });
@@ -45,7 +45,7 @@ describe('Marvira API (e2e)', () => {
       .post('/auth/register')
       .send({ email, name: 'E2E User', password })
       .expect(201)
-      .expect((res) => {
+      .expect(res => {
         expect(res.body.data.tokens.accessToken).toBeDefined();
       });
 
@@ -53,7 +53,7 @@ describe('Marvira API (e2e)', () => {
       .post('/auth/login')
       .send({ email, password })
       .expect(200)
-      .expect((res) => {
+      .expect(res => {
         expect(res.body.data.tokens.accessToken).toBeDefined();
       });
   });

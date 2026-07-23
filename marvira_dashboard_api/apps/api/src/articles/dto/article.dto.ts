@@ -43,7 +43,9 @@ export class CreateArticleDto {
   @MaxLength(100)
   city?: string;
 
-  @ApiProperty({ example: 'A short teaser shown on cards and social previews.' })
+  @ApiProperty({
+    example: 'A short teaser shown on cards and social previews.',
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(10)
@@ -68,7 +70,9 @@ export class CreateArticleDto {
   @IsEnum(ArticleStatus)
   status?: ArticleStatus;
 
-  @ApiPropertyOptional({ description: 'Optional gameplay event to link for a Play CTA.' })
+  @ApiPropertyOptional({
+    description: 'Optional gameplay event to link for a Play CTA.',
+  })
   @IsOptional()
   @IsString()
   eventId?: string | null;

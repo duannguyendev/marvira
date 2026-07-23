@@ -1,24 +1,36 @@
 import React from 'react';
-import {View, Text, StyleSheet, Share} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {StepIndicator} from '../../components/StepIndicator';
-import {Button} from '../../components/Button';
-import {HomeStackParamList, MainTabParamList} from '../../navigation/types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
+import { View, Text, StyleSheet, Share } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { StepIndicator } from '../../components/StepIndicator';
+import { Button } from '../../components/Button';
+import { HomeStackParamList, MainTabParamList } from '../../navigation/types';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
 
-type CreateEventSuccessRouteProp = RouteProp<HomeStackParamList, 'CreateEventSuccess'>;
+type CreateEventSuccessRouteProp = RouteProp<
+  HomeStackParamList,
+  'CreateEventSuccess'
+>;
 
-type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'CreateEventSuccess'>;
+type NavigationProp = NativeStackNavigationProp<
+  HomeStackParamList,
+  'CreateEventSuccess'
+>;
 
 const STEP_LABELS = ['info', 'places', 'review', 'done'];
 
 export const CreateEventSuccessScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<CreateEventSuccessRouteProp>();
   const navigation = useNavigation<NavigationProp>();
-  const {eventId, published, joinPassword} = route.params;
+  const { eventId, published, joinPassword } = route.params;
 
   const handleSharePassword = async () => {
     if (!joinPassword) {
@@ -26,7 +38,9 @@ export const CreateEventSuccessScreen: React.FC = () => {
     }
     try {
       await Share.share({
-        message: t('createEvent.access.shareMessage', {password: joinPassword}),
+        message: t('createEvent.access.shareMessage', {
+          password: joinPassword,
+        }),
       });
     } catch {
       // user dismissed share sheet
@@ -43,7 +57,9 @@ export const CreateEventSuccessScreen: React.FC = () => {
       <View style={styles.content}>
         <Text style={styles.emoji}>{published ? '🎉' : '📝'}</Text>
         <Text style={styles.heading}>
-          {published ? t('createEvent.successPublished') : t('createEvent.successDraft')}
+          {published
+            ? t('createEvent.successPublished')
+            : t('createEvent.successDraft')}
         </Text>
         <Text style={styles.subheading}>
           {published
@@ -55,9 +71,13 @@ export const CreateEventSuccessScreen: React.FC = () => {
 
         {published && joinPassword ? (
           <View style={styles.passwordCard}>
-            <Text style={styles.passwordLabel}>{t('createEvent.access.passwordShareLabel')}</Text>
+            <Text style={styles.passwordLabel}>
+              {t('createEvent.access.passwordShareLabel')}
+            </Text>
             <Text style={styles.passwordValue}>{joinPassword}</Text>
-            <Text style={styles.passwordWarning}>{t('createEvent.access.passwordWarning')}</Text>
+            <Text style={styles.passwordWarning}>
+              {t('createEvent.access.passwordWarning')}
+            </Text>
             <Button
               title={t('createEvent.access.shareInvite')}
               onPress={handleSharePassword}
@@ -79,9 +99,7 @@ export const CreateEventSuccessScreen: React.FC = () => {
         />
         <Button
           title={t('createEvent.viewEventDetails')}
-          onPress={() =>
-            navigation.navigate('EventDetails', {eventId})
-          }
+          onPress={() => navigation.navigate('EventDetails', { eventId })}
           variant="outline"
           fullWidth
           style={styles.button}

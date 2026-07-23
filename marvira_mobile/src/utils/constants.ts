@@ -1,11 +1,10 @@
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 
 // Set USE_MOCK_API=true in dev only when running without backend
 export const USE_MOCK_DATA = false;
 
 // Android emulator: 10.0.2.2 → host machine localhost
-const DEV_API_HOST =
-  Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+const DEV_API_HOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
 
 export const API_BASE_URL = __DEV__
   ? `http://${DEV_API_HOST}:3001`

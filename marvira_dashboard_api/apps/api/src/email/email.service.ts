@@ -23,7 +23,11 @@ export class EmailService {
     }
   }
 
-  async sendPasswordResetEmail(to: string, resetUrl: string, userName: string): Promise<void> {
+  async sendPasswordResetEmail(
+    to: string,
+    resetUrl: string,
+    userName: string,
+  ): Promise<void> {
     const from = this.config.get('SMTP_FROM', 'Marvira <noreply@marvira.com>');
     const subject = 'Reset your Marvira password';
     const text = [

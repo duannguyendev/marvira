@@ -17,8 +17,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     config: ConfigService,
     private authService: AuthService,
   ) {
-    const secret = config.get<string>('JWT_SECRET')
-      ?? (process.env.NODE_ENV === 'production' ? undefined : 'dev-secret');
+    const secret =
+      config.get<string>('JWT_SECRET') ??
+      (process.env.NODE_ENV === 'production' ? undefined : 'dev-secret');
     if (!secret) {
       throw new Error('JWT_SECRET is required');
     }

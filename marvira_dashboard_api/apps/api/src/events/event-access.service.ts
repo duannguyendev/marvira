@@ -80,7 +80,12 @@ export class EventAccessService {
 
     const event = await this.prisma.client.event.findUnique({
       where: { id: eventId },
-      select: { id: true, createdBy: true, joinPasswordHash: true, isActive: true },
+      select: {
+        id: true,
+        createdBy: true,
+        joinPasswordHash: true,
+        isActive: true,
+      },
     });
     if (!event) {
       throw new NotFoundException('Event not found');
@@ -101,10 +106,16 @@ export class EventAccessService {
       await this.redis.expire(rateKey, JOIN_RATE_LIMIT_TTL_SECONDS);
     }
     if (attempts > JOIN_RATE_LIMIT_MAX) {
-      throw new HttpException('Too many attempts', HttpStatus.TOO_MANY_REQUESTS);
+      throw new HttpException(
+        'Too many attempts',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
 
-    const valid = await this.auth.comparePassword(password, event.joinPasswordHash!);
+    const valid = await this.auth.comparePassword(
+      password,
+      event.joinPasswordHash!,
+    );
     if (!valid) {
       throw new ForbiddenException('Incorrect password');
     }

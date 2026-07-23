@@ -1,5 +1,5 @@
-import {useQuery} from '@tanstack/react-query';
-import {leaderboardApi} from '../api/leaderboard';
+import { useQuery } from '@tanstack/react-query';
+import { leaderboardApi } from '../api/leaderboard';
 
 export const useEventLeaderboard = (eventId: string) => {
   return useQuery({

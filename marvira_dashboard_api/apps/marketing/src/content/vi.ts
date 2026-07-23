@@ -49,7 +49,8 @@ const vi: MarketingContent = {
     title: 'Tải Marvira',
     intro: 'Cài trên iOS hoặc Android và bắt đầu cuộc săn đầu tiên.',
     qrLabel: 'Quét để cài',
-    storesSoon: 'Liên kết cửa hàng sẽ mở khi phát hành công khai. Hãy quay lại sau.',
+    storesSoon:
+      'Liên kết cửa hàng sẽ mở khi phát hành công khai. Hãy quay lại sau.',
     deepLinkNote:
       'Đã có ứng dụng? Mở liên kết cuộc săn được chia sẻ — Marvira sẽ tự khởi chạy.',
   },
@@ -100,7 +101,8 @@ const vi: MarketingContent = {
           'Khám phá khu trung tâm lịch sử và tìm những viên ngọc ẩn qua thử thách tương tác.',
         city: 'San Francisco',
         difficulty: 'Trung bình',
-        coverBrief: 'Quảng trường / bến phà / đường chân trời — nhịp sống phố phường sôi động.',
+        coverBrief:
+          'Quảng trường / bến phà / đường chân trời — nhịp sống phố phường sôi động.',
         coverImage: IMAGES.downtown,
       },
       {
@@ -109,7 +111,8 @@ const vi: MarketingContent = {
         blurb: 'Cuộc săn phong cảnh dọc khu vực cầu Golden Gate.',
         city: 'San Francisco',
         difficulty: 'Khó',
-        coverBrief: 'Điểm nhìn cầu / đường ven biển — cảm giác đi bộ ngoài trời.',
+        coverBrief:
+          'Điểm nhìn cầu / đường ven biển — cảm giác đi bộ ngoài trời.',
         coverImage: IMAGES.goldenGate,
       },
     ],
@@ -219,16 +222,20 @@ const vi: MarketingContent = {
     homeDesc:
       'Đi bộ tới địa điểm thật, trả lời thử thách, leo bảng xếp hạng. Marvira là ứng dụng săn tìm kho báu bằng GPS cho người chơi và người tổ chức.',
     howTitle: 'Cách Marvira hoạt động',
-    howDesc: 'Tìm cuộc săn, đi tới địa điểm, trả lời thử thách, leo bảng xếp hạng.',
+    howDesc:
+      'Tìm cuộc săn, đi tới địa điểm, trả lời thử thách, leo bảng xếp hạng.',
     downloadTitle: 'Tải Marvira',
-    downloadDesc: 'Tải Marvira trên App Store hoặc Google Play và bắt đầu khám phá.',
+    downloadDesc:
+      'Tải Marvira trên App Store hoặc Google Play và bắt đầu khám phá.',
     createTitle: 'Tạo cuộc săn tìm kho báu — Marvira',
     createDesc:
       'Thiết kế cuộc săn GPS cho sự kiện, du lịch, địa điểm và trường học. Tải Marvira để tạo.',
     huntsTitle: 'Cuộc săn thành phố nổi bật — Marvira',
-    huntsDesc: 'Xem mẫu cuộc săn như Downtown Discovery và Golden Gate Adventure.',
+    huntsDesc:
+      'Xem mẫu cuộc săn như Downtown Discovery và Golden Gate Adventure.',
     pressTitle: 'Báo chí & đối tác — Marvira',
-    pressDesc: 'Marvira dành cho thành phố, địa điểm, trường học và người tổ chức.',
+    pressDesc:
+      'Marvira dành cho thành phố, địa điểm, trường học và người tổ chức.',
     supportTitle: 'Hỗ trợ & FAQ — Marvira',
     supportDesc: 'Trợ giúp cho người chơi và người tổ chức dùng Marvira.',
     privacyTitle: 'Chính sách quyền riêng tư — Marvira',

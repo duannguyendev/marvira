@@ -37,7 +37,9 @@ export default function EditQuestionPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Edit Question</h1>
-          <p className="text-muted-foreground line-clamp-2">{question.question}</p>
+          <p className="text-muted-foreground line-clamp-2">
+            {question.question}
+          </p>
         </div>
         <Button variant="outline" asChild>
           <Link href="/dashboard/questions">Back</Link>
@@ -52,7 +54,9 @@ export default function EditQuestionPage() {
           <QuestionForm
             question={question}
             onSaved={() => {
-              queryClient.invalidateQueries({ queryKey: ['admin-question', id] });
+              queryClient.invalidateQueries({
+                queryKey: ['admin-question', id],
+              });
               queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
             }}
           />
@@ -65,12 +69,13 @@ export default function EditQuestionPage() {
             <CardTitle className="text-base">Used in Events</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {question.eventQuestions.map((eq) => (
-              <div key={eq.id} className="flex items-center justify-between text-sm">
+            {question.eventQuestions.map(eq => (
+              <div
+                key={eq.id}
+                className="flex items-center justify-between text-sm">
                 <Link
                   href={`/dashboard/events/${eq.event.id}`}
-                  className="font-medium text-primary hover:underline"
-                >
+                  className="font-medium text-primary hover:underline">
                   {eq.event.title}
                 </Link>
                 <span className="text-muted-foreground">{eq.event.city}</span>

@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
 export interface SegmentedOption<T extends string> {
   value: T;
@@ -28,7 +28,7 @@ export function SegmentedControl<T extends string>({
             style={[styles.segment, isActive && styles.segmentActive]}
             onPress={() => onChange(option.value)}
             accessibilityRole="button"
-            accessibilityState={{selected: isActive}}>
+            accessibilityState={{ selected: isActive }}>
             <Text style={[styles.label, isActive && styles.labelActive]}>
               {option.label}
             </Text>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   segmentActive: {
     backgroundColor: colors.background,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 2,

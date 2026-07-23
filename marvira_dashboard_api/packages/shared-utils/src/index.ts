@@ -22,7 +22,10 @@ export function isWithinRadius(
   placeLon: number,
   radiusMeters: number,
 ): boolean {
-  return haversineDistanceMeters(userLat, userLon, placeLat, placeLon) <= radiusMeters;
+  return (
+    haversineDistanceMeters(userLat, userLon, placeLat, placeLon) <=
+    radiusMeters
+  );
 }
 
 export function formatDistance(meters: number): string {
@@ -40,7 +43,7 @@ export function slugify(text: string): string {
 }
 
 export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export function clamp(value: number, min: number, max: number): number {

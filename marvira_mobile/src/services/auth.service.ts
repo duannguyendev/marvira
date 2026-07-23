@@ -1,6 +1,6 @@
-import {storage} from '../utils/storage';
-import {authApi} from '../api/auth';
-import {User, LoginCredentials, RegisterCredentials} from '../types';
+import { storage } from '../utils/storage';
+import { authApi } from '../api/auth';
+import { User, LoginCredentials, RegisterCredentials } from '../types';
 
 class AuthService {
   private currentUser: User | null = null;
@@ -114,4 +114,3 @@ class AuthService {
 }
 
 export const authService = new AuthService();
-

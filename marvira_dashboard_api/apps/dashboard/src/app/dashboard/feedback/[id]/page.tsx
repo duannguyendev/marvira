@@ -10,10 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  FeedbackStatus,
-  type FeedbackItem,
-} from '@marvira/shared-types';
+import { FeedbackStatus, type FeedbackItem } from '@marvira/shared-types';
 
 const STATUS_OPTIONS = [
   FeedbackStatus.NEW,
@@ -76,7 +73,8 @@ export default function FeedbackDetailPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Feedback Detail</h1>
           <p className="text-muted-foreground">
-            From {feedback.name} · {new Date(feedback.createdAt).toLocaleString()}
+            From {feedback.name} ·{' '}
+            {new Date(feedback.createdAt).toLocaleString()}
           </p>
         </div>
         <Button variant="outline" asChild>
@@ -104,7 +102,9 @@ export default function FeedbackDetailPage() {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Source</p>
-              <p className="font-medium">{feedback.source === 'WEB' ? 'Website' : 'Mobile app'}</p>
+              <p className="font-medium">
+                {feedback.source === 'WEB' ? 'Website' : 'Mobile app'}
+              </p>
             </div>
           </div>
 
@@ -144,8 +144,8 @@ export default function FeedbackDetailPage() {
               id="status"
               className="h-10 w-full rounded-md border bg-background px-3 text-sm"
               value={status}
-              onChange={(e) => setStatus(e.target.value as FeedbackStatus)}>
-              {STATUS_OPTIONS.map((opt) => (
+              onChange={e => setStatus(e.target.value as FeedbackStatus)}>
+              {STATUS_OPTIONS.map(opt => (
                 <option key={opt} value={opt}>
                   {formatLabel(opt)}
                 </option>
@@ -160,11 +160,13 @@ export default function FeedbackDetailPage() {
               className="min-h-24 w-full rounded-md border bg-background px-3 py-2 text-sm"
               placeholder="Notes for staff (not visible to user)"
               value={adminNote}
-              onChange={(e) => setAdminNote(e.target.value)}
+              onChange={e => setAdminNote(e.target.value)}
             />
           </div>
 
-          <Button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending}>
+          <Button
+            onClick={() => updateMutation.mutate()}
+            disabled={updateMutation.isPending}>
             {updateMutation.isPending ? 'Saving...' : 'Save changes'}
           </Button>
         </CardContent>

@@ -22,15 +22,8 @@ import {
 } from '@/components/ui/dialog';
 
 const createUserSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email('Invalid email'),
-  name: z
-    .string()
-    .trim()
-    .min(2, 'Name must be at least 2 characters'),
+  email: z.string().trim().toLowerCase().email('Invalid email'),
+  name: z.string().trim().min(2, 'Name must be at least 2 characters'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   role: z.nativeEnum(UserRole),
 });
@@ -71,19 +64,19 @@ export function AddUserDialog({ isAdmin, onCreated }: AddUserDialogProps) {
       setOpen(false);
       onCreated();
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to create user'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to create user'),
   });
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
+      onOpenChange={next => {
         setOpen(next);
         if (!next) {
           reset({ email: '', name: '', password: '', role: UserRole.USER });
         }
-      }}
-    >
+      }}>
       <DialogTrigger asChild>
         <Button type="button">
           <Plus className="h-4 w-4" />
@@ -100,12 +93,17 @@ export function AddUserDialog({ isAdmin, onCreated }: AddUserDialogProps) {
         </DialogHeader>
         <form
           className="space-y-4"
-          onSubmit={handleSubmit((values) => createMutation.mutate(values))}
-        >
+          onSubmit={handleSubmit(values => createMutation.mutate(values))}>
           <div className="space-y-2">
             <Label htmlFor="create-user-name">Name</Label>
-            <Input id="create-user-name" placeholder="Jane Doe" {...register('name')} />
-            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+            <Input
+              id="create-user-name"
+              placeholder="Jane Doe"
+              {...register('name')}
+            />
+            {errors.name && (
+              <p className="text-sm text-destructive">{errors.name.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="create-user-email">Email</Label>
@@ -115,7 +113,9 @@ export function AddUserDialog({ isAdmin, onCreated }: AddUserDialogProps) {
               placeholder="user@example.com"
               {...register('email')}
             />
-            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="create-user-password">Password</Label>
@@ -126,7 +126,9 @@ export function AddUserDialog({ isAdmin, onCreated }: AddUserDialogProps) {
               {...register('password')}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.password.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
@@ -134,18 +136,22 @@ export function AddUserDialog({ isAdmin, onCreated }: AddUserDialogProps) {
             <select
               id="create-user-role"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              {...register('role')}
-            >
-              {roleOptions.map((role) => (
+              {...register('role')}>
+              {roleOptions.map(role => (
                 <option key={role} value={role}>
                   {role}
                 </option>
               ))}
             </select>
-            {errors.role && <p className="text-sm text-destructive">{errors.role.message}</p>}
+            {errors.role && (
+              <p className="text-sm text-destructive">{errors.role.message}</p>
+            )}
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={createMutation.isPending}>

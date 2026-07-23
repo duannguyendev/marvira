@@ -47,7 +47,8 @@ async function writeIdSet(key: string, ids: Set<string>): Promise<void> {
 
 export const practiceStorage = {
   getFavoriteEventIds: () => readIdSet(FAVORITE_EVENTS_KEY),
-  setFavoriteEventIds: (ids: Set<string>) => writeIdSet(FAVORITE_EVENTS_KEY, ids),
+  setFavoriteEventIds: (ids: Set<string>) =>
+    writeIdSet(FAVORITE_EVENTS_KEY, ids),
 
   getFavoriteQuestionIds: () => readIdSet(FAVORITE_QUESTIONS_KEY),
   setFavoriteQuestionIds: (ids: Set<string>) =>

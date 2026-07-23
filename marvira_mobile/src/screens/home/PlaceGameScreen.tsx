@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,29 +9,42 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import MapView, {Marker, Circle, PROVIDER_GOOGLE} from 'react-native-maps';
+import { useTranslation } from 'react-i18next';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import MapView, { Marker, Circle, PROVIDER_GOOGLE } from 'react-native-maps';
 import {
   usePlaceQuestion,
   useSubmitAnswer,
   useUnlockPlace,
 } from '../../hooks/usePlaces';
-import {useLocation} from '../../hooks/useLocation';
-import {useEventDetails} from '../../hooks/useEvents';
-import {placesApi} from '../../api/places';
-import {Button} from '../../components/Button';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {QuestionRenderer} from '../../components/QuestionRenderer';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
-import {HomeStackParamList} from '../../navigation/types';
-import {isWithinRange, formatDistance, calculateDistance} from '../../utils/distance';
-import {LOCATION_ACCURACY_THRESHOLD} from '../../utils/constants';
-import {buildLocationPayload, showLocationWarnings} from '../../utils/anticheat';
+import { useLocation } from '../../hooks/useLocation';
+import { useEventDetails } from '../../hooks/useEvents';
+import { placesApi } from '../../api/places';
+import { Button } from '../../components/Button';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { QuestionRenderer } from '../../components/QuestionRenderer';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
+import { HomeStackParamList } from '../../navigation/types';
+import {
+  isWithinRange,
+  formatDistance,
+  calculateDistance,
+} from '../../utils/distance';
+import { LOCATION_ACCURACY_THRESHOLD } from '../../utils/constants';
+import {
+  buildLocationPayload,
+  showLocationWarnings,
+} from '../../utils/anticheat';
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 const MAP_HEIGHT = height * 0.35;
 
 type PlaceGameScreenRouteProp = RouteProp<HomeStackParamList, 'PlaceGame'>;
@@ -42,14 +55,17 @@ type PlaceGameScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 export const PlaceGameScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<PlaceGameScreenRouteProp>();
   const navigation = useNavigation<PlaceGameScreenNavigationProp>();
-  const {eventId, placeId} = route.params;
+  const { eventId, placeId } = route.params;
 
-  const {data: eventData, isLoading: eventLoading, refetch: refetchEvent} =
-    useEventDetails(eventId);
-  const {location, error: locationError} = useLocation();
+  const {
+    data: eventData,
+    isLoading: eventLoading,
+    refetch: refetchEvent,
+  } = useEventDetails(eventId);
+  const { location, error: locationError } = useLocation();
   const submitAnswerMutation = useSubmitAnswer();
   const unlockPlaceMutation = useUnlockPlace();
 
@@ -70,7 +86,7 @@ export const PlaceGameScreen: React.FC = () => {
     !!location &&
     (!location.accuracy || location.accuracy <= LOCATION_ACCURACY_THRESHOLD);
 
-  const {data: questionData, isLoading: questionLoading} = usePlaceQuestion(
+  const { data: questionData, isLoading: questionLoading } = usePlaceQuestion(
     placeId,
     isUnlocked,
   );
@@ -107,7 +123,10 @@ export const PlaceGameScreen: React.FC = () => {
       await refetchEvent();
     } catch (error: any) {
       unlockAttemptedRef.current = false;
-      Alert.alert(t('game.unlockFailed'), error.message || t('game.couldNotUnlock'));
+      Alert.alert(
+        t('game.unlockFailed'),
+        error.message || t('game.couldNotUnlock'),
+      );
     }
   }, [
     location,
@@ -136,7 +155,7 @@ export const PlaceGameScreen: React.FC = () => {
     if (!isUnlocked) {
       Alert.alert(
         t('game.notUnlocked'),
-        t('game.mustBeWithin', {radius: unlockRadius}),
+        t('game.mustBeWithin', { radius: unlockRadius }),
       );
       return;
     }
@@ -158,7 +177,7 @@ export const PlaceGameScreen: React.FC = () => {
     if (!isWithinRange(location, place.location, unlockRadius)) {
       Alert.alert(
         t('game.locationRequired'),
-        t('game.mustBeWithin', {radius: unlockRadius}),
+        t('game.mustBeWithin', { radius: unlockRadius }),
       );
       return;
     }
@@ -296,11 +315,11 @@ export const PlaceGameScreen: React.FC = () => {
           {distance !== null && (
             <View style={styles.distanceContainer}>
               <Text style={styles.distanceText}>
-                {t('game.distanceAway', {distance: formatDistance(distance)})}
+                {t('game.distanceAway', { distance: formatDistance(distance) })}
               </Text>
               {!isUnlocked && (
                 <Text style={styles.unlockHint}>
-                  {t('game.getWithinToUnlock', {radius: unlockRadius})}
+                  {t('game.getWithinToUnlock', { radius: unlockRadius })}
                   {location?.accuracy &&
                   location.accuracy > LOCATION_ACCURACY_THRESHOLD
                     ? t('game.waitingGps')
@@ -309,7 +328,7 @@ export const PlaceGameScreen: React.FC = () => {
               )}
               {isUnlocked && !isWithinAnswerRange && (
                 <Text style={styles.unlockHint}>
-                  {t('game.mustBeWithin', {radius: unlockRadius})}
+                  {t('game.mustBeWithin', { radius: unlockRadius })}
                 </Text>
               )}
               {isUnlocked && isWithinAnswerRange && !hasGoodGpsAccuracy && (
@@ -349,7 +368,7 @@ export const PlaceGameScreen: React.FC = () => {
               <Text style={styles.lockedSubtext}>
                 {!isAccessible
                   ? t('game.completePreviousFirst')
-                  : t('game.moveWithinToUnlock', {radius: unlockRadius})}
+                  : t('game.moveWithinToUnlock', { radius: unlockRadius })}
               </Text>
               <Button
                 title={t('game.tryUnlockNow')}

@@ -19,11 +19,16 @@ export interface ApiResult<T> {
   message?: string;
 }
 
-function formatApiErrorMessage(error: { message?: unknown }, status: number): string {
+function formatApiErrorMessage(
+  error: { message?: unknown },
+  status: number,
+): string {
   const message = error.message;
   if (typeof message === 'string' && message.trim()) return message;
   if (Array.isArray(message)) {
-    const parts = message.filter((part): part is string => typeof part === 'string' && part.trim() !== '');
+    const parts = message.filter(
+      (part): part is string => typeof part === 'string' && part.trim() !== '',
+    );
     if (parts.length) return parts.join('; ');
   }
   return `HTTP ${status}`;
@@ -67,7 +72,10 @@ class ApiClient {
     return this.accessToken;
   }
 
-  private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  private async request<T>(
+    path: string,
+    options: RequestInit = {},
+  ): Promise<T> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
@@ -92,7 +100,9 @@ class ApiClient {
     }
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      const error = await response
+        .json()
+        .catch(() => ({ message: 'Request failed' }));
       throw new Error(formatApiErrorMessage(error, response.status));
     }
 
@@ -154,7 +164,10 @@ class ApiClient {
       body: formData,
     });
     if (!response.ok) throw new Error('Upload failed');
-    const result = (await response.json()) as ApiResult<{ url: string; filename: string }>;
+    const result = (await response.json()) as ApiResult<{
+      url: string;
+      filename: string;
+    }>;
     return result.data;
   }
 }

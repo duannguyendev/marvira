@@ -1,11 +1,12 @@
 import { z } from 'zod';
-import { EventDifficulty, QuestionType, ArticleStatus } from '@marvira/shared-types';
+import {
+  EventDifficulty,
+  QuestionType,
+  ArticleStatus,
+} from '@marvira/shared-types';
 
 const trimmed = (min: number, label: string) =>
-  z
-    .string()
-    .trim()
-    .min(min, `${label} must be at least ${min} characters`);
+  z.string().trim().min(min, `${label} must be at least ${min} characters`);
 
 export const eventSchema = z
   .object({
@@ -46,7 +47,7 @@ export const eventSchema = z
       });
     }
 
-    const codes = (data.giftCodes ?? []).map((c) => c.trim()).filter(Boolean);
+    const codes = (data.giftCodes ?? []).map(c => c.trim()).filter(Boolean);
     if (codes.length > 10) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -83,7 +84,8 @@ export const newEventSchema = eventSchema.superRefine((data, ctx) => {
   if (data.isActive) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Create as draft first. Add places and questions, then publish from the edit page.',
+      message:
+        'Create as draft first. Add places and questions, then publish from the edit page.',
       path: ['isActive'],
     });
   }
@@ -151,7 +153,11 @@ export const questionSchema = z
       .int('Points must be a whole number')
       .min(1, 'Minimum 1 point')
       .max(1000, 'Maximum 1000 points'),
-    options: z.array(z.object({ value: z.string().trim().min(1, 'Option cannot be empty') })).optional(),
+    options: z
+      .array(
+        z.object({ value: z.string().trim().min(1, 'Option cannot be empty') }),
+      )
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.type === QuestionType.IMAGE && !data.imageUrl?.trim()) {
@@ -162,7 +168,8 @@ export const questionSchema = z
       });
     }
     if (data.type === QuestionType.MULTIPLE_CHOICE) {
-      const options = data.options?.map((o) => o.value.trim()).filter(Boolean) ?? [];
+      const options =
+        data.options?.map(o => o.value.trim()).filter(Boolean) ?? [];
       if (options.length < 2) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -170,7 +177,7 @@ export const questionSchema = z
           path: ['options'],
         });
       }
-      if (!options.some((o) => o.toLowerCase() === data.answer.toLowerCase())) {
+      if (!options.some(o => o.toLowerCase() === data.answer.toLowerCase())) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Answer must match one of the options',
@@ -205,12 +212,23 @@ export const articleSchema = z.object({
     .string()
     .trim()
     .max(220, 'Slug is too long')
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use lowercase letters, numbers, and hyphens only')
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      'Use lowercase letters, numbers, and hyphens only',
+    )
     .optional()
     .or(z.literal('')),
   placeName: trimmed(2, 'Place name').max(160, 'Place name is too long'),
-  city: z.string().trim().max(100, 'City is too long').optional().or(z.literal('')),
-  excerpt: trimmed(10, 'Excerpt').max(300, 'Keep the excerpt under 300 characters'),
+  city: z
+    .string()
+    .trim()
+    .max(100, 'City is too long')
+    .optional()
+    .or(z.literal('')),
+  excerpt: trimmed(10, 'Excerpt').max(
+    300,
+    'Keep the excerpt under 300 characters',
+  ),
   body: trimmed(10, 'Body'),
   coverImage: z.string().optional().or(z.literal('')),
   status: z.nativeEnum(ArticleStatus),

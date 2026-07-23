@@ -5,11 +5,11 @@ import {
   ApiResponse,
   User,
 } from '../types';
-import {USE_MOCK_DATA} from '../utils/constants';
-import {mockUser, delay} from './mockData';
-import {apiClient} from './client';
-import {ApiLoginData, ApiUser} from '../types/api';
-import {storage} from '../utils/storage';
+import { USE_MOCK_DATA } from '../utils/constants';
+import { mockUser, delay } from './mockData';
+import { apiClient } from './client';
+import { ApiLoginData, ApiUser } from '../types/api';
+import { storage } from '../utils/storage';
 
 function mapApiUser(user: ApiUser): User {
   return {
@@ -49,11 +49,11 @@ export const authApi = {
       };
     }
 
-    const response = await apiClient.post<{success: boolean; data: ApiLoginData}>(
-      '/auth/login',
-      credentials,
-    );
-    return {success: true, data: mapAuthData(response.data.data)};
+    const response = await apiClient.post<{
+      success: boolean;
+      data: ApiLoginData;
+    }>('/auth/login', credentials);
+    return { success: true, data: mapAuthData(response.data.data) };
   },
 
   register: async (
@@ -76,11 +76,11 @@ export const authApi = {
       };
     }
 
-    const response = await apiClient.post<{success: boolean; data: ApiLoginData}>(
-      '/auth/register',
-      credentials,
-    );
-    return {success: true, data: mapAuthData(response.data.data)};
+    const response = await apiClient.post<{
+      success: boolean;
+      data: ApiLoginData;
+    }>('/auth/register', credentials);
+    return { success: true, data: mapAuthData(response.data.data) };
   },
 
   logout: async (): Promise<void> => {
@@ -90,7 +90,7 @@ export const authApi = {
     }
     const refreshToken = await storage.getRefreshToken();
     if (refreshToken) {
-      await apiClient.post('/auth/logout', {refreshToken});
+      await apiClient.post('/auth/logout', { refreshToken });
     }
   },
 
@@ -104,23 +104,23 @@ export const authApi = {
       };
     }
 
-    const response = await apiClient.post<{success: boolean; data: ApiLoginData}>(
-      '/auth/refresh',
-      {refreshToken},
-    );
+    const response = await apiClient.post<{
+      success: boolean;
+      data: ApiLoginData;
+    }>('/auth/refresh', { refreshToken });
     return mapAuthData(response.data.data);
   },
 
   getCurrentUser: async (): Promise<ApiResponse<User>> => {
     if (USE_MOCK_DATA) {
       await delay(300);
-      return {success: true, data: mockUser};
+      return { success: true, data: mockUser };
     }
 
-    const response = await apiClient.get<{success: boolean; data: ApiUser}>(
+    const response = await apiClient.get<{ success: boolean; data: ApiUser }>(
       '/auth/me',
     );
-    return {success: true, data: mapApiUser(response.data.data)};
+    return { success: true, data: mapApiUser(response.data.data) };
   },
 
   forgotPassword: async (email: string): Promise<void> => {
@@ -128,7 +128,7 @@ export const authApi = {
       await delay(500);
       return;
     }
-    await apiClient.post('/auth/forgot-password', {email});
+    await apiClient.post('/auth/forgot-password', { email });
   },
 
   resetPassword: async (token: string, password: string): Promise<void> => {
@@ -136,6 +136,6 @@ export const authApi = {
       await delay(500);
       return;
     }
-    await apiClient.post('/auth/reset-password', {token, password});
+    await apiClient.post('/auth/reset-password', { token, password });
   },
 };

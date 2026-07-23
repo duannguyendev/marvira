@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
@@ -7,7 +7,7 @@ import {
   TextInputProps,
   TouchableOpacity,
 } from 'react-native';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -90,4 +90,3 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
 });
-

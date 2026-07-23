@@ -42,9 +42,9 @@ When using local disk, back up `apps/api/uploads/` with object-storage sync. In 
 
 ## RTO / RPO targets (recommended)
 
-| Metric | Target |
-|--------|--------|
-| RPO (max data loss) | ≤ 1 hour (PITR) |
+| Metric                | Target                         |
+| --------------------- | ------------------------------ |
+| RPO (max data loss)   | ≤ 1 hour (PITR)                |
 | RTO (time to restore) | ≤ 4 hours (documented runbook) |
 
 Test a restore in staging at least once before launch.

@@ -327,7 +327,13 @@ export interface EventParticipant {
 }
 
 export interface EventParticipantsResponse {
-  event: { id: string; title: string; city: string; giftCount: number; giftAssignedCount: number };
+  event: {
+    id: string;
+    title: string;
+    city: string;
+    giftCount: number;
+    giftAssignedCount: number;
+  };
   participants: PaginatedResponse<EventParticipant>;
 }
 
@@ -378,7 +384,9 @@ export interface CreatePlaceDto {
   hint?: string;
 }
 
-export interface UpdatePlaceDto extends Partial<Omit<CreatePlaceDto, 'eventId'>> {
+export interface UpdatePlaceDto extends Partial<
+  Omit<CreatePlaceDto, 'eventId'>
+> {
   questionId?: string | null;
 }
 

@@ -31,7 +31,9 @@ export function QueryState({
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-        <p className="text-sm font-medium text-destructive">Failed to load data</p>
+        <p className="text-sm font-medium text-destructive">
+          Failed to load data
+        </p>
         <p className="text-sm text-muted-foreground">
           {error?.message || 'Something went wrong. Please try again.'}
         </p>

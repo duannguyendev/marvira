@@ -1,4 +1,4 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   favoritesApi,
   toggleEventFavorite,
@@ -51,7 +51,7 @@ export const useToggleEventFavorite = () => {
       isFavorite: boolean;
     }) => toggleEventFavorite(eventId, isFavorite),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({queryKey: ['favorites']});
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
       queryClient.invalidateQueries({
         queryKey: ['favorites', 'event', variables.eventId],
       });
@@ -71,8 +71,8 @@ export const useToggleQuestionFavorite = () => {
       isFavorite: boolean;
     }) => toggleQuestionFavorite(questionId, isFavorite),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({queryKey: ['favorites']});
-      queryClient.invalidateQueries({queryKey: ['practice']});
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
       queryClient.invalidateQueries({
         queryKey: ['favorites', 'question', variables.questionId],
       });

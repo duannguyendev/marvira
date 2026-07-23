@@ -14,7 +14,12 @@ import { PlacesService } from './places.service';
 import { ProgressService } from '../progress/progress.service';
 import { QuestionsService } from '../questions/questions.service';
 import { EventOwnershipService } from '../events/event-ownership.service';
-import { CreatePlaceDto, UpdatePlaceDto, UnlockPlaceDto, AnswerPlaceDto } from './dto/place.dto';
+import {
+  CreatePlaceDto,
+  UpdatePlaceDto,
+  UnlockPlaceDto,
+  AnswerPlaceDto,
+} from './dto/place.dto';
 import { Roles, Public } from '../common/decorators/roles.decorator';
 import { RequestUser } from '../common/types/request-user';
 
@@ -89,8 +94,14 @@ export class PlacesController {
   @Get('places/:id/question')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get question for unlocked place' })
-  async getQuestion(@Param('id') id: string, @Req() req: { user: RequestUser }) {
-    const data = await this.questionsService.getQuestionForPlace(req.user.id, id);
+  async getQuestion(
+    @Param('id') id: string,
+    @Req() req: { user: RequestUser },
+  ) {
+    const data = await this.questionsService.getQuestionForPlace(
+      req.user.id,
+      id,
+    );
     return { success: true, data };
   }
 
@@ -102,7 +113,11 @@ export class PlacesController {
     @Body() dto: AnswerPlaceDto,
     @Req() req: { user: RequestUser },
   ) {
-    const result = await this.progressService.submitAnswer(req.user.id, id, dto);
+    const result = await this.progressService.submitAnswer(
+      req.user.id,
+      id,
+      dto,
+    );
     const { warnings, ...data } = result;
     return { success: true, data, warnings: warnings ?? [] };
   }

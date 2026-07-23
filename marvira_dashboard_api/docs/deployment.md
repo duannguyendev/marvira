@@ -11,14 +11,14 @@
 
 Set via platform env vars or secrets manager:
 
-| Variable | Notes |
-|----------|--------|
-| `DATABASE_URL` | Include `connection_limit=20` for pooled connections |
-| `REDIS_URL` | Required; do **not** set `REDIS_DISABLED` in production |
-| `JWT_SECRET` / `JWT_REFRESH_SECRET` | Min 32 random chars each |
-| `OAUTH_DEV_BYPASS` | Must be `false` |
-| `AWS_*` / `S3_BUCKET` / `CDN_URL` | For image uploads at scale |
-| `SENTRY_DSN` | Optional error tracking |
+| Variable                            | Notes                                                   |
+| ----------------------------------- | ------------------------------------------------------- |
+| `DATABASE_URL`                      | Include `connection_limit=20` for pooled connections    |
+| `REDIS_URL`                         | Required; do **not** set `REDIS_DISABLED` in production |
+| `JWT_SECRET` / `JWT_REFRESH_SECRET` | Min 32 random chars each                                |
+| `OAUTH_DEV_BYPASS`                  | Must be `false`                                         |
+| `AWS_*` / `S3_BUCKET` / `CDN_URL`   | For image uploads at scale                              |
+| `SENTRY_DSN`                        | Optional error tracking                                 |
 
 Rotate seed demo passwords (`demo123`, `admin123`) before public launch.
 

@@ -7,7 +7,7 @@ export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  ResetPassword: {token?: string} | undefined;
+  ResetPassword: { token?: string } | undefined;
 };
 
 export type ProfileStackParamList = {
@@ -16,18 +16,18 @@ export type ProfileStackParamList = {
   Feedback: undefined;
   MyEvents: undefined;
   MyQuestions: undefined;
-  AddQuestion: {questionId?: string} | undefined;
+  AddQuestion: { questionId?: string } | undefined;
 };
 
 export type PracticeStackParamList = {
   PracticeList: undefined;
-  QuestionTraining: {questionId: string};
-  AddQuestion: {questionId?: string} | undefined;
+  QuestionTraining: { questionId: string };
+  AddQuestion: { questionId?: string } | undefined;
 };
 
 export type FavoritesStackParamList = {
   FavoritesList: undefined;
-  QuestionTraining: {questionId: string};
+  QuestionTraining: { questionId: string };
 };
 
 export type MainTabParamList = {
@@ -59,8 +59,8 @@ export type MainTabParamList = {
 
 export type HomeStackParamList = {
   EventsList: undefined;
-  EventDetails: {eventId: string};
-  PlaceGame: {eventId: string; placeId: string};
+  EventDetails: { eventId: string };
+  PlaceGame: { eventId: string; placeId: string };
   EventCompletion: {
     eventId: string;
     score?: number;
@@ -72,12 +72,16 @@ export type HomeStackParamList = {
     giftCount?: number;
     giftsAllClaimed?: boolean;
   };
-  EventLeaderboard: {eventId: string};
-  EventFinishers: {eventId: string};
+  EventLeaderboard: { eventId: string };
+  EventFinishers: { eventId: string };
   GlobalLeaderboard: undefined;
   CreateEventInfo: undefined;
-  CreateEventPlace: {eventId: string; placeIndex: number};
-  CreateEventReview: {eventId: string};
-  CreateEventSuccess: {eventId: string; published: boolean; joinPassword?: string};
-  EditEventGifts: {eventId: string};
+  CreateEventPlace: { eventId: string; placeIndex: number };
+  CreateEventReview: { eventId: string };
+  CreateEventSuccess: {
+    eventId: string;
+    published: boolean;
+    joinPassword?: string;
+  };
+  EditEventGifts: { eventId: string };
 };

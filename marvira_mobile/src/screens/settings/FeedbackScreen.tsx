@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,17 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {Button} from '../../components/Button';
-import {feedbackApi} from '../../api/feedback';
-import {FeedbackCategory} from '../../types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
+import { useTranslation } from 'react-i18next';
+import { Button } from '../../components/Button';
+import { feedbackApi } from '../../api/feedback';
+import { FeedbackCategory } from '../../types';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
 
 const CATEGORIES: FeedbackCategory[] = [
   FeedbackCategory.FEEDBACK,
@@ -22,7 +28,7 @@ const CATEGORIES: FeedbackCategory[] = [
 ];
 
 export const FeedbackScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [category, setCategory] = useState<FeedbackCategory>(
     FeedbackCategory.FEEDBACK,
   );
@@ -61,7 +67,9 @@ export const FeedbackScreen: React.FC = () => {
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('feedback.title')}</Text>
-        <Text style={styles.sectionDescription}>{t('feedback.description')}</Text>
+        <Text style={styles.sectionDescription}>
+          {t('feedback.description')}
+        </Text>
 
         <Text style={styles.label}>{t('feedback.category')}</Text>
         <View style={styles.categoryList}>

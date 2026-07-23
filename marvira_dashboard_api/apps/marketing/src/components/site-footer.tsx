@@ -25,9 +25,13 @@ export function SiteFooter({
               height={36}
               className="h-9 w-9 rounded-xl"
             />
-            <p className="font-display text-2xl font-bold tracking-tight">{content.footer.brand}</p>
+            <p className="font-display text-2xl font-bold tracking-tight">
+              {content.footer.brand}
+            </p>
           </div>
-          <p className="mt-2 max-w-sm text-sm text-mist/75">{content.footer.line}</p>
+          <p className="mt-2 max-w-sm text-sm text-mist/75">
+            {content.footer.line}
+          </p>
         </div>
         <div className="flex flex-wrap gap-5 text-sm text-mist/80">
           <Link href={`/privacy${q}`} className="hover:text-white">

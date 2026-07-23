@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,19 +7,25 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {usePracticeQuestions} from '../../hooks/usePractice';
-import {useFavoriteQuestionToggle} from '../../hooks/useFavoriteQuestionToggle';
-import {PracticeQuestionCard} from '../../components/PracticeQuestionCard';
-import {SegmentedControl} from '../../components/SegmentedControl';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {UnfavoriteConfirmBottomSheet} from '../../components/UnfavoriteConfirmBottomSheet';
-import {PracticeStackParamList} from '../../navigation/types';
-import {PracticeQuestionStatus} from '../../types';
-import {colors, spacing, fontSize, fontWeight, borderRadius} from '../../theme';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { usePracticeQuestions } from '../../hooks/usePractice';
+import { useFavoriteQuestionToggle } from '../../hooks/useFavoriteQuestionToggle';
+import { PracticeQuestionCard } from '../../components/PracticeQuestionCard';
+import { SegmentedControl } from '../../components/SegmentedControl';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
+import { PracticeStackParamList } from '../../navigation/types';
+import { PracticeQuestionStatus } from '../../types';
+import {
+  colors,
+  spacing,
+  fontSize,
+  fontWeight,
+  borderRadius,
+} from '../../theme';
 
 type NavigationProp = NativeStackNavigationProp<
   PracticeStackParamList,
@@ -27,12 +33,12 @@ type NavigationProp = NativeStackNavigationProp<
 >;
 
 export const PracticeListScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
   const [status, setStatus] = useState<PracticeQuestionStatus>('unfinished');
   const [refreshing, setRefreshing] = useState(false);
 
-  const {data, isLoading, error, refetch, isRefetching} =
+  const { data, isLoading, error, refetch, isRefetching } =
     usePracticeQuestions(status);
   const {
     pendingUnfavoriteId,
@@ -80,8 +86,8 @@ export const PracticeListScreen: React.FC = () => {
             <Text style={styles.subheading}>{t('practice.subheading')}</Text>
             <SegmentedControl
               options={[
-                {value: 'unfinished', label: t('practice.toPractice')},
-                {value: 'completed', label: t('practice.completedTab')},
+                { value: 'unfinished', label: t('practice.toPractice') },
+                { value: 'completed', label: t('practice.completedTab') },
               ]}
               value={status}
               onChange={setStatus}
@@ -105,11 +111,11 @@ export const PracticeListScreen: React.FC = () => {
             </Text>
           </View>
         }
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <PracticeQuestionCard
             question={item}
             onPress={() =>
-              navigation.navigate('QuestionTraining', {questionId: item.id})
+              navigation.navigate('QuestionTraining', { questionId: item.id })
             }
             onFavoritePress={() => onFavoritePress(item.id, item.isFavorite)}
           />
@@ -192,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 8,

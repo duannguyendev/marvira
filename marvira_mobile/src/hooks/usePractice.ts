@@ -1,5 +1,5 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {practiceApi} from '../api/practice';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { practiceApi } from '../api/practice';
 import {
   CreateQuestionInput,
   PracticeQuestionStatus,
@@ -50,8 +50,8 @@ export const useSubmitTrainingAnswer = () => {
       submission: TrainingAnswerSubmission;
     }) => practiceApi.submitTrainingAnswer(questionId, submission),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({queryKey: ['practice']});
-      queryClient.invalidateQueries({queryKey: ['favorites']});
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
       queryClient.invalidateQueries({
         queryKey: ['practice', 'question', variables.questionId],
       });
@@ -63,9 +63,10 @@ export const useCreatePracticeQuestion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: CreateQuestionInput) => practiceApi.createQuestion(input),
+    mutationFn: (input: CreateQuestionInput) =>
+      practiceApi.createQuestion(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['practice']});
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
     },
   });
 };
@@ -82,7 +83,7 @@ export const useUpdatePracticeQuestion = () => {
       input: CreateQuestionInput;
     }) => practiceApi.updateQuestion(questionId, input),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['practice']});
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
     },
   });
 };
@@ -93,8 +94,8 @@ export const useDeletePracticeQuestion = () => {
   return useMutation({
     mutationFn: (questionId: string) => practiceApi.deleteQuestion(questionId),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['practice']});
-      queryClient.invalidateQueries({queryKey: ['favorites']});
+      queryClient.invalidateQueries({ queryKey: ['practice'] });
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
     },
   });
 };

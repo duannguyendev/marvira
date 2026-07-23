@@ -18,7 +18,7 @@ export class FavoritesService {
     });
 
     const events = await Promise.all(
-      favorites.map(async (f) => this.eventsService.findOne(f.eventId)),
+      favorites.map(async f => this.eventsService.findOne(f.eventId)),
     );
 
     return events;
@@ -32,7 +32,7 @@ export class FavoritesService {
     });
 
     const items = await Promise.all(
-      favorites.map(async (f) => {
+      favorites.map(async f => {
         try {
           return await this.practiceService.getQuestion(userId, f.questionId);
         } catch {
@@ -45,7 +45,9 @@ export class FavoritesService {
   }
 
   async addFavoriteEvent(userId: string, eventId: string) {
-    const event = await this.prisma.client.event.findUnique({ where: { id: eventId } });
+    const event = await this.prisma.client.event.findUnique({
+      where: { id: eventId },
+    });
     if (!event) throw new NotFoundException('Event not found');
 
     await this.prisma.client.userFavoriteEvent.upsert({

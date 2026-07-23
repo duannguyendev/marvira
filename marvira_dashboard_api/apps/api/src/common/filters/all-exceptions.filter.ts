@@ -33,7 +33,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     response.status(status).json({
       success: false,
       statusCode: status,
-      message: typeof message === 'string' ? message : (message as { message: string }).message,
+      message:
+        typeof message === 'string'
+          ? message
+          : (message as { message: string }).message,
     });
   }
 }

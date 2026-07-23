@@ -10,16 +10,24 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 const resetSchema = z
   .object({
     password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z
+      .string()
+      .min(6, 'Password must be at least 6 characters'),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine(data => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
@@ -55,7 +63,9 @@ function ResetPasswordForm() {
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Request failed' }));
+        const error = await response
+          .json()
+          .catch(() => ({ message: 'Request failed' }));
         throw new Error(error.message || 'Request failed');
       }
 
@@ -84,13 +94,21 @@ function ResetPasswordForm() {
       <div className="space-y-2">
         <Label htmlFor="password">New password</Label>
         <Input id="password" type="password" {...register('password')} />
-        {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+        {errors.password && (
+          <p className="text-sm text-destructive">{errors.password.message}</p>
+        )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">Confirm password</Label>
-        <Input id="confirmPassword" type="password" {...register('confirmPassword')} />
+        <Input
+          id="confirmPassword"
+          type="password"
+          {...register('confirmPassword')}
+        />
         {errors.confirmPassword && (
-          <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+          <p className="text-sm text-destructive">
+            {errors.confirmPassword.message}
+          </p>
         )}
       </div>
       <Button type="submit" className="w-full" disabled={loading}>
@@ -106,10 +124,15 @@ export default function ResetPasswordPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle>Reset password</CardTitle>
-          <CardDescription>Choose a new password for your account.</CardDescription>
+          <CardDescription>
+            Choose a new password for your account.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Suspense fallback={<p className="text-sm text-muted-foreground">Loading...</p>}>
+          <Suspense
+            fallback={
+              <p className="text-sm text-muted-foreground">Loading...</p>
+            }>
             <ResetPasswordForm />
           </Suspense>
           <p className="mt-4 text-center text-sm">

@@ -7,18 +7,24 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {CompositeNavigationProp} from '@react-navigation/native';
-import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
-import {useAuth} from '../../hooks/useAuth';
-import {useCompletedEvents} from '../../hooks/useProfile';
-import {Button} from '../../components/Button';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {EventCard} from '../../components/EventCard';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
+import { useAuth } from '../../hooks/useAuth';
+import { useCompletedEvents } from '../../hooks/useProfile';
+import { Button } from '../../components/Button';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { EventCard } from '../../components/EventCard';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
 import {
   HomeStackParamList,
   MainTabParamList,
@@ -34,29 +40,34 @@ type ProfileScreenNavigationProp = CompositeNavigationProp<
 >;
 
 export const ProfileScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const {user, logout, isLoggingOut} = useAuth();
-  const {data: completedData, isLoading: eventsLoading} = useCompletedEvents();
+  const { user, logout, isLoggingOut } = useAuth();
+  const { data: completedData, isLoading: eventsLoading } =
+    useCompletedEvents();
 
   const handleLogout = () => {
-    Alert.alert(t('profile.logoutConfirmTitle'), t('profile.logoutConfirmMessage'), [
-      {text: t('common.cancel'), style: 'cancel'},
-      {
-        text: t('profile.logout'),
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await logout();
-          } catch (error: any) {
-            Alert.alert(
-              t('common.error'),
-              error.message || t('profile.logoutFailed'),
-            );
-          }
+    Alert.alert(
+      t('profile.logoutConfirmTitle'),
+      t('profile.logoutConfirmMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('profile.logout'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+            } catch (error: any) {
+              Alert.alert(
+                t('common.error'),
+                error.message || t('profile.logoutFailed'),
+              );
+            }
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   const completedEvents = completedData?.data || [];
@@ -111,7 +122,9 @@ export const ProfileScreen: React.FC = () => {
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
               <Text style={styles.statValue}>{completedEvents.length}</Text>
-              <Text style={styles.statLabel}>{t('profile.eventsCompleted')}</Text>
+              <Text style={styles.statLabel}>
+                {t('profile.eventsCompleted')}
+              </Text>
             </View>
             <View style={styles.statCard}>
               <Text style={styles.statValue}>{totalScore}</Text>
@@ -132,13 +145,19 @@ export const ProfileScreen: React.FC = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.completedEvents')}</Text>
+          <Text style={styles.sectionTitle}>
+            {t('profile.completedEvents')}
+          </Text>
           {eventsLoading ? (
             <LoadingSpinner />
           ) : completedEvents.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>{t('profile.noCompletedEvents')}</Text>
-              <Text style={styles.emptySubtext}>{t('profile.startExploring')}</Text>
+              <Text style={styles.emptyText}>
+                {t('profile.noCompletedEvents')}
+              </Text>
+              <Text style={styles.emptySubtext}>
+                {t('profile.startExploring')}
+              </Text>
             </View>
           ) : (
             completedEvents.map(event => (
@@ -148,7 +167,7 @@ export const ProfileScreen: React.FC = () => {
                 onPress={() => {
                   navigation.navigate('Home', {
                     screen: 'EventDetails',
-                    params: {eventId: event.id},
+                    params: { eventId: event.id },
                   } as MainTabParamList['Home']);
                 }}
               />
@@ -191,7 +210,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.md,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 8,
@@ -223,7 +242,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     marginBottom: spacing.lg,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
@@ -262,7 +281,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,

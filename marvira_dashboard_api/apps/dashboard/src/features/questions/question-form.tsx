@@ -11,7 +11,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { QuestionType, type AdminQuestion } from '@marvira/shared-types';
-import { questionSchema, type QuestionFormValues } from '@/lib/validation/schemas';
+import {
+  questionSchema,
+  type QuestionFormValues,
+} from '@/lib/validation/schemas';
 import { resolveImageUrl } from '@/lib/resolve-image-url';
 
 export { resolveImageUrl };
@@ -75,9 +78,13 @@ export function QuestionForm({
 
   const questionType = useWatch({ control, name: 'type' });
   const imageUrl = useWatch({ control, name: 'imageUrl' });
-  const { fields, append, remove } = useFieldArray({ control, name: 'options' });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'options',
+  });
 
-  const previewSrc = localPreview || (imageUrl?.trim() ? resolveImageUrl(imageUrl) : '');
+  const previewSrc =
+    localPreview || (imageUrl?.trim() ? resolveImageUrl(imageUrl) : '');
 
   useEffect(() => {
     if (!question) return;
@@ -91,7 +98,7 @@ export function QuestionForm({
       points: question.points,
       options:
         question.type === QuestionType.MULTIPLE_CHOICE
-          ? parseOptions(question.options).map((value) => ({ value }))
+          ? parseOptions(question.options).map(value => ({ value }))
           : question.type === QuestionType.TRUE_FALSE
             ? [{ value: 'True' }, { value: 'False' }]
             : undefined,
@@ -114,7 +121,10 @@ export function QuestionForm({
     if (questionType === QuestionType.TRUE_FALSE) {
       setValue('options', [{ value: 'True' }, { value: 'False' }]);
     }
-    if (questionType === QuestionType.TEXT || questionType === QuestionType.IMAGE) {
+    if (
+      questionType === QuestionType.TEXT ||
+      questionType === QuestionType.IMAGE
+    ) {
       setValue('options', undefined);
     }
     if (questionType === QuestionType.MULTIPLE_CHOICE && fields.length < 2) {
@@ -127,41 +137,49 @@ export function QuestionForm({
       const payload = {
         question: values.question,
         type: values.type,
-        imageUrl: values.type === QuestionType.IMAGE ? values.imageUrl?.trim() : undefined,
+        imageUrl:
+          values.type === QuestionType.IMAGE
+            ? values.imageUrl?.trim()
+            : undefined,
         answer: values.answer.trim(),
         explanation: values.explanation?.trim() || undefined,
         points: values.points,
         options:
           values.type === QuestionType.MULTIPLE_CHOICE
-            ? values.options?.map((o) => o.value.trim()).filter(Boolean)
+            ? values.options?.map(o => o.value.trim()).filter(Boolean)
             : values.type === QuestionType.TRUE_FALSE
               ? ['True', 'False']
               : undefined,
       };
 
       if (isEditing && question) {
-        return api.patch<AdminQuestion>(`${apiBasePath}/${question.id}`, payload);
+        return api.patch<AdminQuestion>(
+          `${apiBasePath}/${question.id}`,
+          payload,
+        );
       }
       return api.post<AdminQuestion>(apiBasePath, payload);
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       if (showSuccessToast) {
         toast.success(isEditing ? 'Question updated' : 'Question created');
       }
       onSaved(data);
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to save question'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to save question'),
   });
 
   return (
     <form
-      onSubmit={handleSubmit((values) => saveMutation.mutate(values))}
-      className="space-y-4"
-    >
+      onSubmit={handleSubmit(values => saveMutation.mutate(values))}
+      className="space-y-4">
       <input type="hidden" {...register('imageUrl')} />
 
       <div className="space-y-2">
-        <Label>{questionType === QuestionType.IMAGE ? 'Caption' : 'Question'}</Label>
+        <Label>
+          {questionType === QuestionType.IMAGE ? 'Caption' : 'Question'}
+        </Label>
         <textarea
           className="flex min-h-[72px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           placeholder={
@@ -181,9 +199,8 @@ export function QuestionForm({
           <Label>Type</Label>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            {...register('type')}
-          >
-            {Object.values(QuestionType).map((t) => (
+            {...register('type')}>
+            {Object.values(QuestionType).map(t => (
               <option key={t} value={t}>
                 {t.replace(/_/g, ' ')}
               </option>
@@ -202,19 +219,19 @@ export function QuestionForm({
           {questionType === QuestionType.TRUE_FALSE ? (
             <select
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              {...register('answer')}
-            >
+              {...register('answer')}>
               <option value="True">True</option>
               <option value="False">False</option>
             </select>
           ) : questionType === QuestionType.MULTIPLE_CHOICE ? (
             <select
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              {...register('answer')}
-            >
+              {...register('answer')}>
               <option value="">Select correct option</option>
               {fields.map((field, i) => (
-                <option key={field.id} value={watch(`options.${i}.value`) || ''}>
+                <option
+                  key={field.id}
+                  value={watch(`options.${i}.value`) || ''}>
                   {watch(`options.${i}.value`) || `Option ${i + 1}`}
                 </option>
               ))}
@@ -249,7 +266,7 @@ export function QuestionForm({
                 type="file"
                 accept="image/*"
                 disabled={uploading}
-                onChange={async (e) => {
+                onChange={async e => {
                   const file = e.target.files?.[0];
                   if (!file) return;
                   revokeLocalPreview();
@@ -287,8 +304,7 @@ export function QuestionForm({
                       shouldTouch: true,
                     });
                     revokeLocalPreview();
-                  }}
-                >
+                  }}>
                   Remove image
                 </Button>
               )}
@@ -298,7 +314,9 @@ export function QuestionForm({
             </div>
           </div>
           {errors.imageUrl && (
-            <p className="text-sm text-destructive">{errors.imageUrl.message}</p>
+            <p className="text-sm text-destructive">
+              {errors.imageUrl.message}
+            </p>
           )}
         </div>
       )}
@@ -307,7 +325,11 @@ export function QuestionForm({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label>Options</Label>
-            <Button type="button" variant="outline" size="sm" onClick={() => append({ value: '' })}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => append({ value: '' })}>
               <Plus className="h-3 w-3" />
               Add option
             </Button>
@@ -320,7 +342,11 @@ export function QuestionForm({
                   {...register(`options.${index}.value` as const)}
                 />
                 {fields.length > 2 && (
-                  <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => remove(index)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
@@ -335,12 +361,19 @@ export function QuestionForm({
 
       <div className="space-y-2">
         <Label>Explanation (shown after correct answer)</Label>
-        <Input placeholder="Optional explanation" {...register('explanation')} />
+        <Input
+          placeholder="Optional explanation"
+          {...register('explanation')}
+        />
       </div>
 
       <div className="flex flex-wrap gap-2">
         <Button type="submit" disabled={saveMutation.isPending}>
-          {saveMutation.isPending ? 'Saving...' : isEditing ? 'Update Question' : 'Create Question'}
+          {saveMutation.isPending
+            ? 'Saving...'
+            : isEditing
+              ? 'Update Question'
+              : 'Create Question'}
         </Button>
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel}>

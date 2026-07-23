@@ -6,7 +6,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { UserRole } from '@marvira/shared-types';
-import type { AnticheatUserListItem, PaginatedResponse, SuspendDuration } from '@marvira/shared-types';
+import type {
+  AnticheatUserListItem,
+  PaginatedResponse,
+  SuspendDuration,
+} from '@marvira/shared-types';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/auth-store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,13 +41,15 @@ function formatDate(iso: string | null) {
 }
 
 function isSuspended(user: AnticheatUserListItem) {
-  return !!user.playSuspendedUntil && new Date(user.playSuspendedUntil) > new Date();
+  return (
+    !!user.playSuspendedUntil && new Date(user.playSuspendedUntil) > new Date()
+  );
 }
 
 export default function AnticheatPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const currentUser = useAuthStore((s) => s.user);
+  const currentUser = useAuthStore(s => s.user);
   const isAdmin = currentUser?.role === UserRole.ADMIN;
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -80,11 +86,13 @@ export default function AnticheatPage() {
       invalidate();
       toast.success('Play suspension applied');
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to suspend user'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to suspend user'),
   });
 
   const liftMutation = useMutation({
-    mutationFn: (id: string) => api.post(`/admin/anticheat/users/${id}/lift-suspension`, {}),
+    mutationFn: (id: string) =>
+      api.post(`/admin/anticheat/users/${id}/lift-suspension`, {}),
     onSuccess: () => {
       invalidate();
       toast.success('Suspension lifted');
@@ -92,7 +100,8 @@ export default function AnticheatPage() {
   });
 
   const resetMutation = useMutation({
-    mutationFn: (id: string) => api.post(`/admin/anticheat/users/${id}/reset-warnings`, {}),
+    mutationFn: (id: string) =>
+      api.post(`/admin/anticheat/users/${id}/reset-warnings`, {}),
     onSuccess: () => {
       invalidate();
       toast.success('Warning points reset');
@@ -100,7 +109,8 @@ export default function AnticheatPage() {
   });
 
   const deactivateMutation = useMutation({
-    mutationFn: (id: string) => api.patch(`/admin/anticheat/users/${id}/deactivate`, {}),
+    mutationFn: (id: string) =>
+      api.patch(`/admin/anticheat/users/${id}/deactivate`, {}),
     onSuccess: () => {
       invalidate();
       toast.success('Account deactivated');
@@ -108,7 +118,8 @@ export default function AnticheatPage() {
   });
 
   const activateMutation = useMutation({
-    mutationFn: (id: string) => api.patch(`/admin/anticheat/users/${id}/activate`, {}),
+    mutationFn: (id: string) =>
+      api.patch(`/admin/anticheat/users/${id}/activate`, {}),
     onSuccess: () => {
       invalidate();
       toast.success('Account activated');
@@ -128,7 +139,10 @@ export default function AnticheatPage() {
   };
 
   const handleDeactivate = (id: string) => {
-    if (!confirm('Deactivate this account? The user will not be able to log in.')) return;
+    if (
+      !confirm('Deactivate this account? The user will not be able to log in.')
+    )
+      return;
     deactivateMutation.mutate(id);
   };
 
@@ -151,14 +165,16 @@ export default function AnticheatPage() {
 
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle>Flagged Users ({data?.total?.toLocaleString() ?? 0})</CardTitle>
+          <CardTitle>
+            Flagged Users ({data?.total?.toLocaleString() ?? 0})
+          </CardTitle>
           <div className="relative w-full sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-9"
               placeholder="Search by name or email..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearch(e.target.value)}
             />
           </div>
         </CardHeader>
@@ -188,11 +204,13 @@ export default function AnticheatPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className={isFetching ? 'opacity-60' : undefined}>
-                  {users.map((user) => (
+                  {users.map(user => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
-                      <TableCell className="text-right font-semibold">{user.warningPoints}</TableCell>
+                      <TableCell className="text-right font-semibold">
+                        {user.warningPoints}
+                      </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {user.lastWarningCode ? (
                           <span>
@@ -223,8 +241,7 @@ export default function AnticheatPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleReset(user.id)}
-                              disabled={resetMutation.isPending}
-                            >
+                              disabled={resetMutation.isPending}>
                               Reset pts
                             </Button>
                           )}
@@ -233,8 +250,7 @@ export default function AnticheatPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => liftMutation.mutate(user.id)}
-                              disabled={liftMutation.isPending}
-                            >
+                              disabled={liftMutation.isPending}>
                               Lift
                             </Button>
                           )}
@@ -242,14 +258,13 @@ export default function AnticheatPage() {
                             <select
                               className="h-8 rounded-md border bg-background px-2 text-xs"
                               defaultValue=""
-                              onChange={(e) => {
+                              onChange={e => {
                                 const value = e.target.value as SuspendDuration;
                                 if (value) {
                                   handleSuspend(user.id, value);
                                   e.target.value = '';
                                 }
-                              }}
-                            >
+                              }}>
                               <option value="">Suspend…</option>
                               <option value="1d">1 day</option>
                               <option value="2d">2 days</option>
@@ -262,8 +277,7 @@ export default function AnticheatPage() {
                               variant="destructive"
                               size="sm"
                               onClick={() => handleDeactivate(user.id)}
-                              disabled={deactivateMutation.isPending}
-                            >
+                              disabled={deactivateMutation.isPending}>
                               Deactivate
                             </Button>
                           ) : (
@@ -271,8 +285,7 @@ export default function AnticheatPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => activateMutation.mutate(user.id)}
-                              disabled={activateMutation.isPending}
-                            >
+                              disabled={activateMutation.isPending}>
                               Activate
                             </Button>
                           )}

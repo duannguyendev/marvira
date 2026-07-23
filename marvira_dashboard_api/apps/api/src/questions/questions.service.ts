@@ -44,14 +44,22 @@ export class QuestionsService {
     answer: string;
   }) {
     if (data.type === QuestionType.IMAGE && !data.imageUrl) {
-      throw new BadRequestException('Image URL is required for IMAGE questions');
+      throw new BadRequestException(
+        'Image URL is required for IMAGE questions',
+      );
     }
     if (data.type === QuestionType.MULTIPLE_CHOICE) {
       const options = data.options ?? [];
       if (options.length < 2) {
-        throw new BadRequestException('Multiple choice needs at least 2 options');
+        throw new BadRequestException(
+          'Multiple choice needs at least 2 options',
+        );
       }
-      if (!options.some((o) => o.trim().toLowerCase() === data.answer.trim().toLowerCase())) {
+      if (
+        !options.some(
+          o => o.trim().toLowerCase() === data.answer.trim().toLowerCase(),
+        )
+      ) {
         throw new BadRequestException('Answer must match one of the options');
       }
     }
@@ -95,10 +103,19 @@ export class QuestionsService {
       include: {
         eventQuestions: {
           orderBy: { orderIndex: 'asc' },
-          include: { event: { select: { id: true, title: true, city: true, isActive: true } } },
+          include: {
+            event: {
+              select: { id: true, title: true, city: true, isActive: true },
+            },
+          },
         },
         places: {
-          select: { id: true, title: true, eventId: true, event: { select: { title: true } } },
+          select: {
+            id: true,
+            title: true,
+            eventId: true,
+            event: { select: { title: true } },
+          },
         },
       },
     });
@@ -151,19 +168,26 @@ export class QuestionsService {
   }
 
   async update(id: string, data: Partial<CreateQuestionInput>) {
-    const existing = await this.prisma.client.question.findUnique({ where: { id } });
+    const existing = await this.prisma.client.question.findUnique({
+      where: { id },
+    });
     if (!existing) throw new NotFoundException('Question not found');
 
     const merged = {
       type: data.type ?? existing.type,
       imageUrl: data.imageUrl !== undefined ? data.imageUrl : existing.imageUrl,
-      options: data.options !== undefined ? data.options : (existing.options as string[] | null),
+      options:
+        data.options !== undefined
+          ? data.options
+          : (existing.options as string[] | null),
       answer: data.answer ?? existing.answer,
     };
     this.validateQuestionData(merged);
 
     const imageUrl =
-      (data.type ?? existing.type) === QuestionType.IMAGE ? merged.imageUrl : null;
+      (data.type ?? existing.type) === QuestionType.IMAGE
+        ? merged.imageUrl
+        : null;
 
     return this.prisma.client.question.update({
       where: { id },
@@ -186,7 +210,9 @@ export class QuestionsService {
     });
     if (!existing) throw new NotFoundException('Question not found');
     if (existing._count.places > 0) {
-      throw new ConflictException('Question is assigned to places. Unassign it first.');
+      throw new ConflictException(
+        'Question is assigned to places. Unassign it first.',
+      );
     }
     await this.prisma.client.question.delete({ where: { id } });
     return { deleted: true };
@@ -203,7 +229,8 @@ export class QuestionsService {
     const existing = await this.prisma.client.eventQuestion.findUnique({
       where: { eventId_questionId: { eventId, questionId } },
     });
-    if (existing) throw new ConflictException('Question already linked to this event');
+    if (existing)
+      throw new ConflictException('Question already linked to this event');
 
     const maxOrder = await this.prisma.client.eventQuestion.aggregate({
       where: { eventId },

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventAccessService } from '../events/event-access.service';
 
@@ -21,20 +25,30 @@ export class PlacesService {
     private readonly eventAccess: EventAccessService,
   ) {}
 
-  private async validateQuestionForEvent(eventId: string, questionId: string | null | undefined) {
+  private async validateQuestionForEvent(
+    eventId: string,
+    questionId: string | null | undefined,
+  ) {
     if (!questionId) return;
     const link = await this.prisma.client.eventQuestion.findUnique({
       where: { eventId_questionId: { eventId, questionId } },
     });
     if (!link) {
-      throw new BadRequestException('Question must be linked to this event before assigning to a place');
+      throw new BadRequestException(
+        'Question must be linked to this event before assigning to a place',
+      );
     }
   }
 
   async findByEvent(eventId: string, userId?: string) {
     const event = await this.prisma.client.event.findUnique({
       where: { id: eventId },
-      select: { id: true, createdBy: true, joinPasswordHash: true, _count: { select: { places: true } } },
+      select: {
+        id: true,
+        createdBy: true,
+        joinPasswordHash: true,
+        _count: { select: { places: true } },
+      },
     });
     if (!event) throw new NotFoundException('Event not found');
 
@@ -62,9 +76,9 @@ export class PlacesService {
     if (!userId) return places;
 
     const completions = await this.prisma.client.userPlaceCompletion.findMany({
-      where: { userId, placeId: { in: places.map((p) => p.id) } },
+      where: { userId, placeId: { in: places.map(p => p.id) } },
     });
-    const completionMap = new Map(completions.map((c) => [c.placeId, c]));
+    const completionMap = new Map(completions.map(c => [c.placeId, c]));
 
     const progress = await this.prisma.client.userEventProgress.findUnique({
       where: { userId_eventId: { userId, eventId } },
@@ -72,7 +86,9 @@ export class PlacesService {
 
     return places.map((place, index) => {
       const completion = completionMap.get(place.id);
-      const accessible = progress ? index <= progress.currentPlaceIndex : index === 0;
+      const accessible = progress
+        ? index <= progress.currentPlaceIndex
+        : index === 0;
       return {
         ...place,
         accessible,

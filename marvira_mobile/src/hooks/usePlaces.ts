@@ -1,6 +1,6 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {placesApi} from '../api/places';
-import {AnswerSubmission, UnlockPlaceRequest} from '../types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { placesApi } from '../api/places';
+import { AnswerSubmission, UnlockPlaceRequest } from '../types';
 
 export const usePlaceQuestion = (placeId: string, enabled: boolean) => {
   return useQuery({
@@ -18,9 +18,9 @@ export const useSubmitAnswer = () => {
     mutationFn: (submission: AnswerSubmission) =>
       placesApi.submitAnswer(submission),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['event']});
-      queryClient.invalidateQueries({queryKey: ['events']});
-      queryClient.invalidateQueries({queryKey: ['completed-events']});
+      queryClient.invalidateQueries({ queryKey: ['event'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['completed-events'] });
     },
   });
 };
@@ -29,11 +29,12 @@ export const useUnlockPlace = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: UnlockPlaceRequest) =>
-      placesApi.unlockPlace(request),
+    mutationFn: (request: UnlockPlaceRequest) => placesApi.unlockPlace(request),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({queryKey: ['event']});
-      queryClient.invalidateQueries({queryKey: ['place-question', variables.placeId]});
+      queryClient.invalidateQueries({ queryKey: ['event'] });
+      queryClient.invalidateQueries({
+        queryKey: ['place-question', variables.placeId],
+      });
     },
   });
 };

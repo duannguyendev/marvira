@@ -1,6 +1,6 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {authService} from '../services/auth.service';
-import {LoginCredentials, RegisterCredentials} from '../types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { authService } from '../services/auth.service';
+import { LoginCredentials, RegisterCredentials } from '../types';
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -9,7 +9,7 @@ export const useAuth = () => {
     mutationFn: (credentials: LoginCredentials) =>
       authService.login(credentials),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['user']});
+      queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
 
@@ -17,7 +17,7 @@ export const useAuth = () => {
     mutationFn: (credentials: RegisterCredentials) =>
       authService.register(credentials),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['user']});
+      queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
 
@@ -28,7 +28,7 @@ export const useAuth = () => {
     },
   });
 
-  const {data: user, isLoading} = useQuery({
+  const { data: user, isLoading } = useQuery({
     queryKey: ['user'],
     queryFn: () => authService.getCurrentUser(),
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -50,4 +50,3 @@ export const useAuth = () => {
     registerError: registerMutation.error,
   };
 };
-

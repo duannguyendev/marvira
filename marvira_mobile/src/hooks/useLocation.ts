@@ -1,6 +1,6 @@
-import {useState, useEffect} from 'react';
-import {locationService} from '../services/location.service';
-import {Location} from '../types';
+import { useState, useEffect } from 'react';
+import { locationService } from '../services/location.service';
+import { Location } from '../types';
 
 export const useLocation = () => {
   const [location, setLocation] = useState<Location | null>(null);
@@ -90,4 +90,3 @@ export const useLocation = () => {
     requestPermission: locationService.requestPermission.bind(locationService),
   };
 };
-

@@ -1,9 +1,9 @@
-import axios, {AxiosError, InternalAxiosRequestConfig} from 'axios';
-import {API_BASE_URL} from '../utils/constants';
-import {storage} from '../utils/storage';
-import {ApiError} from '../types';
-import {authSession} from '../services/authSession';
-import {ApiLoginData} from '../types/api';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { API_BASE_URL } from '../utils/constants';
+import { storage } from '../utils/storage';
+import { ApiError } from '../types';
+import { authSession } from '../services/authSession';
+import { ApiLoginData } from '../types/api';
 
 let isRefreshing = false;
 let refreshQueue: Array<{
@@ -17,13 +17,13 @@ async function refreshAccessToken(): Promise<string> {
     throw new Error('No refresh token');
   }
 
-  const response = await axios.post<{success: boolean; data: ApiLoginData}>(
+  const response = await axios.post<{ success: boolean; data: ApiLoginData }>(
     `${API_BASE_URL}/auth/refresh`,
-    {refreshToken},
-    {headers: {'Content-Type': 'application/json'}},
+    { refreshToken },
+    { headers: { 'Content-Type': 'application/json' } },
   );
 
-  const {tokens, user} = response.data.data;
+  const { tokens, user } = response.data.data;
   await storage.setToken(tokens.accessToken);
   await storage.setRefreshToken(tokens.refreshToken);
   await storage.setUser(user);
@@ -31,7 +31,7 @@ async function refreshAccessToken(): Promise<string> {
 }
 
 function processQueue(error: unknown, token: string | null) {
-  refreshQueue.forEach(({resolve, reject}) => {
+  refreshQueue.forEach(({ resolve, reject }) => {
     if (error) {
       reject(error);
     } else if (token) {
@@ -45,7 +45,7 @@ class ApiClient {
   private client = axios.create({
     baseURL: API_BASE_URL,
     timeout: 30000,
-    headers: {'Content-Type': 'application/json'},
+    headers: { 'Content-Type': 'application/json' },
   });
 
   constructor() {
@@ -117,7 +117,10 @@ class ApiClient {
 
   private handleError(error: AxiosError): ApiError {
     if (error.response) {
-      const data = error.response.data as {message?: string | string[]; code?: string};
+      const data = error.response.data as {
+        message?: string | string[];
+        code?: string;
+      };
       const message = Array.isArray(data?.message)
         ? data.message.join(', ')
         : data?.message || error.message || 'An error occurred';
@@ -128,9 +131,9 @@ class ApiClient {
       };
     }
     if (error.request) {
-      return {message: 'Network error. Please check your connection.'};
+      return { message: 'Network error. Please check your connection.' };
     }
-    return {message: error.message || 'An unexpected error occurred'};
+    return { message: error.message || 'An unexpected error occurred' };
   }
 
   getInstance() {

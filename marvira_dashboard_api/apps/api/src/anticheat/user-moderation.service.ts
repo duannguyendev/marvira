@@ -1,11 +1,19 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { ModerationActionType, Prisma } from '@prisma/client';
 import { buildPaginatedResponse, parsePagination } from '@marvira/shared-utils';
 import { PrismaService } from '../prisma/prisma.service';
 import { getAnticheatConfig } from './anticheat.constants';
 import { SuspendDuration } from './anticheat.types';
 
-const SUSPEND_DURATIONS: Record<SuspendDuration, { days: number; action: ModerationActionType }> = {
+const SUSPEND_DURATIONS: Record<
+  SuspendDuration,
+  { days: number; action: ModerationActionType }
+> = {
   '1d': { days: 1, action: ModerationActionType.SUSPEND_PLAY_1_DAY },
   '2d': { days: 2, action: ModerationActionType.SUSPEND_PLAY_2_DAYS },
   '1w': { days: 7, action: ModerationActionType.SUSPEND_PLAY_1_WEEK },
@@ -35,24 +43,31 @@ export class UserModerationService {
       select: { playSuspendedUntil: true },
     });
 
-    if (refreshed?.playSuspendedUntil && refreshed.playSuspendedUntil > new Date()) {
+    if (
+      refreshed?.playSuspendedUntil &&
+      refreshed.playSuspendedUntil > new Date()
+    ) {
       throw new ForbiddenException(
         'Your account is temporarily restricted from playing. Please try again later.',
       );
     }
   }
 
-  private async maybeAutoResetWarningPoints(userId: string, currentPoints: number) {
+  private async maybeAutoResetWarningPoints(
+    userId: string,
+    currentPoints: number,
+  ) {
     if (currentPoints <= 0) return;
 
     const config = getAnticheatConfig();
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - config.autoResetCleanDays);
 
-    const recentWarning = await this.prisma.client.userLocationWarning.findFirst({
-      where: { userId, createdAt: { gte: cutoff } },
-      select: { id: true },
-    });
+    const recentWarning =
+      await this.prisma.client.userLocationWarning.findFirst({
+        where: { userId, createdAt: { gte: cutoff } },
+        select: { id: true },
+      });
 
     if (recentWarning) return;
 
@@ -98,7 +113,9 @@ export class UserModerationService {
             ],
           }
         : {}),
-      ...(minWarningPoints != null ? { warningPoints: { gte: minWarningPoints } } : {}),
+      ...(minWarningPoints != null
+        ? { warningPoints: { gte: minWarningPoints } }
+        : {}),
       ...(suspendedOnly ? { playSuspendedUntil: { gt: now } } : {}),
     };
 
@@ -127,7 +144,7 @@ export class UserModerationService {
       this.prisma.client.user.count({ where }),
     ]);
 
-    const mapped = items.map((user) => ({
+    const mapped = items.map(user => ({
       id: user.id,
       email: user.email,
       name: user.name,
@@ -180,7 +197,7 @@ export class UserModerationService {
         createdAt: user.createdAt.toISOString(),
         totalWarnings: user._count.locationWarnings,
       },
-      recentWarnings: recentWarnings.map((w) => ({
+      recentWarnings: recentWarnings.map(w => ({
         id: w.id,
         code: w.code,
         placeId: w.placeId,
@@ -188,7 +205,7 @@ export class UserModerationService {
         payload: w.payload,
         createdAt: w.createdAt.toISOString(),
       })),
-      moderationHistory: moderationHistory.map((a) => ({
+      moderationHistory: moderationHistory.map(a => ({
         id: a.id,
         action: a.action,
         reason: a.reason,
@@ -214,7 +231,7 @@ export class UserModerationService {
     ]);
 
     return buildPaginatedResponse(
-      items.map((w) => ({
+      items.map(w => ({
         id: w.id,
         code: w.code,
         placeId: w.placeId,
@@ -228,7 +245,12 @@ export class UserModerationService {
     );
   }
 
-  async suspendPlay(userId: string, adminId: string, duration: SuspendDuration, reason?: string) {
+  async suspendPlay(
+    userId: string,
+    adminId: string,
+    duration: SuspendDuration,
+    reason?: string,
+  ) {
     const user = await this.requireActiveUser(userId);
     const { days, action } = SUSPEND_DURATIONS[duration];
     const until = new Date();
@@ -239,7 +261,9 @@ export class UserModerationService {
       data: { playSuspendedUntil: until },
     });
 
-    await this.logAction(userId, adminId, action, reason, { playSuspendedUntil: until.toISOString() });
+    await this.logAction(userId, adminId, action, reason, {
+      playSuspendedUntil: until.toISOString(),
+    });
     return { playSuspendedUntil: until.toISOString() };
   }
 
@@ -249,7 +273,12 @@ export class UserModerationService {
       where: { id: userId },
       data: { playSuspendedUntil: null },
     });
-    await this.logAction(userId, adminId, ModerationActionType.LIFT_SUSPENSION, reason);
+    await this.logAction(
+      userId,
+      adminId,
+      ModerationActionType.LIFT_SUSPENSION,
+      reason,
+    );
     return { playSuspendedUntil: null };
   }
 
@@ -260,9 +289,15 @@ export class UserModerationService {
       where: { id: userId },
       data: { warningPoints: 0 },
     });
-    await this.logAction(userId, adminId, ModerationActionType.RESET_WARNING_POINTS, reason, {
-      previousPoints,
-    });
+    await this.logAction(
+      userId,
+      adminId,
+      ModerationActionType.RESET_WARNING_POINTS,
+      reason,
+      {
+        previousPoints,
+      },
+    );
     return { warningPoints: 0 };
   }
 
@@ -272,7 +307,12 @@ export class UserModerationService {
       where: { id: userId },
       data: { isActive: false, playSuspendedUntil: null },
     });
-    await this.logAction(userId, adminId, ModerationActionType.DEACTIVATE, reason);
+    await this.logAction(
+      userId,
+      adminId,
+      ModerationActionType.DEACTIVATE,
+      reason,
+    );
     return { isActive: false };
   }
 
@@ -282,12 +322,19 @@ export class UserModerationService {
       where: { id: userId },
       data: { isActive: true },
     });
-    await this.logAction(userId, adminId, ModerationActionType.ACTIVATE, reason);
+    await this.logAction(
+      userId,
+      adminId,
+      ModerationActionType.ACTIVATE,
+      reason,
+    );
     return { isActive: true };
   }
 
   private async requireUser(userId: string) {
-    const user = await this.prisma.client.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.client.user.findUnique({
+      where: { id: userId },
+    });
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
@@ -295,7 +342,9 @@ export class UserModerationService {
   private async requireActiveUser(userId: string) {
     const user = await this.requireUser(userId);
     if (!user.isActive) {
-      throw new BadRequestException('Cannot suspend play for a deactivated account');
+      throw new BadRequestException(
+        'Cannot suspend play for a deactivated account',
+      );
     }
     return user;
   }

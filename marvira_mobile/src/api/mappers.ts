@@ -13,7 +13,7 @@ import {
 } from '../types';
 
 function placeLocation(place: ApiPlace) {
-  return {latitude: place.latitude, longitude: place.longitude};
+  return { latitude: place.latitude, longitude: place.longitude };
 }
 
 export function mapPlace(apiPlace: ApiPlace): Place {
@@ -46,9 +46,9 @@ export function mapQuestion(apiQuestion: ApiQuestionPublic): PlaceQuestion {
 function eventLocation(apiEvent: ApiEvent) {
   const first = apiEvent.places?.[0];
   if (first) {
-    return {latitude: first.latitude, longitude: first.longitude};
+    return { latitude: first.latitude, longitude: first.longitude };
   }
-  return {latitude: 0, longitude: 0};
+  return { latitude: 0, longitude: 0 };
 }
 
 function deriveEventStatus(
@@ -60,8 +60,7 @@ function deriveEventStatus(
     return 'completed';
   }
   if (places.some(p => p.isCompleted)) {
-    const allDone =
-      places.length > 0 && places.every(p => p.isCompleted);
+    const allDone = places.length > 0 && places.every(p => p.isCompleted);
     if (allDone) {
       return 'completed';
     }
@@ -115,7 +114,7 @@ export function mapEventDetails(
     totalPlaces > 0 ? Math.round((completedPlaces / totalPlaces) * 100) : 0;
 
   const base = mapEvent(
-    {...apiEvent, places: apiPlaces, _count: {places: totalPlaces}},
+    { ...apiEvent, places: apiPlaces, _count: { places: totalPlaces } },
     completedEventIds,
   );
 
@@ -128,9 +127,7 @@ export function mapEventDetails(
   };
 }
 
-export function mapCompletedProgress(
-  row: ApiCompletedEventProgress,
-): Event {
+export function mapCompletedProgress(row: ApiCompletedEventProgress): Event {
   const placesCount = row.event._count?.places ?? 0;
   return {
     id: row.event.id,
@@ -143,7 +140,7 @@ export function mapCompletedProgress(
     status: 'completed',
     totalPlaces: placesCount,
     completedPlaces: placesCount,
-    location: {latitude: 0, longitude: 0},
+    location: { latitude: 0, longitude: 0 },
     rewardPoints: row.event.rewardPoints,
     score: row.score,
     totalDurationMs: row.totalDurationMs,

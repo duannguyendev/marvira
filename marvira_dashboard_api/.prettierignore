@@ -1,0 +1,12 @@
+node_modules
+dist
+.next
+.turbo
+coverage
+pnpm-lock.yaml
+*.tsbuildinfo
+uploads
+.env
+.env.*
+apps/api/prisma/migrations
+**/generated

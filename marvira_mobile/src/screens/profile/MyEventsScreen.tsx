@@ -1,27 +1,27 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  RefreshControl,
-} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {CompositeNavigationProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
-import {useMyEvents} from '../../hooks/useMyEvents';
-import {MyEventCard} from '../../components/MyEventCard';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {Button} from '../../components/Button';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { useMyEvents } from '../../hooks/useMyEvents';
+import { MyEventCard } from '../../components/MyEventCard';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { Button } from '../../components/Button';
 import {
   HomeStackParamList,
   MainTabParamList,
   ProfileStackParamList,
 } from '../../navigation/types';
-import {colors, spacing, fontSize, fontWeight, borderRadius} from '../../theme';
+import {
+  colors,
+  spacing,
+  fontSize,
+  fontWeight,
+  borderRadius,
+} from '../../theme';
 
 type NavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<ProfileStackParamList, 'MyEvents'>,
@@ -32,9 +32,9 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 export const MyEventsScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
-  const {data, isLoading, error, refetch, isRefetching} = useMyEvents();
+  const { data, isLoading, error, refetch, isRefetching } = useMyEvents();
   const [refreshing, setRefreshing] = useState(false);
 
   const events = data?.data ?? [];
@@ -71,7 +71,10 @@ export const MyEventsScreen: React.FC = () => {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         refreshControl={
-          <RefreshControl refreshing={refreshing || isRefetching} onRefresh={handleRefresh} />
+          <RefreshControl
+            refreshing={refreshing || isRefetching}
+            onRefresh={handleRefresh}
+          />
         }
         ListHeaderComponent={
           <View style={styles.header}>
@@ -97,25 +100,25 @@ export const MyEventsScreen: React.FC = () => {
             />
           </View>
         }
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <MyEventCard
             event={item}
             onPress={() =>
               navigation.navigate('Home', {
                 screen: 'EventDetails',
-                params: {eventId: item.id},
+                params: { eventId: item.id },
               } as MainTabParamList['Home'])
             }
             onEditGiftsPress={() =>
               navigation.navigate('Home', {
                 screen: 'EditEventGifts',
-                params: {eventId: item.id},
+                params: { eventId: item.id },
               } as MainTabParamList['Home'])
             }
             onFinishersPress={() =>
               navigation.navigate('Home', {
                 screen: 'EventFinishers',
-                params: {eventId: item.id},
+                params: { eventId: item.id },
               } as MainTabParamList['Home'])
             }
           />

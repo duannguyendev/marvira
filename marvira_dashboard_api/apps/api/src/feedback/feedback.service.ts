@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   FeedbackCategory,
   FeedbackSource,
@@ -48,7 +52,9 @@ export class FeedbackService {
       userId = user.id;
     } else {
       if (!dto.name?.trim() || !dto.email?.trim()) {
-        throw new BadRequestException('Name and email are required for guest submissions');
+        throw new BadRequestException(
+          'Name and email are required for guest submissions',
+        );
       }
       name = dto.name.trim();
       email = dto.email.trim();
@@ -130,7 +136,7 @@ export class FeedbackService {
     ]);
 
     return buildPaginatedResponse(
-      items.map((row) => this.toItem(row)),
+      items.map(row => this.toItem(row)),
       total,
       page,
       pageSize,

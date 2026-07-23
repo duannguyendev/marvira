@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,19 +7,25 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useQuery} from '@tanstack/react-query';
-import {Input} from '../../components/Input';
-import {Button} from '../../components/Button';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {useEventDetails} from '../../hooks/useEvents';
-import {useUpdateEventGifts} from '../../hooks/useMyEvents';
-import {eventsApi} from '../../api/events';
-import {HomeStackParamList} from '../../navigation/types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
+import { useTranslation } from 'react-i18next';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useQuery } from '@tanstack/react-query';
+import { Input } from '../../components/Input';
+import { Button } from '../../components/Button';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { useEventDetails } from '../../hooks/useEvents';
+import { useUpdateEventGifts } from '../../hooks/useMyEvents';
+import { eventsApi } from '../../api/events';
+import { HomeStackParamList } from '../../navigation/types';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
 
 type Route = RouteProp<HomeStackParamList, 'EditEventGifts'>;
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'EditEventGifts'>;
@@ -27,12 +33,12 @@ type Nav = NativeStackNavigationProp<HomeStackParamList, 'EditEventGifts'>;
 const MAX_CODES = 10;
 
 export const EditEventGiftsScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<Route>();
   const navigation = useNavigation<Nav>();
-  const {eventId} = route.params;
+  const { eventId } = route.params;
 
-  const {data, isLoading, error, refetch} = useEventDetails(eventId);
+  const { data, isLoading, error, refetch } = useEventDetails(eventId);
   const finishersQuery = useQuery({
     queryKey: ['eventFinishers', eventId],
     queryFn: () => eventsApi.getEventFinishers(eventId),
@@ -100,7 +106,7 @@ export const EditEventGiftsScreen: React.FC = () => {
         giftCodes: trimmed,
       });
       Alert.alert(t('common.ok'), t('createEvent.gifts.saved'), [
-        {text: t('common.ok'), onPress: () => navigation.goBack()},
+        { text: t('common.ok'), onPress: () => navigation.goBack() },
       ]);
     } catch (err: any) {
       Alert.alert(
@@ -145,11 +151,13 @@ export const EditEventGiftsScreen: React.FC = () => {
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled">
       <Text style={styles.heading}>{t('createEvent.gifts.heading')}</Text>
-      <Text style={styles.subheading}>{t('createEvent.gifts.editSubheading')}</Text>
+      <Text style={styles.subheading}>
+        {t('createEvent.gifts.editSubheading')}
+      </Text>
 
       {awardedCount > 0 ? (
         <Text style={styles.freezeHint}>
-          {t('createEvent.gifts.freezeHint', {count: awardedCount})}
+          {t('createEvent.gifts.freezeHint', { count: awardedCount })}
         </Text>
       ) : null}
 

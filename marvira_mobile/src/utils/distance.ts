@@ -1,13 +1,10 @@
-import {Location} from '../types';
+import { Location } from '../types';
 
 /**
  * Calculate distance between two coordinates using Haversine formula
  * Returns distance in meters
  */
-export function calculateDistance(
-  coord1: Location,
-  coord2: Location,
-): number {
+export function calculateDistance(coord1: Location, coord2: Location): number {
   const R = 6371000; // Earth's radius in meters
   const dLat = toRadians(coord2.latitude - coord1.latitude);
   const dLon = toRadians(coord2.longitude - coord1.longitude);
@@ -51,4 +48,3 @@ export function isWithinRange(
   const distance = calculateDistance(userLocation, targetLocation);
   return distance <= rangeMeters;
 }
-

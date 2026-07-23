@@ -38,30 +38,36 @@ export function AddQuestionDialog({
 
   const linkMutation = useMutation({
     mutationFn: async (question: AdminQuestion) => {
-      await api.post(`/admin/events/${eventId}/questions`, { questionId: question.id });
+      await api.post(`/admin/events/${eventId}/questions`, {
+        questionId: question.id,
+      });
       if (assignToPlaceId) {
-        await api.patch(`/places/${assignToPlaceId}`, { questionId: question.id });
+        await api.patch(`/places/${assignToPlaceId}`, {
+          questionId: question.id,
+        });
       }
       return question;
     },
     onSuccess: () => {
       toast.success(
-        assignToPlaceId ? 'Question created and assigned to place' : 'Question created and linked to event',
+        assignToPlaceId
+          ? 'Question created and assigned to place'
+          : 'Question created and linked to event',
       );
       onAdded();
       setOpen(false);
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to link question to event'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to link question to event'),
   });
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
+      onOpenChange={next => {
         setOpen(next);
-        if (next) setFormKey((k) => k + 1);
-      }}
-    >
+        if (next) setFormKey(k => k + 1);
+      }}>
       <DialogTrigger asChild>
         <Button type="button" variant={variant} size={size}>
           <Plus className="h-3 w-3" />
@@ -79,7 +85,7 @@ export function AddQuestionDialog({
         <QuestionForm
           key={formKey}
           showSuccessToast={false}
-          onSaved={(question) => linkMutation.mutate(question)}
+          onSaved={question => linkMutation.mutate(question)}
           onCancel={() => setOpen(false)}
         />
       </DialogContent>

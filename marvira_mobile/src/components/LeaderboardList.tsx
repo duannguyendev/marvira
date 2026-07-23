@@ -7,10 +7,10 @@ import {
   RefreshControl,
   ListRenderItem,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {LoadingSpinner} from './LoadingSpinner';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
-import {formatDuration} from '../utils/formatDuration';
+import { useTranslation } from 'react-i18next';
+import { LoadingSpinner } from './LoadingSpinner';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
+import { formatDuration } from '../utils/formatDuration';
 import {
   ApiEventLeaderboardEntry,
   ApiGlobalLeaderboardEntry,
@@ -34,7 +34,7 @@ type LeaderboardListProps =
       onRefresh: () => void;
     };
 
-function RankBadge({rank}: {rank: number}) {
+function RankBadge({ rank }: { rank: number }) {
   const medal =
     rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
 
@@ -50,8 +50,8 @@ function RankBadge({rank}: {rank: number}) {
 }
 
 export const LeaderboardList: React.FC<LeaderboardListProps> = props => {
-  const {t} = useTranslation();
-  const {entries, currentUserId, isLoading, isRefetching, onRefresh} = props;
+  const { t } = useTranslation();
+  const { entries, currentUserId, isLoading, isRefetching, onRefresh } = props;
 
   if (isLoading && entries.length === 0) {
     return <LoadingSpinner fullScreen />;
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.sm,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 3,
     elevation: 2,

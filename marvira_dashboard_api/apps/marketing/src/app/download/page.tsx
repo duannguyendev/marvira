@@ -6,7 +6,8 @@ import { STORE_READY } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Download',
-  description: 'Get Marvira on the App Store or Google Play and start exploring.',
+  description:
+    'Get Marvira on the App Store or Google Play and start exploring.',
 };
 
 export default async function DownloadPage({
@@ -37,7 +38,9 @@ export default async function DownloadPage({
           </p>
         )}
 
-        <p className="mt-8 max-w-xl text-sm text-ink/60">{content.download.deepLinkNote}</p>
+        <p className="mt-8 max-w-xl text-sm text-ink/60">
+          {content.download.deepLinkNote}
+        </p>
       </section>
     </PageShell>
   );

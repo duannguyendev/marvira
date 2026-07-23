@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import {useToggleEventFavorite} from './useFavorites';
+import { useState } from 'react';
+import { useToggleEventFavorite } from './useFavorites';
 
 export function useFavoriteEventToggle() {
   const [pendingUnfavoriteId, setPendingUnfavoriteId] = useState<string | null>(
@@ -12,7 +12,7 @@ export function useFavoriteEventToggle() {
       setPendingUnfavoriteId(eventId);
       return;
     }
-    toggleMutation.mutate({eventId, isFavorite: false});
+    toggleMutation.mutate({ eventId, isFavorite: false });
   };
 
   const confirmUnfavorite = () => {

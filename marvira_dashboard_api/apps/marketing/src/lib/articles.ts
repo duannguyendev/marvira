@@ -58,13 +58,17 @@ export async function fetchArticles(params: {
   if (params.page) qs.set('page', String(params.page));
   if (params.pageSize) qs.set('pageSize', String(params.pageSize));
 
-  const res = await fetch(`${API_URL}/articles?${qs.toString()}`, { cache: 'no-store' });
+  const res = await fetch(`${API_URL}/articles?${qs.toString()}`, {
+    cache: 'no-store',
+  });
   if (!res.ok) throw new Error('Failed to load articles');
   const json = (await res.json()) as Envelope<Paginated<PublicArticle>>;
   return json.data;
 }
 
-export async function fetchArticleBySlug(slug: string): Promise<PublicArticle | null> {
+export async function fetchArticleBySlug(
+  slug: string,
+): Promise<PublicArticle | null> {
   const res = await fetch(`${API_URL}/articles/${encodeURIComponent(slug)}`, {
     cache: 'no-store',
   });

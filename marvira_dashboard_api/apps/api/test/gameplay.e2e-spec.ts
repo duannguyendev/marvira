@@ -97,8 +97,12 @@ describe('Gameplay flow (e2e)', () => {
       expect(answerRes.body.data.totalScore).toBeGreaterThanOrEqual(0);
       if (place.next === null) {
         expect(answerRes.body.data.eventCompleted).toBe(true);
-        expect(answerRes.body.data.eventTotalDurationMs).toBeGreaterThanOrEqual(0);
-        expect(answerRes.body.data.totalScore).toBeGreaterThan(answerRes.body.data.points);
+        expect(answerRes.body.data.eventTotalDurationMs).toBeGreaterThanOrEqual(
+          0,
+        );
+        expect(answerRes.body.data.totalScore).toBeGreaterThan(
+          answerRes.body.data.points,
+        );
       }
     }
   });

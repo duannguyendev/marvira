@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,21 +8,30 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
-import {authApi} from '../../api/auth';
-import {Button} from '../../components/Button';
-import {Input} from '../../components/Input';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
-import {AuthStackParamList} from '../../navigation/types';
+import { authApi } from '../../api/auth';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
+import { AuthStackParamList } from '../../navigation/types';
 
-type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'ResetPassword'>;
+type NavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  'ResetPassword'
+>;
 type ResetPasswordRouteProp = RouteProp<AuthStackParamList, 'ResetPassword'>;
 
 export const ResetPasswordScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ResetPasswordRouteProp>();
   const [token, setToken] = useState(route.params?.token ?? '');
@@ -48,7 +57,7 @@ export const ResetPasswordScreen: React.FC = () => {
     try {
       await authApi.resetPassword(token.trim(), password);
       Alert.alert(t('auth.success'), t('auth.passwordUpdated'), [
-        {text: t('common.ok'), onPress: () => navigation.navigate('Login')},
+        { text: t('common.ok'), onPress: () => navigation.navigate('Login') },
       ]);
     } catch (error: any) {
       Alert.alert(
@@ -106,9 +115,9 @@ export const ResetPasswordScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1},
-  gradient: {flex: 1},
-  scrollContent: {flexGrow: 1, justifyContent: 'center', padding: spacing.lg},
+  container: { flex: 1 },
+  gradient: { flex: 1 },
+  scrollContent: { flexGrow: 1, justifyContent: 'center', padding: spacing.lg },
   content: {
     backgroundColor: colors.background,
     borderRadius: borderRadius.xl,
@@ -120,5 +129,5 @@ const styles = StyleSheet.create({
     color: colors.textDark,
     marginBottom: spacing.lg,
   },
-  button: {marginTop: spacing.md},
+  button: { marginTop: spacing.md },
 });

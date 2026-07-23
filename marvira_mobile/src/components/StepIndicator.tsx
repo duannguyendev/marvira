@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {colors, spacing, fontSize, fontWeight} from '../theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { colors, spacing, fontSize, fontWeight } from '../theme';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -16,24 +16,21 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.track}>
-        {Array.from({length: totalSteps}).map((_, index) => {
+        {Array.from({ length: totalSteps }).map((_, index) => {
           const step = index + 1;
           const isActive = step <= currentStep;
           const isLast = step === totalSteps;
           return (
             <React.Fragment key={step}>
-              <View
-                style={[styles.dot, isActive && styles.dotActive]}>
-                <Text style={[styles.dotText, isActive && styles.dotTextActive]}>
+              <View style={[styles.dot, isActive && styles.dotActive]}>
+                <Text
+                  style={[styles.dotText, isActive && styles.dotTextActive]}>
                   {step}
                 </Text>
               </View>
               {!isLast && (
                 <View
-                  style={[
-                    styles.line,
-                    step < currentStep && styles.lineActive,
-                  ]}
+                  style={[styles.line, step < currentStep && styles.lineActive]}
                 />
               )}
             </React.Fragment>

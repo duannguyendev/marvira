@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,20 +8,29 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
-import {authApi} from '../../api/auth';
-import {Button} from '../../components/Button';
-import {Input} from '../../components/Input';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
-import {AuthStackParamList} from '../../navigation/types';
+import { authApi } from '../../api/auth';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
+import { AuthStackParamList } from '../../navigation/types';
 
-type NavigationProp = NativeStackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
+type NavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  'ForgotPassword'
+>;
 
 export const ForgotPasswordScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,7 +45,7 @@ export const ForgotPasswordScreen: React.FC = () => {
     try {
       await authApi.forgotPassword(email.trim());
       Alert.alert(t('auth.checkEmailTitle'), t('auth.checkEmailMessage'), [
-        {text: t('common.ok'), onPress: () => navigation.navigate('Login')},
+        { text: t('common.ok'), onPress: () => navigation.navigate('Login') },
       ]);
     } catch (error: any) {
       Alert.alert(
@@ -89,9 +98,9 @@ export const ForgotPasswordScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1},
-  gradient: {flex: 1},
-  scrollContent: {flexGrow: 1, justifyContent: 'center', padding: spacing.lg},
+  container: { flex: 1 },
+  gradient: { flex: 1 },
+  scrollContent: { flexGrow: 1, justifyContent: 'center', padding: spacing.lg },
   content: {
     backgroundColor: colors.background,
     borderRadius: borderRadius.xl,
@@ -108,7 +117,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.lg,
   },
-  button: {marginTop: spacing.md},
+  button: { marginTop: spacing.md },
   link: {
     marginTop: spacing.lg,
     textAlign: 'center',

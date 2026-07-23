@@ -1,35 +1,38 @@
-import React, {useEffect, useState, useLayoutEffect} from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { useEventDetails, useJoinEvent } from '../../hooks/useEvents';
+import { useLocation } from '../../hooks/useLocation';
+import { useIsEventFavorite } from '../../hooks/useFavorites';
+import { useFavoriteEventToggle } from '../../hooks/useFavoriteEventToggle';
+import { PlaceCard } from '../../components/PlaceCard';
+import { Button } from '../../components/Button';
+import { FavoriteButton } from '../../components/FavoriteButton';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
+import { JoinEventPasswordSheet } from '../../components/JoinEventPasswordSheet';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Dimensions,
-} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
-import {useEventDetails, useJoinEvent} from '../../hooks/useEvents';
-import {useLocation} from '../../hooks/useLocation';
-import {useIsEventFavorite} from '../../hooks/useFavorites';
-import {useFavoriteEventToggle} from '../../hooks/useFavoriteEventToggle';
-import {PlaceCard} from '../../components/PlaceCard';
-import {Button} from '../../components/Button';
-import {FavoriteButton} from '../../components/FavoriteButton';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {UnfavoriteConfirmBottomSheet} from '../../components/UnfavoriteConfirmBottomSheet';
-import {JoinEventPasswordSheet} from '../../components/JoinEventPasswordSheet';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
-import {HomeStackParamList} from '../../navigation/types';
-import {calculateDistance} from '../../utils/distance';
-import {DEFAULT_MAP_REGION} from '../../utils/constants';
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
+import { HomeStackParamList } from '../../navigation/types';
+import { calculateDistance } from '../../utils/distance';
+import { DEFAULT_MAP_REGION } from '../../utils/constants';
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 const MAP_HEIGHT = height * 0.4;
 
-type EventDetailsScreenRouteProp = RouteProp<HomeStackParamList, 'EventDetails'>;
+type EventDetailsScreenRouteProp = RouteProp<
+  HomeStackParamList,
+  'EventDetails'
+>;
 
 type EventDetailsScreenNavigationProp = NativeStackNavigationProp<
   HomeStackParamList,
@@ -37,15 +40,15 @@ type EventDetailsScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 export const EventDetailsScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<EventDetailsScreenRouteProp>();
   const navigation = useNavigation<EventDetailsScreenNavigationProp>();
-  const {eventId} = route.params;
+  const { eventId } = route.params;
 
-  const {data, isLoading, error, refetch} = useEventDetails(eventId);
+  const { data, isLoading, error, refetch } = useEventDetails(eventId);
   const joinEvent = useJoinEvent();
-  const {location} = useLocation();
-  const {data: isFavorite} = useIsEventFavorite(eventId);
+  const { location } = useLocation();
+  const { data: isFavorite } = useIsEventFavorite(eventId);
   const {
     pendingUnfavoriteId,
     onFavoritePress,
@@ -59,8 +62,7 @@ export const EventDetailsScreen: React.FC = () => {
   const favorited = isFavorite ?? false;
 
   const event = data?.data;
-  const isLocked =
-    !!event?.isPasswordProtected && event.hasAccess === false;
+  const isLocked = !!event?.isPasswordProtected && event.hasAccess === false;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -95,7 +97,7 @@ export const EventDetailsScreen: React.FC = () => {
     if (event) {
       const place = event.places.find(p => p.id === placeId);
       if (place && !place.isCompleted) {
-        navigation.navigate('PlaceGame', {eventId, placeId});
+        navigation.navigate('PlaceGame', { eventId, placeId });
       }
     }
   };
@@ -103,12 +105,14 @@ export const EventDetailsScreen: React.FC = () => {
   const handleJoinSubmit = async (password: string) => {
     setJoinError(undefined);
     try {
-      await joinEvent.mutateAsync({eventId, password});
+      await joinEvent.mutateAsync({ eventId, password });
       setShowJoinSheet(false);
       await refetch();
     } catch (err: any) {
       setJoinError(
-        err?.response?.data?.message || err.message || t('events.join.incorrectPassword'),
+        err?.response?.data?.message ||
+          err.message ||
+          t('events.join.incorrectPassword'),
       );
     }
   };
@@ -146,130 +150,141 @@ export const EventDetailsScreen: React.FC = () => {
   return (
     <>
       <ScrollView style={styles.container}>
-      {!isLocked ? (
-      <View style={styles.mapContainer}>
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          initialRegion={mapRegion}
-          showsUserLocation
-          showsMyLocationButton>
-          {event.places.map(place => (
-            <Marker
-              key={place.id}
-              coordinate={place.location}
-              title={place.name}
-              pinColor={
-                place.isCompleted
-                  ? colors.completed
-                  : place.isUnlocked
-                  ? colors.primary
-                  : colors.notStarted
-              }
-            />
-          ))}
-        </MapView>
-      </View>
-      ) : null}
-
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>{event.title}</Text>
-            {event.isPasswordProtected ? (
-              <View style={styles.lockBadge}>
-                <Text style={styles.lockBadgeText}>🔒 {t('events.passwordProtected.badge')}</Text>
-              </View>
-            ) : null}
-          </View>
-          {event.city ? (
-            <Text style={styles.city}>{event.city}</Text>
-          ) : null}
-          {!isLocked ? (
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View
-                style={[styles.progressFill, {width: `${event.progress}%`}]}
-              />
-            </View>
-            <Text style={styles.progressText}>
-              {t('events.progressComplete', {
-                progress: event.progress,
-                completed: event.completedPlaces,
-                total: event.totalPlaces,
-              })}
-            </Text>
-          </View>
-          ) : (
-            <Text style={styles.placeCountText}>
-              {t('events.placesCount', {count: event.totalPlaces})}
-            </Text>
-          )}
-        </View>
-
-        <Text style={styles.description}>{event.description}</Text>
-
-        {event.hasGift ? (
-          <View style={styles.giftTeaserCard}>
-            <Text style={styles.giftTeaserTitle}>
-              🎁 {event.giftTeaser || t('events.giftLabel')}
-            </Text>
-            <Text style={styles.giftTeaserText}>
-              {t('events.giftsForFirst', {count: event.giftCount ?? 0})}
-            </Text>
+        {!isLocked ? (
+          <View style={styles.mapContainer}>
+            <MapView
+              provider={PROVIDER_GOOGLE}
+              style={styles.map}
+              initialRegion={mapRegion}
+              showsUserLocation
+              showsMyLocationButton>
+              {event.places.map(place => (
+                <Marker
+                  key={place.id}
+                  coordinate={place.location}
+                  title={place.name}
+                  pinColor={
+                    place.isCompleted
+                      ? colors.completed
+                      : place.isUnlocked
+                        ? colors.primary
+                        : colors.notStarted
+                  }
+                />
+              ))}
+            </MapView>
           </View>
         ) : null}
 
-        {isLocked ? (
-          <View style={styles.lockedCard}>
-            <Text style={styles.lockedTitle}>{t('events.passwordProtected.title')}</Text>
-            <Text style={styles.lockedMessage}>{t('events.passwordProtected.message')}</Text>
-            <Button
-              title={t('events.join.submit')}
-              onPress={() => setShowJoinSheet(true)}
-              fullWidth
-            />
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <View style={styles.titleRow}>
+              <Text style={styles.title}>{event.title}</Text>
+              {event.isPasswordProtected ? (
+                <View style={styles.lockBadge}>
+                  <Text style={styles.lockBadgeText}>
+                    🔒 {t('events.passwordProtected.badge')}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+            {event.city ? <Text style={styles.city}>{event.city}</Text> : null}
+            {!isLocked ? (
+              <View style={styles.progressContainer}>
+                <View style={styles.progressBar}>
+                  <View
+                    style={[
+                      styles.progressFill,
+                      { width: `${event.progress}%` },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.progressText}>
+                  {t('events.progressComplete', {
+                    progress: event.progress,
+                    completed: event.completedPlaces,
+                    total: event.totalPlaces,
+                  })}
+                </Text>
+              </View>
+            ) : (
+              <Text style={styles.placeCountText}>
+                {t('events.placesCount', { count: event.totalPlaces })}
+              </Text>
+            )}
           </View>
-        ) : (
-          <>
-        <Text style={styles.hint}>{t('events.visitHint')}</Text>
 
-        <View style={styles.leaderboardSection}>
-          {event.status === 'completed' ? (
-            <Button
-              title={
-                event.hasGift
-                  ? t('events.viewYourGift')
-                  : t('events.viewCompletion')
-              }
-              onPress={() => navigation.navigate('EventCompletion', {eventId})}
-              fullWidth
-              style={styles.detailButton}
-            />
+          <Text style={styles.description}>{event.description}</Text>
+
+          {event.hasGift ? (
+            <View style={styles.giftTeaserCard}>
+              <Text style={styles.giftTeaserTitle}>
+                🎁 {event.giftTeaser || t('events.giftLabel')}
+              </Text>
+              <Text style={styles.giftTeaserText}>
+                {t('events.giftsForFirst', { count: event.giftCount ?? 0 })}
+              </Text>
+            </View>
           ) : null}
-          <Button
-            title={t('events.viewLeaderboard')}
-            onPress={() => navigation.navigate('EventLeaderboard', {eventId})}
-            variant="outline"
-            fullWidth
-          />
-        </View>
 
-        <View style={styles.placesSection}>
-          <Text style={styles.sectionTitle}>
-            {t('events.placesCount', {count: event.places.length})}
-          </Text>
-          {placesWithDistance.map(place => (
-            <PlaceCard
-              key={place.id}
-              place={place}
-              isActive={place.id === activePlaceId}
-              onPress={() => handlePlacePress(place.id)}
-            />
-          ))}
-        </View>
-          </>
-        )}
+          {isLocked ? (
+            <View style={styles.lockedCard}>
+              <Text style={styles.lockedTitle}>
+                {t('events.passwordProtected.title')}
+              </Text>
+              <Text style={styles.lockedMessage}>
+                {t('events.passwordProtected.message')}
+              </Text>
+              <Button
+                title={t('events.join.submit')}
+                onPress={() => setShowJoinSheet(true)}
+                fullWidth
+              />
+            </View>
+          ) : (
+            <>
+              <Text style={styles.hint}>{t('events.visitHint')}</Text>
+
+              <View style={styles.leaderboardSection}>
+                {event.status === 'completed' ? (
+                  <Button
+                    title={
+                      event.hasGift
+                        ? t('events.viewYourGift')
+                        : t('events.viewCompletion')
+                    }
+                    onPress={() =>
+                      navigation.navigate('EventCompletion', { eventId })
+                    }
+                    fullWidth
+                    style={styles.detailButton}
+                  />
+                ) : null}
+                <Button
+                  title={t('events.viewLeaderboard')}
+                  onPress={() =>
+                    navigation.navigate('EventLeaderboard', { eventId })
+                  }
+                  variant="outline"
+                  fullWidth
+                />
+              </View>
+
+              <View style={styles.placesSection}>
+                <Text style={styles.sectionTitle}>
+                  {t('events.placesCount', { count: event.places.length })}
+                </Text>
+                {placesWithDistance.map(place => (
+                  <PlaceCard
+                    key={place.id}
+                    place={place}
+                    isActive={place.id === activePlaceId}
+                    onPress={() => handlePlacePress(place.id)}
+                  />
+                ))}
+              </View>
+            </>
+          )}
         </View>
       </ScrollView>
 

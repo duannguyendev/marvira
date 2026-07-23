@@ -1,11 +1,13 @@
 import { ProgressService } from './progress.service';
 import { QuestionType } from '@prisma/client';
 
-function createProgressService(overrides: {
-  progress?: Record<string, unknown> | null;
-  existingCompletion?: Record<string, unknown> | null;
-  place?: Record<string, unknown>;
-} = {}) {
+function createProgressService(
+  overrides: {
+    progress?: Record<string, unknown> | null;
+    existingCompletion?: Record<string, unknown> | null;
+    place?: Record<string, unknown>;
+  } = {},
+) {
   const prisma = {
     client: {
       place: {
@@ -36,7 +38,9 @@ function createProgressService(overrides: {
         update: jest.fn(),
       },
       userPlaceCompletion: {
-        findUnique: jest.fn().mockResolvedValue(overrides.existingCompletion ?? null),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue(overrides.existingCompletion ?? null),
         upsert: jest.fn(),
       },
       analyticsEvent: { create: jest.fn() },

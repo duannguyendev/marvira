@@ -1,5 +1,5 @@
-import {mapPlace} from './mappers';
-import {ApiPlace} from '../types/api';
+import { mapPlace } from './mappers';
+import { ApiPlace } from '../types/api';
 
 describe('mapPlace unlock semantics', () => {
   const basePlace: ApiPlace = {

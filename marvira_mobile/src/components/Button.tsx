@@ -8,7 +8,7 @@ import {
   TextStyle,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
 interface ButtonProps {
   title: string;
@@ -47,8 +47,8 @@ export const Button: React.FC<ButtonProps> = ({
               : [colors.primary, colors.primaryDark]
           }
           style={[styles.button, styles.primaryButton]}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 0}}>
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}>
           {loading ? (
             <ActivityIndicator color={colors.background} />
           ) : (
@@ -148,4 +148,3 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
-

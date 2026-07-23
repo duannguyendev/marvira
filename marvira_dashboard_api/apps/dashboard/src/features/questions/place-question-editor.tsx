@@ -19,7 +19,11 @@ import {
 import { QuestionForm } from '@/features/questions/question-form';
 import { resolveImageUrl } from '@/lib/resolve-image-url';
 import { AddQuestionDialog } from '@/features/questions/add-question-dialog';
-import type { PaginatedResponse, PlaceWithQuestion, QuestionListItem } from '@marvira/shared-types';
+import type {
+  PaginatedResponse,
+  PlaceWithQuestion,
+  QuestionListItem,
+} from '@marvira/shared-types';
 
 interface PlaceQuestionEditorProps {
   eventId: string;
@@ -27,13 +31,20 @@ interface PlaceQuestionEditorProps {
   onUpdated: () => void;
 }
 
-export function PlaceQuestionEditor({ eventId, place, onUpdated }: PlaceQuestionEditorProps) {
+export function PlaceQuestionEditor({
+  eventId,
+  place,
+  onUpdated,
+}: PlaceQuestionEditorProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [formKey, setFormKey] = useState(0);
 
   const { data: allQuestions } = useQuery({
     queryKey: ['admin-questions-picker'],
-    queryFn: () => api.get<PaginatedResponse<QuestionListItem>>('/admin/questions?pageSize=200'),
+    queryFn: () =>
+      api.get<PaginatedResponse<QuestionListItem>>(
+        '/admin/questions?pageSize=200',
+      ),
   });
 
   const assignMutation = useMutation({
@@ -49,7 +60,8 @@ export function PlaceQuestionEditor({ eventId, place, onUpdated }: PlaceQuestion
       toast.success('Question assigned to place');
       onUpdated();
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to assign question'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to assign question'),
   });
 
   const clearMutation = useMutation({
@@ -69,17 +81,17 @@ export function PlaceQuestionEditor({ eventId, place, onUpdated }: PlaceQuestion
           <div>
             <Label className="text-base">Question</Label>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Players answer this at this stop (unlock order is enforced in the mobile app only).
+              Players answer this at this stop (unlock order is enforced in the
+              mobile app only).
             </p>
           </div>
           <div className="flex shrink-0 gap-1">
             <Dialog
               open={editOpen}
-              onOpenChange={(next) => {
+              onOpenChange={next => {
                 setEditOpen(next);
-                if (next) setFormKey((k) => k + 1);
-              }}
-            >
+                if (next) setFormKey(k => k + 1);
+              }}>
               <DialogTrigger asChild>
                 <Button type="button" variant="outline" size="sm">
                   <Pencil className="h-3 w-3" />
@@ -89,7 +101,9 @@ export function PlaceQuestionEditor({ eventId, place, onUpdated }: PlaceQuestion
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Edit Question</DialogTitle>
-                  <DialogDescription>Update this place&apos;s question.</DialogDescription>
+                  <DialogDescription>
+                    Update this place&apos;s question.
+                  </DialogDescription>
                 </DialogHeader>
                 <QuestionForm
                   key={formKey}
@@ -108,9 +122,9 @@ export function PlaceQuestionEditor({ eventId, place, onUpdated }: PlaceQuestion
               size="sm"
               disabled={clearMutation.isPending}
               onClick={() => {
-                if (confirm('Remove question from this place?')) clearMutation.mutate();
-              }}
-            >
+                if (confirm('Remove question from this place?'))
+                  clearMutation.mutate();
+              }}>
               <X className="h-3 w-3" />
             </Button>
           </div>
@@ -132,10 +146,14 @@ export function PlaceQuestionEditor({ eventId, place, onUpdated }: PlaceQuestion
           />
         )}
         {q.explanation && (
-          <p className="text-xs text-muted-foreground">Explanation: {q.explanation}</p>
+          <p className="text-xs text-muted-foreground">
+            Explanation: {q.explanation}
+          </p>
         )}
         <Button variant="link" className="h-auto p-0 text-xs" asChild>
-          <Link href={`/dashboard/questions/${q.id}`}>Open in Questions library</Link>
+          <Link href={`/dashboard/questions/${q.id}`}>
+            Open in Questions library
+          </Link>
         </Button>
       </div>
     );
@@ -148,7 +166,9 @@ export function PlaceQuestionEditor({ eventId, place, onUpdated }: PlaceQuestion
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <Label className="text-base">Question</Label>
-          <p className="text-xs text-muted-foreground">Each place has one question for players to answer.</p>
+          <p className="text-xs text-muted-foreground">
+            Each place has one question for players to answer.
+          </p>
         </div>
         <AddQuestionDialog
           eventId={eventId}
@@ -159,18 +179,19 @@ export function PlaceQuestionEditor({ eventId, place, onUpdated }: PlaceQuestion
 
       {bank.length > 0 && (
         <div className="space-y-2">
-          <Label className="text-xs text-muted-foreground">Or pick from question library</Label>
+          <Label className="text-xs text-muted-foreground">
+            Or pick from question library
+          </Label>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             defaultValue=""
-            onChange={(e) => {
+            onChange={e => {
               if (e.target.value) assignMutation.mutate(e.target.value);
               e.target.value = '';
             }}
-            disabled={assignMutation.isPending}
-          >
+            disabled={assignMutation.isPending}>
             <option value="">Select existing question…</option>
-            {bank.map((item) => (
+            {bank.map(item => (
               <option key={item.id} value={item.id}>
                 {item.question.slice(0, 100)}
               </option>

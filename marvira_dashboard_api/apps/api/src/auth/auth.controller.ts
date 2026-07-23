@@ -36,7 +36,11 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new account with email and password' })
   async register(@Body() dto: RegisterDto) {
-    const result = await this.authService.register(dto.email, dto.name, dto.password);
+    const result = await this.authService.register(
+      dto.email,
+      dto.name,
+      dto.password,
+    );
     return { success: true, data: result };
   }
 
@@ -58,8 +62,11 @@ export class AuthController {
     const result = await this.authService.forgotPassword(dto.email);
     return {
       success: true,
-      data: result.devResetToken ? { devResetToken: result.devResetToken } : null,
-      message: 'If an account exists for that email, a reset link has been sent.',
+      data: result.devResetToken
+        ? { devResetToken: result.devResetToken }
+        : null,
+      message:
+        'If an account exists for that email, a reset link has been sent.',
     };
   }
 
@@ -69,7 +76,11 @@ export class AuthController {
   @ApiOperation({ summary: 'Reset password using token from email' })
   async resetPassword(@Body() dto: ResetPasswordDto) {
     await this.authService.resetPassword(dto.token, dto.password);
-    return { success: true, data: null, message: 'Password updated successfully' };
+    return {
+      success: true,
+      data: null,
+      message: 'Password updated successfully',
+    };
   }
 
   @Public()

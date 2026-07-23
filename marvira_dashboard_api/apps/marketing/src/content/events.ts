@@ -32,7 +32,8 @@ export const FEATURED_EVENTS: FeaturedHunt[] = [
       'Meet downtown. This hunt takes you through San Francisco’s historic core: plazas, the waterfront, and a hilltop landmark. Bring comfortable shoes, a charged phone, and a curious team. Exact answers stay in the app — this page is your invite, not a spoiler sheet.',
     when: 'Open whenever the event is published — check the app for live windows.',
     where: 'San Francisco downtown · start near Union Square',
-    coverBrief: 'Downtown plaza / ferry / skyline walk — lively street-level adventure.',
+    coverBrief:
+      'Downtown plaza / ferry / skyline walk — lively street-level adventure.',
   },
   {
     id: 'seed-event-golden-gate',
@@ -53,7 +54,7 @@ export const FEATURED_EVENTS: FeaturedHunt[] = [
 ];
 
 export function getFeaturedEvent(id: string): FeaturedHunt | undefined {
-  return FEATURED_EVENTS.find((e) => e.id === id);
+  return FEATURED_EVENTS.find(e => e.id === id);
 }
 
 /** Public API fields needed later (no spoilers / answers) */

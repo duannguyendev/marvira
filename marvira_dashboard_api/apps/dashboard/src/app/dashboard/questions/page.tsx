@@ -21,7 +21,10 @@ import {
 import { DataTablePagination } from '@/components/data-table/pagination';
 import { useDebouncedValue } from '@/lib/use-debounced-value';
 import { buildQuery } from '@/lib/build-query';
-import type { PaginatedResponse, QuestionListItem } from '@marvira/shared-types';
+import type {
+  PaginatedResponse,
+  QuestionListItem,
+} from '@marvira/shared-types';
 
 export default function QuestionsPage() {
   const queryClient = useQueryClient();
@@ -48,7 +51,8 @@ export default function QuestionsPage() {
       queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
       toast.success('Question deleted');
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to delete question'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to delete question'),
   });
 
   const questions = data?.items ?? [];
@@ -72,14 +76,16 @@ export default function QuestionsPage() {
 
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle>All Questions ({data?.total?.toLocaleString() ?? 0})</CardTitle>
+          <CardTitle>
+            All Questions ({data?.total?.toLocaleString() ?? 0})
+          </CardTitle>
           <div className="relative w-full sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-9"
               placeholder="Search questions..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearch(e.target.value)}
             />
           </div>
         </CardHeader>
@@ -93,7 +99,9 @@ export default function QuestionsPage() {
           ) : questions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <p className="text-muted-foreground">
-                {debouncedSearch ? 'No questions match your search.' : 'No questions found.'}
+                {debouncedSearch
+                  ? 'No questions match your search.'
+                  : 'No questions found.'}
               </p>
               {!debouncedSearch && (
                 <Button asChild className="mt-4">
@@ -116,10 +124,12 @@ export default function QuestionsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className={isFetching ? 'opacity-60' : undefined}>
-                  {questions.map((q) => (
+                  {questions.map(q => (
                     <TableRow key={q.id}>
                       <TableCell>
-                        <p className="max-w-md line-clamp-2 font-medium">{q.question}</p>
+                        <p className="max-w-md line-clamp-2 font-medium">
+                          {q.question}
+                        </p>
                       </TableCell>
                       <TableCell>
                         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
@@ -127,14 +137,21 @@ export default function QuestionsPage() {
                         </span>
                       </TableCell>
                       <TableCell className="text-right">{q.points}</TableCell>
-                      <TableCell className="text-right">{q._count?.eventQuestions ?? 0}</TableCell>
-                      <TableCell className="text-right">{q._count?.places ?? 0}</TableCell>
+                      <TableCell className="text-right">
+                        {q._count?.eventQuestions ?? 0}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {q._count?.places ?? 0}
+                      </TableCell>
                       <TableCell>
                         <p className="max-w-xs line-clamp-1 text-xs text-muted-foreground">
                           {q.eventQuestions?.length
-                            ? q.eventQuestions.map((eq) => eq.event.title).join(', ')
+                            ? q.eventQuestions
+                                .map(eq => eq.event.title)
+                                .join(', ')
                             : '—'}
-                          {(q._count?.eventQuestions ?? 0) > (q.eventQuestions?.length ?? 0)
+                          {(q._count?.eventQuestions ?? 0) >
+                          (q.eventQuestions?.length ?? 0)
                             ? '…'
                             : ''}
                         </p>
@@ -151,9 +168,9 @@ export default function QuestionsPage() {
                             variant="destructive"
                             size="sm"
                             onClick={() => {
-                              if (confirm('Delete this question?')) deleteMutation.mutate(q.id);
-                            }}
-                          >
+                              if (confirm('Delete this question?'))
+                                deleteMutation.mutate(q.id);
+                            }}>
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>

@@ -7,7 +7,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { isWithinRadius, buildPaginatedResponse, parsePagination } from '@marvira/shared-utils';
+import {
+  isWithinRadius,
+  buildPaginatedResponse,
+  parsePagination,
+} from '@marvira/shared-utils';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../common/redis/redis.service';
 import { WebsocketGateway } from '../websocket/websocket.gateway';
@@ -38,15 +42,18 @@ export class ProgressService {
 
     const place = await this.prisma.client.place.findUnique({
       where: { id: placeId },
-      include: { event: { include: { places: { orderBy: { orderIndex: 'asc' } } } } },
+      include: {
+        event: { include: { places: { orderBy: { orderIndex: 'asc' } } } },
+      },
     });
     if (!place) throw new NotFoundException('Place not found');
 
     await this.eventAccess.assertCanPlay(userId, place.eventId);
 
     const places = place.event.places;
-    const placeIndex = places.findIndex((p) => p.id === placeId);
-    if (placeIndex === -1) throw new NotFoundException('Place not found in event');
+    const placeIndex = places.findIndex(p => p.id === placeId);
+    if (placeIndex === -1)
+      throw new NotFoundException('Place not found in event');
 
     let progress = await this.prisma.client.userEventProgress.findUnique({
       where: { userId_eventId: { userId, eventId: place.eventId } },
@@ -65,11 +72,25 @@ export class ProgressService {
       throw new ForbiddenException('Complete previous places first');
     }
 
-    if (!isWithinRadius(dto.latitude, dto.longitude, place.latitude, place.longitude, place.radiusMeters)) {
-      throw new BadRequestException('You must be within the place radius to unlock');
+    if (
+      !isWithinRadius(
+        dto.latitude,
+        dto.longitude,
+        place.latitude,
+        place.longitude,
+        place.radiusMeters,
+      )
+    ) {
+      throw new BadRequestException(
+        'You must be within the place radius to unlock',
+      );
     }
 
-    const previousPlace = await this.getPreviousPlaceContext(userId, places, placeIndex);
+    const previousPlace = await this.getPreviousPlaceContext(
+      userId,
+      places,
+      placeIndex,
+    );
     const warnings = await this.anticheat.evaluateAndRecord(
       userId,
       {
@@ -87,9 +108,10 @@ export class ProgressService {
     );
 
     const now = new Date();
-    const existingCompletion = await this.prisma.client.userPlaceCompletion.findUnique({
-      where: { userId_placeId: { userId, placeId } },
-    });
+    const existingCompletion =
+      await this.prisma.client.userPlaceCompletion.findUnique({
+        where: { userId_placeId: { userId, placeId } },
+      });
 
     await this.prisma.client.userPlaceCompletion.upsert({
       where: { userId_placeId: { userId, placeId } },
@@ -118,7 +140,8 @@ export class ProgressService {
         event: { include: { places: { orderBy: { orderIndex: 'asc' } } } },
       },
     });
-    if (!place || !place.question) throw new NotFoundException('Place or question not found');
+    if (!place || !place.question)
+      throw new NotFoundException('Place or question not found');
 
     await this.eventAccess.assertCanPlay(userId, place.eventId);
 
@@ -127,12 +150,15 @@ export class ProgressService {
     });
     if (!progress) throw new ForbiddenException('Place not unlocked');
 
-    const placeIndex = place.event.places.findIndex((p) => p.id === placeId);
+    const placeIndex = place.event.places.findIndex(p => p.id === placeId);
     const isLastPlace = placeIndex === place.event.places.length - 1;
 
     // Idempotent: already finished → return stored completion snapshot
     if (progress.completed) {
-      const giftFields = await this.completionFieldsFromProgress(progress, place.eventId);
+      const giftFields = await this.completionFieldsFromProgress(
+        progress,
+        place.eventId,
+      );
       return {
         correct: true,
         points: 0,
@@ -152,16 +178,18 @@ export class ProgressService {
       throw new ForbiddenException('Place not unlocked yet');
     }
 
-    const existingCompletion = await this.prisma.client.userPlaceCompletion.findUnique({
-      where: { userId_placeId: { userId, placeId } },
-    });
+    const existingCompletion =
+      await this.prisma.client.userPlaceCompletion.findUnique({
+        where: { userId_placeId: { userId, placeId } },
+      });
 
     // Place already answered correctly
     if (existingCompletion?.completed) {
       // Recover: last place saved but event/gift assign never finished (crash between steps)
       if (isLastPlace) {
         const now = new Date();
-        const eventTotalDurationMs = now.getTime() - progress.startedAt.getTime();
+        const eventTotalDurationMs =
+          now.getTime() - progress.startedAt.getTime();
         const totalScore =
           progress.score + place.question.points + place.event.rewardPoints;
         const completed = await this.completeEventWithGiftAssign({
@@ -180,8 +208,17 @@ export class ProgressService {
           giftCount: giftFields.giftCount,
           giftsAllClaimed: giftFields.giftsAllClaimed,
         });
-        await this.enqueueEventCompletedNotification(userId, place.event.title, totalScore);
-        this.websocket.emitProgressUpdated(userId, place.eventId, placeIndex, totalScore);
+        await this.enqueueEventCompletedNotification(
+          userId,
+          place.event.title,
+          totalScore,
+        );
+        this.websocket.emitProgressUpdated(
+          userId,
+          place.eventId,
+          placeIndex,
+          totalScore,
+        );
         return {
           correct: true,
           points: 0,
@@ -211,11 +248,25 @@ export class ProgressService {
       };
     }
 
-    if (!isWithinRadius(dto.latitude, dto.longitude, place.latitude, place.longitude, place.radiusMeters)) {
-      throw new BadRequestException('You must be within the place radius to submit an answer');
+    if (
+      !isWithinRadius(
+        dto.latitude,
+        dto.longitude,
+        place.latitude,
+        place.longitude,
+        place.radiusMeters,
+      )
+    ) {
+      throw new BadRequestException(
+        'You must be within the place radius to submit an answer',
+      );
     }
 
-    const previousPlace = await this.getPreviousPlaceContext(userId, place.event.places, placeIndex);
+    const previousPlace = await this.getPreviousPlaceContext(
+      userId,
+      place.event.places,
+      placeIndex,
+    );
     const warnings = await this.anticheat.evaluateAndRecord(
       userId,
       {
@@ -238,7 +289,8 @@ export class ProgressService {
 
     let answerDurationMs: number | null = null;
     if (correct && existingCompletion?.unlockedAt) {
-      answerDurationMs = now.getTime() - existingCompletion.unlockedAt.getTime();
+      answerDurationMs =
+        now.getTime() - existingCompletion.unlockedAt.getTime();
     }
 
     await this.prisma.client.userPlaceCompletion.upsert({
@@ -279,7 +331,12 @@ export class ProgressService {
           },
         });
         nextPlaceId = place.event.places[placeIndex + 1]?.id ?? null;
-        this.websocket.emitProgressUpdated(userId, place.eventId, newIndex, totalScore);
+        this.websocket.emitProgressUpdated(
+          userId,
+          place.eventId,
+          newIndex,
+          totalScore,
+        );
       } else {
         eventTotalDurationMs = now.getTime() - progress.startedAt.getTime();
         const completed = await this.completeEventWithGiftAssign({
@@ -299,8 +356,17 @@ export class ProgressService {
           giftCount: giftFields.giftCount,
           giftsAllClaimed: giftFields.giftsAllClaimed,
         });
-        await this.enqueueEventCompletedNotification(userId, place.event.title, totalScore);
-        this.websocket.emitProgressUpdated(userId, place.eventId, newIndex, totalScore);
+        await this.enqueueEventCompletedNotification(
+          userId,
+          place.event.title,
+          totalScore,
+        );
+        this.websocket.emitProgressUpdated(
+          userId,
+          place.eventId,
+          newIndex,
+          totalScore,
+        );
       }
     }
 
@@ -308,13 +374,21 @@ export class ProgressService {
       data: {
         userId,
         eventName: 'place_answered',
-        payload: { placeId, correct, points, answerDurationMs, eventTotalDurationMs },
+        payload: {
+          placeId,
+          correct,
+          points,
+          answerDurationMs,
+          eventTotalDurationMs,
+        },
       },
     });
 
     return {
       correct,
-      points: correct ? points + (eventCompleted ? place.event.rewardPoints : 0) : 0,
+      points: correct
+        ? points + (eventCompleted ? place.event.rewardPoints : 0)
+        : 0,
       totalScore,
       explanation: correct ? place.question.explanation : null,
       nextPlaceId,
@@ -339,7 +413,7 @@ export class ProgressService {
     now: Date;
     eventTotalDurationMs: number;
   }): Promise<{ giftFields: CompletionGiftFields }> {
-    return this.prisma.client.$transaction(async (tx) => {
+    return this.prisma.client.$transaction(async tx => {
       await tx.$queryRaw`SELECT id FROM events WHERE id = ${params.eventId} FOR UPDATE`;
 
       const current = await tx.userEventProgress.findUnique({
@@ -400,7 +474,8 @@ export class ProgressService {
         ],
       });
 
-      const finishRank = finishers.findIndex((f) => f.userId === params.userId) + 1;
+      const finishRank =
+        finishers.findIndex(f => f.userId === params.userId) + 1;
       const giftCodeAwarded =
         finishRank > 0 && finishRank <= giftCodes.length
           ? giftCodes[finishRank - 1]
@@ -455,10 +530,15 @@ export class ProgressService {
       where: { userId_eventId: { userId, eventId } },
     });
     if (!progress || !progress.completed) {
-      throw new ForbiddenException('Complete this event to view completion details');
+      throw new ForbiddenException(
+        'Complete this event to view completion details',
+      );
     }
 
-    const giftFields = await this.completionFieldsFromProgress(progress, eventId);
+    const giftFields = await this.completionFieldsFromProgress(
+      progress,
+      eventId,
+    );
     return {
       eventCompleted: true as const,
       ...giftFields,
@@ -492,13 +572,15 @@ export class ProgressService {
       ],
     });
 
-    const giftAssignedCount = rows.filter((r) => r.giftCodeAwarded != null).length;
+    const giftAssignedCount = rows.filter(
+      r => r.giftCodeAwarded != null,
+    ).length;
 
     return {
       event: { id: event.id, title: event.title, city: event.city },
       giftCount,
       giftAssignedCount,
-      finishers: rows.map((row) => ({
+      finishers: rows.map(row => ({
         userId: row.userId,
         userName: row.user.name,
         completedAt: row.completedAt!.toISOString(),
@@ -512,7 +594,12 @@ export class ProgressService {
 
   private async getPreviousPlaceContext(
     userId: string,
-    places: { id: string; latitude: number; longitude: number; orderIndex: number }[],
+    places: {
+      id: string;
+      latitude: number;
+      longitude: number;
+      orderIndex: number;
+    }[],
     placeIndex: number,
   ) {
     if (placeIndex <= 0) return null;
@@ -548,7 +635,10 @@ export class ProgressService {
 
     if (question.type === QuestionType.MULTIPLE_CHOICE) {
       const options = (question.options as string[] | null) ?? [];
-      return options.some((o) => o.trim().toLowerCase() === normalized) && normalized === expected;
+      return (
+        options.some(o => o.trim().toLowerCase() === normalized) &&
+        normalized === expected
+      );
     }
 
     if (question.type === QuestionType.TRUE_FALSE) {
@@ -564,7 +654,11 @@ export class ProgressService {
     const key = `rate:${action}:${userId}`;
     const count = await this.redis.incr(key);
     if (count === 1) await this.redis.expire(key, COOLDOWN_SECONDS);
-    if (count > 10) throw new HttpException('Too many requests, please slow down', HttpStatus.TOO_MANY_REQUESTS);
+    if (count > 10)
+      throw new HttpException(
+        'Too many requests, please slow down',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
   }
 
   private async enqueueEventCompletedNotification(
@@ -573,7 +667,9 @@ export class ProgressService {
     score: number,
   ) {
     try {
-      const notifications = this.moduleRef.get(NotificationsService, { strict: false });
+      const notifications = this.moduleRef.get(NotificationsService, {
+        strict: false,
+      });
       if (notifications) {
         await notifications.sendNotification(
           userId,
@@ -595,7 +691,9 @@ export class ProgressService {
   }
 
   async getEventLeaderboard(eventId: string, limit = 50) {
-    const event = await this.prisma.client.event.findUnique({ where: { id: eventId } });
+    const event = await this.prisma.client.event.findUnique({
+      where: { id: eventId },
+    });
     if (!event) throw new NotFoundException('Event not found');
 
     const take = Math.min(Math.max(limit, 1), 100);
@@ -647,12 +745,12 @@ export class ProgressService {
       })
       .slice(0, take);
 
-    const userIds = sorted.map((g) => g.userId);
+    const userIds = sorted.map(g => g.userId);
     const users = await this.prisma.client.user.findMany({
       where: { id: { in: userIds } },
       select: { id: true, name: true },
     });
-    const userMap = new Map(users.map((u) => [u.id, u.name]));
+    const userMap = new Map(users.map(u => [u.id, u.name]));
 
     return {
       entries: sorted.map((group, index) => ({
@@ -735,7 +833,7 @@ export class ProgressService {
       }),
     ]);
 
-    const items = rows.map((row) => ({
+    const items = rows.map(row => ({
       userId: row.userId,
       userName: row.user.name,
       userEmail: row.user.email,

@@ -49,7 +49,8 @@ const en = {
     intro: 'Install on iOS or Android and start your first hunt.',
     qrLabel: 'Scan to install',
     storesSoon: 'Store links go live with the public release. Check back soon.',
-    deepLinkNote: 'Already have the app? Open a shared hunt link and Marvira will launch automatically.',
+    deepLinkNote:
+      'Already have the app? Open a shared hunt link and Marvira will launch automatically.',
   },
   create: {
     title: 'Create hunts for your city',
@@ -98,7 +99,8 @@ const en = {
           'Explore the historic downtown district and uncover hidden gems through interactive challenges.',
         city: 'San Francisco',
         difficulty: 'Medium',
-        coverBrief: 'Downtown plaza / ferry / skyline walk — lively street-level adventure.',
+        coverBrief:
+          'Downtown plaza / ferry / skyline walk — lively street-level adventure.',
         coverImage: IMAGES.downtown,
       },
       {
@@ -107,7 +109,8 @@ const en = {
         blurb: 'A scenic hunt along the iconic Golden Gate Bridge area.',
         city: 'San Francisco',
         difficulty: 'Hard',
-        coverBrief: 'Bridge overlook / coastal path — windy outdoor trail energy.',
+        coverBrief:
+          'Bridge overlook / coastal path — windy outdoor trail energy.',
         coverImage: IMAGES.goldenGate,
       },
     ],
@@ -174,7 +177,8 @@ const en = {
       messageLabel: 'Message',
       submit: 'Send message',
       submitting: 'Sending…',
-      success: 'Thanks! Your message was sent. We’ll get back to you if needed.',
+      success:
+        'Thanks! Your message was sent. We’ll get back to you if needed.',
       error: 'Could not send your message. Please try again.',
       categories: {
         feedback: 'Feedback',
@@ -217,14 +221,17 @@ const en = {
     homeDesc:
       'Walk real places, answer challenges, and climb leaderboards. Marvira is a GPS scavenger-hunt app for players and organizers.',
     howTitle: 'How Marvira works',
-    howDesc: 'Find a hunt, walk to places, answer challenges, climb the leaderboard.',
+    howDesc:
+      'Find a hunt, walk to places, answer challenges, climb the leaderboard.',
     downloadTitle: 'Download Marvira',
-    downloadDesc: 'Get Marvira on the App Store or Google Play and start exploring.',
+    downloadDesc:
+      'Get Marvira on the App Store or Google Play and start exploring.',
     createTitle: 'Create a scavenger hunt — Marvira',
     createDesc:
       'Design GPS hunts for events, tourism, venues, and schools. Download Marvira to create.',
     huntsTitle: 'Featured city hunts — Marvira',
-    huntsDesc: 'Explore sample scavenger hunts like Downtown Discovery and Golden Gate Adventure.',
+    huntsDesc:
+      'Explore sample scavenger hunts like Downtown Discovery and Golden Gate Adventure.',
     pressTitle: 'Press & partners — Marvira',
     pressDesc: 'What is Marvira for cities, venues, schools, and organizers.',
     supportTitle: 'Support & FAQ — Marvira',

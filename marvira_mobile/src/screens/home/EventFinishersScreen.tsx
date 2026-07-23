@@ -1,29 +1,29 @@
 import React from 'react';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { useQuery } from '@tanstack/react-query';
+import { eventsApi } from '../../api/events';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { HomeStackParamList } from '../../navigation/types';
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  RefreshControl,
-} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, RouteProp} from '@react-navigation/native';
-import {useQuery} from '@tanstack/react-query';
-import {eventsApi} from '../../api/events';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {HomeStackParamList} from '../../navigation/types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
-import {formatDuration} from '../../utils/formatDuration';
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
+import { formatDuration } from '../../utils/formatDuration';
 
 type Route = RouteProp<HomeStackParamList, 'EventFinishers'>;
 
 export const EventFinishersScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<Route>();
-  const {eventId} = route.params;
+  const { eventId } = route.params;
 
-  const {data, isLoading, error, refetch, isRefetching} = useQuery({
+  const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ['eventFinishers', eventId],
     queryFn: () => eventsApi.getEventFinishers(eventId),
   });
@@ -41,7 +41,7 @@ export const EventFinishersScreen: React.FC = () => {
     );
   }
 
-  const {event, giftCount, giftAssignedCount, finishers} = data.data;
+  const { event, giftCount, giftAssignedCount, finishers } = data.data;
 
   return (
     <View style={styles.container}>
@@ -68,7 +68,7 @@ export const EventFinishersScreen: React.FC = () => {
         ListEmptyComponent={
           <Text style={styles.empty}>{t('finishers.empty')}</Text>
         }
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.rankBadge}>
               <Text style={styles.rankText}>#{item.finishRank ?? '—'}</Text>

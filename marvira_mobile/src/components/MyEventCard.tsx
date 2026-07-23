@@ -1,15 +1,9 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
-import {useTranslation} from 'react-i18next';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import LinearGradient from 'react-native-linear-gradient';
-import {MyCreatedEvent} from '../types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
+import { MyCreatedEvent } from '../types';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
 interface MyEventCardProps {
   event: MyCreatedEvent;
@@ -24,7 +18,7 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
   onFinishersPress,
   onEditGiftsPress,
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <TouchableOpacity
@@ -32,13 +26,13 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
       onPress={onPress}
       activeOpacity={0.8}>
       {event.imageUrl ? (
-        <Image source={{uri: event.imageUrl}} style={styles.image} />
+        <Image source={{ uri: event.imageUrl }} style={styles.image} />
       ) : (
         <LinearGradient
           colors={[colors.primary, colors.secondary]}
           style={styles.image}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
         />
       )}
       <View style={styles.content}>
@@ -61,9 +55,7 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
         <Text style={styles.meta}>
           {event.city} · {t(`createEvent.difficulties.${event.difficulty}`)} ·{' '}
           {event.totalPlaces} {t('common.places')}
-          {event.hasGift
-            ? ` · 🎁 ${t('events.giftLabel')}`
-            : ''}
+          {event.hasGift ? ` · 🎁 ${t('events.giftLabel')}` : ''}
         </Text>
         <Text style={styles.description} numberOfLines={2}>
           {event.description}
@@ -108,7 +100,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,

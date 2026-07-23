@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,25 +7,34 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {StepIndicator} from '../../components/StepIndicator';
-import {Input} from '../../components/Input';
-import {Button} from '../../components/Button';
-import {useCreateEvent} from '../../hooks/useMyEvents';
-import {CreateEventInput, EventDifficulty} from '../../types';
-import {HomeStackParamList} from '../../navigation/types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { StepIndicator } from '../../components/StepIndicator';
+import { Input } from '../../components/Input';
+import { Button } from '../../components/Button';
+import { useCreateEvent } from '../../hooks/useMyEvents';
+import { CreateEventInput, EventDifficulty } from '../../types';
+import { HomeStackParamList } from '../../navigation/types';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
 
-type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'CreateEventInfo'>;
+type NavigationProp = NativeStackNavigationProp<
+  HomeStackParamList,
+  'CreateEventInfo'
+>;
 
 const DIFFICULTIES: EventDifficulty[] = ['EASY', 'MEDIUM', 'HARD'];
 
 const STEP_LABELS = ['info', 'places', 'review', 'done'];
 
 export const CreateEventInfoScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
   const createEvent = useCreateEvent();
 
@@ -36,9 +45,9 @@ export const CreateEventInfoScreen: React.FC = () => {
     difficulty: 'MEDIUM',
     rewardPoints: 100,
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof CreateEventInput, string>>>(
-    {},
-  );
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof CreateEventInput, string>>
+  >({});
 
   const validate = (): boolean => {
     const nextErrors: Partial<Record<keyof CreateEventInput, string>> = {};
@@ -77,7 +86,9 @@ export const CreateEventInfoScreen: React.FC = () => {
     } catch (error: any) {
       Alert.alert(
         t('common.error'),
-        error?.response?.data?.message || error.message || t('createEvent.createFailed'),
+        error?.response?.data?.message ||
+          error.message ||
+          t('createEvent.createFailed'),
       );
     }
   };
@@ -99,14 +110,16 @@ export const CreateEventInfoScreen: React.FC = () => {
         <Input
           label={t('createEvent.title')}
           value={form.title}
-          onChangeText={title => setForm(prev => ({...prev, title}))}
+          onChangeText={title => setForm(prev => ({ ...prev, title }))}
           placeholder={t('createEvent.titlePlaceholder')}
           error={errors.title}
         />
         <Input
           label={t('createEvent.description')}
           value={form.description}
-          onChangeText={description => setForm(prev => ({...prev, description}))}
+          onChangeText={description =>
+            setForm(prev => ({ ...prev, description }))
+          }
           placeholder={t('createEvent.descriptionPlaceholder')}
           multiline
           error={errors.description}
@@ -114,7 +127,7 @@ export const CreateEventInfoScreen: React.FC = () => {
         <Input
           label={t('createEvent.city')}
           value={form.city}
-          onChangeText={city => setForm(prev => ({...prev, city}))}
+          onChangeText={city => setForm(prev => ({ ...prev, city }))}
           placeholder={t('createEvent.cityPlaceholder')}
           error={errors.city}
         />
@@ -128,7 +141,7 @@ export const CreateEventInfoScreen: React.FC = () => {
                 styles.difficultyButton,
                 form.difficulty === difficulty && styles.difficultyButtonActive,
               ]}
-              onPress={() => setForm(prev => ({...prev, difficulty}))}>
+              onPress={() => setForm(prev => ({ ...prev, difficulty }))}>
               <Text
                 style={[
                   styles.difficultyText,

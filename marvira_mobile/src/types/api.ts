@@ -1,10 +1,6 @@
 // Types aligned with marvira_dashboard_api / @marvira/shared-types
 
-export type QuestionType =
-  | 'TEXT'
-  | 'MULTIPLE_CHOICE'
-  | 'TRUE_FALSE'
-  | 'IMAGE';
+export type QuestionType = 'TEXT' | 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'IMAGE';
 
 export interface ApiUser {
   id: string;
@@ -45,7 +41,7 @@ export interface ApiEvent {
   updatedAt: string;
   distanceMeters?: number;
   places?: ApiPlace[];
-  _count?: {places: number; eventQuestions?: number};
+  _count?: { places: number; eventQuestions?: number };
 }
 
 export interface ApiPlace {
@@ -115,7 +111,7 @@ export interface ApiEventFinisher {
 }
 
 export interface ApiEventFinishersResponse {
-  event: {id: string; title: string; city: string};
+  event: { id: string; title: string; city: string };
   giftCount: number;
   giftAssignedCount: number;
   finishers: ApiEventFinisher[];
@@ -157,7 +153,7 @@ export interface ApiEventLeaderboardEntry {
 }
 
 export interface ApiEventLeaderboardResponse {
-  event: {id: string; title: string; city: string};
+  event: { id: string; title: string; city: string };
   entries: ApiEventLeaderboardEntry[];
 }
 

@@ -32,7 +32,9 @@ export function FeedbackForm({ content }: { content: FeedbackFormContent }) {
   const [category, setCategory] = useState<FeedbackCategory>('FEEDBACK');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [status, setStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (event: FormEvent) => {
@@ -80,7 +82,9 @@ export function FeedbackForm({ content }: { content: FeedbackFormContent }) {
   if (status === 'success') {
     return (
       <div className="rounded-2xl border border-forest/15 bg-white/70 p-8 text-center shadow-sm">
-        <p className="font-display text-lg font-semibold text-ink">{content.success}</p>
+        <p className="font-display text-lg font-semibold text-ink">
+          {content.success}
+        </p>
         <button
           type="button"
           className="mt-4 text-sm font-medium text-canopy underline-offset-4 hover:underline"
@@ -95,37 +99,45 @@ export function FeedbackForm({ content }: { content: FeedbackFormContent }) {
     <form
       onSubmit={handleSubmit}
       className="rounded-2xl border border-forest/15 bg-white/70 p-6 shadow-sm md:p-8">
-      <h2 className="font-display text-2xl font-bold text-ink">{content.title}</h2>
+      <h2 className="font-display text-2xl font-bold text-ink">
+        {content.title}
+      </h2>
       <p className="mt-2 text-sm text-ink/70">{content.intro}</p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-ink">{content.nameLabel}</span>
+          <span className="mb-1 block font-medium text-ink">
+            {content.nameLabel}
+          </span>
           <input
             required
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={e => setName(e.target.value)}
             className="w-full rounded-lg border border-forest/20 bg-white px-3 py-2 text-ink outline-none ring-canopy/30 focus:ring-2"
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-ink">{content.emailLabel}</span>
+          <span className="mb-1 block font-medium text-ink">
+            {content.emailLabel}
+          </span>
           <input
             required
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
             className="w-full rounded-lg border border-forest/20 bg-white px-3 py-2 text-ink outline-none ring-canopy/30 focus:ring-2"
           />
         </label>
       </div>
 
       <label className="mt-4 block text-sm">
-        <span className="mb-1 block font-medium text-ink">{content.categoryLabel}</span>
+        <span className="mb-1 block font-medium text-ink">
+          {content.categoryLabel}
+        </span>
         <select
           value={category}
-          onChange={(e) => setCategory(e.target.value as FeedbackCategory)}
+          onChange={e => setCategory(e.target.value as FeedbackCategory)}
           className="w-full rounded-lg border border-forest/20 bg-white px-3 py-2 text-ink outline-none ring-canopy/30 focus:ring-2">
           <option value="FEEDBACK">{content.categories.feedback}</option>
           <option value="SUGGESTION">{content.categories.suggestion}</option>
@@ -135,29 +147,35 @@ export function FeedbackForm({ content }: { content: FeedbackFormContent }) {
       </label>
 
       <label className="mt-4 block text-sm">
-        <span className="mb-1 block font-medium text-ink">{content.subjectLabel}</span>
+        <span className="mb-1 block font-medium text-ink">
+          {content.subjectLabel}
+        </span>
         <input
           type="text"
           value={subject}
-          onChange={(e) => setSubject(e.target.value)}
+          onChange={e => setSubject(e.target.value)}
           className="w-full rounded-lg border border-forest/20 bg-white px-3 py-2 text-ink outline-none ring-canopy/30 focus:ring-2"
         />
       </label>
 
       <label className="mt-4 block text-sm">
-        <span className="mb-1 block font-medium text-ink">{content.messageLabel}</span>
+        <span className="mb-1 block font-medium text-ink">
+          {content.messageLabel}
+        </span>
         <textarea
           required
           minLength={10}
           rows={5}
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={e => setMessage(e.target.value)}
           className="w-full rounded-lg border border-forest/20 bg-white px-3 py-2 text-ink outline-none ring-canopy/30 focus:ring-2"
         />
       </label>
 
       {status === 'error' ? (
-        <p className="mt-4 text-sm text-red-600">{errorMessage || content.error}</p>
+        <p className="mt-4 text-sm text-red-600">
+          {errorMessage || content.error}
+        </p>
       ) : null}
 
       <button

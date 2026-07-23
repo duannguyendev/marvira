@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,37 +8,49 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
-import {StepIndicator} from '../../components/StepIndicator';
-import {Button} from '../../components/Button';
-import {Input} from '../../components/Input';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {useEventDetails} from '../../hooks/useEvents';
-import {usePublishEvent} from '../../hooks/useMyEvents';
-import {HomeStackParamList} from '../../navigation/types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
-import {DEFAULT_MAP_REGION} from '../../utils/constants';
+import { useTranslation } from 'react-i18next';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { StepIndicator } from '../../components/StepIndicator';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { useEventDetails } from '../../hooks/useEvents';
+import { usePublishEvent } from '../../hooks/useMyEvents';
+import { HomeStackParamList } from '../../navigation/types';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
+import { DEFAULT_MAP_REGION } from '../../utils/constants';
 
-type CreateEventReviewRouteProp = RouteProp<HomeStackParamList, 'CreateEventReview'>;
+type CreateEventReviewRouteProp = RouteProp<
+  HomeStackParamList,
+  'CreateEventReview'
+>;
 
-type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'CreateEventReview'>;
+type NavigationProp = NativeStackNavigationProp<
+  HomeStackParamList,
+  'CreateEventReview'
+>;
 
 type AccessMode = 'public' | 'password';
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 const MAP_HEIGHT = height * 0.28;
 const STEP_LABELS = ['info', 'places', 'review', 'done'];
 
 export const CreateEventReviewScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<CreateEventReviewRouteProp>();
   const navigation = useNavigation<NavigationProp>();
-  const {eventId} = route.params;
-  const {data, isLoading, error, refetch} = useEventDetails(eventId);
+  const { eventId } = route.params;
+  const { data, isLoading, error, refetch } = useEventDetails(eventId);
   const publishEvent = usePublishEvent();
 
   const [accessMode, setAccessMode] = useState<AccessMode>('public');
@@ -94,12 +106,14 @@ export const CreateEventReviewScreen: React.FC = () => {
       setAccessErrors({});
       return true;
     }
-    const nextErrors: {joinPassword?: string; confirmPassword?: string} = {};
+    const nextErrors: { joinPassword?: string; confirmPassword?: string } = {};
     if (joinPassword.length < 4) {
       nextErrors.joinPassword = t('createEvent.access.validation.passwordMin');
     }
     if (joinPassword !== confirmPassword) {
-      nextErrors.confirmPassword = t('createEvent.access.validation.passwordMismatch');
+      nextErrors.confirmPassword = t(
+        'createEvent.access.validation.passwordMismatch',
+      );
     }
     setAccessErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -114,8 +128,8 @@ export const CreateEventReviewScreen: React.FC = () => {
       await publishEvent.mutateAsync({
         eventId,
         ...(accessMode === 'password'
-          ? {joinPassword}
-          : {clearJoinPassword: true}),
+          ? { joinPassword }
+          : { clearJoinPassword: true }),
         giftTeaser: giftTeaser.trim() || null,
         completionMessage: completionMessage.trim() || null,
         giftCodes: codes,
@@ -123,18 +137,20 @@ export const CreateEventReviewScreen: React.FC = () => {
       navigation.navigate('CreateEventSuccess', {
         eventId,
         published: true,
-        ...(accessMode === 'password' ? {joinPassword} : {}),
+        ...(accessMode === 'password' ? { joinPassword } : {}),
       });
     } catch (err: any) {
       Alert.alert(
         t('common.error'),
-        err?.response?.data?.message || err.message || t('createEvent.publishFailed'),
+        err?.response?.data?.message ||
+          err.message ||
+          t('createEvent.publishFailed'),
       );
     }
   };
 
   const handleSaveDraft = () => {
-    navigation.navigate('CreateEventSuccess', {eventId, published: false});
+    navigation.navigate('CreateEventSuccess', { eventId, published: false });
   };
 
   if (isLoading) {
@@ -170,7 +186,9 @@ export const CreateEventReviewScreen: React.FC = () => {
       />
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.heading}>{t('createEvent.reviewHeading')}</Text>
-        <Text style={styles.subheading}>{t('createEvent.reviewSubheading')}</Text>
+        <Text style={styles.subheading}>
+          {t('createEvent.reviewSubheading')}
+        </Text>
 
         <View style={styles.summaryCard}>
           <Text style={styles.eventTitle}>{event.title}</Text>
@@ -196,8 +214,12 @@ export const CreateEventReviewScreen: React.FC = () => {
         </MapView>
 
         <View style={styles.accessSection}>
-          <Text style={styles.accessTitle}>{t('createEvent.access.heading')}</Text>
-          <Text style={styles.accessSubheading}>{t('createEvent.access.subheading')}</Text>
+          <Text style={styles.accessTitle}>
+            {t('createEvent.access.heading')}
+          </Text>
+          <Text style={styles.accessSubheading}>
+            {t('createEvent.access.subheading')}
+          </Text>
           <View style={styles.accessRow}>
             {(['public', 'password'] as AccessMode[]).map(mode => (
               <TouchableOpacity
@@ -235,13 +257,17 @@ export const CreateEventReviewScreen: React.FC = () => {
                 secureTextEntry
                 error={accessErrors.confirmPassword}
               />
-              <Text style={styles.accessHint}>{t('createEvent.access.hint')}</Text>
+              <Text style={styles.accessHint}>
+                {t('createEvent.access.hint')}
+              </Text>
             </>
           ) : null}
         </View>
 
         <View style={styles.accessSection}>
-          <Text style={styles.accessTitle}>{t('createEvent.gifts.heading')}</Text>
+          <Text style={styles.accessTitle}>
+            {t('createEvent.gifts.heading')}
+          </Text>
           <Text style={styles.accessSubheading}>
             {t('createEvent.gifts.subheading')}
           </Text>
@@ -279,12 +305,16 @@ export const CreateEventReviewScreen: React.FC = () => {
         </View>
 
         <View style={styles.checklist}>
-          <Text style={styles.checklistTitle}>{t('createEvent.checklist')}</Text>
-          <Text style={styles.checkItem}>
-            {allPlacesHaveQuestions ? '✓' : '○'} {t('createEvent.checkPlaces', {count: event.places.length})}
+          <Text style={styles.checklistTitle}>
+            {t('createEvent.checklist')}
           </Text>
           <Text style={styles.checkItem}>
-            {allPlacesHaveQuestions ? '✓' : '○'} {t('createEvent.checkQuestions')}
+            {allPlacesHaveQuestions ? '✓' : '○'}{' '}
+            {t('createEvent.checkPlaces', { count: event.places.length })}
+          </Text>
+          <Text style={styles.checkItem}>
+            {allPlacesHaveQuestions ? '✓' : '○'}{' '}
+            {t('createEvent.checkQuestions')}
           </Text>
         </View>
 

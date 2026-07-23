@@ -20,7 +20,9 @@ export class NotificationsProcessor extends WorkerHost {
 export class AnalyticsProcessor extends WorkerHost {
   private readonly logger = new Logger(AnalyticsProcessor.name);
 
-  async process(job: Job<{ eventName: string; payload: Record<string, unknown> }>) {
+  async process(
+    job: Job<{ eventName: string; payload: Record<string, unknown> }>,
+  ) {
     this.logger.log(`Analytics event: ${job.data.eventName}`);
     return { processed: true };
   }
@@ -79,7 +81,9 @@ export class CleanupProcessor extends WorkerHost implements OnModuleInit {
       resetTokens = result.count;
     }
 
-    this.logger.log(`Cleanup: ${sessions} sessions, ${resetTokens} reset tokens removed`);
+    this.logger.log(
+      `Cleanup: ${sessions} sessions, ${resetTokens} reset tokens removed`,
+    );
     return { sessions, resetTokens };
   }
 }

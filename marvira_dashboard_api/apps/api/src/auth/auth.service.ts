@@ -43,7 +43,9 @@ export class AuthService {
     name: string,
     password: string,
   ): Promise<{ user: PublicUser; tokens: TokenPair }> {
-    const existing = await this.prisma.client.user.findUnique({ where: { email } });
+    const existing = await this.prisma.client.user.findUnique({
+      where: { email },
+    });
     if (existing) {
       throw new ConflictException('Email already registered');
     }
@@ -63,7 +65,10 @@ export class AuthService {
     return { user: this.stripPassword(user), tokens };
   }
 
-  async login(email: string, password: string): Promise<{ user: PublicUser; tokens: TokenPair }> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ user: PublicUser; tokens: TokenPair }> {
     const user = await this.prisma.client.user.findUnique({ where: { email } });
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid credentials');
@@ -88,7 +93,9 @@ export class AuthService {
     const tokenHash = this.hashResetToken(rawToken);
     const expiresAt = new Date(Date.now() + AuthService.RESET_TOKEN_TTL_MS);
 
-    await this.prisma.client.passwordResetToken.deleteMany({ where: { userId: user.id } });
+    await this.prisma.client.passwordResetToken.deleteMany({
+      where: { userId: user.id },
+    });
     await this.prisma.client.passwordResetToken.create({
       data: {
         userId: user.id,
@@ -102,7 +109,11 @@ export class AuthService {
       'http://localhost:3000/reset-password',
     );
     const resetUrl = `${resetBaseUrl}?token=${rawToken}`;
-    await this.emailService.sendPasswordResetEmail(user.email, resetUrl, user.name);
+    await this.emailService.sendPasswordResetEmail(
+      user.email,
+      resetUrl,
+      user.name,
+    );
 
     const smtpConfigured = !!this.config.get<string>('SMTP_HOST');
     if (!smtpConfigured && this.config.get('NODE_ENV') !== 'production') {
@@ -119,11 +130,18 @@ export class AuthService {
       include: { user: true },
     });
 
-    if (!resetRecord || resetRecord.usedAt || resetRecord.expiresAt < new Date()) {
+    if (
+      !resetRecord ||
+      resetRecord.usedAt ||
+      resetRecord.expiresAt < new Date()
+    ) {
       throw new BadRequestException('Invalid or expired reset token');
     }
 
-    if (!resetRecord.user.isActive || resetRecord.user.provider !== AuthProvider.LOCAL) {
+    if (
+      !resetRecord.user.isActive ||
+      resetRecord.user.provider !== AuthProvider.LOCAL
+    ) {
       throw new BadRequestException('Invalid or expired reset token');
     }
 
@@ -138,7 +156,9 @@ export class AuthService {
         where: { id: resetRecord.id },
         data: { usedAt: new Date() },
       }),
-      this.prisma.client.session.deleteMany({ where: { userId: resetRecord.userId } }),
+      this.prisma.client.session.deleteMany({
+        where: { userId: resetRecord.userId },
+      }),
     ]);
   }
 
@@ -176,7 +196,9 @@ export class AuthService {
     let profile: OAuthProfile;
 
     if (input.identityToken) {
-      profile = await this.oauthVerifier.verifyAppleIdentityToken(input.identityToken);
+      profile = await this.oauthVerifier.verifyAppleIdentityToken(
+        input.identityToken,
+      );
       if (input.name?.trim()) {
         profile.name = input.name.trim();
       }
@@ -207,7 +229,9 @@ export class AuthService {
   }
 
   async getMe(userId: string): Promise<PublicUser> {
-    const user = await this.prisma.client.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.client.user.findUnique({
+      where: { id: userId },
+    });
     if (!user) throw new UnauthorizedException('User not found');
     return this.stripPassword(user);
   }
@@ -215,7 +239,14 @@ export class AuthService {
   async validateUser(payload: { sub: string }): Promise<RequestUser | null> {
     const user = await this.prisma.client.user.findUnique({
       where: { id: payload.sub },
-      select: { id: true, email: true, name: true, role: true, avatar: true, isActive: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        avatar: true,
+        isActive: true,
+      },
     });
     if (!user || !user.isActive) return null;
     const { isActive: _, ...rest } = user;
@@ -267,7 +298,9 @@ export class AuthService {
     }
 
     if (!input.email || !input.name) {
-      throw new BadRequestException(`${provider} profile requires email and name in development mode`);
+      throw new BadRequestException(
+        `${provider} profile requires email and name in development mode`,
+      );
     }
 
     return {

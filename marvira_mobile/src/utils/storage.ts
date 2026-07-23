@@ -94,7 +94,9 @@ async function setSecureToken(key: 'access' | 'refresh', value: string) {
   });
 }
 
-async function getSecureToken(key: 'access' | 'refresh'): Promise<string | null> {
+async function getSecureToken(
+  key: 'access' | 'refresh',
+): Promise<string | null> {
   try {
     const credentials = await Keychain.getGenericPassword({
       service: `${KEYCHAIN_SERVICE}.${key}`,
@@ -110,7 +112,9 @@ async function getSecureToken(key: 'access' | 'refresh'): Promise<string | null>
 
 async function removeSecureToken(key: 'access' | 'refresh') {
   try {
-    await Keychain.resetGenericPassword({service: `${KEYCHAIN_SERVICE}.${key}`});
+    await Keychain.resetGenericPassword({
+      service: `${KEYCHAIN_SERVICE}.${key}`,
+    });
   } catch {
     // ignore
   }

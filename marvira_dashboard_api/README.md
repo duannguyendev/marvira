@@ -79,12 +79,12 @@ pnpm dev:dashboard
 
 Wait until you see: `Local: http://localhost:3000`
 
-| Service   | URL                          |
-|-----------|------------------------------|
-| Dashboard | http://localhost:3000        |
-| Login     | http://localhost:3000/login  |
-| API       | http://localhost:3001        |
-| Swagger   | http://localhost:3001/docs   |
+| Service   | URL                         |
+| --------- | --------------------------- |
+| Dashboard | http://localhost:3000       |
+| Login     | http://localhost:3000/login |
+| API       | http://localhost:3001       |
+| Swagger   | http://localhost:3001/docs  |
 
 **Admin:** `admin@marvira.com` / `admin123`  
 **Demo user:** `demo@marvira.com` / `demo123`

@@ -11,7 +11,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { resolveImageUrl } from '@/lib/resolve-image-url';
-import { articleSchema, type ArticleFormValues } from '@/lib/validation/schemas';
+import {
+  articleSchema,
+  type ArticleFormValues,
+} from '@/lib/validation/schemas';
 import {
   ArticleStatus,
   type Article,
@@ -89,11 +92,13 @@ export function ArticleForm({
 
   const { data: eventsData } = useQuery({
     queryKey: ['admin-events-picker'],
-    queryFn: () => api.get<PaginatedResponse<Event>>('/admin/events?pageSize=100'),
+    queryFn: () =>
+      api.get<PaginatedResponse<Event>>('/admin/events?pageSize=100'),
   });
 
   const coverImage = useWatch({ control, name: 'coverImage' });
-  const previewSrc = localPreview || (coverImage?.trim() ? resolveImageUrl(coverImage) : '');
+  const previewSrc =
+    localPreview || (coverImage?.trim() ? resolveImageUrl(coverImage) : '');
 
   const submit = (values: ArticleFormValues) => {
     const payload: CreateArticleDto = {
@@ -116,32 +121,53 @@ export function ArticleForm({
 
       <div className="space-y-2">
         <Label htmlFor="title">Title *</Label>
-        <Input id="title" placeholder="Explore Downtown San Francisco" {...register('title')} />
-        {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+        <Input
+          id="title"
+          placeholder="Explore Downtown San Francisco"
+          {...register('title')}
+        />
+        {errors.title && (
+          <p className="text-sm text-destructive">{errors.title.message}</p>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="placeName">Place name *</Label>
-          <Input id="placeName" placeholder="Union Square" {...register('placeName')} />
+          <Input
+            id="placeName"
+            placeholder="Union Square"
+            {...register('placeName')}
+          />
           {errors.placeName && (
-            <p className="text-sm text-destructive">{errors.placeName.message}</p>
+            <p className="text-sm text-destructive">
+              {errors.placeName.message}
+            </p>
           )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="city">City</Label>
           <Input id="city" placeholder="San Francisco" {...register('city')} />
-          {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
+          {errors.city && (
+            <p className="text-sm text-destructive">{errors.city.message}</p>
+          )}
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="slug">Slug</Label>
-        <Input id="slug" placeholder="explore-downtown-san-francisco" {...register('slug')} />
+        <Input
+          id="slug"
+          placeholder="explore-downtown-san-francisco"
+          {...register('slug')}
+        />
         <p className="text-xs text-muted-foreground">
-          Used in the shareable URL (/explore/&lt;slug&gt;). Leave blank to auto-generate from the title.
+          Used in the shareable URL (/explore/&lt;slug&gt;). Leave blank to
+          auto-generate from the title.
         </p>
-        {errors.slug && <p className="text-sm text-destructive">{errors.slug.message}</p>}
+        {errors.slug && (
+          <p className="text-sm text-destructive">{errors.slug.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -152,7 +178,9 @@ export function ArticleForm({
           placeholder="Short teaser shown on cards and social previews (max 300 characters)."
           {...register('excerpt')}
         />
-        {errors.excerpt && <p className="text-sm text-destructive">{errors.excerpt.message}</p>}
+        {errors.excerpt && (
+          <p className="text-sm text-destructive">{errors.excerpt.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -160,10 +188,14 @@ export function ArticleForm({
         <textarea
           id="body"
           className="flex min-h-[220px] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm"
-          placeholder={'## Heading\n\nWrite the full article here. Markdown is supported.'}
+          placeholder={
+            '## Heading\n\nWrite the full article here. Markdown is supported.'
+          }
           {...register('body')}
         />
-        {errors.body && <p className="text-sm text-destructive">{errors.body.message}</p>}
+        {errors.body && (
+          <p className="text-sm text-destructive">{errors.body.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -187,7 +219,7 @@ export function ArticleForm({
               type="file"
               accept="image/*"
               disabled={uploading}
-              onChange={async (e) => {
+              onChange={async e => {
                 const file = e.target.files?.[0];
                 if (!file) return;
                 revokeLocalPreview();
@@ -218,10 +250,12 @@ export function ArticleForm({
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  setValue('coverImage', '', { shouldValidate: true, shouldDirty: true });
+                  setValue('coverImage', '', {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
                   revokeLocalPreview();
-                }}
-              >
+                }}>
                 Remove image
               </Button>
             )}
@@ -238,11 +272,12 @@ export function ArticleForm({
           <select
             id="status"
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            {...register('status')}
-          >
-            {Object.values(ArticleStatus).map((s) => (
+            {...register('status')}>
+            {Object.values(ArticleStatus).map(s => (
               <option key={s} value={s}>
-                {s === ArticleStatus.PUBLISHED ? 'Published (visible on Explore page)' : 'Draft'}
+                {s === ArticleStatus.PUBLISHED
+                  ? 'Published (visible on Explore page)'
+                  : 'Draft'}
               </option>
             ))}
           </select>
@@ -252,10 +287,9 @@ export function ArticleForm({
           <select
             id="eventId"
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            {...register('eventId')}
-          >
+            {...register('eventId')}>
             <option value="">None — standalone article</option>
-            {eventsData?.items.map((event) => (
+            {eventsData?.items.map(event => (
               <option key={event.id} value={event.id}>
                 {event.title}
                 {event.city ? ` — ${event.city}` : ''}
@@ -263,7 +297,8 @@ export function ArticleForm({
             ))}
           </select>
           <p className="text-xs text-muted-foreground">
-            Attach a gameplay event to show a &ldquo;Play&rdquo; call-to-action on the article.
+            Attach a gameplay event to show a &ldquo;Play&rdquo; call-to-action
+            on the article.
           </p>
         </div>
       </div>

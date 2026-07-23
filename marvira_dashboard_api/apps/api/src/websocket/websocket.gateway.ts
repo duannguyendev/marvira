@@ -11,7 +11,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 @WebSocketGateway({
-  cors: { origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'] },
+  cors: {
+    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+  },
   namespace: '/ws',
 })
 export class WebsocketGateway
@@ -68,7 +70,9 @@ export class WebsocketGateway
   }
 
   emitPlaceUnlocked(userId: string, placeId: string, eventId: string) {
-    this.server.to(`user:${userId}`).emit('place_unlocked', { userId, placeId, eventId });
+    this.server
+      .to(`user:${userId}`)
+      .emit('place_unlocked', { userId, placeId, eventId });
   }
 
   emitProgressUpdated(
@@ -79,7 +83,12 @@ export class WebsocketGateway
   ) {
     this.server
       .to(`user:${userId}`)
-      .emit('event_progress_updated', { userId, eventId, currentPlaceIndex, score });
+      .emit('event_progress_updated', {
+        userId,
+        eventId,
+        currentPlaceIndex,
+        score,
+      });
   }
 
   emitEventCompleted(

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,20 +6,20 @@ import {
   Text,
   Dimensions,
 } from 'react-native';
-import MapView, {Marker, PROVIDER_GOOGLE, Region} from 'react-native-maps';
-import {useTranslation} from 'react-i18next';
-import {Location} from '../types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
-import {DEFAULT_MAP_REGION} from '../utils/constants';
+import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
+import { useTranslation } from 'react-i18next';
+import { Location } from '../types';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
+import { DEFAULT_MAP_REGION } from '../utils/constants';
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 const MAP_HEIGHT = height * 0.32;
 
 interface MapPickerProps {
   coordinate: Location;
   onCoordinateChange: (location: Location) => void;
   onUseMyLocation?: () => void;
-  markers?: Array<{id: string; coordinate: Location; label?: string}>;
+  markers?: Array<{ id: string; coordinate: Location; label?: string }>;
 }
 
 export const MapPicker: React.FC<MapPickerProps> = ({
@@ -28,7 +28,7 @@ export const MapPicker: React.FC<MapPickerProps> = ({
   onUseMyLocation,
   markers = [],
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [region, setRegion] = useState<Region>({
     ...coordinate,
     latitudeDelta: 0.01,
@@ -36,17 +36,17 @@ export const MapPicker: React.FC<MapPickerProps> = ({
   });
 
   const handleMapPress = (event: {
-    nativeEvent: {coordinate: {latitude: number; longitude: number}};
+    nativeEvent: { coordinate: { latitude: number; longitude: number } };
   }) => {
-    const {latitude, longitude} = event.nativeEvent.coordinate;
-    onCoordinateChange({latitude, longitude});
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    onCoordinateChange({ latitude, longitude });
   };
 
   const handleMarkerDrag = (event: {
-    nativeEvent: {coordinate: {latitude: number; longitude: number}};
+    nativeEvent: { coordinate: { latitude: number; longitude: number } };
   }) => {
-    const {latitude, longitude} = event.nativeEvent.coordinate;
-    onCoordinateChange({latitude, longitude});
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    onCoordinateChange({ latitude, longitude });
   };
 
   return (
@@ -75,7 +75,9 @@ export const MapPicker: React.FC<MapPickerProps> = ({
         />
       </MapView>
       {onUseMyLocation ? (
-        <TouchableOpacity style={styles.locationButton} onPress={onUseMyLocation}>
+        <TouchableOpacity
+          style={styles.locationButton}
+          onPress={onUseMyLocation}>
           <Text style={styles.locationButtonText}>
             {t('createEvent.useMyLocation')}
           </Text>
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.md,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 4,

@@ -7,7 +7,7 @@ import {
   UnlockPlaceRequest,
   LocationWarning,
 } from '../types';
-import {USE_MOCK_DATA} from '../utils/constants';
+import { USE_MOCK_DATA } from '../utils/constants';
 import {
   mockPlacesEvent1,
   mockCorrectAnswers,
@@ -15,17 +15,19 @@ import {
   mockPlaceQuestions,
   delay,
 } from './mockData';
-import {apiClient} from './client';
+import { apiClient } from './client';
 import {
   ApiAnswerResponse,
   ApiPlace,
   ApiQuestionPublic,
   ApiUnlockResponse,
 } from '../types/api';
-import {mapPlace, mapQuestion} from './mappers';
-import {buildLocationPayload} from '../utils/anticheat';
+import { mapPlace, mapQuestion } from './mappers';
+import { buildLocationPayload } from '../utils/anticheat';
 
-export type UnlockPlaceResult = ApiResponse<Place> & {warnings?: LocationWarning[]};
+export type UnlockPlaceResult = ApiResponse<Place> & {
+  warnings?: LocationWarning[];
+};
 export type SubmitAnswerResult = ApiResponse<AnswerResponse>;
 
 export const placesApi = {
@@ -81,7 +83,7 @@ export const placesApi = {
       const place = allPlaces.find(p => p.id === request.placeId);
       if (place) {
         place.isUnlocked = true;
-        return {success: true, data: place};
+        return { success: true, data: place };
       }
       throw new Error('Place not found');
     }
@@ -92,15 +94,20 @@ export const placesApi = {
       warnings?: LocationWarning[];
     }>(`/places/${request.placeId}/unlock`, buildLocationPayload(request));
 
-    const placesRes = await apiClient.get<{success: boolean; data: ApiPlace[]}>(
-      `/events/${response.data.data.eventId}/places`,
-    );
+    const placesRes = await apiClient.get<{
+      success: boolean;
+      data: ApiPlace[];
+    }>(`/events/${response.data.data.eventId}/places`);
     const apiPlace = placesRes.data.data.find(p => p.id === request.placeId);
     if (!apiPlace) {
       throw new Error('Place not found after unlock');
     }
 
-    return {success: true, data: mapPlace(apiPlace), warnings: response.data.warnings};
+    return {
+      success: true,
+      data: mapPlace(apiPlace),
+      warnings: response.data.warnings,
+    };
   },
 
   submitAnswer: async (

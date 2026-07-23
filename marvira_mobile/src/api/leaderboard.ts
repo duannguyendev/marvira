@@ -1,4 +1,4 @@
-import {apiClient} from './client';
+import { apiClient } from './client';
 import {
   ApiEventLeaderboardResponse,
   ApiGlobalLeaderboardResponse,
@@ -12,7 +12,7 @@ export const leaderboardApi = {
     const response = await apiClient.get<{
       success: boolean;
       data: ApiEventLeaderboardResponse;
-    }>(`/events/${eventId}/leaderboard`, {params: {limit}});
+    }>(`/events/${eventId}/leaderboard`, { params: { limit } });
     return response.data.data;
   },
 
@@ -22,7 +22,7 @@ export const leaderboardApi = {
     const response = await apiClient.get<{
       success: boolean;
       data: ApiGlobalLeaderboardResponse;
-    }>('/leaderboard/global', {params: {limit}});
+    }>('/leaderboard/global', { params: { limit } });
     return response.data.data;
   },
 };

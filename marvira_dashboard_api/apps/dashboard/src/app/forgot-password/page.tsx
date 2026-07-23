@@ -9,7 +9,13 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -41,7 +47,9 @@ export default function ForgotPasswordPage() {
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Request failed' }));
+        const error = await response
+          .json()
+          .catch(() => ({ message: 'Request failed' }));
         throw new Error(error.message || 'Request failed');
       }
 
@@ -66,7 +74,9 @@ export default function ForgotPasswordPage() {
         <CardContent>
           {submitted ? (
             <div className="space-y-4 text-center text-sm text-muted-foreground">
-              <p>If an account exists for that email, a reset link has been sent.</p>
+              <p>
+                If an account exists for that email, a reset link has been sent.
+              </p>
               <Link href="/login" className="text-primary underline">
                 Back to login
               </Link>
@@ -76,7 +86,11 @@ export default function ForgotPasswordPage() {
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" {...register('email')} />
-                {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+                {errors.email && (
+                  <p className="text-sm text-destructive">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Sending...' : 'Send reset link'}

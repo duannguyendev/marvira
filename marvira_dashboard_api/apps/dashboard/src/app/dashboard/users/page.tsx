@@ -47,10 +47,11 @@ function formatDate(iso: string) {
 
 export default function UsersPage() {
   const queryClient = useQueryClient();
-  const currentUser = useAuthStore((s) => s.user);
+  const currentUser = useAuthStore(s => s.user);
   const isAdmin = currentUser?.role === UserRole.ADMIN;
   const canCreateUsers =
-    currentUser?.role === UserRole.ADMIN || currentUser?.role === UserRole.STAFF;
+    currentUser?.role === UserRole.ADMIN ||
+    currentUser?.role === UserRole.STAFF;
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [search, setSearch] = useState('');
@@ -75,7 +76,8 @@ export default function UsersPage() {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       toast.success('User updated');
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to update user'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to update user'),
   });
 
   const roleMutation = useMutation({
@@ -85,7 +87,8 @@ export default function UsersPage() {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       toast.success('Role updated');
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to update role'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to update role'),
   });
 
   const users = data?.items ?? [];
@@ -104,21 +107,25 @@ export default function UsersPage() {
         {canCreateUsers && (
           <AddUserDialog
             isAdmin={isAdmin}
-            onCreated={() => queryClient.invalidateQueries({ queryKey: ['admin-users'] })}
+            onCreated={() =>
+              queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+            }
           />
         )}
       </div>
 
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle>All Users ({data?.total?.toLocaleString() ?? 0})</CardTitle>
+          <CardTitle>
+            All Users ({data?.total?.toLocaleString() ?? 0})
+          </CardTitle>
           <div className="relative w-full sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-9"
               placeholder="Search by name or email..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearch(e.target.value)}
             />
           </div>
         </CardHeader>
@@ -132,7 +139,9 @@ export default function UsersPage() {
           ) : users.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <p className="text-muted-foreground">
-                {debouncedSearch ? 'No users match your search.' : 'No users found.'}
+                {debouncedSearch
+                  ? 'No users match your search.'
+                  : 'No users found.'}
               </p>
             </div>
           ) : (
@@ -146,15 +155,19 @@ export default function UsersPage() {
                     <TableHead className="text-right">Events played</TableHead>
                     <TableHead>Joined</TableHead>
                     <TableHead>Status</TableHead>
-                    {isAdmin && <TableHead className="text-right">Actions</TableHead>}
+                    {isAdmin && (
+                      <TableHead className="text-right">Actions</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody className={isFetching ? 'opacity-60' : undefined}>
-                  {users.map((user) => {
+                  {users.map(user => {
                     const isSelf = user.id === currentUser?.id;
                     return (
                       <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.name}</TableCell>
+                        <TableCell className="font-medium">
+                          {user.name}
+                        </TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
                           {isAdmin && !isSelf ? (
@@ -162,14 +175,13 @@ export default function UsersPage() {
                               className="rounded-md border bg-background px-2 py-1 text-xs"
                               value={user.role}
                               disabled={roleMutation.isPending}
-                              onChange={(e) =>
+                              onChange={e =>
                                 roleMutation.mutate({
                                   id: user.id,
                                   role: e.target.value as UserRole,
                                 })
-                              }
-                            >
-                              {ROLE_OPTIONS.map((role) => (
+                              }>
+                              {ROLE_OPTIONS.map(role => (
                                 <option key={role} value={role}>
                                   {role}
                                 </option>
@@ -181,12 +193,19 @@ export default function UsersPage() {
                             </span>
                           )}
                         </TableCell>
-                        <TableCell className="text-right">{user._count.eventProgress}</TableCell>
+                        <TableCell className="text-right">
+                          {user._count.eventProgress}
+                        </TableCell>
                         <TableCell className="text-muted-foreground">
                           {formatDate(user.createdAt)}
                         </TableCell>
                         <TableCell>
-                          <span className={user.isActive ? 'text-green-500' : 'text-destructive'}>
+                          <span
+                            className={
+                              user.isActive
+                                ? 'text-green-500'
+                                : 'text-destructive'
+                            }>
                             {user.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </TableCell>
@@ -201,8 +220,7 @@ export default function UsersPage() {
                                     id: user.id,
                                     activate: !user.isActive,
                                   })
-                                }
-                              >
+                                }>
                                 {user.isActive ? 'Deactivate' : 'Activate'}
                               </Button>
                             )}

@@ -21,13 +21,15 @@ export default function EditArticlePage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (payload: CreateArticleDto) => api.patch<Article>(`/admin/articles/${id}`, payload),
+    mutationFn: (payload: CreateArticleDto) =>
+      api.patch<Article>(`/admin/articles/${id}`, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-article', id] });
       queryClient.invalidateQueries({ queryKey: ['admin-articles'] });
       toast.success('Article saved');
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to save article'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to save article'),
   });
 
   if (isLoading) {
@@ -50,7 +52,9 @@ export default function EditArticlePage() {
           <h1 className="text-3xl font-bold tracking-tight">Edit Article</h1>
           <p className="text-muted-foreground">{article.title}</p>
         </div>
-        <Button variant="outline" onClick={() => router.push('/dashboard/articles')}>
+        <Button
+          variant="outline"
+          onClick={() => router.push('/dashboard/articles')}>
           Back to Articles
         </Button>
       </div>
@@ -64,7 +68,7 @@ export default function EditArticlePage() {
             article={article}
             submitLabel="Save Article"
             submitting={mutation.isPending}
-            onSubmit={(payload) => mutation.mutate(payload)}
+            onSubmit={payload => mutation.mutate(payload)}
             onCancel={() => router.push('/dashboard/articles')}
           />
         </CardContent>

@@ -1,7 +1,7 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {colors, spacing, fontSize, borderRadius} from '../theme';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { colors, spacing, fontSize, borderRadius } from '../theme';
 
 interface ErrorViewProps {
   message: string;
@@ -14,14 +14,16 @@ export const ErrorView: React.FC<ErrorViewProps> = ({
   onRetry,
   retryLabel,
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
       <Text style={styles.message}>{message}</Text>
       {onRetry && (
         <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
-          <Text style={styles.retryText}>{retryLabel ?? t('common.retry')}</Text>
+          <Text style={styles.retryText}>
+            {retryLabel ?? t('common.retry')}
+          </Text>
         </TouchableOpacity>
       )}
     </View>

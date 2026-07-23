@@ -1,9 +1,9 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {PracticeQuestionListItem} from '../types';
-import {FavoriteButton} from './FavoriteButton';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { PracticeQuestionListItem } from '../types';
+import { FavoriteButton } from './FavoriteButton';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
 interface PracticeQuestionCardProps {
   question: PracticeQuestionListItem;
@@ -18,7 +18,7 @@ export const PracticeQuestionCard: React.FC<PracticeQuestionCardProps> = ({
   onFavoritePress,
   showSource = true,
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <TouchableOpacity
@@ -33,7 +33,9 @@ export const PracticeQuestionCard: React.FC<PracticeQuestionCardProps> = ({
           {showSource ? (
             <Text style={styles.meta}>
               {question.source === 'event'
-                ? t('practice.sourceEvent', {event: question.eventTitle ?? ''})
+                ? t('practice.sourceEvent', {
+                    event: question.eventTitle ?? '',
+                  })
                 : t('practice.sourceCommunity')}{' '}
               · {question.authorName}
             </Text>
@@ -77,7 +79,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,

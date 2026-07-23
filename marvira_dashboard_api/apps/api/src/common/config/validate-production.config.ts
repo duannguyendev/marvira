@@ -20,7 +20,9 @@ export function validateProductionConfig(logger: Logger): void {
   }
 
   if (process.env.REDIS_DISABLED === 'true') {
-    throw new Error('REDIS_DISABLED=true is not allowed when NODE_ENV=production');
+    throw new Error(
+      'REDIS_DISABLED=true is not allowed when NODE_ENV=production',
+    );
   }
 
   if (process.env.OAUTH_DEV_BYPASS !== 'false') {

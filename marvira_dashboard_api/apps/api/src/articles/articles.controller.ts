@@ -10,7 +10,9 @@ export class ArticlesController {
 
   @Public()
   @Get()
-  @ApiOperation({ summary: 'List published articles (search by title, place, or city)' })
+  @ApiOperation({
+    summary: 'List published articles (search by title, place, or city)',
+  })
   async list(
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,

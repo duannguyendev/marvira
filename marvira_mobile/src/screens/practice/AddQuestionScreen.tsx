@@ -1,28 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  Text,
-} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {QuestionForm} from '../../components/QuestionForm';
-import {Button} from '../../components/Button';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView, Alert, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { QuestionForm } from '../../components/QuestionForm';
+import { Button } from '../../components/Button';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 import {
   useCreatePracticeQuestion,
   usePracticeQuestion,
   useUpdatePracticeQuestion,
 } from '../../hooks/usePractice';
-import {CreateQuestionInput} from '../../types';
+import { CreateQuestionInput } from '../../types';
 import {
   PracticeStackParamList,
   ProfileStackParamList,
 } from '../../navigation/types';
-import {colors, spacing, fontSize, fontWeight} from '../../theme';
+import { colors, spacing, fontSize, fontWeight } from '../../theme';
 
 type AddQuestionRoute =
   | RouteProp<PracticeStackParamList, 'AddQuestion'>
@@ -40,17 +34,17 @@ const DEFAULT_QUESTION: CreateQuestionInput = {
 };
 
 export const AddQuestionScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<AddQuestionRoute>();
   const navigation = useNavigation<AddQuestionNavigation>();
   const questionId = route.params?.questionId;
 
-  const [question, setQuestion] = useState<CreateQuestionInput>(DEFAULT_QUESTION);
+  const [question, setQuestion] =
+    useState<CreateQuestionInput>(DEFAULT_QUESTION);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const {data: existingData, isLoading: loadingExisting} = usePracticeQuestion(
-    questionId ?? '',
-  );
+  const { data: existingData, isLoading: loadingExisting } =
+    usePracticeQuestion(questionId ?? '');
   const createMutation = useCreatePracticeQuestion();
   const updateMutation = useUpdatePracticeQuestion();
 
@@ -78,7 +72,9 @@ export const AddQuestionScreen: React.FC = () => {
       nextErrors.answer = t('createEvent.validation.answerRequired');
     }
     if (question.type === 'MULTIPLE_CHOICE') {
-      const options = (question.options ?? []).map(o => o.trim()).filter(Boolean);
+      const options = (question.options ?? [])
+        .map(o => o.trim())
+        .filter(Boolean);
       if (options.length < 2) {
         nextErrors.options = t('createEvent.validation.optionsMin');
       } else if (
@@ -100,15 +96,19 @@ export const AddQuestionScreen: React.FC = () => {
 
     try {
       if (isEditing && questionId) {
-        await updateMutation.mutateAsync({questionId, input: question});
-        Alert.alert(t('practice.updateSuccessTitle'), t('practice.updateSuccessMessage'), [
-          {text: t('common.ok'), onPress: () => navigation.goBack()},
-        ]);
+        await updateMutation.mutateAsync({ questionId, input: question });
+        Alert.alert(
+          t('practice.updateSuccessTitle'),
+          t('practice.updateSuccessMessage'),
+          [{ text: t('common.ok'), onPress: () => navigation.goBack() }],
+        );
       } else {
         await createMutation.mutateAsync(question);
-        Alert.alert(t('practice.createSuccessTitle'), t('practice.createSuccessMessage'), [
-          {text: t('common.ok'), onPress: () => navigation.goBack()},
-        ]);
+        Alert.alert(
+          t('practice.createSuccessTitle'),
+          t('practice.createSuccessMessage'),
+          [{ text: t('common.ok'), onPress: () => navigation.goBack() }],
+        );
       }
     } catch (err: unknown) {
       Alert.alert(
@@ -127,14 +127,18 @@ export const AddQuestionScreen: React.FC = () => {
       <Text style={styles.heading}>
         {isEditing ? t('practice.editQuestion') : t('practice.addQuestion')}
       </Text>
-      <Text style={styles.subheading}>{t('practice.addQuestionSubheading')}</Text>
+      <Text style={styles.subheading}>
+        {t('practice.addQuestionSubheading')}
+      </Text>
 
       <View style={styles.formCard}>
         <QuestionForm value={question} onChange={setQuestion} errors={errors} />
       </View>
 
       <Button
-        title={isEditing ? t('practice.saveQuestion') : t('practice.publishQuestion')}
+        title={
+          isEditing ? t('practice.saveQuestion') : t('practice.publishQuestion')
+        }
         onPress={handleSubmit}
         loading={createMutation.isPending || updateMutation.isPending}
         fullWidth

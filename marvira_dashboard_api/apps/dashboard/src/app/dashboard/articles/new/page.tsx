@@ -12,12 +12,14 @@ export default function NewArticlePage() {
   const router = useRouter();
 
   const mutation = useMutation({
-    mutationFn: (payload: CreateArticleDto) => api.post<Article>('/admin/articles', payload),
-    onSuccess: (article) => {
+    mutationFn: (payload: CreateArticleDto) =>
+      api.post<Article>('/admin/articles', payload),
+    onSuccess: article => {
       toast.success('Article created');
       router.push(`/dashboard/articles/${article.id}`);
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to create article'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to create article'),
   });
 
   return (
@@ -25,7 +27,8 @@ export default function NewArticlePage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Create Article</h1>
         <p className="text-muted-foreground">
-          Write a marketing page to promote an event and share it on social media.
+          Write a marketing page to promote an event and share it on social
+          media.
         </p>
       </div>
 
@@ -37,7 +40,7 @@ export default function NewArticlePage() {
           <ArticleForm
             submitLabel="Create Article"
             submitting={mutation.isPending}
-            onSubmit={(payload) => mutation.mutate(payload)}
+            onSubmit={payload => mutation.mutate(payload)}
             onCancel={() => router.back()}
           />
         </CardContent>

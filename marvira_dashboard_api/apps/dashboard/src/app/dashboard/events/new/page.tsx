@@ -19,7 +19,7 @@ function normalizeGiftFields(data: EventFormValues): EventFormValues {
     ...data,
     completionMessage: data.completionMessage?.trim() || null,
     giftTeaser: data.giftTeaser?.trim() || null,
-    giftCodes: (data.giftCodes ?? []).map((c) => c.trim()).filter(Boolean),
+    giftCodes: (data.giftCodes ?? []).map(c => c.trim()).filter(Boolean),
   };
 }
 
@@ -47,19 +47,23 @@ export default function NewEventPage() {
   const giftCodesText = (watch('giftCodes') ?? []).join('\n');
 
   const mutation = useMutation({
-    mutationFn: (data: EventFormValues) => api.post<Event>('/events', normalizeGiftFields(data)),
-    onSuccess: (event) => {
+    mutationFn: (data: EventFormValues) =>
+      api.post<Event>('/events', normalizeGiftFields(data)),
+    onSuccess: event => {
       toast.success('Event created');
       router.push(`/dashboard/events/${event.id}`);
     },
-    onError: (err: Error) => toast.error(err.message || 'Failed to create event'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to create event'),
   });
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Create Event</h1>
-        <p className="text-muted-foreground">Set up a new scavenger hunt event</p>
+        <p className="text-muted-foreground">
+          Set up a new scavenger hunt event
+        </p>
       </div>
 
       <Card>
@@ -67,11 +71,21 @@ export default function NewEventPage() {
           <CardTitle>Event Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-4">
+          <form
+            onSubmit={handleSubmit(d => mutation.mutate(d))}
+            className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="title">Title *</Label>
-              <Input id="title" placeholder="Downtown Discovery Hunt" {...register('title')} />
-              {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+              <Input
+                id="title"
+                placeholder="Downtown Discovery Hunt"
+                {...register('title')}
+              />
+              {errors.title && (
+                <p className="text-sm text-destructive">
+                  {errors.title.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description *</Label>
@@ -82,38 +96,56 @@ export default function NewEventPage() {
                 {...register('description')}
               />
               {errors.description && (
-                <p className="text-sm text-destructive">{errors.description.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.description.message}
+                </p>
               )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="city">City *</Label>
-                <Input id="city" placeholder="San Francisco" {...register('city')} />
-                {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
+                <Input
+                  id="city"
+                  placeholder="San Francisco"
+                  {...register('city')}
+                />
+                {errors.city && (
+                  <p className="text-sm text-destructive">
+                    {errors.city.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="difficulty">Difficulty *</Label>
                 <select
                   id="difficulty"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  {...register('difficulty')}
-                >
-                  {Object.values(EventDifficulty).map((d) => (
+                  {...register('difficulty')}>
+                  {Object.values(EventDifficulty).map(d => (
                     <option key={d} value={d}>
                       {d}
                     </option>
                   ))}
                 </select>
                 {errors.difficulty && (
-                  <p className="text-sm text-destructive">{errors.difficulty.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.difficulty.message}
+                  </p>
                 )}
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="rewardPoints">Reward Points *</Label>
-              <Input id="rewardPoints" type="number" min={0} {...register('rewardPoints')} />
+              <Input
+                id="rewardPoints"
+                type="number"
+                min={0}
+                {...register('rewardPoints')}
+              />
               {errors.rewardPoints && (
-                <p className="text-sm text-destructive">{errors.rewardPoints.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.rewardPoints.message}
+                </p>
               )}
             </div>
 
@@ -121,7 +153,8 @@ export default function NewEventPage() {
               <div>
                 <h3 className="text-sm font-medium">Completion gifts</h3>
                 <p className="text-xs text-muted-foreground">
-                  Optional. Soonest finishers receive codes in order (1st → first code). Max 10.
+                  Optional. Soonest finishers receive codes in order (1st →
+                  first code). Max 10.
                 </p>
               </div>
               <div className="space-y-2">
@@ -133,10 +166,13 @@ export default function NewEventPage() {
                   {...register('giftTeaser')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Public description of the gift (not the code). Required when codes are set.
+                  Public description of the gift (not the code). Required when
+                  codes are set.
                 </p>
                 {errors.giftTeaser && (
-                  <p className="text-sm text-destructive">{errors.giftTeaser.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.giftTeaser.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
@@ -152,7 +188,9 @@ export default function NewEventPage() {
                   Shown after finish — thanks, story, and how to redeem.
                 </p>
                 {errors.completionMessage && (
-                  <p className="text-sm text-destructive">{errors.completionMessage.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.completionMessage.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
@@ -162,8 +200,10 @@ export default function NewEventPage() {
                   className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
                   placeholder={'CODE-FIRST\nCODE-SECOND\nCODE-THIRD'}
                   value={giftCodesText}
-                  onChange={(e) =>
-                    setValue('giftCodes', e.target.value.split('\n'), { shouldValidate: true })
+                  onChange={e =>
+                    setValue('giftCodes', e.target.value.split('\n'), {
+                      shouldValidate: true,
+                    })
                   }
                 />
                 <p className="text-xs text-muted-foreground">
@@ -181,21 +221,32 @@ export default function NewEventPage() {
 
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <input type="checkbox" id="isActive" {...register('isActive')} className="h-4 w-4" />
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  {...register('isActive')}
+                  className="h-4 w-4"
+                />
                 <Label htmlFor="isActive">Publish immediately</Label>
               </div>
               {errors.isActive && (
-                <p className="text-sm text-destructive">{errors.isActive.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.isActive.message}
+                </p>
               )}
               <p className="text-xs text-muted-foreground">
-                Recommended: save as draft, add places and questions, then publish from the edit page.
+                Recommended: save as draft, add places and questions, then
+                publish from the edit page.
               </p>
             </div>
             <div className="flex gap-2">
               <Button type="submit" disabled={mutation.isPending}>
                 {mutation.isPending ? 'Creating...' : 'Create Event'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => router.back()}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}>
                 Cancel
               </Button>
             </div>

@@ -1,8 +1,8 @@
 import Geolocation from 'react-native-geolocation-service';
-import {Platform, PermissionsAndroid} from 'react-native';
-import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import {Location} from '../types';
-import {LOCATION_UPDATE_INTERVAL} from '../utils/constants';
+import { Platform, PermissionsAndroid } from 'react-native';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { Location } from '../types';
+import { LOCATION_UPDATE_INTERVAL } from '../utils/constants';
 
 type LocationCallback = (location: Location) => void;
 type ErrorCallback = (error: any) => void;
@@ -193,4 +193,3 @@ class LocationService {
 }
 
 export const locationService = new LocationService();
-

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,29 +8,40 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
-import {useAuth} from '../../hooks/useAuth';
-import {Button} from '../../components/Button';
-import {Input} from '../../components/Input';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
-import {AuthStackParamList} from '../../navigation/types';
+import { useAuth } from '../../hooks/useAuth';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
+import { AuthStackParamList } from '../../navigation/types';
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
+type LoginScreenNavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  'Login'
+>;
 
 export const LoginScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<LoginScreenNavigationProp>();
-  const {login, isLoggingIn, loginError} = useAuth();
+  const { login, isLoggingIn, loginError } = useAuth();
 
   const [email, setEmail] = useState('user@example.com');
   const [password, setPassword] = useState('password123');
-  const [errors, setErrors] = useState<{email?: string; password?: string}>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {},
+  );
 
   const validate = () => {
-    const newErrors: {email?: string; password?: string} = {};
+    const newErrors: { email?: string; password?: string } = {};
 
     if (!email.trim()) {
       newErrors.email = t('validation.emailRequired');
@@ -54,7 +65,7 @@ export const LoginScreen: React.FC = () => {
     }
 
     try {
-      await login({email, password});
+      await login({ email, password });
     } catch (error: any) {
       Alert.alert(
         t('auth.loginFailed'),
@@ -153,7 +164,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.xl,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,

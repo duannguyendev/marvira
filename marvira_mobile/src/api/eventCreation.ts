@@ -1,4 +1,4 @@
-import {AxiosError} from 'axios';
+import { AxiosError } from 'axios';
 import {
   ApiEvent,
   ApiPaginated,
@@ -14,8 +14,8 @@ import {
   MyCreatedEvent,
   PublishEventInput,
 } from '../types';
-import {apiClient} from './client';
-import {mapEvent} from './mappers';
+import { apiClient } from './client';
+import { mapEvent } from './mappers';
 
 function mapMyCreatedEvent(apiEvent: ApiEvent): MyCreatedEvent {
   const base = mapEvent(apiEvent);
@@ -23,9 +23,10 @@ function mapMyCreatedEvent(apiEvent: ApiEvent): MyCreatedEvent {
   return {
     ...base,
     isPublished: apiEvent.isActive,
-    difficulty: (apiEvent.difficulty as MyCreatedEvent['difficulty']) ?? 'MEDIUM',
+    difficulty:
+      (apiEvent.difficulty as MyCreatedEvent['difficulty']) ?? 'MEDIUM',
     location: firstPlace
-      ? {latitude: firstPlace.latitude, longitude: firstPlace.longitude}
+      ? { latitude: firstPlace.latitude, longitude: firstPlace.longitude }
       : base.location,
     totalPlaces: apiEvent._count?.places ?? base.totalPlaces,
   };
@@ -36,7 +37,7 @@ export const eventCreationApi = {
     const response = await apiClient.get<{
       success: boolean;
       data: ApiPaginated<ApiEvent>;
-    }>('/events/mine', {params: {page: 1, pageSize: 50}});
+    }>('/events/mine', { params: { page: 1, pageSize: 50 } });
 
     return {
       success: true,
@@ -47,11 +48,11 @@ export const eventCreationApi = {
   createEvent: async (
     input: CreateEventInput,
   ): Promise<ApiResponse<ApiEvent>> => {
-    const response = await apiClient.post<{success: boolean; data: ApiEvent}>(
+    const response = await apiClient.post<{ success: boolean; data: ApiEvent }>(
       '/events',
-      {...input, isActive: false},
+      { ...input, isActive: false },
     );
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 
   createQuestion: async (
@@ -59,7 +60,7 @@ export const eventCreationApi = {
   ): Promise<ApiQuestionPublic> => {
     const response = await apiClient.post<{
       success: boolean;
-      data: ApiQuestionPublic & {answer: string};
+      data: ApiQuestionPublic & { answer: string };
     }>('/questions', {
       question: input.question,
       type: input.type,
@@ -94,7 +95,7 @@ export const eventCreationApi = {
     input: CreatePlaceInput,
     questionId: string,
   ): Promise<ApiPlace> => {
-    const response = await apiClient.post<{success: boolean; data: ApiPlace}>(
+    const response = await apiClient.post<{ success: boolean; data: ApiPlace }>(
       '/places',
       {
         eventId,
@@ -118,7 +119,11 @@ export const eventCreationApi = {
     questionInput: CreateQuestionInput,
   ): Promise<ApiPlace> => {
     const question = await eventCreationApi.createQuestion(questionInput);
-    await eventCreationApi.linkQuestionToEvent(eventId, question.id, orderIndex);
+    await eventCreationApi.linkQuestionToEvent(
+      eventId,
+      question.id,
+      orderIndex,
+    );
     return eventCreationApi.createPlace(
       eventId,
       orderIndex,
@@ -131,10 +136,10 @@ export const eventCreationApi = {
     eventId: string,
     input?: PublishEventInput,
   ): Promise<ApiEvent> => {
-    const response = await apiClient.patch<{success: boolean; data: ApiEvent}>(
-      `/events/${eventId}`,
-      {isActive: true, ...input},
-    );
+    const response = await apiClient.patch<{
+      success: boolean;
+      data: ApiEvent;
+    }>(`/events/${eventId}`, { isActive: true, ...input });
     return response.data.data;
   },
 
@@ -146,12 +151,12 @@ export const eventCreationApi = {
       giftCodes?: string[];
     },
   ): Promise<ApiEvent> => {
-    const response = await apiClient.patch<{success: boolean; data: ApiEvent}>(
-      `/events/${eventId}`,
-      input,
-    );
+    const response = await apiClient.patch<{
+      success: boolean;
+      data: ApiEvent;
+    }>(`/events/${eventId}`, input);
     return response.data.data;
   },
 };
 
-export type {QuestionType};
+export type { QuestionType };

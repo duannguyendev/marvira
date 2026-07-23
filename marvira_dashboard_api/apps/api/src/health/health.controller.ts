@@ -21,12 +21,16 @@ export class HealthController {
 
   @Public()
   @Get('ready')
-  @ApiOperation({ summary: 'Readiness probe — checks DB, Redis, and pending migrations' })
+  @ApiOperation({
+    summary: 'Readiness probe — checks DB, Redis, and pending migrations',
+  })
   async ready() {
     await this.prisma.client.$queryRaw`SELECT 1`;
     await this.redis.set('health:ping', '1', 10);
 
-    const columns = await this.prisma.client.$queryRaw<Array<{ column_name: string }>>`
+    const columns = await this.prisma.client.$queryRaw<
+      Array<{ column_name: string }>
+    >`
       SELECT column_name
       FROM information_schema.columns
       WHERE table_schema = 'public'
@@ -35,9 +39,13 @@ export class HealthController {
           OR (table_name = 'user_event_progress' AND column_name = 'total_duration_ms')
         )
     `;
-    const found = new Set(columns.map((c) => c.column_name));
-    const required = ['unlocked_at', 'answer_duration_ms', 'total_duration_ms'] as const;
-    const missing = required.filter((name) => !found.has(name));
+    const found = new Set(columns.map(c => c.column_name));
+    const required = [
+      'unlocked_at',
+      'answer_duration_ms',
+      'total_duration_ms',
+    ] as const;
+    const missing = required.filter(name => !found.has(name));
     if (missing.length > 0) {
       throw new ServiceUnavailableException({
         success: false,

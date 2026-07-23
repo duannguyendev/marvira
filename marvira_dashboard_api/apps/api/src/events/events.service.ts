@@ -1,8 +1,17 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { EventDifficulty } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../common/redis/redis.service';
-import { buildPaginatedResponse, parsePagination, haversineDistanceMeters } from '@marvira/shared-utils';
+import {
+  buildPaginatedResponse,
+  parsePagination,
+  haversineDistanceMeters,
+} from '@marvira/shared-utils';
 import { GeoQueryService } from './geo-query.service';
 import { AuthService } from '../auth/auth.service';
 import { EventAccessService } from './event-access.service';
@@ -83,7 +92,7 @@ export class EventsService {
     const result = buildPaginatedResponse(items, total, page, pageSize);
     const mapped = {
       ...result,
-      items: result.items.map((item) => this.eventAccess.toPublicFields(item)),
+      items: result.items.map(item => this.eventAccess.toPublicFields(item)),
     };
     await this.redis.set(cacheKey, JSON.stringify(mapped), 60);
     return mapped;
@@ -94,8 +103,12 @@ export class EventsService {
 
     if (await this.geoQuery.isPostGisAvailable()) {
       try {
-        const rows = await this.geoQuery.findNearbyEvents(latitude, longitude, radiusMeters);
-        return rows.map((row) =>
+        const rows = await this.geoQuery.findNearbyEvents(
+          latitude,
+          longitude,
+          radiusMeters,
+        );
+        return rows.map(row =>
           this.eventAccess.toPublicFields({
             id: row.id,
             title: row.title,
@@ -125,14 +138,16 @@ export class EventsService {
     });
 
     return events
-      .map((event) => {
-        const distances = event.places.map((p) =>
+      .map(event => {
+        const distances = event.places.map(p =>
           haversineDistanceMeters(latitude, longitude, p.latitude, p.longitude),
         );
-        const distanceMeters = distances.length ? Math.min(...distances) : Infinity;
+        const distanceMeters = distances.length
+          ? Math.min(...distances)
+          : Infinity;
         return { event, distanceMeters };
       })
-      .filter((row) => row.distanceMeters <= radiusMeters)
+      .filter(row => row.distanceMeters <= radiusMeters)
       .sort((a, b) => a.distanceMeters - b.distanceMeters)
       .map(({ event, distanceMeters }) =>
         this.eventAccess.toPublicFields({
@@ -165,7 +180,7 @@ export class EventsService {
     ]);
 
     return buildPaginatedResponse(
-      items.map((item) =>
+      items.map(item =>
         this.eventAccess.toPublicFields(item, { includeOwnerGiftFields: true }),
       ),
       total,
@@ -181,7 +196,9 @@ export class EventsService {
     data: Partial<CreateEventInput>,
   ) {
     if (role !== 'ADMIN' && role !== 'STAFF') {
-      const event = await this.prisma.client.event.findUnique({ where: { id } });
+      const event = await this.prisma.client.event.findUnique({
+        where: { id },
+      });
       if (!event) throw new NotFoundException('Event not found');
       if (event.createdBy !== userId) {
         throw new ForbiddenException('You can only update your own events');
@@ -192,7 +209,9 @@ export class EventsService {
 
   async removeForUser(id: string, userId: string, role: string) {
     if (role !== 'ADMIN' && role !== 'STAFF') {
-      const event = await this.prisma.client.event.findUnique({ where: { id } });
+      const event = await this.prisma.client.event.findUnique({
+        where: { id },
+      });
       if (!event) throw new NotFoundException('Event not found');
       if (event.createdBy !== userId) {
         throw new ForbiddenException('You can only delete your own events');
@@ -223,8 +242,7 @@ export class EventsService {
     const hasAccess = await this.eventAccess.hasAccess(userId, event);
     const includeOwnerGiftFields =
       !!userId &&
-      (event.createdBy === userId ||
-        (await this.isStaffOrAdmin(userId)));
+      (event.createdBy === userId || (await this.isStaffOrAdmin(userId)));
     const publicEvent = this.eventAccess.toPublicFields(event, {
       hasAccess,
       includeOwnerGiftFields,
@@ -265,26 +283,40 @@ export class EventsService {
       },
     });
     if (!event) throw new NotFoundException('Event not found');
-    return this.eventAccess.toPublicFields(event, { includeOwnerGiftFields: true });
+    return this.eventAccess.toPublicFields(event, {
+      includeOwnerGiftFields: true,
+    });
   }
 
   async create(data: CreateEventInput) {
     if (data.isActive) {
       await this.validateEventForPublish(null, data);
     }
-    const { joinPassword, clearJoinPassword, giftCodes, giftTeaser, completionMessage, ...rest } =
-      data;
+    const {
+      joinPassword,
+      clearJoinPassword,
+      giftCodes,
+      giftTeaser,
+      completionMessage,
+      ...rest
+    } = data;
     const createData = await this.applyJoinPasswordFields(
       { joinPasswordHash: null },
       joinPassword,
       clearJoinPassword,
     );
-    const giftFields = validateGiftFields({ giftCodes, giftTeaser, completionMessage });
+    const giftFields = validateGiftFields({
+      giftCodes,
+      giftTeaser,
+      completionMessage,
+    });
     const event = await this.prisma.client.event.create({
       data: { ...rest, ...createData, ...giftFields },
     });
     await this.invalidateCache();
-    return this.eventAccess.toPublicFields(event, { includeOwnerGiftFields: true });
+    return this.eventAccess.toPublicFields(event, {
+      includeOwnerGiftFields: true,
+    });
   }
 
   async update(id: string, data: Partial<CreateEventInput>) {
@@ -292,8 +324,14 @@ export class EventsService {
     if (data.isActive) {
       await this.validateEventForPublish(id);
     }
-    const { joinPassword, clearJoinPassword, giftCodes, giftTeaser, completionMessage, ...rest } =
-      data;
+    const {
+      joinPassword,
+      clearJoinPassword,
+      giftCodes,
+      giftTeaser,
+      completionMessage,
+      ...rest
+    } = data;
     const passwordFields = await this.applyJoinPasswordFields(
       existing,
       joinPassword,
@@ -314,7 +352,9 @@ export class EventsService {
       data: { ...rest, ...passwordFields, ...giftPatch },
     });
     await this.invalidateCache();
-    return this.eventAccess.toPublicFields(event, { includeOwnerGiftFields: true });
+    return this.eventAccess.toPublicFields(event, {
+      includeOwnerGiftFields: true,
+    });
   }
 
   private buildGiftUpdatePatch(
@@ -409,7 +449,10 @@ export class EventsService {
     return { joinPasswordHash: existing.joinPasswordHash };
   }
 
-  private async validateEventForPublish(eventId: string | null, _draft?: Partial<CreateEventInput>) {
+  private async validateEventForPublish(
+    eventId: string | null,
+    _draft?: Partial<CreateEventInput>,
+  ) {
     if (!eventId) {
       throw new BadRequestException(
         'Cannot publish a new event before adding places. Create as draft, add places and questions, then publish.',
@@ -422,10 +465,12 @@ export class EventsService {
     });
 
     if (places.length === 0) {
-      throw new BadRequestException('Event must have at least one place before publishing');
+      throw new BadRequestException(
+        'Event must have at least one place before publishing',
+      );
     }
 
-    const missing = places.filter((p) => !p.questionId);
+    const missing = places.filter(p => !p.questionId);
     if (missing.length > 0) {
       throw new BadRequestException(
         `Each place must have a question before publishing (${missing.length} place(s) missing)`,

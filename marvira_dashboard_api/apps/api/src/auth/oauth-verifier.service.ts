@@ -44,7 +44,9 @@ export class OAuthVerifierService {
         throw new UnauthorizedException('Invalid Facebook token');
       }
 
-      const debug = (await debugResponse.json()) as { data?: { is_valid?: boolean } };
+      const debug = (await debugResponse.json()) as {
+        data?: { is_valid?: boolean };
+      };
       if (!debug.data?.is_valid) {
         throw new UnauthorizedException('Invalid Facebook token');
       }
@@ -95,7 +97,9 @@ export class OAuthVerifierService {
   }
 
   isDevBypassEnabled(): boolean {
-    return this.config.get('NODE_ENV') !== 'production'
-      && this.config.get('OAUTH_DEV_BYPASS') !== 'false';
+    return (
+      this.config.get('NODE_ENV') !== 'production' &&
+      this.config.get('OAUTH_DEV_BYPASS') !== 'false'
+    );
   }
 }

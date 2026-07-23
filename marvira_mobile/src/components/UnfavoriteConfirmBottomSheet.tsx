@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   Pressable,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {Button} from './Button';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
+import { useTranslation } from 'react-i18next';
+import { Button } from './Button';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
 interface UnfavoriteConfirmBottomSheetProps {
   visible: boolean;
@@ -21,8 +21,8 @@ interface UnfavoriteConfirmBottomSheetProps {
 
 export const UnfavoriteConfirmBottomSheet: React.FC<
   UnfavoriteConfirmBottomSheetProps
-> = ({visible, title, message, onCancel, onConfirm}) => {
-  const {t} = useTranslation();
+> = ({ visible, title, message, onCancel, onConfirm }) => {
+  const { t } = useTranslation();
 
   return (
     <Modal

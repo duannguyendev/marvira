@@ -1,11 +1,11 @@
-import {useEffect} from 'react';
-import {useQueryClient} from '@tanstack/react-query';
-import {connectGameSocket, disconnectGameSocket} from '../api/websocket';
-import {useAuth} from './useAuth';
+import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { connectGameSocket, disconnectGameSocket } from '../api/websocket';
+import { useAuth } from './useAuth';
 
 export const useGameSocket = () => {
   const queryClient = useQueryClient();
-  const {isAuthenticated} = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -14,18 +14,18 @@ export const useGameSocket = () => {
     }
 
     connectGameSocket({
-      onProgressUpdated: (_payload) => {
-        queryClient.invalidateQueries({queryKey: ['event']});
-        queryClient.invalidateQueries({queryKey: ['events']});
+      onProgressUpdated: _payload => {
+        queryClient.invalidateQueries({ queryKey: ['event'] });
+        queryClient.invalidateQueries({ queryKey: ['events'] });
       },
       onPlaceUnlocked: () => {
-        queryClient.invalidateQueries({queryKey: ['event']});
+        queryClient.invalidateQueries({ queryKey: ['event'] });
       },
       onEventCompleted: () => {
-        queryClient.invalidateQueries({queryKey: ['event']});
-        queryClient.invalidateQueries({queryKey: ['events']});
-        queryClient.invalidateQueries({queryKey: ['completed-events']});
-        queryClient.invalidateQueries({queryKey: ['leaderboard']});
+        queryClient.invalidateQueries({ queryKey: ['event'] });
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        queryClient.invalidateQueries({ queryKey: ['completed-events'] });
+        queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       },
     });
 

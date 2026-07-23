@@ -1,6 +1,6 @@
-import {CreateQuestionInput, PracticeQuestion} from '../types';
-import {mockUser, delay} from './mockData';
-import {practiceStorage} from '../services/practiceStorage';
+import { CreateQuestionInput, PracticeQuestion } from '../types';
+import { mockUser, delay } from './mockData';
+import { practiceStorage } from '../services/practiceStorage';
 
 const seedQuestions: PracticeQuestion[] = [
   {
@@ -176,7 +176,11 @@ export const practiceMockStore = {
   async submitTrainingAnswer(
     questionId: string,
     answer: string,
-  ): Promise<{isCorrect: boolean; message: string; explanation?: string | null}> {
+  ): Promise<{
+    isCorrect: boolean;
+    message: string;
+    explanation?: string | null;
+  }> {
     await delay(500);
     const question = questions.find(q => q.id === questionId);
     if (!question) {
@@ -193,7 +197,7 @@ export const practiceMockStore = {
     return {
       isCorrect,
       message: isCorrect ? 'Correct!' : 'Incorrect, try again!',
-      explanation: isCorrect ? question.explanation ?? null : null,
+      explanation: isCorrect ? (question.explanation ?? null) : null,
     };
   },
 

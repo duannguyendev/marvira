@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,23 +8,32 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   usePracticeQuestion,
   useSubmitTrainingAnswer,
 } from '../../hooks/usePractice';
-import {useIsQuestionFavorite} from '../../hooks/useFavorites';
-import {useFavoriteQuestionToggle} from '../../hooks/useFavoriteQuestionToggle';
-import {QuestionRenderer} from '../../components/QuestionRenderer';
-import {FavoriteButton} from '../../components/FavoriteButton';
-import {Button} from '../../components/Button';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {UnfavoriteConfirmBottomSheet} from '../../components/UnfavoriteConfirmBottomSheet';
-import {PracticeStackParamList, FavoritesStackParamList} from '../../navigation/types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
+import { useIsQuestionFavorite } from '../../hooks/useFavorites';
+import { useFavoriteQuestionToggle } from '../../hooks/useFavoriteQuestionToggle';
+import { QuestionRenderer } from '../../components/QuestionRenderer';
+import { FavoriteButton } from '../../components/FavoriteButton';
+import { Button } from '../../components/Button';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
+import {
+  PracticeStackParamList,
+  FavoritesStackParamList,
+} from '../../navigation/types';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
 
 type TrainingRoute =
   | RouteProp<PracticeStackParamList, 'QuestionTraining'>
@@ -35,15 +44,15 @@ type TrainingNavigation =
   | NativeStackNavigationProp<FavoritesStackParamList, 'QuestionTraining'>;
 
 export const QuestionTrainingScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<TrainingRoute>();
   const navigation = useNavigation<TrainingNavigation>();
-  const {questionId} = route.params;
+  const { questionId } = route.params;
 
   const [answer, setAnswer] = useState('');
-  const {data, isLoading, error, refetch} = usePracticeQuestion(questionId);
+  const { data, isLoading, error, refetch } = usePracticeQuestion(questionId);
   const submitMutation = useSubmitTrainingAnswer();
-  const {data: isFavorite} = useIsQuestionFavorite(questionId);
+  const { data: isFavorite } = useIsQuestionFavorite(questionId);
   const {
     pendingUnfavoriteId,
     onFavoritePress,
@@ -63,7 +72,7 @@ export const QuestionTrainingScreen: React.FC = () => {
     try {
       const result = await submitMutation.mutateAsync({
         questionId,
-        submission: {answer},
+        submission: { answer },
       });
 
       if (result.data.isCorrect) {
@@ -78,7 +87,10 @@ export const QuestionTrainingScreen: React.FC = () => {
           ],
         );
       } else {
-        Alert.alert(t('practice.incorrectTitle'), t('practice.incorrectMessage'));
+        Alert.alert(
+          t('practice.incorrectTitle'),
+          t('practice.incorrectMessage'),
+        );
       }
     } catch (err: unknown) {
       Alert.alert(
@@ -105,7 +117,9 @@ export const QuestionTrainingScreen: React.FC = () => {
     <KeyboardAvoidingView
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <View style={styles.headerText}>
             <Text style={styles.badge}>{t('practice.trainingMode')}</Text>
@@ -194,7 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
     elevation: 3,

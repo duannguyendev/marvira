@@ -22,9 +22,14 @@ import { DataTablePagination } from '@/components/data-table/pagination';
 import { useDebouncedValue } from '@/lib/use-debounced-value';
 import { buildQuery } from '@/lib/build-query';
 import { resolveImageUrl } from '@/lib/resolve-image-url';
-import { ArticleStatus, type Article, type PaginatedResponse } from '@marvira/shared-types';
+import {
+  ArticleStatus,
+  type Article,
+  type PaginatedResponse,
+} from '@marvira/shared-types';
 
-const MARKETING_URL = process.env.NEXT_PUBLIC_MARKETING_URL || 'http://localhost:3002';
+const MARKETING_URL =
+  process.env.NEXT_PUBLIC_MARKETING_URL || 'http://localhost:3002';
 
 export default function ArticlesPage() {
   const queryClient = useQueryClient();
@@ -63,7 +68,8 @@ export default function ArticlesPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Articles</h1>
           <p className="text-muted-foreground">
-            Marketing pages that promote events — published articles appear on the public Explore page.
+            Marketing pages that promote events — published articles appear on
+            the public Explore page.
           </p>
         </div>
         <Button asChild>
@@ -76,15 +82,16 @@ export default function ArticlesPage() {
 
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle>All Articles ({data?.total?.toLocaleString() ?? 0})</CardTitle>
+          <CardTitle>
+            All Articles ({data?.total?.toLocaleString() ?? 0})
+          </CardTitle>
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
             <select
               className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
               value={status}
-              onChange={(e) => setStatus(e.target.value as '' | ArticleStatus)}
-            >
+              onChange={e => setStatus(e.target.value as '' | ArticleStatus)}>
               <option value="">All statuses</option>
-              {Object.values(ArticleStatus).map((s) => (
+              {Object.values(ArticleStatus).map(s => (
                 <option key={s} value={s}>
                   {s.charAt(0) + s.slice(1).toLowerCase()}
                 </option>
@@ -96,7 +103,7 @@ export default function ArticlesPage() {
                 className="pl-9"
                 placeholder="Search by title, place, city..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={e => setSearch(e.target.value)}
               />
             </div>
           </div>
@@ -135,7 +142,7 @@ export default function ArticlesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className={isFetching ? 'opacity-60' : undefined}>
-                  {articles.map((article) => (
+                  {articles.map(article => (
                     <TableRow key={article.id}>
                       <TableCell>
                         {article.coverImage ? (
@@ -161,7 +168,9 @@ export default function ArticlesPage() {
                         <div className="text-sm">
                           <p>{article.placeName}</p>
                           {article.city && (
-                            <p className="text-xs text-muted-foreground">{article.city}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {article.city}
+                            </p>
                           )}
                         </div>
                       </TableCell>
@@ -171,9 +180,10 @@ export default function ArticlesPage() {
                             article.status === ArticleStatus.PUBLISHED
                               ? 'rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600'
                               : 'rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground'
-                          }
-                        >
-                          {article.status === ArticleStatus.PUBLISHED ? 'Published' : 'Draft'}
+                          }>
+                          {article.status === ArticleStatus.PUBLISHED
+                            ? 'Published'
+                            : 'Draft'}
                         </span>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
@@ -186,8 +196,7 @@ export default function ArticlesPage() {
                               <a
                                 href={`${MARKETING_URL}/explore/${article.slug}`}
                                 target="_blank"
-                                rel="noreferrer"
-                              >
+                                rel="noreferrer">
                                 <ExternalLink className="h-3 w-3" />
                                 View
                               </a>
@@ -203,9 +212,9 @@ export default function ArticlesPage() {
                             variant="destructive"
                             size="sm"
                             onClick={() => {
-                              if (confirm('Delete this article?')) deleteMutation.mutate(article.id);
-                            }}
-                          >
+                              if (confirm('Delete this article?'))
+                                deleteMutation.mutate(article.id);
+                            }}>
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>

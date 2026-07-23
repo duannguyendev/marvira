@@ -85,7 +85,9 @@ export class FacebookAuthDto {
   @IsString()
   accessToken?: string;
 
-  @ApiPropertyOptional({ description: 'Dev fallback when accessToken is not used' })
+  @ApiPropertyOptional({
+    description: 'Dev fallback when accessToken is not used',
+  })
   @ValidateIf((dto: FacebookAuthDto) => !dto.accessToken)
   @IsEmail()
   email?: string;
@@ -107,12 +109,16 @@ export class AppleAuthDto {
   @IsString()
   identityToken?: string;
 
-  @ApiPropertyOptional({ description: 'Name from Apple (only sent on first sign-in)' })
+  @ApiPropertyOptional({
+    description: 'Name from Apple (only sent on first sign-in)',
+  })
   @IsOptional()
   @IsString()
   name?: string;
 
-  @ApiPropertyOptional({ description: 'Dev fallback when identityToken is not used' })
+  @ApiPropertyOptional({
+    description: 'Dev fallback when identityToken is not used',
+  })
   @ValidateIf((dto: AppleAuthDto) => !dto.identityToken)
   @IsEmail()
   email?: string;

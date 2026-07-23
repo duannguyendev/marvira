@@ -21,7 +21,9 @@ export class MetricsService {
 
     for (const [key, count] of this.statusCounts.entries()) {
       const [method, status] = key.split(':');
-      lines.push(`http_requests_by_status{method="${method}",status="${status}"} ${count}`);
+      lines.push(
+        `http_requests_by_status{method="${method}",status="${status}"} ${count}`,
+      );
     }
 
     return `${lines.join('\n')}\n`;

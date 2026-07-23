@@ -21,14 +21,19 @@ import {
 import { DataTablePagination } from '@/components/data-table/pagination';
 import { useDebouncedValue } from '@/lib/use-debounced-value';
 import { buildQuery } from '@/lib/build-query';
-import type { PaginatedResponse, PracticeQuestionAdminItem } from '@marvira/shared-types';
+import type {
+  PaginatedResponse,
+  PracticeQuestionAdminItem,
+} from '@marvira/shared-types';
 
 export default function PracticePage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [search, setSearch] = useState('');
-  const [publishedFilter, setPublishedFilter] = useState<'all' | 'true' | 'false'>('all');
+  const [publishedFilter, setPublishedFilter] = useState<
+    'all' | 'true' | 'false'
+  >('all');
   const debouncedSearch = useDebouncedValue(search);
 
   useEffect(() => {
@@ -36,7 +41,13 @@ export default function PracticePage() {
   }, [debouncedSearch, pageSize, publishedFilter]);
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['admin-practice', page, pageSize, debouncedSearch, publishedFilter],
+    queryKey: [
+      'admin-practice',
+      page,
+      pageSize,
+      debouncedSearch,
+      publishedFilter,
+    ],
     queryFn: () =>
       api.get<PaginatedResponse<PracticeQuestionAdminItem>>(
         `/admin/practice/questions${buildQuery({
@@ -73,7 +84,9 @@ export default function PracticePage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Practice Questions</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Practice Questions
+          </h1>
           <p className="text-muted-foreground">
             Community standalone questions for the mobile Practice tab
           </p>
@@ -88,7 +101,9 @@ export default function PracticePage() {
 
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle>Community Pool ({data?.total?.toLocaleString() ?? 0})</CardTitle>
+          <CardTitle>
+            Community Pool ({data?.total?.toLocaleString() ?? 0})
+          </CardTitle>
           <div className="flex flex-wrap gap-2">
             <div className="relative w-full sm:max-w-sm">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -96,13 +111,15 @@ export default function PracticePage() {
                 className="pl-9"
                 placeholder="Search questions..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={e => setSearch(e.target.value)}
               />
             </div>
             <select
               className="h-10 rounded-md border bg-background px-3 text-sm"
               value={publishedFilter}
-              onChange={(e) => setPublishedFilter(e.target.value as typeof publishedFilter)}>
+              onChange={e =>
+                setPublishedFilter(e.target.value as typeof publishedFilter)
+              }>
               <option value="all">All</option>
               <option value="true">Published</option>
               <option value="false">Unpublished</option>
@@ -118,9 +135,13 @@ export default function PracticePage() {
             </div>
           ) : questions.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-muted-foreground">No community practice questions found.</p>
+              <p className="text-muted-foreground">
+                No community practice questions found.
+              </p>
               <Button asChild className="mt-4">
-                <Link href="/dashboard/practice/new">Create Practice Question</Link>
+                <Link href="/dashboard/practice/new">
+                  Create Practice Question
+                </Link>
               </Button>
             </div>
           ) : (
@@ -137,9 +158,11 @@ export default function PracticePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {questions.map((q) => (
+                  {questions.map(q => (
                     <TableRow key={q.id}>
-                      <TableCell className="max-w-xs truncate font-medium">{q.question}</TableCell>
+                      <TableCell className="max-w-xs truncate font-medium">
+                        {q.question}
+                      </TableCell>
                       <TableCell>{q.creator?.name ?? 'System'}</TableCell>
                       <TableCell>{q.isPublished ? 'Yes' : 'No'}</TableCell>
                       <TableCell>{q.completionCount ?? 0}</TableCell>
@@ -155,7 +178,10 @@ export default function PracticePage() {
                             variant="ghost"
                             size="icon"
                             onClick={() =>
-                              publishMutation.mutate({ id: q.id, isPublished: !q.isPublished })
+                              publishMutation.mutate({
+                                id: q.id,
+                                isPublished: !q.isPublished,
+                              })
                             }>
                             {q.isPublished ? (
                               <EyeOff className="h-4 w-4" />

@@ -23,7 +23,13 @@ interface PlaceEditorProps {
   onDelete: () => void;
 }
 
-export function PlaceEditor({ eventId, place, stopNumber, onUpdated, onDelete }: PlaceEditorProps) {
+export function PlaceEditor({
+  eventId,
+  place,
+  stopNumber,
+  onUpdated,
+  onDelete,
+}: PlaceEditorProps) {
   const {
     register,
     handleSubmit,
@@ -73,50 +79,71 @@ export function PlaceEditor({ eventId, place, stopNumber, onUpdated, onDelete }:
         <CardTitle className="text-base">
           Stop #{stopNumber} — {place.title}
         </CardTitle>
-        <Button type="button" variant="destructive" size="sm" onClick={onDelete}>
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={onDelete}>
           <Trash2 className="h-3 w-3" />
         </Button>
       </CardHeader>
       <CardContent>
         <form
-          onSubmit={handleSubmit((data) => saveMutation.mutate(data))}
-          className="grid gap-4 sm:grid-cols-2"
-        >
+          onSubmit={handleSubmit(data => saveMutation.mutate(data))}
+          className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Title *</Label>
             <Input {...register('title')} />
-            {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+            {errors.title && (
+              <p className="text-sm text-destructive">{errors.title.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Order *</Label>
             <Input type="number" min={0} {...register('orderIndex')} />
             {errors.orderIndex && (
-              <p className="text-sm text-destructive">{errors.orderIndex.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.orderIndex.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
             <Label>Radius (meters) *</Label>
-            <Input type="number" min={10} max={5000} {...register('radiusMeters')} />
+            <Input
+              type="number"
+              min={10}
+              max={5000}
+              {...register('radiusMeters')}
+            />
             {errors.radiusMeters && (
-              <p className="text-sm text-destructive">{errors.radiusMeters.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.radiusMeters.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
             <Label>Hint</Label>
-            <Input placeholder="Optional hint for players" {...register('hint')} />
+            <Input
+              placeholder="Optional hint for players"
+              {...register('hint')}
+            />
           </div>
           <div className="space-y-2">
             <Label>Latitude *</Label>
             <Input type="number" step="any" {...register('latitude')} />
             {errors.latitude && (
-              <p className="text-sm text-destructive">{errors.latitude.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.latitude.message}
+              </p>
             )}
           </div>
           <div className="space-y-2">
             <Label>Longitude *</Label>
             <Input type="number" step="any" {...register('longitude')} />
             {errors.longitude && (
-              <p className="text-sm text-destructive">{errors.longitude.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.longitude.message}
+              </p>
             )}
           </div>
           <div className="space-y-2 sm:col-span-2">
@@ -126,17 +153,26 @@ export function PlaceEditor({ eventId, place, stopNumber, onUpdated, onDelete }:
               {...register('description')}
             />
             {errors.description && (
-              <p className="text-sm text-destructive">{errors.description.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.description.message}
+              </p>
             )}
           </div>
 
           <div className="sm:col-span-2">
-            <Button type="submit" disabled={saveMutation.isPending || !isDirty} size="sm">
+            <Button
+              type="submit"
+              disabled={saveMutation.isPending || !isDirty}
+              size="sm">
               {saveMutation.isPending ? 'Saving...' : 'Save Place'}
             </Button>
           </div>
 
-          <PlaceQuestionEditor eventId={eventId} place={place} onUpdated={onUpdated} />
+          <PlaceQuestionEditor
+            eventId={eventId}
+            place={place}
+            onUpdated={onUpdated}
+          />
         </form>
       </CardContent>
     </Card>

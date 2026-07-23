@@ -1,11 +1,11 @@
-import {apiClient} from './client';
-import {USE_MOCK_DATA} from '../utils/constants';
+import { apiClient } from './client';
+import { USE_MOCK_DATA } from '../utils/constants';
 
 const USE_PRACTICE_MOCK = USE_MOCK_DATA;
-import {practiceMockStore} from './practiceMockStore';
-import {practiceStorage} from '../services/practiceStorage';
-import {mockUser} from './mockData';
-import {storage} from '../utils/storage';
+import { practiceMockStore } from './practiceMockStore';
+import { practiceStorage } from '../services/practiceStorage';
+import { mockUser } from './mockData';
+import { storage } from '../utils/storage';
 import {
   ApiResponse,
   CreateQuestionInput,
@@ -32,8 +32,12 @@ function toListItem(
   favoriteIds: Set<string>,
   completedIds: Set<string>,
 ): PracticeQuestionListItem {
-  const {answer: _answer, placeId: _placeId, explanation: _explanation, ...rest} =
-    question;
+  const {
+    answer: _answer,
+    placeId: _placeId,
+    explanation: _explanation,
+    ...rest
+  } = question;
   return {
     ...rest,
     isFavorite: favoriteIds.has(question.id),
@@ -64,15 +68,15 @@ export const practiceApi = {
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
 
-      return {success: true, data: items};
+      return { success: true, data: items };
     }
 
     const response = await apiClient.get<{
       success: boolean;
       data: PracticeQuestionListItem[];
-    }>('/practice/questions', {params: {status}});
+    }>('/practice/questions', { params: { status } });
 
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 
   getQuestion: async (
@@ -100,7 +104,7 @@ export const practiceApi = {
       data: PracticeQuestionListItem;
     }>(`/practice/questions/${questionId}`);
 
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 
   getQuestionForTraining: async (
@@ -111,7 +115,7 @@ export const practiceApi = {
       if (!question) {
         throw new Error('Question not found');
       }
-      return {success: true, data: question};
+      return { success: true, data: question };
     }
 
     const response = await apiClient.get<{
@@ -119,10 +123,12 @@ export const practiceApi = {
       data: PracticeQuestion;
     }>(`/practice/questions/${questionId}`);
 
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 
-  getMyQuestions: async (): Promise<ApiResponse<PracticeQuestionListItem[]>> => {
+  getMyQuestions: async (): Promise<
+    ApiResponse<PracticeQuestionListItem[]>
+  > => {
     const user = await getCurrentUser();
     if (!user?.id) {
       throw new Error('User not authenticated');
@@ -142,7 +148,7 @@ export const practiceApi = {
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
 
-      return {success: true, data: items};
+      return { success: true, data: items };
     }
 
     const response = await apiClient.get<{
@@ -150,7 +156,7 @@ export const practiceApi = {
       data: PracticeQuestionListItem[];
     }>('/practice/questions/mine');
 
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 
   createQuestion: async (
@@ -167,7 +173,7 @@ export const practiceApi = {
         user.name,
         input,
       );
-      return {success: true, data: question};
+      return { success: true, data: question };
     }
 
     const response = await apiClient.post<{
@@ -175,7 +181,7 @@ export const practiceApi = {
       data: PracticeQuestion;
     }>('/practice/questions', input);
 
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 
   updateQuestion: async (
@@ -193,7 +199,7 @@ export const practiceApi = {
         user.id,
         input,
       );
-      return {success: true, data: question};
+      return { success: true, data: question };
     }
 
     const response = await apiClient.patch<{
@@ -201,7 +207,7 @@ export const practiceApi = {
       data: PracticeQuestion;
     }>(`/practice/questions/${questionId}`, input);
 
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 
   deleteQuestion: async (questionId: string): Promise<ApiResponse<null>> => {
@@ -212,11 +218,11 @@ export const practiceApi = {
 
     if (USE_PRACTICE_MOCK) {
       await practiceMockStore.deleteQuestion(questionId, user.id);
-      return {success: true, data: null};
+      return { success: true, data: null };
     }
 
     await apiClient.delete(`/practice/questions/${questionId}`);
-    return {success: true, data: null};
+    return { success: true, data: null };
   },
 
   submitTrainingAnswer: async (
@@ -228,7 +234,7 @@ export const practiceApi = {
         questionId,
         submission.answer,
       );
-      return {success: true, data: result};
+      return { success: true, data: result };
     }
 
     const response = await apiClient.post<{
@@ -236,6 +242,6 @@ export const practiceApi = {
       data: TrainingAnswerResponse;
     }>(`/practice/questions/${questionId}/answer`, submission);
 
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 };

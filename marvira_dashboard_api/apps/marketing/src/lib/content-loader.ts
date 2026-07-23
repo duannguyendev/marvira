@@ -2,7 +2,9 @@ import { cookies } from 'next/headers';
 import { getContent, resolveLocale } from '@/lib/i18n';
 import type { Locale } from '@/lib/site';
 
-export async function loadMarketingContent(langParam?: string | string[]): Promise<{
+export async function loadMarketingContent(
+  langParam?: string | string[],
+): Promise<{
   content: ReturnType<typeof getContent>;
   locale: Locale;
 }> {

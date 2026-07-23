@@ -13,8 +13,12 @@ export default function NewPracticeQuestionPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">New Practice Question</h1>
-          <p className="text-muted-foreground">Published to the mobile Practice community pool</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            New Practice Question
+          </h1>
+          <p className="text-muted-foreground">
+            Published to the mobile Practice community pool
+          </p>
         </div>
         <Button variant="outline" asChild>
           <Link href="/dashboard/practice">Back</Link>

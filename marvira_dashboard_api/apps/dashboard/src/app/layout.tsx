@@ -7,7 +7,11 @@ export const metadata: Metadata = {
   description: 'Admin dashboard for Marvira scavenger hunt platform',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>

@@ -6,7 +6,12 @@ describe('haversineDistanceMeters', () => {
   });
 
   it('calculates distance between two points', () => {
-    const distance = haversineDistanceMeters(37.7879, -122.4075, 37.7956, -122.3933);
+    const distance = haversineDistanceMeters(
+      37.7879,
+      -122.4075,
+      37.7956,
+      -122.3933,
+    );
     expect(distance).toBeGreaterThan(1000);
     expect(distance).toBeLessThan(2000);
   });

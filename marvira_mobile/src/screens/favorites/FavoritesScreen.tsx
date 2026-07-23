@@ -1,31 +1,34 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  RefreshControl,
-} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {CompositeNavigationProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
-import {useFavoriteEvents, useFavoriteQuestions} from '../../hooks/useFavorites';
-import {useFavoriteQuestionToggle} from '../../hooks/useFavoriteQuestionToggle';
-import {useFavoriteEventToggle} from '../../hooks/useFavoriteEventToggle';
-import {EventCard} from '../../components/EventCard';
-import {PracticeQuestionCard} from '../../components/PracticeQuestionCard';
-import {SegmentedControl} from '../../components/SegmentedControl';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {UnfavoriteConfirmBottomSheet} from '../../components/UnfavoriteConfirmBottomSheet';
+  useFavoriteEvents,
+  useFavoriteQuestions,
+} from '../../hooks/useFavorites';
+import { useFavoriteQuestionToggle } from '../../hooks/useFavoriteQuestionToggle';
+import { useFavoriteEventToggle } from '../../hooks/useFavoriteEventToggle';
+import { EventCard } from '../../components/EventCard';
+import { PracticeQuestionCard } from '../../components/PracticeQuestionCard';
+import { SegmentedControl } from '../../components/SegmentedControl';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
 import {
   FavoritesStackParamList,
   HomeStackParamList,
   MainTabParamList,
 } from '../../navigation/types';
-import {colors, spacing, fontSize, fontWeight, borderRadius} from '../../theme';
+import {
+  colors,
+  spacing,
+  fontSize,
+  fontWeight,
+  borderRadius,
+} from '../../theme';
 
 type FavoriteTab = 'events' | 'questions';
 
@@ -38,7 +41,7 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 export const FavoritesScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
   const [tab, setTab] = useState<FavoriteTab>('events');
   const [refreshing, setRefreshing] = useState(false);
@@ -63,7 +66,9 @@ export const FavoritesScreen: React.FC = () => {
   if (activeQuery.error) {
     return (
       <ErrorView
-        message={(activeQuery.error as Error)?.message || t('favorites.loadFailed')}
+        message={
+          (activeQuery.error as Error)?.message || t('favorites.loadFailed')
+        }
         onRetry={() => activeQuery.refetch()}
       />
     );
@@ -79,8 +84,8 @@ export const FavoritesScreen: React.FC = () => {
         <Text style={styles.subheading}>{t('favorites.subheading')}</Text>
         <SegmentedControl
           options={[
-            {value: 'events', label: t('favorites.eventsTab')},
-            {value: 'questions', label: t('favorites.questionsTab')},
+            { value: 'events', label: t('favorites.eventsTab') },
+            { value: 'questions', label: t('favorites.questionsTab') },
           ]}
           value={tab}
           onChange={setTab}
@@ -101,19 +106,25 @@ export const FavoritesScreen: React.FC = () => {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={styles.emptyIcon}>⭐</Text>
-              <Text style={styles.emptyTitle}>{t('favorites.emptyEventsTitle')}</Text>
-              <Text style={styles.emptyText}>{t('favorites.emptyEventsMessage')}</Text>
+              <Text style={styles.emptyTitle}>
+                {t('favorites.emptyEventsTitle')}
+              </Text>
+              <Text style={styles.emptyText}>
+                {t('favorites.emptyEventsMessage')}
+              </Text>
             </View>
           }
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <EventCard
               event={item}
               isFavorite
-              onFavoritePress={() => eventFavorite.onFavoritePress(item.id, true)}
+              onFavoritePress={() =>
+                eventFavorite.onFavoritePress(item.id, true)
+              }
               onPress={() =>
                 navigation.navigate('Home', {
                   screen: 'EventDetails',
-                  params: {eventId: item.id},
+                  params: { eventId: item.id },
                 } as MainTabParamList['Home'])
               }
             />
@@ -141,11 +152,11 @@ export const FavoritesScreen: React.FC = () => {
               </Text>
             </View>
           }
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <PracticeQuestionCard
               question={item}
               onPress={() =>
-                navigation.navigate('QuestionTraining', {questionId: item.id})
+                navigation.navigate('QuestionTraining', { questionId: item.id })
               }
               onFavoritePress={() =>
                 questionFavorite.onFavoritePress(item.id, item.isFavorite)

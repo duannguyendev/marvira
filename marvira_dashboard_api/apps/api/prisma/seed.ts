@@ -1,4 +1,12 @@
-import { PrismaClient, UserRole, AuthProvider, EventDifficulty, QuestionType, QuestionSource, ArticleStatus } from '@prisma/client';
+import {
+  PrismaClient,
+  UserRole,
+  AuthProvider,
+  EventDifficulty,
+  QuestionType,
+  QuestionSource,
+  ArticleStatus,
+} from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -73,7 +81,8 @@ async function main() {
       question: 'What year was Union Square dedicated?',
       type: QuestionType.TEXT,
       answer: '1850',
-      explanation: 'Union Square was dedicated in 1850 and named for pro-Union rallies.',
+      explanation:
+        'Union Square was dedicated in 1850 and named for pro-Union rallies.',
       points: 15,
       placeId: 'seed-place-1',
     },
@@ -83,7 +92,8 @@ async function main() {
       type: QuestionType.MULTIPLE_CHOICE,
       options: ['Big Ben', 'Eiffel Tower', 'Leaning Tower', 'CN Tower'],
       answer: 'Big Ben',
-      explanation: 'The clock was inspired by the Giralda tower in Seville, but resembles Big Ben.',
+      explanation:
+        'The clock was inspired by the Giralda tower in Seville, but resembles Big Ben.',
       points: 20,
       placeId: 'seed-place-2',
     },
@@ -93,7 +103,8 @@ async function main() {
       type: QuestionType.TRUE_FALSE,
       options: ['True', 'False'],
       answer: 'True',
-      explanation: 'Lillie Hitchcock Coit left funds to beautify San Francisco.',
+      explanation:
+        'Lillie Hitchcock Coit left funds to beautify San Francisco.',
       points: 25,
       placeId: 'seed-place-3',
     },
@@ -150,7 +161,7 @@ async function main() {
   }
 
   for (const place of placesData) {
-    const qDef = questionDefs.find((q) => q.placeId === place.id);
+    const qDef = questionDefs.find(q => q.placeId === place.id);
     await prisma.place.upsert({
       where: { id: place.id },
       update: { questionId: qDef?.id ?? null },
@@ -196,7 +207,11 @@ async function main() {
       eventId_questionId: { eventId: event2.id, questionId: bridgeQuestion.id },
     },
     update: {},
-    create: { eventId: event2.id, questionId: bridgeQuestion.id, orderIndex: 0 },
+    create: {
+      eventId: event2.id,
+      questionId: bridgeQuestion.id,
+      orderIndex: 0,
+    },
   });
 
   await prisma.place.upsert({
@@ -221,10 +236,16 @@ async function main() {
       eventId_questionId: { eventId: event2.id, questionId: 'seed-question-1' },
     },
     update: {},
-    create: { eventId: event2.id, questionId: 'seed-question-1', orderIndex: 1 },
+    create: {
+      eventId: event2.id,
+      questionId: 'seed-question-1',
+      orderIndex: 1,
+    },
   });
 
-  const demoUser = await prisma.user.findUnique({ where: { email: 'demo@marvira.com' } });
+  const demoUser = await prisma.user.findUnique({
+    where: { email: 'demo@marvira.com' },
+  });
 
   const communityQuestions = [
     {
@@ -279,7 +300,10 @@ async function main() {
     });
     await prisma.userFavoriteQuestion.upsert({
       where: {
-        userId_questionId: { userId: demoUser.id, questionId: 'seed-practice-1' },
+        userId_questionId: {
+          userId: demoUser.id,
+          questionId: 'seed-practice-1',
+        },
       },
       update: {},
       create: { userId: demoUser.id, questionId: 'seed-practice-1' },
@@ -369,7 +393,7 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error(e);
     process.exit(1);
   })

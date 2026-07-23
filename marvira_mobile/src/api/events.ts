@@ -5,13 +5,13 @@ import {
   EventFilters,
   Location,
 } from '../types';
-import {USE_MOCK_DATA} from '../utils/constants';
-import {mockEvents, mockEventDetails, delay} from './mockData';
-import {calculateDistance} from '../utils/distance';
-import {apiClient} from './client';
-import {ApiEvent, ApiPaginated, ApiPlace} from '../types/api';
-import {mapEvent, mapEventDetails} from './mappers';
-import {profileApi} from './profile';
+import { USE_MOCK_DATA } from '../utils/constants';
+import { mockEvents, mockEventDetails, delay } from './mockData';
+import { calculateDistance } from '../utils/distance';
+import { apiClient } from './client';
+import { ApiEvent, ApiPaginated, ApiPlace } from '../types/api';
+import { mapEvent, mapEventDetails } from './mappers';
+import { profileApi } from './profile';
 
 async function getCompletedEventIds(): Promise<Set<string>> {
   try {
@@ -68,7 +68,7 @@ export const eventsApi = {
         });
       }
 
-      return {success: true, data: filteredEvents};
+      return { success: true, data: filteredEvents };
     }
 
     const completedIds = await getCompletedEventIds();
@@ -84,23 +84,23 @@ export const eventsApi = {
             e.description.toLowerCase().includes(q),
         );
       }
-      return {success: true, data: events};
+      return { success: true, data: events };
     }
 
     let apiEvents: ApiEvent[] = [];
 
     if (userLocation) {
       const radiusKm = (filters?.radius ?? 5000) / 1000;
-      const response = await apiClient.get<{success: boolean; data: ApiEvent[]}>(
-        '/events/nearby',
-        {
-          params: {
-            latitude: userLocation.latitude,
-            longitude: userLocation.longitude,
-            radiusKm,
-          },
+      const response = await apiClient.get<{
+        success: boolean;
+        data: ApiEvent[];
+      }>('/events/nearby', {
+        params: {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          radiusKm,
         },
-      );
+      });
       apiEvents = response.data.data;
     } else {
       const response = await apiClient.get<{
@@ -110,7 +110,7 @@ export const eventsApi = {
         params: {
           page: 1,
           pageSize: 50,
-          ...(filters?.searchQuery ? {search: filters.searchQuery} : {}),
+          ...(filters?.searchQuery ? { search: filters.searchQuery } : {}),
         },
       });
       apiEvents = response.data.data.items;
@@ -134,7 +134,7 @@ export const eventsApi = {
       events = events.filter(e => e.status === 'not_started');
     }
 
-    return {success: true, data: events};
+    return { success: true, data: events };
   },
 
   getEventDetails: async (
@@ -144,7 +144,7 @@ export const eventsApi = {
       await delay(500);
       const eventDetails = mockEventDetails[eventId];
       if (eventDetails) {
-        return {success: true, data: eventDetails};
+        return { success: true, data: eventDetails };
       }
       throw new Error('Event not found');
     }
@@ -152,8 +152,8 @@ export const eventsApi = {
     const completedIds = await getCompletedEventIds();
 
     const [eventRes, placesRes] = await Promise.all([
-      apiClient.get<{success: boolean; data: ApiEvent}>(`/events/${eventId}`),
-      apiClient.get<{success: boolean; data: ApiPlace[]}>(
+      apiClient.get<{ success: boolean; data: ApiEvent }>(`/events/${eventId}`),
+      apiClient.get<{ success: boolean; data: ApiPlace[] }>(
         `/events/${eventId}/places`,
       ),
     ]);
@@ -164,18 +164,18 @@ export const eventsApi = {
       completedIds,
     );
 
-    return {success: true, data: details};
+    return { success: true, data: details };
   },
 
   joinEvent: async (
     eventId: string,
     password: string,
-  ): Promise<ApiResponse<{joined: boolean; hasAccess: boolean}>> => {
+  ): Promise<ApiResponse<{ joined: boolean; hasAccess: boolean }>> => {
     const response = await apiClient.post<{
       success: boolean;
-      data: {joined: boolean; hasAccess: boolean};
-    }>(`/events/${eventId}/join`, {password});
-    return {success: true, data: response.data.data};
+      data: { joined: boolean; hasAccess: boolean };
+    }>(`/events/${eventId}/join`, { password });
+    return { success: true, data: response.data.data };
   },
 
   getEventCompletion: async (eventId: string) => {
@@ -183,7 +183,7 @@ export const eventsApi = {
       success: boolean;
       data: import('../types/api').ApiEventCompletion;
     }>(`/events/${eventId}/completion`);
-    return {success: true as const, data: response.data.data};
+    return { success: true as const, data: response.data.data };
   },
 
   getEventFinishers: async (eventId: string) => {
@@ -191,6 +191,6 @@ export const eventsApi = {
       success: boolean;
       data: import('../types/api').ApiEventFinishersResponse;
     }>(`/events/${eventId}/finishers`);
-    return {success: true as const, data: response.data.data};
+    return { success: true as const, data: response.data.data };
   },
 };

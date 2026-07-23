@@ -5,9 +5,11 @@ export const MAX_GIFT_CODE_LENGTH = 64;
 export const MAX_GIFT_TEASER_LENGTH = 80;
 export const MAX_COMPLETION_MESSAGE_LENGTH = 2000;
 
-export function normalizeGiftCodes(codes: string[] | undefined | null): string[] {
+export function normalizeGiftCodes(
+  codes: string[] | undefined | null,
+): string[] {
   if (codes == null) return [];
-  return codes.map((c) => c.trim()).filter((c) => c.length > 0);
+  return codes.map(c => c.trim()).filter(c => c.length > 0);
 }
 
 export function validateGiftFields(input: {
@@ -22,7 +24,9 @@ export function validateGiftFields(input: {
   const giftCodes = normalizeGiftCodes(input.giftCodes);
 
   if (giftCodes.length > MAX_GIFT_CODES) {
-    throw new BadRequestException(`At most ${MAX_GIFT_CODES} gift codes are allowed`);
+    throw new BadRequestException(
+      `At most ${MAX_GIFT_CODES} gift codes are allowed`,
+    );
   }
 
   const seen = new Set<string>();
@@ -34,7 +38,9 @@ export function validateGiftFields(input: {
     }
     const key = code.toLowerCase();
     if (seen.has(key)) {
-      throw new BadRequestException('Gift codes must be unique within an event');
+      throw new BadRequestException(
+        'Gift codes must be unique within an event',
+      );
     }
     seen.add(key);
   }
@@ -52,7 +58,9 @@ export function validateGiftFields(input: {
   }
 
   if (giftCodes.length > 0 && !giftTeaser) {
-    throw new BadRequestException('Gift teaser is required when gift codes are set');
+    throw new BadRequestException(
+      'Gift teaser is required when gift codes are set',
+    );
   }
 
   let completionMessage =
@@ -61,7 +69,10 @@ export function validateGiftFields(input: {
       : input.completionMessage.trim();
   if (completionMessage === '') completionMessage = null;
 
-  if (completionMessage && completionMessage.length > MAX_COMPLETION_MESSAGE_LENGTH) {
+  if (
+    completionMessage &&
+    completionMessage.length > MAX_COMPLETION_MESSAGE_LENGTH
+  ) {
     throw new BadRequestException(
       `Completion message must be at most ${MAX_COMPLETION_MESSAGE_LENGTH} characters`,
     );

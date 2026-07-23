@@ -1,5 +1,5 @@
-import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
-import {eventCreationApi} from '../api/eventCreation';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { eventCreationApi } from '../api/eventCreation';
 import {
   CreateEventInput,
   CreatePlaceInput,
@@ -18,9 +18,10 @@ export const useMyEvents = () => {
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: CreateEventInput) => eventCreationApi.createEvent(input),
+    mutationFn: (input: CreateEventInput) =>
+      eventCreationApi.createEvent(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['myEvents']});
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
     },
   });
 };
@@ -46,8 +47,8 @@ export const useCreatePlaceWithQuestion = () => {
         question,
       ),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({queryKey: ['myEvents']});
-      queryClient.invalidateQueries({queryKey: ['event', variables.eventId]});
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['event', variables.eventId] });
     },
   });
 };
@@ -58,12 +59,12 @@ export const usePublishEvent = () => {
     mutationFn: ({
       eventId,
       ...input
-    }: {eventId: string} & PublishEventInput) =>
+    }: { eventId: string } & PublishEventInput) =>
       eventCreationApi.publishEvent(eventId, input),
-    onSuccess: (_data, {eventId}) => {
-      queryClient.invalidateQueries({queryKey: ['myEvents']});
-      queryClient.invalidateQueries({queryKey: ['events']});
-      queryClient.invalidateQueries({queryKey: ['event', eventId]});
+    onSuccess: (_data, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
     },
   });
 };
@@ -80,11 +81,11 @@ export const useUpdateEventGifts = () => {
       giftTeaser?: string | null;
       giftCodes?: string[];
     }) => eventCreationApi.updateEventGifts(eventId, input),
-    onSuccess: (_data, {eventId}) => {
-      queryClient.invalidateQueries({queryKey: ['myEvents']});
-      queryClient.invalidateQueries({queryKey: ['events']});
-      queryClient.invalidateQueries({queryKey: ['event', eventId]});
-      queryClient.invalidateQueries({queryKey: ['eventFinishers', eventId]});
+    onSuccess: (_data, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+      queryClient.invalidateQueries({ queryKey: ['eventFinishers', eventId] });
     },
   });
 };

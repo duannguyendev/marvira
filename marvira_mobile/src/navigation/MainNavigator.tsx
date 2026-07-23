@@ -1,19 +1,19 @@
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {useTranslation} from 'react-i18next';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {HomeNavigator} from './HomeNavigator';
-import {PracticeNavigator} from './PracticeNavigator';
-import {FavoritesNavigator} from './FavoritesNavigator';
-import {ProfileNavigator} from './ProfileNavigator';
-import {MainTabParamList} from './types';
-import {colors} from '../theme';
-import {Text} from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { HomeNavigator } from './HomeNavigator';
+import { PracticeNavigator } from './PracticeNavigator';
+import { FavoritesNavigator } from './FavoritesNavigator';
+import { ProfileNavigator } from './ProfileNavigator';
+import { MainTabParamList } from './types';
+import { colors } from '../theme';
+import { Text } from 'react-native';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export const MainNavigator: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const tabBarPaddingBottom = Math.max(insets.bottom, 8);
 
@@ -40,7 +40,7 @@ export const MainNavigator: React.FC = () => {
         name="Home"
         component={HomeNavigator}
         options={{
-          tabBarIcon: () => <Text style={{fontSize: 24}}>🏠</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 24 }}>🏠</Text>,
           tabBarLabel: t('nav.events'),
         }}
       />
@@ -48,7 +48,7 @@ export const MainNavigator: React.FC = () => {
         name="Practice"
         component={PracticeNavigator}
         options={{
-          tabBarIcon: () => <Text style={{fontSize: 24}}>📚</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 24 }}>📚</Text>,
           tabBarLabel: t('nav.practice'),
         }}
       />
@@ -56,7 +56,7 @@ export const MainNavigator: React.FC = () => {
         name="Favorites"
         component={FavoritesNavigator}
         options={{
-          tabBarIcon: () => <Text style={{fontSize: 24}}>⭐</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 24 }}>⭐</Text>,
           tabBarLabel: t('nav.favorites'),
         }}
       />
@@ -64,7 +64,7 @@ export const MainNavigator: React.FC = () => {
         name="Profile"
         component={ProfileNavigator}
         options={{
-          tabBarIcon: () => <Text style={{fontSize: 24}}>👤</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 24 }}>👤</Text>,
           tabBarLabel: t('nav.profile'),
         }}
       />

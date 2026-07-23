@@ -8,7 +8,11 @@ import {
   AnticheatCode,
   getAnticheatConfig,
 } from './anticheat.constants';
-import { AnticheatContext, LocationInput, LocationWarning } from './anticheat.types';
+import {
+  AnticheatContext,
+  LocationInput,
+  LocationWarning,
+} from './anticheat.types';
 
 @Injectable()
 export class AnticheatService {
@@ -30,7 +34,11 @@ export class AnticheatService {
 
     const codes: AnticheatCode[] = [...this.detectViolations(location, config)];
 
-    const movementCode = await this.checkSuspiciousMovement(userId, location, config);
+    const movementCode = await this.checkSuspiciousMovement(
+      userId,
+      location,
+      config,
+    );
     if (movementCode) {
       codes.push(movementCode);
     }
@@ -46,7 +54,10 @@ export class AnticheatService {
     }
 
     const primaryCode = codes[0];
-    const shouldIncrement = await this.shouldIncrementWarningPoint(userId, primaryCode);
+    const shouldIncrement = await this.shouldIncrementWarningPoint(
+      userId,
+      primaryCode,
+    );
 
     await this.prisma.client.userLocationWarning.create({
       data: {
@@ -69,7 +80,11 @@ export class AnticheatService {
         where: { id: userId },
         data: { warningPoints: { increment: 1 } },
       });
-      await this.setWarningCooldown(userId, primaryCode, config.warningCooldownSec);
+      await this.setWarningCooldown(
+        userId,
+        primaryCode,
+        config.warningCooldownSec,
+      );
     }
 
     await this.updateLocationCache(userId, location);
@@ -111,11 +126,20 @@ export class AnticheatService {
     const prev = await this.redis.get(key);
     if (!prev) return null;
 
-    const { lat, lon, ts } = JSON.parse(prev) as { lat: number; lon: number; ts: number };
+    const { lat, lon, ts } = JSON.parse(prev) as {
+      lat: number;
+      lon: number;
+      ts: number;
+    };
     const elapsed = (Date.now() - ts) / 1000;
     if (elapsed <= 0 || elapsed >= config.locationRedisTtlSec) return null;
 
-    const distance = haversineDistanceMeters(lat, lon, location.latitude, location.longitude);
+    const distance = haversineDistanceMeters(
+      lat,
+      lon,
+      location.latitude,
+      location.longitude,
+    );
     const speed = distance / elapsed;
     if (speed > config.maxSpeedMps) {
       return ANTICHEAT_CODES.SUSPICIOUS_MOVEMENT;
@@ -154,13 +178,20 @@ export class AnticheatService {
     return null;
   }
 
-  private async shouldIncrementWarningPoint(userId: string, code: AnticheatCode): Promise<boolean> {
+  private async shouldIncrementWarningPoint(
+    userId: string,
+    code: AnticheatCode,
+  ): Promise<boolean> {
     const key = `anticheat:cooldown:${userId}:${code}`;
     const existing = await this.redis.get(key);
     return !existing;
   }
 
-  private async setWarningCooldown(userId: string, code: AnticheatCode, cooldownSec: number) {
+  private async setWarningCooldown(
+    userId: string,
+    code: AnticheatCode,
+    cooldownSec: number,
+  ) {
     const key = `anticheat:cooldown:${userId}:${code}`;
     await this.redis.set(key, '1', cooldownSec);
   }

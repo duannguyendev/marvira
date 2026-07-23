@@ -81,11 +81,7 @@ export interface Place {
   hint?: string;
 }
 
-export type QuestionType =
-  | 'TEXT'
-  | 'MULTIPLE_CHOICE'
-  | 'TRUE_FALSE'
-  | 'IMAGE';
+export type QuestionType = 'TEXT' | 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'IMAGE';
 
 export interface PlaceQuestion {
   id: string;
@@ -311,7 +307,7 @@ export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  ResetPassword: {token?: string} | undefined;
+  ResetPassword: { token?: string } | undefined;
 };
 
 export type ProfileStackParamList = {
@@ -337,7 +333,7 @@ export type MainTabParamList = {
 
 export type HomeStackParamList = {
   EventsList: undefined;
-  EventDetails: {eventId: string};
-  PlaceGame: {eventId: string; placeId: string};
-  EventCompletion: {eventId: string; score?: number};
+  EventDetails: { eventId: string };
+  PlaceGame: { eventId: string; placeId: string };
+  EventCompletion: { eventId: string; score?: number };
 };

@@ -17,17 +17,21 @@ export class AnalyticsService {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const [totalUsers, activeUsers, totalEvents, completedEvents] = await Promise.all([
-      this.prisma.client.user.count(),
-      this.prisma.client.userEventProgress.count({
-        where: { startedAt: { gte: thirtyDaysAgo } },
-      }),
-      this.prisma.client.event.count({ where: { isActive: true } }),
-      this.prisma.client.userEventProgress.count({ where: { completed: true } }),
-    ]);
+    const [totalUsers, activeUsers, totalEvents, completedEvents] =
+      await Promise.all([
+        this.prisma.client.user.count(),
+        this.prisma.client.userEventProgress.count({
+          where: { startedAt: { gte: thirtyDaysAgo } },
+        }),
+        this.prisma.client.event.count({ where: { isActive: true } }),
+        this.prisma.client.userEventProgress.count({
+          where: { completed: true },
+        }),
+      ]);
 
     const totalProgress = await this.prisma.client.userEventProgress.count();
-    const completionRate = totalProgress > 0 ? (completedEvents / totalProgress) * 100 : 0;
+    const completionRate =
+      totalProgress > 0 ? (completedEvents / totalProgress) * 100 : 0;
 
     const result = {
       totalUsers,
@@ -48,9 +52,9 @@ export class AnalyticsService {
       },
     });
 
-    return events.map((event) => {
+    return events.map(event => {
       const participants = event.progress.length;
-      const completions = event.progress.filter((p) => p.completed).length;
+      const completions = event.progress.filter(p => p.completed).length;
       const avgScore =
         participants > 0
           ? event.progress.reduce((sum, p) => sum + p.score, 0) / participants
@@ -61,7 +65,8 @@ export class AnalyticsService {
         eventTitle: event.title,
         participants,
         completions,
-        completionRate: participants > 0 ? (completions / participants) * 100 : 0,
+        completionRate:
+          participants > 0 ? (completions / participants) * 100 : 0,
         averageScore: Math.round(avgScore * 10) / 10,
       };
     });
@@ -77,7 +82,7 @@ export class AnalyticsService {
       _count: { id: true },
     });
 
-    return events.map((e) => ({
+    return events.map(e => ({
       name: e.eventName,
       count: e._count.id,
     }));

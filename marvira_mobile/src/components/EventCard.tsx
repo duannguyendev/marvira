@@ -7,12 +7,12 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import LinearGradient from 'react-native-linear-gradient';
-import {Event} from '../types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
-import {formatDistance} from '../utils/distance';
-import {FavoriteButton} from './FavoriteButton';
+import { Event } from '../types';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
+import { formatDistance } from '../utils/distance';
+import { FavoriteButton } from './FavoriteButton';
 
 interface EventCardProps {
   event: Event;
@@ -21,7 +21,7 @@ interface EventCardProps {
   onFavoritePress?: () => void;
 }
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - spacing.lg * 2;
 
 export const EventCard: React.FC<EventCardProps> = ({
@@ -30,7 +30,7 @@ export const EventCard: React.FC<EventCardProps> = ({
   isFavorite,
   onFavoritePress,
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const getStatusColor = () => {
     switch (event.status) {
@@ -53,13 +53,13 @@ export const EventCard: React.FC<EventCardProps> = ({
       onPress={onPress}
       activeOpacity={0.8}>
       {event.imageUrl ? (
-        <Image source={{uri: event.imageUrl}} style={styles.image} />
+        <Image source={{ uri: event.imageUrl }} style={styles.image} />
       ) : (
         <LinearGradient
           colors={[colors.primary, colors.secondary]}
           style={styles.image}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
         />
       )}
       {onFavoritePress ? (
@@ -89,7 +89,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             ) : null}
           </View>
           <View
-            style={[styles.statusBadge, {backgroundColor: getStatusColor()}]}>
+            style={[styles.statusBadge, { backgroundColor: getStatusColor() }]}>
             <Text style={styles.statusText}>
               {t(`eventStatus.${event.status}`)}
             </Text>
@@ -115,7 +115,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               <View
                 style={[
                   styles.progressFill,
-                  {width: `${progress}%`, backgroundColor: getStatusColor()},
+                  { width: `${progress}%`, backgroundColor: getStatusColor() },
                 ]}
               />
             </View>
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,

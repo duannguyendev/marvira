@@ -15,7 +15,12 @@ import { UserRole } from '@prisma/client';
 import { EventsService } from './events.service';
 import { EventOwnershipService } from './event-ownership.service';
 import { EventAccessService } from './event-access.service';
-import { CreateEventDto, UpdateEventDto, NearbyQueryDto, JoinEventDto } from './dto/event.dto';
+import {
+  CreateEventDto,
+  UpdateEventDto,
+  NearbyQueryDto,
+  JoinEventDto,
+} from './dto/event.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Public } from '../common/decorators/roles.decorator';
 import { RequestUser } from '../common/types/request-user';
@@ -37,7 +42,10 @@ export class EventsController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'List active events' })
-  async findAll(@Query('page') page?: string, @Query('pageSize') pageSize?: string) {
+  async findAll(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
     const data = await this.eventsService.findAll(
       parseInt(page || '1', 10),
       parseInt(pageSize || '20', 10),
@@ -76,7 +84,9 @@ export class EventsController {
 
   @Public()
   @Get(':id/leaderboard')
-  @ApiOperation({ summary: 'Event completion leaderboard (score, then fastest time)' })
+  @ApiOperation({
+    summary: 'Event completion leaderboard (score, then fastest time)',
+  })
   async leaderboard(@Param('id') id: string, @Query('limit') limit?: string) {
     const data = await this.progressService.getEventLeaderboard(
       id,
@@ -88,7 +98,9 @@ export class EventsController {
   @Get(':id/completion')
   @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Re-open completion / gift snapshot for a finished event' })
+  @ApiOperation({
+    summary: 'Re-open completion / gift snapshot for a finished event',
+  })
   async completion(@Param('id') id: string, @Req() req: { user: RequestUser }) {
     const data = await this.progressService.getEventCompletion(req.user.id, id);
     return { success: true, data };
@@ -97,7 +109,9 @@ export class EventsController {
   @Get(':id/finishers')
   @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'List finishers with gift assignment (owner or staff)' })
+  @ApiOperation({
+    summary: 'List finishers with gift assignment (owner or staff)',
+  })
   async finishers(@Param('id') id: string, @Req() req: { user: RequestUser }) {
     await this.ownershipService.assertCanManage(id, req.user);
     const data = await this.progressService.getEventFinishers(id);
@@ -121,7 +135,11 @@ export class EventsController {
     @Body() dto: JoinEventDto,
     @Req() req: { user: RequestUser },
   ) {
-    const data = await this.eventAccessService.joinEvent(req.user.id, id, dto.password);
+    const data = await this.eventAccessService.joinEvent(
+      req.user.id,
+      id,
+      dto.password,
+    );
     return { success: true, data };
   }
 
@@ -130,7 +148,10 @@ export class EventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create event (draft)' })
   async create(@Body() dto: CreateEventDto, @Req() req: { user: RequestUser }) {
-    const data = await this.eventsService.create({ ...dto, createdBy: req.user.id });
+    const data = await this.eventsService.create({
+      ...dto,
+      createdBy: req.user.id,
+    });
     return { success: true, data };
   }
 
@@ -161,7 +182,12 @@ export class EventsController {
     @Body() dto: UpdateEventDto,
     @Req() req: { user: RequestUser },
   ) {
-    const data = await this.eventsService.updateForUser(id, req.user.id, req.user.role, dto);
+    const data = await this.eventsService.updateForUser(
+      id,
+      req.user.id,
+      req.user.role,
+      dto,
+    );
     return { success: true, data };
   }
 
@@ -170,7 +196,11 @@ export class EventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete event' })
   async remove(@Param('id') id: string, @Req() req: { user: RequestUser }) {
-    const data = await this.eventsService.removeForUser(id, req.user.id, req.user.role);
+    const data = await this.eventsService.removeForUser(
+      id,
+      req.user.id,
+      req.user.role,
+    );
     return { success: true, data };
   }
 }

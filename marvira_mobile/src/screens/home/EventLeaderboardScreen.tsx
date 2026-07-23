@@ -1,23 +1,23 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {RouteProp, useRoute} from '@react-navigation/native';
-import {useEventLeaderboard} from '../../hooks/useLeaderboard';
-import {useAuth} from '../../hooks/useAuth';
-import {LeaderboardList} from '../../components/LeaderboardList';
-import {ErrorView} from '../../components/ErrorView';
-import {colors, spacing, fontSize, fontWeight} from '../../theme';
-import {HomeStackParamList} from '../../navigation/types';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import { useEventLeaderboard } from '../../hooks/useLeaderboard';
+import { useAuth } from '../../hooks/useAuth';
+import { LeaderboardList } from '../../components/LeaderboardList';
+import { ErrorView } from '../../components/ErrorView';
+import { colors, spacing, fontSize, fontWeight } from '../../theme';
+import { HomeStackParamList } from '../../navigation/types';
 
 type ScreenRoute = RouteProp<HomeStackParamList, 'EventLeaderboard'>;
 
 export const EventLeaderboardScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<ScreenRoute>();
-  const {eventId} = route.params;
-  const {user} = useAuth();
+  const { eventId } = route.params;
+  const { user } = useAuth();
 
-  const {data, isLoading, isFetching, error, refetch} =
+  const { data, isLoading, isFetching, error, refetch } =
     useEventLeaderboard(eventId);
 
   if (error && !data) {

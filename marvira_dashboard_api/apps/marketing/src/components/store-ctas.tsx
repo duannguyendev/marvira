@@ -27,8 +27,7 @@ export function StoreCtas({
           className={cn(
             'inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition',
             primary,
-          )}
-        >
+          )}>
           {content.home.ctaDownload}
         </Link>
         <Link
@@ -36,8 +35,7 @@ export function StoreCtas({
           className={cn(
             'inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition',
             secondary,
-          )}
-        >
+          )}>
           {content.home.ctaHow}
         </Link>
       </div>
@@ -53,8 +51,7 @@ export function StoreCtas({
           primary,
         )}
         rel="noopener noreferrer"
-        target="_blank"
-      >
+        target="_blank">
         {content.home.ctaAppStore}
       </a>
       <a
@@ -64,8 +61,7 @@ export function StoreCtas({
           secondary,
         )}
         rel="noopener noreferrer"
-        target="_blank"
-      >
+        target="_blank">
         {content.home.ctaPlayStore}
       </a>
     </div>

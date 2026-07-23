@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,15 +8,21 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
-import {useAuth} from '../../hooks/useAuth';
-import {Button} from '../../components/Button';
-import {Input} from '../../components/Input';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
-import {AuthStackParamList} from '../../navigation/types';
+import { useAuth } from '../../hooks/useAuth';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import {
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
+import { AuthStackParamList } from '../../navigation/types';
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -24,9 +30,9 @@ type RegisterScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 export const RegisterScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
-  const {register, isRegistering, registerError} = useAuth();
+  const { register, isRegistering, registerError } = useAuth();
 
   const [name, setName] = useState('John Doe');
   const [email, setEmail] = useState('user@example.com');
@@ -77,7 +83,7 @@ export const RegisterScreen: React.FC = () => {
     }
 
     try {
-      await register({name, email, password});
+      await register({ name, email, password });
     } catch (error: any) {
       Alert.alert(
         t('auth.registrationFailed'),
@@ -189,7 +195,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.xl,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,

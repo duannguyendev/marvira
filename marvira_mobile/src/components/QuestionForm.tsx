@@ -1,9 +1,15 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, TextInput} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {CreateQuestionInput, QuestionType} from '../types';
-import {Input} from './Input';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { CreateQuestionInput, QuestionType } from '../types';
+import { Input } from './Input';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
 const QUESTION_TYPES: QuestionType[] = [
   'TEXT',
@@ -22,18 +28,18 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   onChange,
   errors,
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const setField = <K extends keyof CreateQuestionInput>(
     key: K,
     fieldValue: CreateQuestionInput[K],
   ) => {
-    onChange({...value, [key]: fieldValue});
+    onChange({ ...value, [key]: fieldValue });
   };
 
   const handleTypeChange = (type: QuestionType) => {
     if (type === 'TRUE_FALSE') {
-      onChange({...value, type, answer: 'True', options: undefined});
+      onChange({ ...value, type, answer: 'True', options: undefined });
       return;
     }
     if (type === 'MULTIPLE_CHOICE') {
@@ -45,27 +51,29 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
       });
       return;
     }
-    onChange({...value, type, options: undefined, answer: ''});
+    onChange({ ...value, type, options: undefined, answer: '' });
   };
 
   const updateOption = (index: number, text: string) => {
     const options = [...(value.options ?? ['', ''])];
     options[index] = text;
-    onChange({...value, options});
+    onChange({ ...value, options });
   };
 
   const addOption = () => {
-    onChange({...value, options: [...(value.options ?? []), '']});
+    onChange({ ...value, options: [...(value.options ?? []), ''] });
   };
 
   const removeOption = (index: number) => {
     const options = (value.options ?? []).filter((_, i) => i !== index);
-    onChange({...value, options});
+    onChange({ ...value, options });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>{t('createEvent.questionSection')}</Text>
+      <Text style={styles.sectionTitle}>
+        {t('createEvent.questionSection')}
+      </Text>
 
       <Text style={styles.label}>{t('createEvent.questionType')}</Text>
       <View style={styles.typeRow}>
@@ -106,7 +114,9 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 style={styles.optionInput}
                 value={option}
                 onChangeText={text => updateOption(index, text)}
-                placeholder={t('createEvent.optionPlaceholder', {n: index + 1})}
+                placeholder={t('createEvent.optionPlaceholder', {
+                  n: index + 1,
+                })}
                 placeholderTextColor={colors.textLight}
               />
               {(value.options?.length ?? 0) > 2 ? (
@@ -117,7 +127,9 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
             </View>
           ))}
           <TouchableOpacity onPress={addOption} style={styles.addOption}>
-            <Text style={styles.addOptionText}>{t('createEvent.addOption')}</Text>
+            <Text style={styles.addOptionText}>
+              {t('createEvent.addOption')}
+            </Text>
           </TouchableOpacity>
           {errors?.options ? (
             <Text style={styles.errorText}>{errors.options}</Text>

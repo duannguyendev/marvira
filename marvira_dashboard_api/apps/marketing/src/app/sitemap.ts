@@ -18,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/e/seed-event-golden-gate',
   ];
 
-  return routes.map((path) => ({
+  return routes.map(path => ({
     url: `${SITE.url}${path}`,
     lastModified: new Date('2026-07-20'),
     changeFrequency: path === '' ? 'weekly' : 'monthly',

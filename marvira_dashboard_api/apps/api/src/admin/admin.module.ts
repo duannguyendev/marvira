@@ -10,7 +10,16 @@ import { FeedbackModule } from '../feedback/feedback.module';
 import { ArticlesModule } from '../articles/articles.module';
 
 @Module({
-  imports: [UsersModule, EventsModule, AnalyticsModule, QuestionsModule, ProgressModule, PracticeModule, FeedbackModule, ArticlesModule],
+  imports: [
+    UsersModule,
+    EventsModule,
+    AnalyticsModule,
+    QuestionsModule,
+    ProgressModule,
+    PracticeModule,
+    FeedbackModule,
+    ArticlesModule,
+  ],
   controllers: [AdminController],
 })
 export class AdminModule {}

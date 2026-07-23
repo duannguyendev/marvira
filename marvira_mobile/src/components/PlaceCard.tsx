@@ -1,9 +1,9 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {Place} from '../types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
-import {formatDistance} from '../utils/distance';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Place } from '../types';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
+import { formatDistance } from '../utils/distance';
 
 interface PlaceCardProps {
   place: Place;
@@ -16,7 +16,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({
   isActive = false,
   onPress,
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const getStatusIcon = () => {
     if (place.isCompleted) return '✅';
@@ -61,7 +61,9 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({
       {place.distance !== undefined && place.isUnlocked && (
         <View style={styles.footer}>
           <Text style={styles.distanceText}>
-            {t('game.distanceAway', {distance: formatDistance(place.distance)})}
+            {t('game.distanceAway', {
+              distance: formatDistance(place.distance),
+            })}
           </Text>
         </View>
       )}

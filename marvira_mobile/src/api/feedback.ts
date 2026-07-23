@@ -1,4 +1,4 @@
-import {apiClient} from './client';
+import { apiClient } from './client';
 import {
   ApiResponse,
   FeedbackCategory,
@@ -25,6 +25,6 @@ export const feedbackApi = {
       source: FeedbackSource.MOBILE,
     });
 
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 };

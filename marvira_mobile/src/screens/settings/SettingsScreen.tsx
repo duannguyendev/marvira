@@ -6,16 +6,18 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { SUPPORTED_LANGUAGES, LanguageCode, setAppLanguage } from '../../i18n';
+import { ProfileStackParamList } from '../../navigation/types';
 import {
-  SUPPORTED_LANGUAGES,
-  LanguageCode,
-  setAppLanguage,
-} from '../../i18n';
-import {ProfileStackParamList} from '../../navigation/types';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../../theme';
+  colors,
+  spacing,
+  borderRadius,
+  fontSize,
+  fontWeight,
+} from '../../theme';
 
 type SettingsNavigationProp = NativeStackNavigationProp<
   ProfileStackParamList,
@@ -23,7 +25,7 @@ type SettingsNavigationProp = NativeStackNavigationProp<
 >;
 
 export const SettingsScreen: React.FC = () => {
-  const {t, i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<SettingsNavigationProp>();
   const currentLanguage = i18n.language as LanguageCode;
 
@@ -70,9 +72,7 @@ export const SettingsScreen: React.FC = () => {
                   ]}>
                   {t(lang.labelKey)}
                 </Text>
-                {isSelected ? (
-                  <Text style={styles.checkmark}>✓</Text>
-                ) : null}
+                {isSelected ? <Text style={styles.checkmark}>✓</Text> : null}
               </TouchableOpacity>
             );
           })}

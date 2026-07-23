@@ -1,6 +1,6 @@
 import React from 'react';
-import {ActivityIndicator, View, StyleSheet} from 'react-native';
-import {colors} from '../theme';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { colors } from '../theme';
 
 interface LoadingSpinnerProps {
   size?: 'small' | 'large';
@@ -41,4 +41,3 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 });
-

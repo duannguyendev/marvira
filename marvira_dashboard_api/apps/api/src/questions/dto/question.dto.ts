@@ -15,7 +15,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { QuestionType } from '@prisma/client';
 
 export class CreateQuestionDto {
-  @ApiProperty({ description: 'Question text or caption (shown with the image for IMAGE type)' })
+  @ApiProperty({
+    description:
+      'Question text or caption (shown with the image for IMAGE type)',
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
@@ -26,8 +29,11 @@ export class CreateQuestionDto {
   @IsEnum(QuestionType)
   type!: QuestionType;
 
-  @ApiPropertyOptional({ description: 'Image URL for IMAGE type questions (upload via POST /uploads)' })
-  @ValidateIf((o) => o.type === QuestionType.IMAGE)
+  @ApiPropertyOptional({
+    description:
+      'Image URL for IMAGE type questions (upload via POST /uploads)',
+  })
+  @ValidateIf(o => o.type === QuestionType.IMAGE)
   @IsString()
   @IsNotEmpty()
   imageUrl?: string;

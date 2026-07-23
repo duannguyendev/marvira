@@ -22,7 +22,10 @@ import { DataTablePagination } from '@/components/data-table/pagination';
 import { useDebouncedValue } from '@/lib/use-debounced-value';
 import { buildQuery } from '@/lib/build-query';
 import { formatDuration } from '@/lib/format-duration';
-import type { EventParticipantSortBy, EventParticipantsResponse } from '@marvira/shared-types';
+import type {
+  EventParticipantSortBy,
+  EventParticipantsResponse,
+} from '@marvira/shared-types';
 
 const SORT_OPTIONS: { value: EventParticipantSortBy; label: string }[] = [
   { value: 'fastest', label: 'Fastest finish' },
@@ -56,7 +59,14 @@ export default function EventParticipantsPage() {
   }, [debouncedSearch, pageSize, sortBy]);
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['admin-event-participants', id, page, pageSize, debouncedSearch, sortBy],
+    queryKey: [
+      'admin-event-participants',
+      id,
+      page,
+      pageSize,
+      debouncedSearch,
+      sortBy,
+    ],
     queryFn: () =>
       api.get<EventParticipantsResponse>(
         `/admin/events/${id}/participants${buildQuery({
@@ -90,12 +100,15 @@ export default function EventParticipantsPage() {
                 </p>
                 {data.event.giftCount > 0 && (
                   <p className="text-sm text-muted-foreground">
-                    {data.event.giftAssignedCount}/{data.event.giftCount} gifts assigned
+                    {data.event.giftAssignedCount}/{data.event.giftCount} gifts
+                    assigned
                   </p>
                 )}
               </div>
             ) : (
-              <p className="text-muted-foreground">Users who joined this event</p>
+              <p className="text-muted-foreground">
+                Users who joined this event
+              </p>
             )}
           </div>
         </div>
@@ -113,9 +126,10 @@ export default function EventParticipantsPage() {
             <select
               className="h-10 rounded-md border border-input bg-background px-3 text-sm"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as EventParticipantSortBy)}
-            >
-              {SORT_OPTIONS.map((opt) => (
+              onChange={e =>
+                setSortBy(e.target.value as EventParticipantSortBy)
+              }>
+              {SORT_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>
                   Sort: {opt.label}
                 </option>
@@ -127,7 +141,7 @@ export default function EventParticipantsPage() {
                 className="pl-9"
                 placeholder="Search by name or email..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={e => setSearch(e.target.value)}
               />
             </div>
           </div>
@@ -165,25 +179,30 @@ export default function EventParticipantsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className={isFetching ? 'opacity-60' : undefined}>
-                  {participants.map((p) => (
+                  {participants.map(p => (
                     <TableRow key={p.userId}>
-                      <TableCell className="font-medium">{p.userName}</TableCell>
-                      <TableCell className="text-muted-foreground">{p.userEmail}</TableCell>
+                      <TableCell className="font-medium">
+                        {p.userName}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {p.userEmail}
+                      </TableCell>
                       <TableCell>
                         <span
                           className={
                             p.completed
                               ? 'rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-600'
                               : 'rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600'
-                          }
-                        >
+                          }>
                           {p.completed ? 'Completed' : 'In progress'}
                         </span>
                       </TableCell>
                       <TableCell className="text-right text-muted-foreground">
                         {p.placesCompleted}/{p.totalPlaces}
                       </TableCell>
-                      <TableCell className="text-right font-medium">{p.score}</TableCell>
+                      <TableCell className="text-right font-medium">
+                        {p.score}
+                      </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {formatDateTime(p.startedAt)}
                       </TableCell>

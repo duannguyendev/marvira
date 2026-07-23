@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { RequestUser } from '../common/types/request-user';
@@ -20,7 +24,10 @@ export class EventOwnershipService {
     }
   }
 
-  async assertCanManagePlace(placeId: string, user: RequestUser): Promise<void> {
+  async assertCanManagePlace(
+    placeId: string,
+    user: RequestUser,
+  ): Promise<void> {
     const place = await this.prisma.client.place.findUnique({
       where: { id: placeId },
       include: { event: { select: { createdBy: true } } },

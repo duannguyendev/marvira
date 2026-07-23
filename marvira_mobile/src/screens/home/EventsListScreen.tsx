@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,14 +8,14 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useEvents} from '../../hooks/useEvents';
-import {useLocation} from '../../hooks/useLocation';
-import {EventCard} from '../../components/EventCard';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useEvents } from '../../hooks/useEvents';
+import { useLocation } from '../../hooks/useLocation';
+import { EventCard } from '../../components/EventCard';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
 import {
   colors,
   spacing,
@@ -23,9 +23,9 @@ import {
   fontSize,
   fontWeight,
 } from '../../theme';
-import {HomeStackParamList} from '../../navigation/types';
-import {EventFilters, EventStatus} from '../../types';
-import {calculateDistance} from '../../utils/distance';
+import { HomeStackParamList } from '../../navigation/types';
+import { EventFilters, EventStatus } from '../../types';
+import { calculateDistance } from '../../utils/distance';
 
 type EventsListScreenNavigationProp = NativeStackNavigationProp<
   HomeStackParamList,
@@ -33,9 +33,9 @@ type EventsListScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 export const EventsListScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<EventsListScreenNavigationProp>();
-  const {location, hasPermission, requestPermission} = useLocation();
+  const { location, hasPermission, requestPermission } = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [radius, setRadius] = useState(5000);
@@ -48,7 +48,7 @@ export const EventsListScreen: React.FC = () => {
     searchQuery: searchQuery.trim() || undefined,
   };
 
-  const {data, isLoading, error, refetch} = useEvents(
+  const { data, isLoading, error, refetch } = useEvents(
     filters,
     location || undefined,
   );
@@ -66,7 +66,7 @@ export const EventsListScreen: React.FC = () => {
   };
 
   const handleEventPress = (eventId: string) => {
-    navigation.navigate('EventDetails', {eventId});
+    navigation.navigate('EventDetails', { eventId });
   };
 
   const events = data?.data || [];
@@ -180,7 +180,7 @@ export const EventsListScreen: React.FC = () => {
       <FlatList
         data={sortedEvents}
         keyExtractor={item => item.id}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <EventCard event={item} onPress={() => handleEventPress(item.id)} />
         )}
         contentContainerStyle={styles.listContent}
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 8,

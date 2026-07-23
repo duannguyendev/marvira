@@ -1,32 +1,28 @@
-import React, {useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  Text,
-} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {StepIndicator} from '../../components/StepIndicator';
-import {Input} from '../../components/Input';
-import {Button} from '../../components/Button';
-import {MapPicker, getDefaultCoordinate} from '../../components/MapPicker';
-import {QuestionForm} from '../../components/QuestionForm';
-import {useCreatePlaceWithQuestion} from '../../hooks/useMyEvents';
-import {useLocation} from '../../hooks/useLocation';
-import {
-  CreatePlaceInput,
-  CreateQuestionInput,
-  Location,
-} from '../../types';
-import {HomeStackParamList} from '../../navigation/types';
-import {colors, spacing, fontSize, fontWeight} from '../../theme';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, Alert, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { StepIndicator } from '../../components/StepIndicator';
+import { Input } from '../../components/Input';
+import { Button } from '../../components/Button';
+import { MapPicker, getDefaultCoordinate } from '../../components/MapPicker';
+import { QuestionForm } from '../../components/QuestionForm';
+import { useCreatePlaceWithQuestion } from '../../hooks/useMyEvents';
+import { useLocation } from '../../hooks/useLocation';
+import { CreatePlaceInput, CreateQuestionInput, Location } from '../../types';
+import { HomeStackParamList } from '../../navigation/types';
+import { colors, spacing, fontSize, fontWeight } from '../../theme';
 
-type CreateEventPlaceRouteProp = RouteProp<HomeStackParamList, 'CreateEventPlace'>;
+type CreateEventPlaceRouteProp = RouteProp<
+  HomeStackParamList,
+  'CreateEventPlace'
+>;
 
-type NavigationProp = NativeStackNavigationProp<HomeStackParamList, 'CreateEventPlace'>;
+type NavigationProp = NativeStackNavigationProp<
+  HomeStackParamList,
+  'CreateEventPlace'
+>;
 
 const STEP_LABELS = ['info', 'places', 'review', 'done'];
 
@@ -38,11 +34,11 @@ const DEFAULT_QUESTION: CreateQuestionInput = {
 };
 
 export const CreateEventPlaceScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const route = useRoute<CreateEventPlaceRouteProp>();
   const navigation = useNavigation<NavigationProp>();
-  const {eventId, placeIndex} = route.params;
-  const {location, requestPermission} = useLocation();
+  const { eventId, placeIndex } = route.params;
+  const { location, requestPermission } = useLocation();
   const createPlace = useCreatePlaceWithQuestion();
 
   const [coordinate, setCoordinate] = useState<Location>(
@@ -55,7 +51,8 @@ export const CreateEventPlaceScreen: React.FC = () => {
     longitude: coordinate.longitude,
     radiusMeters: 100,
   });
-  const [question, setQuestion] = useState<CreateQuestionInput>(DEFAULT_QUESTION);
+  const [question, setQuestion] =
+    useState<CreateQuestionInput>(DEFAULT_QUESTION);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleCoordinateChange = (next: Location) => {
@@ -93,7 +90,9 @@ export const CreateEventPlaceScreen: React.FC = () => {
       nextErrors.answer = t('createEvent.validation.answerRequired');
     }
     if (question.type === 'MULTIPLE_CHOICE') {
-      const options = (question.options ?? []).map(o => o.trim()).filter(Boolean);
+      const options = (question.options ?? [])
+        .map(o => o.trim())
+        .filter(Boolean);
       if (options.length < 2) {
         nextErrors.options = t('createEvent.validation.optionsMin');
       } else if (
@@ -140,7 +139,7 @@ export const CreateEventPlaceScreen: React.FC = () => {
       });
 
       if (isLast) {
-        navigation.navigate('CreateEventReview', {eventId});
+        navigation.navigate('CreateEventReview', { eventId });
       } else {
         navigation.push('CreateEventPlace', {
           eventId,
@@ -150,7 +149,9 @@ export const CreateEventPlaceScreen: React.FC = () => {
     } catch (error: any) {
       Alert.alert(
         t('common.error'),
-        error?.response?.data?.message || error.message || t('createEvent.placeFailed'),
+        error?.response?.data?.message ||
+          error.message ||
+          t('createEvent.placeFailed'),
       );
     }
   };
@@ -167,9 +168,11 @@ export const CreateEventPlaceScreen: React.FC = () => {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled">
         <Text style={styles.heading}>
-          {t('createEvent.placeHeading', {n: placeIndex + 1})}
+          {t('createEvent.placeHeading', { n: placeIndex + 1 })}
         </Text>
-        <Text style={styles.subheading}>{t('createEvent.placeSubheading')}</Text>
+        <Text style={styles.subheading}>
+          {t('createEvent.placeSubheading')}
+        </Text>
 
         <MapPicker
           coordinate={coordinate}
@@ -180,14 +183,16 @@ export const CreateEventPlaceScreen: React.FC = () => {
         <Input
           label={t('createEvent.placeTitle')}
           value={place.title}
-          onChangeText={title => setPlace(prev => ({...prev, title}))}
+          onChangeText={title => setPlace(prev => ({ ...prev, title }))}
           placeholder={t('createEvent.placeTitlePlaceholder')}
           error={errors.title}
         />
         <Input
           label={t('createEvent.placeDescription')}
           value={place.description}
-          onChangeText={description => setPlace(prev => ({...prev, description}))}
+          onChangeText={description =>
+            setPlace(prev => ({ ...prev, description }))
+          }
           placeholder={t('createEvent.placeDescriptionPlaceholder')}
           multiline
           error={errors.description}
@@ -209,7 +214,9 @@ export const CreateEventPlaceScreen: React.FC = () => {
         <Input
           label={t('createEvent.hintOptional')}
           value={place.hint ?? ''}
-          onChangeText={hint => setPlace(prev => ({...prev, hint: hint || undefined}))}
+          onChangeText={hint =>
+            setPlace(prev => ({ ...prev, hint: hint || undefined }))
+          }
           placeholder={t('createEvent.hintPlaceholder')}
         />
 

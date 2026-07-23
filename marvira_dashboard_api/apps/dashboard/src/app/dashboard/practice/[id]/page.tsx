@@ -57,8 +57,12 @@ export default function EditPracticeQuestionPage({
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Edit Practice Question</h1>
-          <p className="text-muted-foreground">Update community practice question</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Edit Practice Question
+          </h1>
+          <p className="text-muted-foreground">
+            Update community practice question
+          </p>
         </div>
         <div className="flex gap-2">
           <Button

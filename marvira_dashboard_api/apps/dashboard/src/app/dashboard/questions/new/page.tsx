@@ -14,7 +14,9 @@ export default function NewQuestionPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">New Question</h1>
-          <p className="text-muted-foreground">Create a reusable question for your events</p>
+          <p className="text-muted-foreground">
+            Create a reusable question for your events
+          </p>
         </div>
         <Button variant="outline" asChild>
           <Link href="/dashboard/questions">Back</Link>
@@ -26,7 +28,7 @@ export default function NewQuestionPage() {
         </CardHeader>
         <CardContent>
           <QuestionForm
-            onSaved={(q) => router.push(`/dashboard/questions/${q.id}`)}
+            onSaved={q => router.push(`/dashboard/questions/${q.id}`)}
             onCancel={() => router.push('/dashboard/questions')}
           />
         </CardContent>

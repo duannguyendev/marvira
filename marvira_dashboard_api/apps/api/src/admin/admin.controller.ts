@@ -1,6 +1,22 @@
-import { Controller, Get, Patch, Param, Query, Post, Delete, Body, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Param,
+  Query,
+  Post,
+  Delete,
+  Body,
+  Req,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { UserRole, FeedbackStatus, FeedbackCategory, FeedbackSource, ArticleStatus } from '@prisma/client';
+import {
+  UserRole,
+  FeedbackStatus,
+  FeedbackCategory,
+  FeedbackSource,
+  ArticleStatus,
+} from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { EventsService } from '../events/events.service';
 import { AnalyticsService } from '../analytics/analytics.service';
@@ -12,7 +28,10 @@ import { ProgressService } from '../progress/progress.service';
 import { PracticeService } from '../practice/practice.service';
 import { FeedbackService } from '../feedback/feedback.service';
 import { ArticlesService } from '../articles/articles.service';
-import { CreateArticleDto, UpdateArticleDto } from '../articles/dto/article.dto';
+import {
+  CreateArticleDto,
+  UpdateArticleDto,
+} from '../articles/dto/article.dto';
 import { PublishPracticeQuestionDto } from '../practice/dto/admin-practice.dto';
 import { UpdateFeedbackDto } from '../feedback/dto/admin-feedback.dto';
 import { SetUserRoleDto } from '../users/dto/set-user-role.dto';
@@ -51,8 +70,13 @@ export class AdminController {
   }
 
   @Post('users')
-  @ApiOperation({ summary: 'Create a user (admin/staff; only admin may assign ADMIN role)' })
-  async createUser(@Body() dto: CreateUserDto, @Req() req: { user: RequestUser }) {
+  @ApiOperation({
+    summary: 'Create a user (admin/staff; only admin may assign ADMIN role)',
+  })
+  async createUser(
+    @Body() dto: CreateUserDto,
+    @Req() req: { user: RequestUser },
+  ) {
     const data = await this.usersService.create(dto, req.user.role);
     return { success: true, data };
   }
@@ -121,7 +145,9 @@ export class AdminController {
   }
 
   @Get('events/:id/participants')
-  @ApiOperation({ summary: 'List users who joined an event (search, sort, pagination)' })
+  @ApiOperation({
+    summary: 'List users who joined an event (search, sort, pagination)',
+  })
   async eventParticipants(
     @Param('id') id: string,
     @Query('page') page?: string,
@@ -192,7 +218,10 @@ export class AdminController {
     @Param('eventId') eventId: string,
     @Param('questionId') questionId: string,
   ) {
-    const data = await this.questionsService.unlinkFromEvent(eventId, questionId);
+    const data = await this.questionsService.unlinkFromEvent(
+      eventId,
+      questionId,
+    );
     return { success: true, data };
   }
 
@@ -228,7 +257,10 @@ export class AdminController {
     @Param('id') id: string,
     @Body() dto: PublishPracticeQuestionDto,
   ) {
-    const data = await this.practiceService.adminSetPublished(id, dto.isPublished);
+    const data = await this.practiceService.adminSetPublished(
+      id,
+      dto.isPublished,
+    );
     return { success: true, data };
   }
 
@@ -283,7 +315,10 @@ export class AdminController {
 
   @Patch('feedback/:id')
   @ApiOperation({ summary: 'Update feedback status or admin note' })
-  async feedbackUpdate(@Param('id') id: string, @Body() dto: UpdateFeedbackDto) {
+  async feedbackUpdate(
+    @Param('id') id: string,
+    @Body() dto: UpdateFeedbackDto,
+  ) {
     const data = await this.feedbackService.update(id, dto);
     return { success: true, data };
   }
@@ -314,7 +349,10 @@ export class AdminController {
 
   @Post('articles')
   @ApiOperation({ summary: 'Create a marketing article' })
-  async articleCreate(@Body() dto: CreateArticleDto, @Req() req: { user: RequestUser }) {
+  async articleCreate(
+    @Body() dto: CreateArticleDto,
+    @Req() req: { user: RequestUser },
+  ) {
     const data = await this.articlesService.create(dto, req.user.id);
     return { success: true, data };
   }

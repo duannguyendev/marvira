@@ -17,7 +17,9 @@ export class RedisService implements OnModuleDestroy {
   constructor() {
     this.useMemory = process.env.REDIS_DISABLED === 'true';
     if (this.useMemory && process.env.NODE_ENV === 'production') {
-      throw new Error('REDIS_DISABLED=true is not allowed when NODE_ENV=production');
+      throw new Error(
+        'REDIS_DISABLED=true is not allowed when NODE_ENV=production',
+      );
     }
     if (this.useMemory) {
       this.client = null;
@@ -67,7 +69,7 @@ export class RedisService implements OnModuleDestroy {
 
   async del(...keys: string[]): Promise<void> {
     if (this.useMemory) {
-      keys.forEach((k) => this.memory.delete(k));
+      keys.forEach(k => this.memory.delete(k));
       return;
     }
     if (keys.length) await this.client!.del(...keys);
@@ -98,7 +100,7 @@ export class RedisService implements OnModuleDestroy {
   async keys(pattern: string): Promise<string[]> {
     if (this.useMemory) {
       const regex = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`);
-      return [...this.memory.keys()].filter((k) => regex.test(k));
+      return [...this.memory.keys()].filter(k => regex.test(k));
     }
     return this.client!.keys(pattern);
   }

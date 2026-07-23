@@ -1,7 +1,7 @@
-import React, {Component, ErrorInfo, ReactNode} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {Button} from './Button';
-import {colors, spacing, fontSize, fontWeight} from '../theme';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Button } from './Button';
+import { colors, spacing, fontSize, fontWeight } from '../theme';
 import i18n from '../i18n';
 
 interface Props {
@@ -14,10 +14,10 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = {hasError: false, message: ''};
+  state: State = { hasError: false, message: '' };
 
   static getDerivedStateFromError(error: Error): State {
-    return {hasError: true, message: error.message};
+    return { hasError: true, message: error.message };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
@@ -27,7 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   handleReset = () => {
-    this.setState({hasError: false, message: ''});
+    this.setState({ hasError: false, message: '' });
   };
 
   render() {

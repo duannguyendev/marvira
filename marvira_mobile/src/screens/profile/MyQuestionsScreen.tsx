@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,23 +8,32 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import {CompositeNavigationProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import {
   useDeletePracticeQuestion,
   useMyQuestions,
 } from '../../hooks/usePractice';
-import {useFavoriteQuestionToggle} from '../../hooks/useFavoriteQuestionToggle';
-import {PracticeQuestionCard} from '../../components/PracticeQuestionCard';
-import {LoadingSpinner} from '../../components/LoadingSpinner';
-import {ErrorView} from '../../components/ErrorView';
-import {Button} from '../../components/Button';
-import {UnfavoriteConfirmBottomSheet} from '../../components/UnfavoriteConfirmBottomSheet';
-import {MainTabParamList, ProfileStackParamList} from '../../navigation/types';
-import {colors, spacing, fontSize, fontWeight, borderRadius} from '../../theme';
+import { useFavoriteQuestionToggle } from '../../hooks/useFavoriteQuestionToggle';
+import { PracticeQuestionCard } from '../../components/PracticeQuestionCard';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { ErrorView } from '../../components/ErrorView';
+import { Button } from '../../components/Button';
+import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
+import {
+  MainTabParamList,
+  ProfileStackParamList,
+} from '../../navigation/types';
+import {
+  colors,
+  spacing,
+  fontSize,
+  fontWeight,
+  borderRadius,
+} from '../../theme';
 
 type NavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<ProfileStackParamList, 'MyQuestions'>,
@@ -32,11 +41,11 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 export const MyQuestionsScreen: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
 
-  const {data, isLoading, error, refetch, isRefetching} = useMyQuestions();
+  const { data, isLoading, error, refetch, isRefetching } = useMyQuestions();
   const deleteMutation = useDeletePracticeQuestion();
   const {
     pendingUnfavoriteId,
@@ -56,9 +65,9 @@ export const MyQuestionsScreen: React.FC = () => {
   const handleDelete = (questionId: string, questionText: string) => {
     Alert.alert(
       t('myQuestions.deleteTitle'),
-      t('myQuestions.deleteMessage', {question: questionText}),
+      t('myQuestions.deleteMessage', { question: questionText }),
       [
-        {text: t('common.cancel'), style: 'cancel'},
+        { text: t('common.cancel'), style: 'cancel' },
         {
           text: t('myQuestions.delete'),
           style: 'destructive',
@@ -117,7 +126,9 @@ export const MyQuestionsScreen: React.FC = () => {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>{t('myQuestions.emptyTitle')}</Text>
-            <Text style={styles.emptyText}>{t('myQuestions.emptyMessage')}</Text>
+            <Text style={styles.emptyText}>
+              {t('myQuestions.emptyMessage')}
+            </Text>
             <Button
               title={t('myQuestions.addFirst')}
               onPress={() => navigation.navigate('AddQuestion')}
@@ -126,7 +137,7 @@ export const MyQuestionsScreen: React.FC = () => {
             />
           </View>
         }
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <View style={styles.itemWrap}>
             <PracticeQuestionCard
               question={item}
@@ -134,7 +145,7 @@ export const MyQuestionsScreen: React.FC = () => {
                 if (item.source === 'community') {
                   navigation.navigate('Practice', {
                     screen: 'QuestionTraining',
-                    params: {questionId: item.id},
+                    params: { questionId: item.id },
                   });
                 }
               }}
@@ -144,7 +155,7 @@ export const MyQuestionsScreen: React.FC = () => {
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={() =>
-                  navigation.navigate('AddQuestion', {questionId: item.id})
+                  navigation.navigate('AddQuestion', { questionId: item.id })
                 }>
                 <Text style={styles.actionText}>{t('myQuestions.edit')}</Text>
               </TouchableOpacity>
@@ -159,7 +170,9 @@ export const MyQuestionsScreen: React.FC = () => {
               ) : (
                 <View style={styles.eventBadge}>
                   <Text style={styles.eventBadgeText}>
-                    {t('myQuestions.fromEvent', {event: item.eventTitle ?? ''})}
+                    {t('myQuestions.fromEvent', {
+                      event: item.eventTitle ?? '',
+                    })}
                   </Text>
                 </View>
               )}

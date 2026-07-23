@@ -1,18 +1,14 @@
-import {apiClient} from './client';
-import {USE_MOCK_DATA} from '../utils/constants';
+import { apiClient } from './client';
+import { USE_MOCK_DATA } from '../utils/constants';
 
 const USE_PRACTICE_MOCK = USE_MOCK_DATA;
-import {practiceStorage} from '../services/practiceStorage';
-import {practiceMockStore} from './practiceMockStore';
-import {eventsApi} from './events';
-import {
-  ApiResponse,
-  Event,
-  PracticeQuestionListItem,
-} from '../types';
-import {ApiEvent} from '../types/api';
-import {mapEvent} from './mappers';
-import {profileApi} from './profile';
+import { practiceStorage } from '../services/practiceStorage';
+import { practiceMockStore } from './practiceMockStore';
+import { eventsApi } from './events';
+import { ApiResponse, Event, PracticeQuestionListItem } from '../types';
+import { ApiEvent } from '../types/api';
+import { mapEvent } from './mappers';
+import { profileApi } from './profile';
 
 async function getCompletedEventIds(): Promise<Set<string>> {
   try {
@@ -47,15 +43,16 @@ export const favoritesApi = {
       const favoriteIds = await practiceStorage.getFavoriteEventIds();
       const eventsResponse = await eventsApi.getEvents();
       const events = eventsResponse.data.filter(e => favoriteIds.has(e.id));
-      return {success: true, data: events};
+      return { success: true, data: events };
     }
 
-    const response = await apiClient.get<{success: boolean; data: ApiEvent[]}>(
-      '/favorites/events',
-    );
+    const response = await apiClient.get<{
+      success: boolean;
+      data: ApiEvent[];
+    }>('/favorites/events');
     const completedIds = await getCompletedEventIds();
     const events = response.data.data.map(e => mapEvent(e, completedIds));
-    return {success: true, data: events};
+    return { success: true, data: events };
   },
 
   getFavoriteQuestions: async (): Promise<
@@ -92,7 +89,7 @@ export const favoritesApi = {
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
 
-      return {success: true, data: items};
+      return { success: true, data: items };
     }
 
     const response = await apiClient.get<{
@@ -100,7 +97,7 @@ export const favoritesApi = {
       data: PracticeQuestionListItem[];
     }>('/favorites/questions');
 
-    return {success: true, data: response.data.data};
+    return { success: true, data: response.data.data };
   },
 
   addFavoriteEvent: async (eventId: string): Promise<ApiResponse<null>> => {
@@ -108,11 +105,11 @@ export const favoritesApi = {
       const ids = await practiceStorage.getFavoriteEventIds();
       ids.add(eventId);
       await practiceStorage.setFavoriteEventIds(ids);
-      return {success: true, data: null};
+      return { success: true, data: null };
     }
 
     await apiClient.post(`/favorites/events/${eventId}`);
-    return {success: true, data: null};
+    return { success: true, data: null };
   },
 
   removeFavoriteEvent: async (eventId: string): Promise<ApiResponse<null>> => {
@@ -120,11 +117,11 @@ export const favoritesApi = {
       const ids = await practiceStorage.getFavoriteEventIds();
       ids.delete(eventId);
       await practiceStorage.setFavoriteEventIds(ids);
-      return {success: true, data: null};
+      return { success: true, data: null };
     }
 
     await apiClient.delete(`/favorites/events/${eventId}`);
-    return {success: true, data: null};
+    return { success: true, data: null };
   },
 
   addFavoriteQuestion: async (
@@ -134,11 +131,11 @@ export const favoritesApi = {
       const ids = await practiceStorage.getFavoriteQuestionIds();
       ids.add(questionId);
       await practiceStorage.setFavoriteQuestionIds(ids);
-      return {success: true, data: null};
+      return { success: true, data: null };
     }
 
     await apiClient.post(`/favorites/questions/${questionId}`);
-    return {success: true, data: null};
+    return { success: true, data: null };
   },
 
   removeFavoriteQuestion: async (
@@ -148,11 +145,11 @@ export const favoritesApi = {
       const ids = await practiceStorage.getFavoriteQuestionIds();
       ids.delete(questionId);
       await practiceStorage.setFavoriteQuestionIds(ids);
-      return {success: true, data: null};
+      return { success: true, data: null };
     }
 
     await apiClient.delete(`/favorites/questions/${questionId}`);
-    return {success: true, data: null};
+    return { success: true, data: null };
   },
 };
 

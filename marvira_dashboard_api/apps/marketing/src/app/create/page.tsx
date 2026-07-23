@@ -28,21 +28,26 @@ export default async function CreatePage({
         </p>
 
         <ul className="mt-14 grid gap-10 md:grid-cols-3">
-          {content.create.props.map((item) => (
+          {content.create.props.map(item => (
             <li key={item.title}>
-              <h2 className="font-display text-xl font-bold text-forest">{item.title}</h2>
-              <p className="mt-3 text-sm leading-relaxed text-ink/70">{item.body}</p>
+              <h2 className="font-display text-xl font-bold text-forest">
+                {item.title}
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-ink/70">
+                {item.body}
+              </p>
             </li>
           ))}
         </ul>
 
         <div className="mt-16 max-w-xl rounded-3xl bg-forest px-6 py-8 text-mist">
-          <p className="font-display text-xl font-bold">{content.create.ctaDownload}</p>
+          <p className="font-display text-xl font-bold">
+            {content.create.ctaDownload}
+          </p>
           <p className="mt-3 text-sm text-mist/80">{content.create.intro}</p>
           <Link
             href={withLang('/download', locale)}
-            className="mt-6 inline-flex rounded-full bg-sun px-5 py-3 text-sm font-semibold text-ink"
-          >
+            className="mt-6 inline-flex rounded-full bg-sun px-5 py-3 text-sm font-semibold text-ink">
             {content.home.ctaDownload}
           </Link>
         </div>

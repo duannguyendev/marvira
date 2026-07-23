@@ -1,16 +1,17 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {useGlobalLeaderboard} from '../../hooks/useLeaderboard';
-import {useAuth} from '../../hooks/useAuth';
-import {LeaderboardList} from '../../components/LeaderboardList';
-import {ErrorView} from '../../components/ErrorView';
-import {colors, spacing, fontSize, fontWeight} from '../../theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useGlobalLeaderboard } from '../../hooks/useLeaderboard';
+import { useAuth } from '../../hooks/useAuth';
+import { LeaderboardList } from '../../components/LeaderboardList';
+import { ErrorView } from '../../components/ErrorView';
+import { colors, spacing, fontSize, fontWeight } from '../../theme';
 
 export const GlobalLeaderboardScreen: React.FC = () => {
-  const {t} = useTranslation();
-  const {user} = useAuth();
-  const {data, isLoading, isFetching, error, refetch} = useGlobalLeaderboard();
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const { data, isLoading, isFetching, error, refetch } =
+    useGlobalLeaderboard();
 
   if (error && !data) {
     return (

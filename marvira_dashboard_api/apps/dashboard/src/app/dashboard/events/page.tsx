@@ -89,14 +89,16 @@ export default function EventsPage() {
 
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle>All Events ({data?.total?.toLocaleString() ?? 0})</CardTitle>
+          <CardTitle>
+            All Events ({data?.total?.toLocaleString() ?? 0})
+          </CardTitle>
           <div className="relative w-full sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-9"
               placeholder="Search by title, city..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearch(e.target.value)}
             />
           </div>
         </CardHeader>
@@ -110,7 +112,9 @@ export default function EventsPage() {
           ) : events.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <p className="text-muted-foreground">
-                {debouncedSearch ? 'No events match your search.' : 'No events yet.'}
+                {debouncedSearch
+                  ? 'No events match your search.'
+                  : 'No events yet.'}
               </p>
               {!debouncedSearch && (
                 <Button asChild className="mt-4">
@@ -134,14 +138,15 @@ export default function EventsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className={isFetching ? 'opacity-60' : undefined}>
-                  {events.map((event) => (
+                  {events.map(event => (
                     <TableRow
                       key={event.id}
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() =>
-                        router.push(`/dashboard/events/${event.id}/participants`)
-                      }
-                    >
+                        router.push(
+                          `/dashboard/events/${event.id}/participants`,
+                        )
+                      }>
                       <TableCell>
                         <div className="max-w-xs">
                           <p className="font-medium">{event.title}</p>
@@ -156,17 +161,24 @@ export default function EventsPage() {
                           {event.difficulty}
                         </span>
                       </TableCell>
-                      <TableCell className="text-right">{event._count?.places ?? 0}</TableCell>
+                      <TableCell className="text-right">
+                        {event._count?.places ?? 0}
+                      </TableCell>
                       <TableCell className="text-right">
                         {event._count?.eventQuestions ?? 0}
                       </TableCell>
-                      <TableCell className="text-right">{event.rewardPoints}</TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
+                      <TableCell className="text-right">
+                        {event.rewardPoints}
+                      </TableCell>
+                      <TableCell onClick={e => e.stopPropagation()}>
                         <div className="flex items-center gap-2">
                           <Switch
                             checked={event.isActive}
-                            onCheckedChange={(checked) =>
-                              toggleMutation.mutate({ id: event.id, isActive: checked })
+                            onCheckedChange={checked =>
+                              toggleMutation.mutate({
+                                id: event.id,
+                                isActive: checked,
+                              })
                             }
                           />
                           <span className="text-xs text-muted-foreground">
@@ -174,10 +186,13 @@ export default function EventsPage() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                      <TableCell
+                        className="text-right"
+                        onClick={e => e.stopPropagation()}>
                         <div className="flex justify-end gap-2">
                           <Button variant="outline" size="sm" asChild>
-                            <Link href={`/dashboard/events/${event.id}/participants`}>
+                            <Link
+                              href={`/dashboard/events/${event.id}/participants`}>
                               <Users className="h-3 w-3" />
                               Players
                             </Link>
@@ -192,9 +207,9 @@ export default function EventsPage() {
                             variant="destructive"
                             size="sm"
                             onClick={() => {
-                              if (confirm('Delete this event?')) deleteMutation.mutate(event.id);
-                            }}
-                          >
+                              if (confirm('Delete this event?'))
+                                deleteMutation.mutate(event.id);
+                            }}>
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>

@@ -7,7 +7,10 @@ import {
 } from '@nestjs/common';
 import { QuestionSource, QuestionType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { QuestionsService, CreateQuestionInput } from '../questions/questions.service';
+import {
+  QuestionsService,
+  CreateQuestionInput,
+} from '../questions/questions.service';
 import { buildPaginatedResponse, parsePagination } from '@marvira/shared-utils';
 
 type QuestionWithCreator = {
@@ -40,8 +43,7 @@ export class PracticeService {
   }
 
   private getEventMeta(q: QuestionWithCreator) {
-    const event =
-      q.places?.[0]?.event ?? q.eventQuestions?.[0]?.event ?? null;
+    const event = q.places?.[0]?.event ?? q.eventQuestions?.[0]?.event ?? null;
     return event ? { eventId: event.id, eventTitle: event.title } : {};
   }
 
@@ -89,8 +91,8 @@ export class PracticeService {
       }),
     ]);
     return {
-      favoriteIds: new Set(favorites.map((f) => f.questionId)),
-      completedIds: new Set(completions.map((c) => c.questionId)),
+      favoriteIds: new Set(favorites.map(f => f.questionId)),
+      completedIds: new Set(completions.map(c => c.questionId)),
     };
   }
 
@@ -122,7 +124,7 @@ export class PracticeService {
       take,
     });
 
-    const items = questions.map((q) =>
+    const items = questions.map(q =>
       this.toListItem(q, { favoriteIds, completedIds }),
     );
     const total = await this.prisma.client.question.count({
@@ -177,7 +179,11 @@ export class PracticeService {
     const question = await this.prisma.client.question.findUnique({
       where: { id: questionId },
     });
-    if (!question || question.source !== QuestionSource.COMMUNITY || !question.isPublished) {
+    if (
+      !question ||
+      question.source !== QuestionSource.COMMUNITY ||
+      !question.isPublished
+    ) {
       throw new NotFoundException('Question not found');
     }
 
@@ -235,7 +241,9 @@ export class PracticeService {
     });
     if (!existing) throw new NotFoundException('Question not found');
     if (existing.source !== QuestionSource.COMMUNITY) {
-      throw new BadRequestException('Only community questions can be edited here');
+      throw new BadRequestException(
+        'Only community questions can be edited here',
+      );
     }
     if (existing.createdBy !== userId) {
       throw new ForbiddenException('Not authorized to edit this question');
@@ -252,7 +260,9 @@ export class PracticeService {
     });
     if (!existing) throw new NotFoundException('Question not found');
     if (existing.source !== QuestionSource.COMMUNITY) {
-      throw new BadRequestException('Only community questions can be deleted here');
+      throw new BadRequestException(
+        'Only community questions can be deleted here',
+      );
     }
     if (existing.createdBy !== userId) {
       throw new ForbiddenException('Not authorized to delete this question');
@@ -273,7 +283,10 @@ export class PracticeService {
         where: { createdBy: userId },
         include: {
           creator: { select: { id: true, name: true } },
-          places: { take: 1, include: { event: { select: { id: true, title: true } } } },
+          places: {
+            take: 1,
+            include: { event: { select: { id: true, title: true } } },
+          },
           eventQuestions: {
             take: 1,
             include: { event: { select: { id: true, title: true } } },
@@ -292,7 +305,10 @@ export class PracticeService {
         },
         include: {
           creator: { select: { id: true, name: true } },
-          places: { take: 1, include: { event: { select: { id: true, title: true } } } },
+          places: {
+            take: 1,
+            include: { event: { select: { id: true, title: true } } },
+          },
           eventQuestions: {
             take: 1,
             include: { event: { select: { id: true, title: true } } },
@@ -307,8 +323,12 @@ export class PracticeService {
       byId.set(q.id, q);
     }
 
-    return [...byId.values()].map((q) =>
-      this.toListItem(q, { favoriteIds, completedIds, includeAnswer: q.createdBy === userId }),
+    return [...byId.values()].map(q =>
+      this.toListItem(q, {
+        favoriteIds,
+        completedIds,
+        includeAnswer: q.createdBy === userId,
+      }),
     );
   }
 
@@ -349,7 +369,7 @@ export class PracticeService {
     ]);
 
     return buildPaginatedResponse(
-      items.map((q) => ({
+      items.map(q => ({
         ...q,
         options: q.options as string[] | null,
         completionCount: q._count.practiceCompletions,
@@ -362,7 +382,9 @@ export class PracticeService {
   }
 
   async adminSetPublished(questionId: string, isPublished: boolean) {
-    const q = await this.prisma.client.question.findUnique({ where: { id: questionId } });
+    const q = await this.prisma.client.question.findUnique({
+      where: { id: questionId },
+    });
     if (!q || q.source !== QuestionSource.COMMUNITY) {
       throw new NotFoundException('Community question not found');
     }
@@ -373,39 +395,52 @@ export class PracticeService {
   }
 
   async adminStats() {
-    const [total, published, completions7d, completions30d] = await Promise.all([
-      this.prisma.client.question.count({ where: { source: QuestionSource.COMMUNITY } }),
-      this.prisma.client.question.count({
-        where: { source: QuestionSource.COMMUNITY, isPublished: true },
-      }),
-      this.prisma.client.userPracticeCompletion.count({
-        where: { completedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
-      }),
-      this.prisma.client.userPracticeCompletion.count({
-        where: { completedAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
-      }),
-    ]);
+    const [total, published, completions7d, completions30d] = await Promise.all(
+      [
+        this.prisma.client.question.count({
+          where: { source: QuestionSource.COMMUNITY },
+        }),
+        this.prisma.client.question.count({
+          where: { source: QuestionSource.COMMUNITY, isPublished: true },
+        }),
+        this.prisma.client.userPracticeCompletion.count({
+          where: {
+            completedAt: {
+              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+            },
+          },
+        }),
+        this.prisma.client.userPracticeCompletion.count({
+          where: {
+            completedAt: {
+              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
+          },
+        }),
+      ],
+    );
 
-    const topPracticed = await this.prisma.client.userPracticeCompletion.groupBy({
-      by: ['questionId'],
-      _count: { questionId: true },
-      orderBy: { _count: { questionId: 'desc' } },
-      take: 5,
-    });
+    const topPracticed =
+      await this.prisma.client.userPracticeCompletion.groupBy({
+        by: ['questionId'],
+        _count: { questionId: true },
+        orderBy: { _count: { questionId: 'desc' } },
+        take: 5,
+      });
 
-    const questionIds = topPracticed.map((t) => t.questionId);
+    const questionIds = topPracticed.map(t => t.questionId);
     const questions = await this.prisma.client.question.findMany({
       where: { id: { in: questionIds } },
       select: { id: true, question: true },
     });
-    const qMap = new Map(questions.map((q) => [q.id, q.question]));
+    const qMap = new Map(questions.map(q => [q.id, q.question]));
 
     return {
       totalCommunityQuestions: total,
       publishedCommunityQuestions: published,
       completionsLast7Days: completions7d,
       completionsLast30Days: completions30d,
-      topPracticed: topPracticed.map((t) => ({
+      topPracticed: topPracticed.map(t => ({
         questionId: t.questionId,
         text: qMap.get(t.questionId) ?? '',
         count: t._count.questionId,

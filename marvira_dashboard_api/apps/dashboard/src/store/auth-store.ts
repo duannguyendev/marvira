@@ -19,13 +19,15 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       login: async (email, password) => {
-        const data = await api.post<{ user: User; tokens: { accessToken: string; refreshToken: string } }>(
-          '/auth/login',
-          { email, password },
-        );
+        const data = await api.post<{
+          user: User;
+          tokens: { accessToken: string; refreshToken: string };
+        }>('/auth/login', { email, password });
         if (!isDashboardRole(data.user.role)) {
           api.clearTokens();
-          throw new Error('Staff or admin access only. This account cannot use the dashboard.');
+          throw new Error(
+            'Staff or admin access only. This account cannot use the dashboard.',
+          );
         }
         api.setTokens(data.tokens.accessToken, data.tokens.refreshToken);
         set({ user: data.user, isAuthenticated: true });
@@ -53,11 +55,14 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: user => set({ user, isAuthenticated: !!user }),
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
+      partialize: state => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
     },
   ),
 );

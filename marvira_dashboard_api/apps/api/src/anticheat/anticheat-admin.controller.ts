@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Post, Body, Query, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Query,
+  Patch,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -62,7 +70,12 @@ export class AnticheatAdminController {
     @Body() dto: SuspendPlayDto,
     @Req() req: { user: RequestUser },
   ) {
-    const data = await this.moderation.suspendPlay(id, req.user.id, dto.duration, dto.reason);
+    const data = await this.moderation.suspendPlay(
+      id,
+      req.user.id,
+      dto.duration,
+      dto.reason,
+    );
     return { success: true, data };
   }
 
@@ -73,7 +86,11 @@ export class AnticheatAdminController {
     @Body() dto: ModerationReasonDto,
     @Req() req: { user: RequestUser },
   ) {
-    const data = await this.moderation.liftSuspension(id, req.user.id, dto.reason);
+    const data = await this.moderation.liftSuspension(
+      id,
+      req.user.id,
+      dto.reason,
+    );
     return { success: true, data };
   }
 
@@ -84,7 +101,11 @@ export class AnticheatAdminController {
     @Body() dto: ModerationReasonDto,
     @Req() req: { user: RequestUser },
   ) {
-    const data = await this.moderation.resetWarningPoints(id, req.user.id, dto.reason);
+    const data = await this.moderation.resetWarningPoints(
+      id,
+      req.user.id,
+      dto.reason,
+    );
     return { success: true, data };
   }
 
@@ -95,7 +116,11 @@ export class AnticheatAdminController {
     @Body() dto: ModerationReasonDto,
     @Req() req: { user: RequestUser },
   ) {
-    const data = await this.moderation.deactivateUser(id, req.user.id, dto.reason);
+    const data = await this.moderation.deactivateUser(
+      id,
+      req.user.id,
+      dto.reason,
+    );
     return { success: true, data };
   }
 
@@ -106,7 +131,11 @@ export class AnticheatAdminController {
     @Body() dto: ModerationReasonDto,
     @Req() req: { user: RequestUser },
   ) {
-    const data = await this.moderation.activateUser(id, req.user.id, dto.reason);
+    const data = await this.moderation.activateUser(
+      id,
+      req.user.id,
+      dto.reason,
+    );
     return { success: true, data };
   }
 }

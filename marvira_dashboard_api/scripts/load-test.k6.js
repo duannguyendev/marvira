@@ -25,7 +25,7 @@ export function setup() {
     JSON.stringify({ email: EMAIL, password: PASSWORD }),
     { headers: { 'Content-Type': 'application/json' } },
   );
-  check(login, { 'login ok': (r) => r.status === 200 });
+  check(login, { 'login ok': r => r.status === 200 });
   const token = login.json('data.tokens.accessToken');
   return { token };
 }
@@ -40,10 +40,10 @@ export default function (data) {
     `${API_URL}/events/nearby?latitude=37.7879&longitude=-122.4075&radiusKm=50`,
     { headers },
   );
-  check(nearby, { 'nearby ok': (r) => r.status === 200 });
+  check(nearby, { 'nearby ok': r => r.status === 200 });
 
   const events = http.get(`${API_URL}/events?page=1&pageSize=10`);
-  check(events, { 'events ok': (r) => r.status === 200 });
+  check(events, { 'events ok': r => r.status === 200 });
 
   sleep(1);
 }

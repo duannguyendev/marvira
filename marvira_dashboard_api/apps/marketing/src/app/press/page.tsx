@@ -27,10 +27,14 @@ export default async function PressPage({
         </p>
 
         <div className="mt-14 grid gap-8 md:grid-cols-2">
-          {content.press.audiences.map((item) => (
+          {content.press.audiences.map(item => (
             <div key={item.title}>
-              <h2 className="font-display text-xl font-bold text-forest">{item.title}</h2>
-              <p className="mt-3 text-sm leading-relaxed text-ink/70">{item.body}</p>
+              <h2 className="font-display text-xl font-bold text-forest">
+                {item.title}
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-ink/70">
+                {item.body}
+              </p>
             </div>
           ))}
         </div>
@@ -42,7 +46,9 @@ export default async function PressPage({
         <p className="mt-10 text-sm text-ink/55">
           Media & partnerships: {SITE.supportEmail}
         </p>
-        <p className="mt-3 max-w-2xl text-xs text-ink/45">{content.press.pdfBrief}</p>
+        <p className="mt-3 max-w-2xl text-xs text-ink/45">
+          {content.press.pdfBrief}
+        </p>
       </section>
     </PageShell>
   );

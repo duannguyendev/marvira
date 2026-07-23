@@ -34,7 +34,7 @@ export function ExploreSearch({ placeholder }: { placeholder: string }) {
       <input
         type="search"
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={e => setValue(e.target.value)}
         placeholder={placeholder}
         className="w-full rounded-full border border-ink/15 bg-white px-5 py-3 text-sm text-ink shadow-sm outline-none transition focus:border-forest focus:ring-2 focus:ring-forest/20"
         aria-label={placeholder}

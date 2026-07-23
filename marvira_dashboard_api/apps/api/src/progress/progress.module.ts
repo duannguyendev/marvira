@@ -5,7 +5,11 @@ import { EventAccessModule } from '../events/event-access.module';
 import { AnticheatModule } from '../anticheat/anticheat.module';
 
 @Module({
-  imports: [forwardRef(() => WebsocketModule), EventAccessModule, AnticheatModule],
+  imports: [
+    forwardRef(() => WebsocketModule),
+    EventAccessModule,
+    AnticheatModule,
+  ],
   providers: [ProgressService],
   exports: [ProgressService],
 })

@@ -72,13 +72,18 @@ export class CreateEventDto {
   @IsBoolean()
   clearJoinPassword?: boolean;
 
-  @ApiPropertyOptional({ description: 'Message shown on completion (thanks + redeem how-to)' })
+  @ApiPropertyOptional({
+    description: 'Message shown on completion (thanks + redeem how-to)',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(2000)
   completionMessage?: string | null;
 
-  @ApiPropertyOptional({ description: 'Short public gift teaser; required when giftCodes is non-empty' })
+  @ApiPropertyOptional({
+    description:
+      'Short public gift teaser; required when giftCodes is non-empty',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(80)
@@ -156,13 +161,18 @@ export class UpdateEventDto {
   @IsBoolean()
   clearJoinPassword?: boolean;
 
-  @ApiPropertyOptional({ description: 'Message shown on completion (thanks + redeem how-to)' })
+  @ApiPropertyOptional({
+    description: 'Message shown on completion (thanks + redeem how-to)',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(2000)
   completionMessage?: string | null;
 
-  @ApiPropertyOptional({ description: 'Short public gift teaser; required when giftCodes is non-empty' })
+  @ApiPropertyOptional({
+    description:
+      'Short public gift teaser; required when giftCodes is non-empty',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(80)

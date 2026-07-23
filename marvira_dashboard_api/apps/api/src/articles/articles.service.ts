@@ -1,7 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { ArticleStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { buildPaginatedResponse, parsePagination, slugify } from '@marvira/shared-utils';
+import {
+  buildPaginatedResponse,
+  parsePagination,
+  slugify,
+} from '@marvira/shared-utils';
 import { CreateArticleDto, UpdateArticleDto } from './dto/article.dto';
 
 const adminInclude = {
@@ -14,7 +22,9 @@ const publicInclude = {
 } as const;
 
 type ArticleAdmin = Prisma.ArticleGetPayload<{ include: typeof adminInclude }>;
-type ArticlePublic = Prisma.ArticleGetPayload<{ include: typeof publicInclude }>;
+type ArticlePublic = Prisma.ArticleGetPayload<{
+  include: typeof publicInclude;
+}>;
 
 @Injectable()
 export class ArticlesService {
@@ -68,7 +78,10 @@ export class ArticlesService {
     };
   }
 
-  private async ensureUniqueSlug(base: string, excludeId?: string): Promise<string> {
+  private async ensureUniqueSlug(
+    base: string,
+    excludeId?: string,
+  ): Promise<string> {
     const root = slugify(base) || 'article';
     let candidate = root;
     let suffix = 2;
@@ -113,7 +126,7 @@ export class ArticlesService {
     ]);
 
     return buildPaginatedResponse(
-      items.map((row) => this.toPublic(row)),
+      items.map(row => this.toPublic(row)),
       total,
       page,
       pageSize,
@@ -135,7 +148,10 @@ export class ArticlesService {
       this.prisma.client.article.findFirst({
         where: {
           status: ArticleStatus.PUBLISHED,
-          OR: [{ publishedAt: { gt: anchor } }, { publishedAt: anchor, id: { gt: row.id } }],
+          OR: [
+            { publishedAt: { gt: anchor } },
+            { publishedAt: anchor, id: { gt: row.id } },
+          ],
         },
         orderBy: [{ publishedAt: 'asc' }, { id: 'asc' }],
         select: neighborSelect,
@@ -143,7 +159,10 @@ export class ArticlesService {
       this.prisma.client.article.findFirst({
         where: {
           status: ArticleStatus.PUBLISHED,
-          OR: [{ publishedAt: { lt: anchor } }, { publishedAt: anchor, id: { lt: row.id } }],
+          OR: [
+            { publishedAt: { lt: anchor } },
+            { publishedAt: anchor, id: { lt: row.id } },
+          ],
         },
         orderBy: [{ publishedAt: 'desc' }, { id: 'desc' }],
         select: neighborSelect,
@@ -155,7 +174,12 @@ export class ArticlesService {
 
   // --- Admin ---
 
-  async findAllAdmin(page = 1, pageSize = 20, search?: string, status?: ArticleStatus) {
+  async findAllAdmin(
+    page = 1,
+    pageSize = 20,
+    search?: string,
+    status?: ArticleStatus,
+  ) {
     const { skip, take } = parsePagination({ page, pageSize });
     const where: Prisma.ArticleWhereInput = {
       ...(status ? { status } : {}),
@@ -174,7 +198,7 @@ export class ArticlesService {
     ]);
 
     return buildPaginatedResponse(
-      items.map((row) => this.toAdmin(row)),
+      items.map(row => this.toAdmin(row)),
       total,
       page,
       pageSize,
@@ -217,7 +241,9 @@ export class ArticlesService {
   }
 
   async update(id: string, dto: UpdateArticleDto) {
-    const existing = await this.prisma.client.article.findUnique({ where: { id } });
+    const existing = await this.prisma.client.article.findUnique({
+      where: { id },
+    });
     if (!existing) throw new NotFoundException('Article not found');
 
     if (dto.eventId) await this.assertEventExists(dto.eventId);
@@ -226,13 +252,17 @@ export class ArticlesService {
 
     if (dto.title !== undefined) data.title = dto.title.trim();
     if (dto.slug !== undefined) {
-      data.slug = await this.ensureUniqueSlug(dto.slug.trim() || existing.title, id);
+      data.slug = await this.ensureUniqueSlug(
+        dto.slug.trim() || existing.title,
+        id,
+      );
     }
     if (dto.placeName !== undefined) data.placeName = dto.placeName.trim();
     if (dto.city !== undefined) data.city = dto.city.trim() || null;
     if (dto.excerpt !== undefined) data.excerpt = dto.excerpt.trim();
     if (dto.body !== undefined) data.body = dto.body;
-    if (dto.coverImage !== undefined) data.coverImage = dto.coverImage.trim() || null;
+    if (dto.coverImage !== undefined)
+      data.coverImage = dto.coverImage.trim() || null;
     if (dto.eventId !== undefined) {
       data.event = dto.eventId
         ? { connect: { id: dto.eventId } }

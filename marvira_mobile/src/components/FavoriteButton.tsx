@@ -1,6 +1,6 @@
 import React from 'react';
-import {TouchableOpacity, Text, StyleSheet, ViewStyle} from 'react-native';
-import {colors, spacing, fontSize} from '../theme';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
+import { colors, spacing, fontSize } from '../theme';
 
 interface FavoriteButtonProps {
   isFavorite: boolean;
@@ -20,10 +20,10 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   <TouchableOpacity
     onPress={onPress}
     style={[styles.button, style]}
-    hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
+    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
     accessibilityRole="button"
     accessibilityLabel={accessibilityLabel}>
-    <Text style={[styles.icon, {fontSize: size}]}>
+    <Text style={[styles.icon, { fontSize: size }]}>
       {isFavorite ? '★' : '☆'}
     </Text>
   </TouchableOpacity>

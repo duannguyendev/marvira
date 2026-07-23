@@ -35,21 +35,30 @@ export class FavoritesController {
 
   @Delete('events/:id')
   @ApiOperation({ summary: 'Remove event from favorites' })
-  async removeEvent(@Req() req: { user: RequestUser }, @Param('id') id: string) {
+  async removeEvent(
+    @Req() req: { user: RequestUser },
+    @Param('id') id: string,
+  ) {
     await this.favoritesService.removeFavoriteEvent(req.user.id, id);
     return { success: true, data: null };
   }
 
   @Post('questions/:id')
   @ApiOperation({ summary: 'Add question to favorites' })
-  async addQuestion(@Req() req: { user: RequestUser }, @Param('id') id: string) {
+  async addQuestion(
+    @Req() req: { user: RequestUser },
+    @Param('id') id: string,
+  ) {
     await this.favoritesService.addFavoriteQuestion(req.user.id, id);
     return { success: true, data: null };
   }
 
   @Delete('questions/:id')
   @ApiOperation({ summary: 'Remove question from favorites' })
-  async removeQuestion(@Req() req: { user: RequestUser }, @Param('id') id: string) {
+  async removeQuestion(
+    @Req() req: { user: RequestUser },
+    @Param('id') id: string,
+  ) {
     await this.favoritesService.removeFavoriteQuestion(req.user.id, id);
     return { success: true, data: null };
   }

@@ -27,18 +27,21 @@ export default async function SupportPage({
         </p>
 
         <div className="mt-12 max-w-3xl space-y-6">
-          {content.support.faqs.map((item) => (
+          {content.support.faqs.map(item => (
             <details
               key={item.q}
-              className="group border-b border-forest/10 pb-5 open:pb-5"
-            >
+              className="group border-b border-forest/10 pb-5 open:pb-5">
               <summary className="cursor-pointer list-none font-display text-lg font-semibold text-ink marker:content-none">
                 <span className="flex items-start justify-between gap-4">
                   {item.q}
-                  <span className="text-canopy transition group-open:rotate-45">+</span>
+                  <span className="text-canopy transition group-open:rotate-45">
+                    +
+                  </span>
                 </span>
               </summary>
-              <p className="mt-3 text-sm leading-relaxed text-ink/70">{item.a}</p>
+              <p className="mt-3 text-sm leading-relaxed text-ink/70">
+                {item.a}
+              </p>
             </details>
           ))}
         </div>

@@ -1,15 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-} from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {Button} from './Button';
-import {Input} from './Input';
-import {colors, spacing, borderRadius, fontSize, fontWeight} from '../theme';
+import React, { useState, useEffect } from 'react';
+import { Modal, View, Text, StyleSheet, Pressable } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Button } from './Button';
+import { Input } from './Input';
+import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
 interface JoinEventPasswordSheetProps {
   visible: boolean;
@@ -26,7 +20,7 @@ export const JoinEventPasswordSheet: React.FC<JoinEventPasswordSheetProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
 
   useEffect(() => {
