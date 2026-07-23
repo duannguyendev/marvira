@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StepIndicator } from '../../components/StepIndicator';
 import { Button } from '../../components/Button';
 import { HomeStackParamList, MainTabParamList } from '../../navigation/types';
+import { AnalyticsEvents } from '../../services/analytics';
 import {
   colors,
   spacing,
@@ -37,6 +38,7 @@ export const CreateEventSuccessScreen: React.FC = () => {
       return;
     }
     try {
+      void AnalyticsEvents.shareTapped(eventId, 'other');
       await Share.share({
         message: t('createEvent.access.shareMessage', {
           password: joinPassword,

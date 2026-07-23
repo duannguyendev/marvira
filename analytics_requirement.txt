@@ -1,0 +1,290 @@
+================================================================================
+MARVIRA — ANALYTICS REQUIREMENT (FIREBASE + LIGHT ADMIN)
+================================================================================
+Updated: 2026-07-23
+Purpose: Product analytics for v1.0+ without building a full DIY analytics suite.
+Companion: growth_plan.txt | monetization_todo.txt | go_live_update_checklist.txt
+Status: Implementation in progress in marvira_mobile — replace Firebase placeholder configs before production.
+Audience: Mobile + API/dashboard developers
+
+Legend:
+  [ ] = Not started
+  [~] = In progress
+  [x] = Done
+
+================================================================================
+DECISION (LOCKED)
+================================================================================
+
+  Product metrics (MAU, DAU, retention, funnels, crashes)
+    → Firebase Analytics + Firebase Crashlytics on mobile
+
+  Ops / staff metrics (events, practice, moderation)
+    → Keep existing admin dashboard; do NOT rebuild MAU/retention there
+
+  Do NOT build a custom mobile analytics pipeline for growth metrics.
+  Existing API `analytics_events` table may stay for sparse server-side ops
+  logging; it is NOT a substitute for Firebase.
+
+================================================================================
+WHY
+================================================================================
+
+  - Real MAU / D1 / D7 / funnels are expensive to DIY correctly
+  - Current admin “Active Users” is NOT MAU (counts hunt starts in 30 days,
+    not unique app users) — leave as-is or rename later; don’t expand DIY
+  - Firebase is free at early scale and standard for React Native apps
+  - Growth plan north-star metrics need reliable client analytics at launch
+
+================================================================================
+VERSION SCOPE
+================================================================================
+
+  v1.0 (REQUIRED before / with public launch)
+    [~] Firebase project + Android / iOS apps registered
+        (code ready; replace placeholder google-services.json / GoogleService-Info.plist)
+    [x] Analytics SDK on marvira_mobile
+    [x] Crashlytics SDK on marvira_mobile
+    [x] Core event taxonomy (see below) — wired in app
+    [x] Privacy Policy mentions analytics / Crashlytics (marketing /privacy)
+    [ ] Store privacy labels (Apple / Google) updated for analytics
+        (do at App Store Connect / Play Console before release)
+
+  v1.1+
+    [ ] Optional: rename admin “Active Users” → “Hunt starts (30d)” for honesty
+    [ ] Optional: more funnel events if growth data needs them
+
+  v1.2+ (monetization)
+    [ ] ad_impression / ad_click (by placement)
+    [ ] paywall_view / purchase_start / purchase_success / purchase_restore
+    [ ] plus_cancel (if available via store / RevenueCat later)
+
+  Out of scope (do not build now)
+    - DIY MAU/DAU/retention charts in dashboard
+    - Replacing Firebase with Mixpanel/Amplitude (revisit only if Firebase lacks)
+    - PII in event params (no email, name, precise GPS in Analytics params)
+
+================================================================================
+STACK (MOBILE)
+================================================================================
+
+  App: marvira_mobile (React Native 0.85)
+
+  Recommended packages (confirm current RN Firebase docs at implement time):
+    - @react-native-firebase/app
+    - @react-native-firebase/analytics
+    - @react-native-firebase/crashlytics
+
+  Config files (do not commit secrets carelessly; follow Firebase console export):
+    - Android: google-services.json
+    - iOS: GoogleService-Info.plist
+
+  Environments:
+    - Prefer separate Firebase projects or apps for staging vs production
+      so test traffic does not pollute launch metrics
+    - At minimum: debug builds should not flood prod (use staging project
+      or disable collection in __DEV__ unless testing analytics)
+
+================================================================================
+PRIVACY & CONSENT
+================================================================================
+
+  [ ] Update marketing /privacy (and /terms if needed): Firebase Analytics,
+      Crashlytics, crash logs, device/app identifiers as applicable
+  [ ] iOS: respect ATT if advertising ID used later; Analytics can run with
+      analytics-only setup — follow Apple + Firebase guidance at implement time
+  [ ] No precise lat/lng in event parameters (hunt is location-based; keep
+      coords off Analytics payloads). Use event_id / place_id only if needed.
+  [ ] Do not log passwords, tokens, or full invite secrets
+
+================================================================================
+EVENT TAXONOMY (v1.0 — IMPLEMENT THESE)
+================================================================================
+
+  Naming: snake_case, stable. Do not rename after launch without a migration note.
+  Params: only primitive strings/numbers; keep cardinality low (no free-text answers).
+
+  ---------------------------------------------------------------------------
+  A) App lifecycle
+  ---------------------------------------------------------------------------
+  [x] app_open
+      When: app comes to foreground / cold start (dedupe per Firebase defaults OK)
+      Params: optional — none required
+
+  ---------------------------------------------------------------------------
+  B) Hunt (core loop) — highest priority for growth
+  ---------------------------------------------------------------------------
+  [x] hunt_started
+      When: user starts / joins playing an event
+      Params: event_id (string)
+
+  [x] place_unlocked
+      When: GPS unlock succeeds for a place
+      Params: event_id, place_id
+
+  [x] place_answered
+      When: user submits an answer at a place (success or fail)
+      Params: event_id, place_id, correct (bool or 0/1)
+
+  [x] hunt_completed
+      When: user finishes the hunt / marks event complete
+      Params: event_id, score (number, optional), duration_sec (optional)
+
+  [x] hunt_abandoned
+      When: user leaves mid-hunt if detectable (optional v1.0; nice-to-have)
+      Params: event_id, places_done (number, optional)
+
+  ---------------------------------------------------------------------------
+  C) Practice
+  ---------------------------------------------------------------------------
+  [x] practice_opened
+      When: Practice list or training screen opens
+      Params: optional — source (list|training)
+
+  [x] practice_answered
+      When: user submits a practice answer
+      Params: question_id, correct (0/1)
+
+  ---------------------------------------------------------------------------
+  D) Create / publish (supply side)
+  ---------------------------------------------------------------------------
+  [x] event_draft_created
+      When: user creates a new event draft
+      Params: none or event_id
+
+  [x] event_published
+      When: user publishes an event
+      Params: event_id
+
+  [ ] event_unpublished
+      When: user unpublishes (useful later for cap analytics)
+      Params: event_id
+      Note: no unpublish UI yet — AnalyticsEvents.eventUnpublished helper ready
+
+  ---------------------------------------------------------------------------
+  E) Growth / invites
+  ---------------------------------------------------------------------------
+  [x] invite_opened
+      When: app opens from invite / deep / universal link
+      Params: event_id (if known), link_type (invite|share|other)
+
+  [x] share_tapped
+      When: user taps share after hunt or from event
+      Params: event_id, surface (post_hunt|event_detail|other)
+
+  ---------------------------------------------------------------------------
+  F) Store / feedback (light)
+  ---------------------------------------------------------------------------
+  [ ] review_prompt_shown   (if you show in-app review)
+  [ ] review_prompt_result  (optional: accepted|dismissed — if API allows)
+  [x] feedback_submitted    (if user sends feedback from app)
+
+================================================================================
+FUNNELS TO CONFIGURE IN FIREBASE CONSOLE (POST-IMPLEMENT)
+================================================================================
+
+  After events ship, create these explorations / funnels (PM or lead):
+
+  [ ] Install / first open → hunt_started → place_unlocked → hunt_completed
+  [ ] invite_opened → hunt_started → hunt_completed
+  [ ] practice_opened → practice_answered
+  [ ] event_draft_created → event_published
+
+  Retention:
+  [ ] Check D1 / D7 in Firebase Retention (especially users who fired
+      hunt_completed once)
+
+================================================================================
+CRASHLYTICS
+================================================================================
+
+  [ ] Enable Crashlytics for Android + iOS release builds
+  [ ] Optional: log non-fatal for critical caught errors (API failure on
+      unlock / publish) — do not spam
+  [ ] Verify a test crash in staging before production release
+  [ ] Ensure dSYM / mapping upload for readable stack traces (iOS/Android)
+
+================================================================================
+IMPLEMENTATION NOTES (DEVELOPER)
+================================================================================
+
+  1. Centralize logging in one helper, e.g.:
+       src/services/analytics.ts
+         logEvent(name, params?)
+         setUserId(userId | null)   // after login; clear on logout
+     Call sites should not import Firebase everywhere ad hoc.
+
+  2. setUserId: use internal user UUID only — never email.
+
+  3. Fail soft: analytics must never block UX if Firebase fails.
+
+  4. Screen views: optional automatic screen tracking OR manual
+     logScreenView for main tabs (Home, Practice, Profile, Map/Hunt).
+     Prefer a small set of named screens over every stack push.
+
+  5. Align param names with growth_plan.txt north stars so reports stay stable.
+
+  6. Existing backend:
+       - apps/api AnalyticsEvent + admin /dashboard/analytics → keep for ops
+       - Do not duplicate every Firebase event into Postgres
+       - Optional later: server logs for place_answered already exist; no need
+         to expand unless ops needs it
+
+================================================================================
+ADMIN DASHBOARD (EXISTING — LIGHT TOUCH ONLY)
+================================================================================
+
+  Current:
+    /dashboard           — Total Users, “Active Users”, events, completions
+    /dashboard/analytics — completion, engagement charts, practice stats
+
+  “Active Users” today = count of userEventProgress started in last 30 days
+  (NOT unique MAU). See analytics.service.ts getOverview().
+
+  v1.0 tasks for admin:
+    [ ] None required for Firebase
+    [ ] Optional: rename label to avoid confusing staff (“Hunt starts (30d)”)
+
+  Do NOT in v1.0:
+    [ ] DIY MAU widget
+    [ ] DIY retention charts
+    [ ] Full event stream UI mirroring Firebase
+
+================================================================================
+ACCEPTANCE CRITERIA (v1.0 DONE)
+================================================================================
+
+  [ ] Release build of Android + iOS sends events visible in Firebase DebugView
+  [ ] At least: app_open, hunt_started, place_unlocked, place_answered,
+      hunt_completed, practice_answered, event_published, invite_opened
+  [ ] Crashlytics receives a verified test crash from staging
+  [ ] Privacy Policy updated; store listings disclosure checked
+  [ ] Staging traffic separated from production (project or collection gate)
+  [ ] No PII / precise GPS in event parameters
+
+================================================================================
+CHECKLIST ORDER (FOR DEVELOPER)
+================================================================================
+
+  1. Create Firebase project(s); register Android + iOS apps
+  2. Add config files + RN Firebase packages; verify build
+  3. Implement analytics.ts helper + setUserId on auth
+  4. Wire core hunt + practice + publish + invite events
+  5. Enable Crashlytics + mapping/dSYM upload
+  6. DebugView validation on device
+  7. Legal / store privacy updates
+  8. Document event list in PR / handoff (link this file)
+
+================================================================================
+REFERENCES
+================================================================================
+
+  - growth_plan.txt — north-star metrics; users-first launch
+  - monetization_todo.txt — add ad/IAP events at v1.2 / v1.3
+  - go_live_update_checklist.txt — production release gates
+  - Existing admin analytics: apps/api/src/analytics/
+  - Existing sparse server event: progress.service.ts → place_answered
+
+================================================================================
+END
+================================================================================

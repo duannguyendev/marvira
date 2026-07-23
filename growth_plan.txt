@@ -1,0 +1,301 @@
+================================================================================
+MARVIRA — GROWTH PLAN (USERS FIRST)
+================================================================================
+Updated: 2026-07-23
+Purpose: Acquire and retain users before monetization. One city → density → expand.
+Companion: monetization_todo.txt | analytics_requirement.txt | go_live_update_checklist.txt
+Status: Plan only — execute alongside store launch; ads/Plus deferred to post-v1.0.
+
+Legend:
+  [ ] = Not started
+  [~] = In progress
+  [x] = Done
+
+================================================================================
+PRINCIPLE
+================================================================================
+
+  Users first. Monetization later.
+  Empty cities feel broken; a few packed cities feel magical.
+  Do NOT turn on ads or Plus at public launch (v1.0).
+  Flip monetization only after retention and hunt density look healthy.
+
+================================================================================
+NORTH STAR METRICS (first 3–6 months)
+================================================================================
+
+  Primary
+    - Weekly active players who finish ≥1 hunt
+    - Published hunts in focus city
+    - Invite → install → first unlock conversion
+    - D7 retention of players who completed a hunt once
+
+  Secondary
+    - Organizers who publish ≥1 hunt
+    - Share / invite link opens
+    - App Store / Play ratings (target after first completion)
+
+  Ignore early: download vanity, ad revenue, Plus conversion
+
+================================================================================
+POSITIONING
+================================================================================
+
+  Players:     “Turn your city into a scavenger hunt with friends.”
+  Organizers:  “Build a GPS hunt and invite with one link — events, schools, tourism.”
+
+  Lead consumer brand with players + weekend energy.
+  Organizers scale supply; don’t lead with “enterprise event software.”
+
+================================================================================
+VERSION ROADMAP × MONETIZATION (see monetization_todo.txt)
+================================================================================
+
+  Rule: Growth versions ship product + acquisition; monetization ships only when gated.
+
+  ---------------------------------------------------------------------------
+  v1.0 — PUBLIC LAUNCH (users first)
+  ---------------------------------------------------------------------------
+  Goal: Win trust + first city density. Zero revenue pressure.
+
+  Product
+    - Full free core loop (find → walk → GPS unlock → answer → finish)
+    - Practice mode, create/draft/publish, leaderboards, share/invite
+    - Marketing site + store listings live
+    - Seeded public hunts in ONE launch city
+
+  Monetization (from monetization_todo.txt)
+    - Ship: NONE active (ads off, no Plus paywall, no publish cap)
+    - Optional plumbing only (flagged OFF — no user-facing pay):
+        [ ] M0.3–M0.4 Privacy/Terms ready for future ads + subs (legal text OK)
+        [ ] Ad SDK + kill switch installed but ALL ad units disabled remotely
+        [ ] Plus product IDs created in stores but paywall hidden / flag off
+    - Do NOT ship: M1 ads live, M2 Plus live, M3 publish cap enforced
+
+  Growth focus: Phase 0–1 below (seed city, soft test, public launch)
+
+  ---------------------------------------------------------------------------
+  v1.1 — RETENTION + SHARE LOOP
+  ---------------------------------------------------------------------------
+  Goal: People come back and invite friends. Still free.
+
+  Product (examples — pick what retention data needs)
+    - Stronger post-hunt share / certificate / invite UX
+    - Featured / weekend hunt surfacing
+    - Practice habit nudges (light, not spam)
+    - Review prompt after hunt completion
+    - Organizer create flow polish (time-to-first-publish)
+
+  Monetization
+    - Still OFF for users
+    - Allowed prep (still flagged off):
+        [ ] M0.1 Monetization product rules doc
+        [ ] M0.2 Store products + regional prices configured (not sold yet)
+        [ ] M4.1 Analytics events stubbed (paywall/ad impressions = 0)
+
+  Growth focus: Phase 2 (retention before expansion)
+
+  ---------------------------------------------------------------------------
+  v1.2 — LIGHT ADS (practice-first)
+  ---------------------------------------------------------------------------
+  Gate to ship: D7 of completers healthy + focus city not empty + complaints low.
+
+  Monetization ON (subset of monetization_todo.txt)
+    [ ] M0 complete (rules + legal + consent)
+    [ ] M1.1–M1.3 Ad SDK, units, consent / age gating
+    [ ] M1.4 Practice ad surfaces (banner + after session)  ← priority
+    [ ] M1.5 Hub banners (Home, Profile, Favorites)
+    [ ] M1.8 Kill switch / remote config per ad type
+    [ ] M4.2 Remote disable if complaints spike
+
+  Still OFF
+    - M2 Plus / IAP
+    - M3 publish cap
+    - M1.6 Rewarded cosmetics
+    - M1.7 Interstitial
+
+  Growth focus: Keep acquisition; watch uninstall / 1-star “too many ads”
+
+  ---------------------------------------------------------------------------
+  v1.3 — MARVIRA PLUS + PUBLISH CAP
+  ---------------------------------------------------------------------------
+  Gate: Ads stable ≥2–4 weeks; no retention cliff from v1.2.
+
+  Monetization ON
+    [ ] M2.1–M2.5 Plus IAP ($3.99/mo or $29.99/yr) + entitlements + paywall
+    [ ] M3.1–M3.3 Publish cap: Free 10 concurrent published; Plus unlimited
+    [ ] Wire Plus: no ads + unlimited publish + badge + practice/share perks
+
+  Publish-cap transition (important)
+    - v1.0–v1.2: unlimited create + publish
+    - v1.3+: Free = max 10 concurrent PUBLISHED; drafts always unlimited
+    - Over-cap users: existing hunts stay live; NEW publish blocked until
+      they unpublish down to ≤10 or go Plus (see monetization_todo.txt M3)
+
+  Still OFF / later
+    - M1.6 Rewarded cosmetics (optional same release if low risk)
+    - M1.7 Rare interstitial
+    - B2B web billing
+    - Price A/B ($4.99 / $39.99)
+
+  Growth focus: Soft paywall only at Profile / publish limit / remove ads —
+                never block starting a hunt; never block creating drafts
+
+  ---------------------------------------------------------------------------
+  v1.4 — ADS DEPTH + OPTIMIZATION
+  ---------------------------------------------------------------------------
+  Monetization ON
+    [ ] M1.6 Rewarded cosmetics (frame / share theme — never hints)
+    [ ] M1.7 Interstitial after hunt OR practice session (cooldown ≥3–5 min)
+    [ ] M4.3 A/B pricing later ($3.99 vs $4.99; yearly $29.99 vs $39.99)
+    [ ] M4.4 Store guideline re-check
+
+  Growth focus: Second city expansion + light geo-fenced paid UA
+                (only if first-hunt completion CPA is sane)
+
+  ---------------------------------------------------------------------------
+  v1.5+ — B2B / INSTITUTIONS (optional)
+  ---------------------------------------------------------------------------
+    [ ] B2B web plans for schools / cities / tourism (separate from Plus)
+    [ ] Optional cosmetic packs (not main IAP)
+    - Still never: hint IAP, mid-hunt ads, pay-to-win
+
+================================================================================
+QUICK VERSION ↔ MONETIZATION MAP
+================================================================================
+
+  Version | Growth goal              | Monetization live
+  --------|--------------------------|----------------------------------
+  v1.0    | Launch + 1 city density  | None (plumbing optional, OFF)
+  v1.1    | Retention + invites      | None (prep only)
+  v1.2    | Scale practice/hub ads   | M0 + M1.1–M1.5 + M1.8 (+ M4.2)
+  v1.3    | Soft revenue             | M2 Plus + M3 publish cap
+  v1.4    | Optimize ARPU            | M1.6–M1.7 + M4.3–M4.4
+  v1.5+   | Institutions             | B2B web; optional cosmetics
+
+================================================================================
+PHASE G0 — PRE-LAUNCH (1–2 weeks before v1.0)
+================================================================================
+
+  [ ] G0.1 Pick ONE launch city (or one district) — not “everywhere”
+  [ ] G0.2 Seed 8–15 strong public hunts there (you + friends as organizers OK)
+  [ ] G0.3 Soft test with 20–50 real people; fix GPS unlock + first-hunt drop-off
+  [ ] G0.4 Store listing + marketing site: one story (walk → unlock → answer → board)
+  [ ] G0.5 Screenshots = real streets / people walking — not abstract UI chrome
+  [ ] G0.6 Share finish + invite link works end-to-end (cheapest acquisition)
+  [ ] G0.7 Analytics: Firebase v1.0 events live (see analytics_requirement.txt)
+             Track: install, first unlock, hunt complete, invite open, D1/D7 in Firebase
+
+================================================================================
+PHASE G1 — LAUNCH: WIN ONE CITY (v1.0, weeks 1–6)
+================================================================================
+
+  Concentrate every channel on the launch city.
+
+  [ ] G1.1 Public store release (go_live_update_checklist.txt P0s done)
+  [ ] G1.2 Organizer outreach: schools, student clubs, tourism, HR/team-building,
+           birthday planners, café/district associations
+           Pitch: “We help build the hunt; you invite the crowd.”
+  [ ] G1.3 Player outreach: local Facebook/Zalo groups, university clubs,
+           walking/running communities, “things to do this weekend”
+  [ ] G1.4 Content: short clips of real routes + weekly featured weekend hunt
+  [ ] G1.5 1–2 venue partnerships (museum, park event, café street) co-host a hunt
+  [ ] G1.6 Local press/blog pitch: “New app turns [City] into a scavenger hunt”
+  [ ] G1.7 Paid: NONE broad. Optional retarget only invite/download visitors in city
+
+================================================================================
+PHASE G2 — RETENTION BEFORE EXPANSION (v1.1, weeks 4–12)
+================================================================================
+
+  [ ] G2.1 Weekly featured hunt + light leaderboard presence
+  [ ] G2.2 Practice as rainy-day / between-hunts habit
+  [ ] G2.3 Push only: new hunt near you, friend finished, weekly challenge
+  [ ] G2.4 Ask for store review right after hunt completion
+  [ ] G2.5 Organizer workshops: “Create your first hunt in 30 minutes”
+  [ ] G2.6 Gate city #2: D7 healthy + map not empty without hand-holding
+
+================================================================================
+PHASE G3 — SECOND CITY + LIGHT PAID (v1.4-ish, months 3–6)
+================================================================================
+
+  [ ] G3.1 Copy playbook: seed hunts → organizers → weekend challenge → local groups
+  [ ] G3.2 Small geo-fenced Meta/TikTok: outdoor walk + “free hunt this weekend”
+  [ ] G3.3 Kill ads that don’t produce a completed first hunt
+  [ ] G3.4 Align with v1.2+ monetization only after city #1 retention holds
+
+================================================================================
+BUDGET (LEAN)
+================================================================================
+
+  Highest  Seed content + founder time in 1 city
+  High     Small partner / venue collabs
+  Medium   ASO polish + short video
+  Low      Broad UA until D7 is healthy
+  Optional Local micro-influencers (city walkers / students) only
+
+================================================================================
+30-DAY ACTION LIST (from now → v1.0)
+================================================================================
+
+  Week 1
+    [ ] Choose launch city
+    [ ] Seed first 5 hunts
+    [ ] Soft test group invited
+
+  Week 2
+    [ ] Seed to 10 hunts
+    [ ] Fix top first-session drop-offs
+    [ ] Store listing + site download CTAs ready
+
+  Week 3
+    [ ] Soft test 30 people; note friction
+    [ ] Line up 3 organizer partners
+    [ ] One featured weekend hunt planned
+
+  Week 4
+    [ ] v1.0 public launch
+    [ ] Post local groups + partners go live
+    [ ] Measure completions + invites daily (not just installs)
+
+================================================================================
+GATES BEFORE EACH MONETIZATION VERSION
+================================================================================
+
+  Before v1.2 (ads)
+    [ ] Completers D7 stable vs v1.0 baseline
+    [ ] Focus city has enough hunts that cold open isn’t empty
+    [ ] Privacy / ATT / UMP ready
+    [ ] Kill switch tested
+
+  Before v1.3 (Plus + publish cap)
+    [ ] Ads live ≥2–4 weeks without retention cliff or review bomb
+    [ ] Paywall copy clear; restore purchases works
+    [ ] Free still: full hunt loop + drafts + ≤10 published (cap only)
+
+  Before v1.4 (interstitial / rewarded / paid UA)
+    [ ] Plus conversion + cancel rates sane
+    [ ] Interstitial cooldown enforced; never mid-hunt
+
+================================================================================
+ANTI-PATTERNS (GROWTH)
+================================================================================
+
+  - Launching nationally with empty maps
+  - Broad paid UA before first-hunt completion is healthy
+  - Turning on ads/Plus at v1.0 to “cover hosting”
+  - Leading brand as B2B tool to consumers
+  - Spam pushes that train uninstalls
+  - Monetizing hints or interrupting the outdoor hunt loop
+
+================================================================================
+NOTES
+================================================================================
+
+  - Monetization feature detail: monetization_todo.txt (M0–M4)
+  - This file owns WHEN (versions + growth phases); that file owns WHAT/HOW
+  - Update version map in both files if release order changes
+  - Mark [~] when started, [x] when done
+
+================================================================================
+END
+================================================================================

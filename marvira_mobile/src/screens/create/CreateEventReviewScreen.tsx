@@ -20,6 +20,7 @@ import { ErrorView } from '../../components/ErrorView';
 import { useEventDetails } from '../../hooks/useEvents';
 import { usePublishEvent } from '../../hooks/useMyEvents';
 import { HomeStackParamList } from '../../navigation/types';
+import { AnalyticsEvents, analytics } from '../../services/analytics';
 import {
   colors,
   spacing,
@@ -134,12 +135,14 @@ export const CreateEventReviewScreen: React.FC = () => {
         completionMessage: completionMessage.trim() || null,
         giftCodes: codes,
       });
+      void AnalyticsEvents.eventPublished(eventId);
       navigation.navigate('CreateEventSuccess', {
         eventId,
         published: true,
         ...(accessMode === 'password' ? { joinPassword } : {}),
       });
     } catch (err: any) {
+      analytics.recordError(err);
       Alert.alert(
         t('common.error'),
         err?.response?.data?.message ||

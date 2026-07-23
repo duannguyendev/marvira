@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/Button';
 import { feedbackApi } from '../../api/feedback';
 import { FeedbackCategory } from '../../types';
+import { AnalyticsEvents } from '../../services/analytics';
 import {
   colors,
   spacing,
@@ -49,6 +50,7 @@ export const FeedbackScreen: React.FC = () => {
         subject: subject.trim() || undefined,
         message: message.trim(),
       });
+      void AnalyticsEvents.feedbackSubmitted(category);
       Alert.alert(t('feedback.successTitle'), t('feedback.successMessage'));
       setCategory(FeedbackCategory.FEEDBACK);
       setSubject('');

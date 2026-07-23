@@ -24,6 +24,14 @@ export class ErrorBoundary extends Component<Props, State> {
     if (__DEV__) {
       console.error('ErrorBoundary:', error, info.componentStack);
     }
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { analytics } = require('../services/analytics') as typeof import('../services/analytics');
+      analytics.logBreadcrumb(`ErrorBoundary: ${info.componentStack ?? ''}`);
+      analytics.recordError(error);
+    } catch {
+      // ignore
+    }
   }
 
   handleReset = () => {

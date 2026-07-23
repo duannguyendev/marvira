@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import { ErrorView } from '../../components/ErrorView';
 import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
 import { PracticeStackParamList } from '../../navigation/types';
 import { PracticeQuestionStatus } from '../../types';
+import { AnalyticsEvents } from '../../services/analytics';
 import {
   colors,
   spacing,
@@ -48,6 +49,10 @@ export const PracticeListScreen: React.FC = () => {
   } = useFavoriteQuestionToggle();
 
   const questions = data?.data ?? [];
+
+  useEffect(() => {
+    void AnalyticsEvents.practiceOpened('list');
+  }, []);
 
   const handleRefresh = async () => {
     setRefreshing(true);

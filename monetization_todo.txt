@@ -1,9 +1,10 @@
 ================================================================================
 MARVIRA — MONETIZATION TODO (IAP + ADS)
 ================================================================================
-Updated: 2026-07-20
+Updated: 2026-07-23
 Purpose: In-app purchase + advertising with best benefit, least annoyance, best UX.
-Status: Plan only — implement after core gameplay is stable / near store release.
+Status: Plan only — NOT at v1.0. Ship per version map below (see growth_plan.txt).
+Companion: growth_plan.txt (users first; when to flip ads/Plus).
 
 Legend:
   [ ] = Not started
@@ -179,13 +180,25 @@ PHASE M3 — PUBLISH LIMIT (bundled into Plus)
 
 Decision:
   Free: 10 concurrent PUBLISHED events (unpublish frees a slot)
-  Drafts: unlimited
+  Drafts: unlimited always (create never blocked by monetization)
   Plus: unlimited published
   Prefer concurrent cap over lifetime “10 ever”
 
+  Before v1.3 (v1.0–v1.2): NO publish cap — create + publish freely.
+
+  When cap turns on (v1.3) — grandfather over-cap creators:
+    - Existing published events STAY live (do NOT force-unpublish or delete)
+    - If free user already has >10 published: block NEW publishes only
+    - They can still: create drafts, edit, unpublish, re-publish only if
+      after unpublish count ≤10, OR subscribe to Plus
+    - UX: “You have 15 published (Free allows 10). Unpublish some or go Plus
+      to publish more. Your current hunts stay live.”
+    - Do NOT grandfather “unlimited forever” for early users (keeps rules simple)
+
 [ ] M3.1 Enforce publish cap in API + mobile create flow
 [ ] M3.2 At cap UX: “Free: 10/10 published. Unpublish one or go Plus.”
-[ ] M3.3 Show usage (e.g. 7/10 published) in My Events / Profile
+[ ] M3.2b Over-cap grandfather UX (count >10 when flag flips)
+[ ] M3.3 Show usage (e.g. 7/10 or 15/10 published) in My Events / Profile
 [ ] M3.4 Anti-abuse rate limits / admin tools
 [ ] M3.5 Later: B2B web plans for schools/cities (not required for consumer launch)
 
@@ -199,15 +212,39 @@ PHASE M4 — ANALYTICS & GUARDRAILS
 [ ] M4.4 Store guideline review (subscriptions, ads, kids policies if needed)
 
 ================================================================================
+VERSION RELEASE MAP (aligned with growth_plan.txt)
+================================================================================
+
+  v1.0  Launch — users first
+        Live: none. Optional: legal copy + SDK/IAP plumbing flagged OFF.
+
+  v1.1  Retention — still free
+        Live: none. Prep: M0.1–M0.2, analytics stubs (M4.1).
+
+  v1.2  Light ads
+        Live: M0 + M1.1–M1.5 + M1.8 + M4.2 (practice-first, then hub banners).
+        Off: Plus, publish cap, rewarded, interstitial.
+
+  v1.3  Soft revenue
+        Live: M2 Plus + M3 publish cap (10 → unlimited) + Plus benefits wired.
+
+  v1.4  Optimize
+        Live: M1.6 rewarded cosmetics + M1.7 rare interstitial + M4.3–M4.4.
+
+  v1.5+ B2B web / optional cosmetics — separate from consumer Plus.
+
+  Gates (do not skip): growth_plan.txt → “GATES BEFORE EACH MONETIZATION VERSION”
+
+================================================================================
 IMPLEMENTATION ORDER
 ================================================================================
 
-  1. M0 rules + legal
-  2. M1.4 Practice ads (banner + after session)
-  3. M1.5 Other hub banners
-  4. M2 Plus ($3.99 / $29.99) + M3 publish cap (10 → unlimited)
-  5. M1.6–M1.7 Rewarded + rare interstitial
-  6. M4 analytics; B2B later
+  1. M0 rules + legal          → prep v1.0–v1.1; required before v1.2
+  2. M1.4 Practice ads         → v1.2
+  3. M1.5 Other hub banners    → v1.2
+  4. M2 Plus + M3 publish cap  → v1.3
+  5. M1.6–M1.7 Rewarded + interstitial → v1.4
+  6. M4 analytics; B2B later   → stubs early; A/B + B2B v1.4 / v1.5+
 
 ================================================================================
 SCREEN ALLOWLIST (ADS)
@@ -243,6 +280,7 @@ NOTES
 ================================================================================
 
   - Ship after core hunt UX is solid (see go_live_update_checklist.txt)
+  - Users-first timing + city growth: growth_plan.txt
   - Legal pages: requirement_all.txt §19.5 (marketing site /privacy + /terms)
   - Mark [~] when started, [x] when done
 

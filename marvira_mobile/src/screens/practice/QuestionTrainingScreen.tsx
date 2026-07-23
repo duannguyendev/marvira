@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ import {
   PracticeStackParamList,
   FavoritesStackParamList,
 } from '../../navigation/types';
+import { AnalyticsEvents } from '../../services/analytics';
 import {
   colors,
   spacing,
@@ -63,6 +64,10 @@ export const QuestionTrainingScreen: React.FC = () => {
   const question = data?.data;
   const favorited = isFavorite ?? false;
 
+  useEffect(() => {
+    void AnalyticsEvents.practiceOpened('training');
+  }, [questionId]);
+
   const handleSubmit = async () => {
     if (!answer.trim()) {
       Alert.alert(t('game.enterAnswer'));
@@ -74,6 +79,11 @@ export const QuestionTrainingScreen: React.FC = () => {
         questionId,
         submission: { answer },
       });
+
+      void AnalyticsEvents.practiceAnswered(
+        questionId,
+        result.data.isCorrect,
+      );
 
       if (result.data.isCorrect) {
         Alert.alert(

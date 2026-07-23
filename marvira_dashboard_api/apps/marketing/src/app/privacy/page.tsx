@@ -84,6 +84,15 @@ export default async function PrivacyPage({
           never expose answers, exact GPS spoilers, or private participant
           lists.
         </p>
+        <p>
+          The mobile app uses <strong>Google Firebase Analytics</strong> and{' '}
+          <strong>Firebase Crashlytics</strong> to measure feature usage
+          (for example hunt starts and completions), app stability, and crash
+          reports. These services may process device and app identifiers and
+          crash logs. We do not send precise GPS coordinates or answer text to
+          Analytics event parameters. See Google’s Firebase privacy
+          documentation for how Google processes this data on our behalf.
+        </p>
 
         <h2>5. Retention & security</h2>
         <p>

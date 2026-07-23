@@ -43,9 +43,13 @@ import {
   buildLocationPayload,
   showLocationWarnings,
 } from '../../utils/anticheat';
+import { AnalyticsEvents, analytics } from '../../services/analytics';
 
 const { height } = Dimensions.get('window');
 const MAP_HEIGHT = height * 0.35;
+
+/** Dedupe hunt_started per event for this app session. */
+const huntStartedLogged = new Set<string>();
 
 type PlaceGameScreenRouteProp = RouteProp<HomeStackParamList, 'PlaceGame'>;
 
@@ -73,6 +77,7 @@ export const PlaceGameScreen: React.FC = () => {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [distance, setDistance] = useState<number | null>(null);
   const unlockAttemptedRef = useRef(false);
+  const completingRef = useRef(false);
 
   const event = eventData?.data;
   const place = placesApi.getPlaceFromEvent(event?.places, placeId);
@@ -98,6 +103,28 @@ export const PlaceGameScreen: React.FC = () => {
     }
   }, [place?.id, place?.isUnlocked]);
 
+  useEffect(() => {
+    if (!huntStartedLogged.has(eventId)) {
+      huntStartedLogged.add(eventId);
+      void AnalyticsEvents.huntStarted(eventId);
+    }
+  }, [eventId]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', e => {
+      if (completingRef.current) {
+        return;
+      }
+      if (e.data.action.type === 'REPLACE') {
+        return;
+      }
+      const placesDone =
+        event?.places?.filter(p => p.isCompleted).length ?? undefined;
+      void AnalyticsEvents.huntAbandoned(eventId, placesDone);
+    });
+    return unsubscribe;
+  }, [navigation, eventId, event?.places]);
+
   const attemptUnlock = useCallback(async () => {
     if (!location || !place || isUnlocked || place.isCompleted) {
       return;
@@ -120,9 +147,11 @@ export const PlaceGameScreen: React.FC = () => {
       });
       showLocationWarnings(result.warnings);
       setIsUnlocked(true);
+      void AnalyticsEvents.placeUnlocked(eventId, placeId);
       await refetchEvent();
     } catch (error: any) {
       unlockAttemptedRef.current = false;
+      analytics.recordError(error);
       Alert.alert(
         t('game.unlockFailed'),
         error.message || t('game.couldNotUnlock'),
@@ -134,8 +163,10 @@ export const PlaceGameScreen: React.FC = () => {
     isUnlocked,
     unlockRadius,
     placeId,
+    eventId,
     unlockPlaceMutation,
     refetchEvent,
+    t,
   ]);
 
   useEffect(() => {
@@ -191,7 +222,25 @@ export const PlaceGameScreen: React.FC = () => {
 
       showLocationWarnings(response.data.warnings);
 
+      void AnalyticsEvents.placeAnswered(
+        eventId,
+        placeId,
+        response.data.isCorrect,
+      );
+
       if (response.data.isCorrect) {
+        if (response.data.eventCompleted) {
+          const durationSec =
+            typeof response.data.eventTotalDurationMs === 'number'
+              ? Math.round(response.data.eventTotalDurationMs / 1000)
+              : undefined;
+          void AnalyticsEvents.huntCompleted(eventId, {
+            score: response.data.totalScore ?? response.data.points,
+            duration_sec: durationSec,
+          });
+          completingRef.current = true;
+        }
+
         Alert.alert(
           t('game.correct'),
           response.data.explanation ||
@@ -232,6 +281,7 @@ export const PlaceGameScreen: React.FC = () => {
         );
       }
     } catch (error: any) {
+      analytics.recordError(error);
       Alert.alert(t('common.error'), error.message || t('game.submitFailed'));
     }
   };

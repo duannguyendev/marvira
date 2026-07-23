@@ -1,6 +1,7 @@
 import { storage } from '../utils/storage';
 import { authApi } from '../api/auth';
 import { User, LoginCredentials, RegisterCredentials } from '../types';
+import { analytics } from './analytics';
 
 class AuthService {
   private currentUser: User | null = null;
@@ -18,6 +19,7 @@ class AuthService {
         }
         await storage.setUser(response.data.user);
         this.currentUser = response.data.user;
+        await analytics.setUserId(response.data.user.id);
         return response.data.user;
       }
       throw new Error(response.message || 'Login failed');
@@ -39,6 +41,7 @@ class AuthService {
         }
         await storage.setUser(response.data.user);
         this.currentUser = response.data.user;
+        await analytics.setUserId(response.data.user.id);
         return response.data.user;
       }
       throw new Error(response.message || 'Registration failed');
@@ -59,6 +62,7 @@ class AuthService {
     } finally {
       await storage.clearAll();
       this.currentUser = null;
+      await analytics.setUserId(null);
     }
   }
 
@@ -80,6 +84,7 @@ class AuthService {
     const user = await storage.getUser();
     if (user) {
       this.currentUser = user;
+      await analytics.setUserId(user.id);
     }
     return user;
   }

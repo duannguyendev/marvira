@@ -16,6 +16,7 @@ import { Button } from '../../components/Button';
 import { useCreateEvent } from '../../hooks/useMyEvents';
 import { CreateEventInput, EventDifficulty } from '../../types';
 import { HomeStackParamList } from '../../navigation/types';
+import { AnalyticsEvents, analytics } from '../../services/analytics';
 import {
   colors,
   spacing,
@@ -79,11 +80,13 @@ export const CreateEventInfoScreen: React.FC = () => {
         description: form.description.trim(),
         city: form.city.trim(),
       });
+      void AnalyticsEvents.eventDraftCreated(result.data.id);
       navigation.navigate('CreateEventPlace', {
         eventId: result.data.id,
         placeIndex: 0,
       });
     } catch (error: any) {
+      analytics.recordError(error);
       Alert.alert(
         t('common.error'),
         error?.response?.data?.message ||
