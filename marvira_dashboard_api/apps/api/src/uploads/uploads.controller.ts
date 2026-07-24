@@ -40,17 +40,18 @@ export class UploadsController {
   }
 
   @Post()
-  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @Roles(UserRole.ADMIN, UserRole.STAFF, UserRole.USER)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Upload image file' })
+  @ApiOperation({ summary: 'Upload image file (jpeg/png/webp, max 5 MB)' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),
       limits: { fileSize: 5 * 1024 * 1024 },
       fileFilter: (_req, file, cb) => {
-        if (!file.mimetype.startsWith('image/')) {
-          cb(new BadRequestException('Only image files allowed'), false);
+        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+        if (!allowed.includes(file.mimetype) && !file.mimetype.startsWith('image/')) {
+          cb(new BadRequestException('Only jpeg, png, or webp images allowed'), false);
         } else {
           cb(null, true);
         }

@@ -318,9 +318,11 @@ Training screen:
 - Favorite icon on question (see Favorites section)
 
 Add question:
-- Entry points: FAB on Practice tab + Profile â†’ My Questions
+- Entry points: FAB on Practice tab + Profile -> My Questions
 - Creates standalone question (no event required)
-- After publish â†’ visible in Practice "To Practice" for other users
+- Supported types: TEXT | TRUE_FALSE | MULTIPLE_CHOICE | IMAGE (see section 23)
+- IMAGE: user picks camera/gallery photo -> POST /uploads -> imageUrl + caption + answer
+- After publish -> visible in Practice "To Practice" for other users (same language; see section 23)
 
 Empty states:
 - To Practice: friendly message when no questions available
@@ -460,10 +462,17 @@ Translation scope (MUST be translated in all 4 languages):
 - Practice, Favorites, My Questions screens (create-event / my-events â€” see Â§14â€“15)
 - Settings + Feedback screens (see Â§20)
 
-NOT translated (server-provided content):
+NOT translated client-side (server-provided content):
 - Event titles, descriptions, city names
 - Place names and descriptions
-- Question text and multiple-choice options from API
+- Question text, captions, multiple-choice options, answers from API
+
+Content language (separate from UI i18n — see §23):
+- Each Event and Question stores a single `language` code (vi | en | zh | ja).
+- Practice lists and event discovery (nearby / search / list) MUST filter by the
+  user's expected content language (default = current app UI language).
+- Optional "All languages" toggle may disable the filter.
+- Do NOT auto-translate server content in the client.
 
 Special rules:
 - TRUE_FALSE answers MUST still submit "True" / "False" to the API (UI labels
@@ -619,6 +628,7 @@ events
 - title
 - description
 - city
+- language (vi | en | zh | ja -- content language of title/description/places; see section 23)
 - cover_image
 - difficulty
 - reward_points
@@ -650,6 +660,7 @@ questions (reusable question bank â€” NOT tied 1:1 to a single place)
 - answer (admin-only in public API responses)
 - explanation
 - points
+- language (vi | en | zh | ja -- content language; see section 23)
 - created_by (FK users, nullable â€” author for COMMUNITY practice questions)
 - source (enum COMMUNITY | EVENT â€” default EVENT)
 - is_published (boolean â€” default false; true = visible in Practice pool)
@@ -658,6 +669,7 @@ questions (reusable question bank â€” NOT tied 1:1 to a single place)
 
 Rules:
 - COMMUNITY + is_published=true + no Place link â†’ appears in Practice "To Practice" pool
+- Practice pool + event discovery MUST filter by content language unless "All languages" (section 23)
 - EVENT source â†’ linked to Place and/or EventQuestion; shown in My Questions for author
 - `answer` field MUST NOT be returned in practice list/detail public DTOs (training submit only)
 - Admin may create COMMUNITY questions with created_by null (system seed)
@@ -820,6 +832,7 @@ IMAGE
 - image_url required (upload via POST /uploads).
 - question field = caption shown with the image.
 - answer is text (same validation as TEXT).
+- Mobile users MUST be able to create IMAGE questions (Practice + Create Event; see section 23).
 
 Public API MUST expose image_url but NEVER expose answer on player endpoints.
 
@@ -895,7 +908,7 @@ ADMIN EVENTS
 GET /admin/events/:id (full event: all places with questions including answers)
 
 UPLOADS
-POST /uploads (admin â€” multipart image upload)
+POST /uploads (authenticated USER/STAFF/ADMIN -- multipart image upload; see section 23)
 GET /uploads/:filename (public â€” serve uploaded images)
 
 GAMEPLAY
@@ -1542,7 +1555,7 @@ development (mobile app remains a separate project).
    - Wizard flow (Home stack):
      Step 1 â€” Event info: title, description, city, difficulty, reward points â†’ POST /events
      Step 2 â€” Place + question (repeat): map pin picker (tap, drag, use my location), place
-       title/description/radius, question form (TEXT, TRUE_FALSE, MULTIPLE_CHOICE) â†’ question +
+       title/description/radius, question form (TEXT, TRUE_FALSE, MULTIPLE_CHOICE, IMAGE -- see section 23) â†’ question +
        link + place APIs; CTAs: "Add another place" / "This is the last place"
      Step 3 â€” Review: map with all pins, place list, validation checklist, Access section
        (public vs password-required; password + confirm when private) â†’ Publish or keep draft;
@@ -2036,6 +2049,83 @@ development (mobile app remains a separate project).
      * Mobile create/edit + completion UX + gift icon/teaser + re-open: IMPLEMENTED
      * Dashboard create/edit + finishers gift columns: IMPLEMENTED
      * Live scarcity / share card: NOT STARTED (v1.1)
+
+23. MOBILE IMAGE QUESTIONS + CONTENT LANGUAGE (full-stack)
+   Purpose: (1) Let mobile users create IMAGE questions easily (camera/gallery).
+   (2) Filter Practice and event discovery by content language so users see hunts
+   and practice questions in their expected language.
+   Spec: requirement_all.txt §23 (former plan file removed after implementation).
+   Status: IMPLEMENTED (2026-07-24) -- device manual pass remaining (camera/
+   gallery create + GPS IMAGE place). Optional create-form language override
+   deferred.
+
+   23.1 MOBILE IMAGE QUESTION CREATE
+   - Practice Add Question + Create Event place-question form MUST offer IMAGE
+     alongside TEXT, TRUE_FALSE, MULTIPLE_CHOICE.
+   - IMAGE flow: pick camera or gallery -> POST /uploads (JWT) -> store returned
+     url as imageUrl -> caption in question field -> free-text answer.
+   - Validation: IMAGE requires imageUrl; caption min length; answer required
+     (same as TEXT grading).
+   - Edit: keep existing imageUrl unless user replaces the photo.
+   - Training / gameplay: QuestionRenderer already shows image + text input.
+   - Permissions: Android camera/storage (or photo picker); iOS camera +
+     photo library usage strings in Info.plist.
+   - i18n: IMAGE type label, upload/pick/remove actions, upload errors in
+     vi, en, zh, ja.
+
+   23.2 UPLOADS (mobile-usable)
+   - POST /uploads MUST accept any authenticated USER (not admin-only).
+   - Allowed MIME: image/jpeg, image/png, image/webp; enforce max file size.
+   - Response url may be relative (/uploads/...) or absolute CDN; mobile MUST
+     resolve relative urls against API_BASE_URL (same as QuestionRenderer).
+   - Prefer S3 + CDN_URL in production (existing uploads infra).
+
+   23.3 CONTENT LANGUAGE MODEL
+   - Add language (vi | en | zh | ja) on Event and Question.
+   - One language per row (no per-field translation packs in v1).
+   - Backfill existing rows to 'vi' (app default).
+   - Indexes: Event.language; Question (source, is_published, language).
+   - Create defaults: mobile sends language = current app UI language;
+     optional override on create forms; API accepts explicit body field.
+
+   23.4 FILTER RULES
+   - Default: Practice list + Events nearby/search/list filter to current
+     content language (app UI language unless overridden).
+   - Query param: language=vi|en|zh|ja ; language=all (or client "All languages"
+     toggle) disables filter.
+   - Persist All-languages preference in AsyncStorage.
+   - NEVER filter out: My Events, My Questions, Favorites, in-progress hunts,
+     or event opened by id / invite deep link.
+   - Empty state when filter yields zero: suggest switch UI language or enable
+     All languages.
+
+   23.5 API
+   - Practice: GET /practice/questions?status=&language=
+   - Events: nearby / list / search accept language=
+   - Create/update Event + Question (+ practice create) accept language
+   - Admin dashboard: language select on event + question forms
+
+   23.6 SEED / GO-LIVE
+   - Seed COMMUNITY practice questions with explicit language (launch city = vi)
+   - Seed events with matching language
+   - Optional: 1-2 IMAGE practice seeds with HTTPS imageUrl
+
+   23.7 OUT OF SCOPE (this section)
+   - Auto-translate content
+   - Multi-locale packs on a single event/question
+   - Detect language from GPS city alone
+
+   Implementation status (section 23):
+     * Spec: requirement_all.txt §23 (plan file removed after implementation)
+     * Prisma language columns + migration: IMPLEMENTED
+     * API language filters + DTOs: IMPLEMENTED
+     * Mobile All-languages toggle + query wiring: IMPLEMENTED
+     * Mobile IMAGE QuestionForm + upload + permissions: IMPLEMENTED
+     * Create Event wizard IMAGE: IMPLEMENTED
+     * Dashboard language fields: IMPLEMENTED
+     * Seed language + IMAGE practice samples: IMPLEMENTED
+     * Device manual pass (camera/gallery/GPS IMAGE): NOT STARTED
+     * Optional create-form language override picker: DEFERRED
 
 ====================================================
 EXPECTED OUTPUT

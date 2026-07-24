@@ -17,6 +17,7 @@ import { useCreateEvent } from '../../hooks/useMyEvents';
 import { CreateEventInput, EventDifficulty } from '../../types';
 import { HomeStackParamList } from '../../navigation/types';
 import { AnalyticsEvents, analytics } from '../../services/analytics';
+import { getAppContentLanguage } from '../../services/contentLanguage';
 import {
   colors,
   spacing,
@@ -45,6 +46,7 @@ export const CreateEventInfoScreen: React.FC = () => {
     city: '',
     difficulty: 'MEDIUM',
     rewardPoints: 100,
+    language: getAppContentLanguage(),
   });
   const [errors, setErrors] = useState<
     Partial<Record<keyof CreateEventInput, string>>

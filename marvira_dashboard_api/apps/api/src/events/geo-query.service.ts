@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 interface NearbyEventRow {
@@ -10,6 +11,7 @@ interface NearbyEventRow {
   difficulty: string;
   reward_points: number;
   is_active: boolean;
+  language: string;
   created_by: string;
   created_at: Date;
   updated_at: Date;
@@ -54,7 +56,16 @@ export class GeoQueryService {
     latitude: number,
     longitude: number,
     radiusMeters: number,
+    language?: string,
+    exceptionEventIds: string[] = [],
   ): Promise<NearbyEventRow[]> {
+    const languageClause =
+      language == null
+        ? Prisma.empty
+        : exceptionEventIds.length > 0
+          ? Prisma.sql`AND (e.language = ${language} OR e.id IN (${Prisma.join(exceptionEventIds)}))`
+          : Prisma.sql`AND e.language = ${language}`;
+
     return this.prisma.client.$queryRaw<NearbyEventRow[]>`
       SELECT
         e.id,
@@ -65,6 +76,7 @@ export class GeoQueryService {
         e.difficulty,
         e.reward_points,
         e.is_active,
+        e.language,
         e.join_password_hash,
         e.gift_teaser,
         e.gift_codes,
@@ -80,6 +92,7 @@ export class GeoQueryService {
       FROM events e
       INNER JOIN places p ON p.event_id = e.id
       WHERE e.is_active = true
+      ${languageClause}
       GROUP BY e.id
       HAVING MIN(
         ST_Distance(

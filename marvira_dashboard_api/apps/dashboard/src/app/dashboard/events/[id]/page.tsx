@@ -66,6 +66,7 @@ export default function EditEventPage() {
       difficulty: EventDifficulty.MEDIUM,
       rewardPoints: 0,
       isActive: false,
+      language: 'vi',
       completionMessage: '',
       giftTeaser: '',
       giftCodes: [],
@@ -81,6 +82,7 @@ export default function EditEventPage() {
       difficulty: event.difficulty as EventDifficulty,
       rewardPoints: event.rewardPoints,
       isActive: event.isActive,
+      language: (event.language as EventFormValues['language']) ?? 'vi',
       completionMessage: event.completionMessage ?? '',
       giftTeaser: event.giftTeaser ?? '',
       giftCodes: event.giftCodes ?? [],
@@ -247,22 +249,33 @@ export default function EditEventPage() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Status</Label>
-                <div className="flex h-10 items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="isActive"
-                    {...register('isActive')}
-                    className="h-4 w-4"
-                  />
-                  <Label htmlFor="isActive">Published</Label>
-                </div>
-                {errors.isActive && (
-                  <p className="text-sm text-destructive">
-                    {errors.isActive.message}
-                  </p>
-                )}
+                <Label>Content language *</Label>
+                <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  {...register('language')}>
+                  <option value="vi">Tiếng Việt</option>
+                  <option value="en">English</option>
+                  <option value="zh">中文</option>
+                  <option value="ja">日本語</option>
+                </select>
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <div className="flex h-10 items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  {...register('isActive')}
+                  className="h-4 w-4"
+                />
+                <Label htmlFor="isActive">Published</Label>
+              </div>
+              {errors.isActive && (
+                <p className="text-sm text-destructive">
+                  {errors.isActive.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-4 border-t pt-4">

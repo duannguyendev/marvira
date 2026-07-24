@@ -9,6 +9,7 @@ import { QuestionType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { buildPaginatedResponse, parsePagination } from '@marvira/shared-utils';
 import { EventAccessService } from '../events/event-access.service';
+import { normalizeContentLanguage } from '../common/content-language';
 
 export interface CreateQuestionInput {
   question: string;
@@ -18,6 +19,7 @@ export interface CreateQuestionInput {
   answer: string;
   explanation?: string;
   points?: number;
+  language?: string;
 }
 
 const publicQuestionSelect = {
@@ -163,6 +165,7 @@ export class QuestionsService {
         answer: data.answer,
         explanation: data.explanation,
         points: data.points ?? 10,
+        language: normalizeContentLanguage(data.language),
       },
     });
   }
@@ -197,6 +200,9 @@ export class QuestionsService {
         imageUrl,
         options: data.options,
         answer: data.answer,
+        ...(data.language !== undefined
+          ? { language: normalizeContentLanguage(data.language) }
+          : {}),
         explanation: data.explanation,
         points: data.points,
       },

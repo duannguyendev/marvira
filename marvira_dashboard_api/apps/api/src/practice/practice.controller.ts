@@ -36,12 +36,14 @@ export class PracticeController {
     @Query('status') status?: 'unfinished' | 'completed',
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
+    @Query('language') language?: string,
   ) {
     const data = await this.practiceService.listPracticeQuestions(
       req.user.id,
       status === 'completed' ? 'completed' : 'unfinished',
       parseInt(page || '1', 10),
       parseInt(pageSize || '50', 10),
+      language,
     );
     return { success: true, data: data.items };
   }

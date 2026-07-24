@@ -30,6 +30,7 @@ export interface ApiEvent {
   difficulty: string;
   rewardPoints: number;
   isActive: boolean;
+  language?: string;
   isPasswordProtected?: boolean;
   hasAccess?: boolean;
   hasGift?: boolean;

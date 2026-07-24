@@ -99,6 +99,7 @@ export function mapEvent(
     giftTeaser: apiEvent.giftTeaser ?? null,
     giftCodes: apiEvent.giftCodes,
     completionMessage: apiEvent.completionMessage ?? null,
+    language: apiEvent.language,
   };
 }
 

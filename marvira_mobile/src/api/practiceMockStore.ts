@@ -114,6 +114,8 @@ export const practiceMockStore = {
       answer: input.answer,
       options: input.options,
       points: input.points ?? 10,
+      imageUrl: input.imageUrl,
+      language: input.language ?? 'vi',
       authorId: userId,
       authorName: userName,
       source: 'community',
@@ -144,6 +146,8 @@ export const practiceMockStore = {
       answer: input.answer,
       options: input.options,
       points: input.points ?? questions[index].points,
+      imageUrl: input.imageUrl,
+      language: input.language ?? questions[index].language,
     };
     questions[index] = updated;
     return updated;

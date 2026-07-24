@@ -1,20 +1,32 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Image,
+  ActivityIndicator,
+  Alert,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import {
+  launchCamera,
+  launchImageLibrary,
+  ImagePickerResponse,
+  Asset,
+} from 'react-native-image-picker';
 import { CreateQuestionInput, QuestionType } from '../types';
 import { Input } from './Input';
+import { needsImageUpload, resolveUploadUrl } from '../api/uploads';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
 const QUESTION_TYPES: QuestionType[] = [
   'TEXT',
   'TRUE_FALSE',
   'MULTIPLE_CHOICE',
+  'IMAGE',
 ];
 
 interface QuestionFormProps {
@@ -23,12 +35,23 @@ interface QuestionFormProps {
   errors?: Partial<Record<keyof CreateQuestionInput | 'options', string>>;
 }
 
+function previewUri(imageUrl?: string): string | undefined {
+  if (!imageUrl) {
+    return undefined;
+  }
+  if (needsImageUpload(imageUrl)) {
+    return imageUrl;
+  }
+  return resolveUploadUrl(imageUrl);
+}
+
 export const QuestionForm: React.FC<QuestionFormProps> = ({
   value,
   onChange,
   errors,
 }) => {
   const { t } = useTranslation();
+  const [picking, setPicking] = useState(false);
 
   const setField = <K extends keyof CreateQuestionInput>(
     key: K,
@@ -39,7 +62,13 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
   const handleTypeChange = (type: QuestionType) => {
     if (type === 'TRUE_FALSE') {
-      onChange({ ...value, type, answer: 'True', options: undefined });
+      onChange({
+        ...value,
+        type,
+        answer: 'True',
+        options: undefined,
+        imageUrl: undefined,
+      });
       return;
     }
     if (type === 'MULTIPLE_CHOICE') {
@@ -48,10 +77,26 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         type,
         options: value.options?.length ? value.options : ['', ''],
         answer: '',
+        imageUrl: undefined,
       });
       return;
     }
-    onChange({ ...value, type, options: undefined, answer: '' });
+    if (type === 'IMAGE') {
+      onChange({
+        ...value,
+        type,
+        options: undefined,
+        answer: value.answer || '',
+      });
+      return;
+    }
+    onChange({
+      ...value,
+      type,
+      options: undefined,
+      answer: '',
+      imageUrl: undefined,
+    });
   };
 
   const updateOption = (index: number, text: string) => {
@@ -68,6 +113,62 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     const options = (value.options ?? []).filter((_, i) => i !== index);
     onChange({ ...value, options });
   };
+
+  const applyAsset = (asset?: Asset) => {
+    if (!asset?.uri) {
+      return;
+    }
+    setField('imageUrl', asset.uri);
+  };
+
+  const handlePickerResult = (response: ImagePickerResponse) => {
+    setPicking(false);
+    if (response.didCancel) {
+      return;
+    }
+    if (response.errorCode) {
+      Alert.alert(
+        t('common.error'),
+        response.errorMessage || t('createEvent.imagePickFailed'),
+      );
+      return;
+    }
+    applyAsset(response.assets?.[0]);
+  };
+
+  const pickFromLibrary = () => {
+    setPicking(true);
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        selectionLimit: 1,
+        quality: 0.8,
+        maxWidth: 1600,
+        maxHeight: 1600,
+      },
+      handlePickerResult,
+    );
+  };
+
+  const takePhoto = () => {
+    setPicking(true);
+    launchCamera(
+      {
+        mediaType: 'photo',
+        cameraType: 'back',
+        quality: 0.8,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        saveToPhotos: false,
+      },
+      handlePickerResult,
+    );
+  };
+
+  const imagePreview = useMemo(
+    () => previewUri(value.imageUrl),
+    [value.imageUrl],
+  );
 
   return (
     <View style={styles.container}>
@@ -97,13 +198,77 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
       </View>
 
       <Input
-        label={t('createEvent.questionText')}
+        label={
+          value.type === 'IMAGE'
+            ? t('createEvent.imageCaption')
+            : t('createEvent.questionText')
+        }
         value={value.question}
         onChangeText={text => setField('question', text)}
-        placeholder={t('createEvent.questionTextPlaceholder')}
+        placeholder={
+          value.type === 'IMAGE'
+            ? t('createEvent.imageCaptionPlaceholder')
+            : t('createEvent.questionTextPlaceholder')
+        }
         multiline
         error={errors?.question}
       />
+
+      {value.type === 'IMAGE' ? (
+        <View style={styles.imageSection}>
+          <Text style={styles.label}>{t('createEvent.questionImage')}</Text>
+          {imagePreview ? (
+            <Image
+              source={{ uri: imagePreview }}
+              style={styles.preview}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.previewPlaceholder}>
+              <Text style={styles.previewPlaceholderText}>
+                {t('createEvent.noImageSelected')}
+              </Text>
+            </View>
+          )}
+          <View style={styles.imageActions}>
+            <TouchableOpacity
+              style={styles.imageButton}
+              onPress={takePhoto}
+              disabled={picking}>
+              <Text style={styles.imageButtonText}>
+                {t('createEvent.takePhoto')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.imageButton}
+              onPress={pickFromLibrary}
+              disabled={picking}>
+              <Text style={styles.imageButtonText}>
+                {t('createEvent.chooseFromLibrary')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {value.imageUrl ? (
+            <TouchableOpacity
+              onPress={() => setField('imageUrl', undefined)}
+              style={styles.removeImage}>
+              <Text style={styles.removeImageText}>
+                {t('createEvent.removeImage')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {picking ? (
+            <ActivityIndicator
+              color={colors.primary}
+              style={{ marginTop: spacing.sm }}
+            />
+          ) : null}
+          {errors?.imageUrl ? (
+            <Text style={styles.errorText}>{errors.imageUrl}</Text>
+          ) : null}
+          <Text style={styles.hint}>{t('createEvent.imageUploadHint')}</Text>
+        </View>
+      ) : null}
 
       {value.type === 'MULTIPLE_CHOICE' ? (
         <View>
@@ -214,6 +379,64 @@ const styles = StyleSheet.create({
   },
   typeButtonTextActive: {
     color: colors.background,
+  },
+  imageSection: {
+    marginBottom: spacing.md,
+  },
+  preview: {
+    width: '100%',
+    height: 180,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.backgroundGray,
+    marginBottom: spacing.sm,
+  },
+  previewPlaceholder: {
+    width: '100%',
+    height: 120,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderStyle: Platform.OS === 'ios' ? 'dashed' : 'solid',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+    backgroundColor: colors.backgroundGray,
+  },
+  previewPlaceholderText: {
+    color: colors.textSecondary,
+    fontSize: fontSize.sm,
+  },
+  imageActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  imageButton: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.backgroundGray,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+  },
+  imageButtonText: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.primary,
+  },
+  removeImage: {
+    marginTop: spacing.sm,
+    alignSelf: 'flex-start',
+  },
+  removeImageText: {
+    color: colors.error,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+  },
+  hint: {
+    marginTop: spacing.sm,
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
   },
   optionRow: {
     flexDirection: 'row',

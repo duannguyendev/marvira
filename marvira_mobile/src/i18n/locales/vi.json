@@ -114,6 +114,10 @@
     "sendFeedback": "Gửi phản hồi",
     "language": "Ngôn ngữ",
     "languageDescription": "Chọn ngôn ngữ bạn muốn dùng",
+    "contentLanguage": "Bộ lọc nội dung",
+    "contentLanguageDescription": "Mặc định bạn chỉ thấy sự kiện và câu hỏi luyện tập theo ngôn ngữ ứng dụng.",
+    "allLanguages": "Hiện tất cả ngôn ngữ",
+    "allLanguagesHint": "Bao gồm sự kiện và câu hỏi ở mọi ngôn ngữ",
     "languages": {
       "vi": "Tiếng Việt",
       "en": "English",
@@ -145,6 +149,7 @@
     "searchPlaceholder": "Tìm kiếm sự kiện...",
     "noEventsFound": "Không tìm thấy sự kiện",
     "adjustFilters": "Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm",
+    "emptyLanguageHint": "Mẹo: bật “Hiện tất cả ngôn ngữ” trong Cài đặt, hoặc đổi ngôn ngữ ứng dụng.",
     "loadFailed": "Không thể tải sự kiện",
     "detailsLoadFailed": "Không thể tải chi tiết sự kiện",
     "progressComplete": "Hoàn thành {{progress}}% ({{completed}}/{{total}} địa điểm)",
@@ -298,10 +303,21 @@
     "questionTypes": {
       "TEXT": "Văn bản",
       "TRUE_FALSE": "Đúng/Sai",
-      "MULTIPLE_CHOICE": "Trắc nghiệm"
+      "MULTIPLE_CHOICE": "Trắc nghiệm",
+      "IMAGE": "Hình ảnh"
     },
     "questionText": "Câu hỏi",
     "questionTextPlaceholder": "Nơi này được thành lập năm nào?",
+    "imageCaption": "Chú thích",
+    "imageCaptionPlaceholder": "Địa danh nào trong bức ảnh này?",
+    "questionImage": "Ảnh câu hỏi",
+    "noImageSelected": "Chưa chọn ảnh",
+    "takePhoto": "Chụp ảnh",
+    "chooseFromLibrary": "Chọn từ thư viện",
+    "removeImage": "Xóa ảnh",
+    "imageUploadHint": "JPEG, PNG hoặc WebP tối đa 5 MB. Ảnh được tải lên khi bạn lưu.",
+    "imagePickFailed": "Không mở được bộ chọn ảnh",
+    "imageUploadFailed": "Tải ảnh thất bại. Thử lại.",
     "options": "Các lựa chọn",
     "optionPlaceholder": "Lựa chọn {{n}}",
     "addOption": "+ Thêm lựa chọn",
@@ -384,6 +400,7 @@
       "placeDescriptionMin": "Mô tả phải có ít nhất 5 ký tự",
       "questionMin": "Câu hỏi phải có ít nhất 3 ký tự",
       "answerRequired": "Cần có đáp án đúng",
+      "imageRequired": "Thêm ảnh cho câu hỏi hình ảnh",
       "optionsMin": "Thêm ít nhất 2 lựa chọn",
       "answerMustMatchOption": "Đáp án phải khớp một trong các lựa chọn"
     }
@@ -420,6 +437,7 @@
     "emptyToPracticeMessage": "Hãy quay lại sau hoặc thêm câu hỏi để người khác luyện tập!",
     "emptyCompletedTitle": "Chưa hoàn thành bài luyện nào",
     "emptyCompletedMessage": "Hoàn thành một câu hỏi luyện tập để xem tại đây.",
+    "emptyLanguageHint": "Mẹo: bật “Hiện tất cả ngôn ngữ” trong Cài đặt, hoặc đổi ngôn ngữ ứng dụng.",
     "addQuestion": "Thêm câu hỏi",
     "editQuestion": "Sửa câu hỏi",
     "addQuestionSubheading": "Tạo câu hỏi độc lập cho kho luyện tập cộng đồng.",

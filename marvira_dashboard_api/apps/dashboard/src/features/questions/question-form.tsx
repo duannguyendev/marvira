@@ -19,6 +19,13 @@ import { resolveImageUrl } from '@/lib/resolve-image-url';
 
 export { resolveImageUrl };
 
+const LANGUAGE_OPTIONS = [
+  { value: 'vi', label: 'Tiếng Việt' },
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: '中文' },
+  { value: 'ja', label: '日本語' },
+] as const;
+
 function parseOptions(options: AdminQuestion['options']): string[] {
   if (!options) return ['', ''];
   if (Array.isArray(options)) return options.map(String);
@@ -72,6 +79,7 @@ export function QuestionForm({
       answer: '',
       explanation: '',
       points: 10,
+      language: 'vi',
       options: [{ value: '' }, { value: '' }],
     },
   });
@@ -96,6 +104,7 @@ export function QuestionForm({
       answer: question.answer,
       explanation: question.explanation ?? '',
       points: question.points,
+      language: (question.language as QuestionFormValues['language']) ?? 'vi',
       options:
         question.type === QuestionType.MULTIPLE_CHOICE
           ? parseOptions(question.options).map(value => ({ value }))
@@ -111,6 +120,7 @@ export function QuestionForm({
     question?.answer,
     question?.explanation,
     question?.points,
+    question?.language,
     JSON.stringify(question?.options ?? null),
     reset,
     revokeLocalPreview,
@@ -144,6 +154,7 @@ export function QuestionForm({
         answer: values.answer.trim(),
         explanation: values.explanation?.trim() || undefined,
         points: values.points,
+        language: values.language,
         options:
           values.type === QuestionType.MULTIPLE_CHOICE
             ? values.options?.map(o => o.value.trim()).filter(Boolean)
@@ -215,13 +226,27 @@ export function QuestionForm({
           )}
         </div>
         <div className="space-y-2">
-          <Label>Correct Answer</Label>
-          {questionType === QuestionType.TRUE_FALSE ? (
-            <select
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              {...register('answer')}>
-              <option value="True">True</option>
-              <option value="False">False</option>
+          <Label>Content language</Label>
+          <select
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            {...register('language')}>
+            {LANGUAGE_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Correct Answer</Label>
+        {questionType === QuestionType.TRUE_FALSE ? (
+          <select
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            {...register('answer')}>
+            <option value="True">True</option>
+            <option value="False">False</option>
             </select>
           ) : questionType === QuestionType.MULTIPLE_CHOICE ? (
             <select
@@ -243,7 +268,6 @@ export function QuestionForm({
             <p className="text-sm text-destructive">{errors.answer.message}</p>
           )}
         </div>
-      </div>
 
       {questionType === QuestionType.IMAGE && (
         <div className="space-y-2">

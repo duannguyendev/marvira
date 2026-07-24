@@ -3,10 +3,14 @@ import {
   EventDifficulty,
   QuestionType,
   ArticleStatus,
+  CONTENT_LANGUAGES,
+  DEFAULT_CONTENT_LANGUAGE,
 } from '@marvira/shared-types';
 
 const trimmed = (min: number, label: string) =>
   z.string().trim().min(min, `${label} must be at least ${min} characters`);
+
+const contentLanguageSchema = z.enum(CONTENT_LANGUAGES);
 
 export const eventSchema = z
   .object({
@@ -22,6 +26,7 @@ export const eventSchema = z
       .min(0, 'Reward points cannot be negative')
       .max(100000, 'Reward points cannot exceed 100,000'),
     isActive: z.boolean(),
+    language: contentLanguageSchema.default(DEFAULT_CONTENT_LANGUAGE),
     completionMessage: z
       .string()
       .max(2000, 'Completion message must be at most 2000 characters')
@@ -153,6 +158,7 @@ export const questionSchema = z
       .int('Points must be a whole number')
       .min(1, 'Minimum 1 point')
       .max(1000, 'Maximum 1000 points'),
+    language: contentLanguageSchema.default(DEFAULT_CONTENT_LANGUAGE),
     options: z
       .array(
         z.object({ value: z.string().trim().min(1, 'Option cannot be empty') }),

@@ -16,6 +16,8 @@ import {
   PracticeStackParamList,
   ProfileStackParamList,
 } from '../../navigation/types';
+import { uploadsApi } from '../../api/uploads';
+import { getAppContentLanguage } from '../../services/contentLanguage';
 import { colors, spacing, fontSize, fontWeight } from '../../theme';
 
 type AddQuestionRoute =
@@ -42,6 +44,7 @@ export const AddQuestionScreen: React.FC = () => {
   const [question, setQuestion] =
     useState<CreateQuestionInput>(DEFAULT_QUESTION);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
 
   const { data: existingData, isLoading: loadingExisting } =
     usePracticeQuestion(questionId ?? '');
@@ -59,6 +62,8 @@ export const AddQuestionScreen: React.FC = () => {
         answer: q.answer,
         options: q.options,
         points: q.points,
+        imageUrl: q.imageUrl,
+        language: q.language ?? getAppContentLanguage(),
       });
     }
   }, [existingData]);
@@ -70,6 +75,9 @@ export const AddQuestionScreen: React.FC = () => {
     }
     if (question.type !== 'TRUE_FALSE' && question.answer.trim().length < 1) {
       nextErrors.answer = t('createEvent.validation.answerRequired');
+    }
+    if (question.type === 'IMAGE' && !question.imageUrl?.trim()) {
+      nextErrors.imageUrl = t('createEvent.validation.imageRequired');
     }
     if (question.type === 'MULTIPLE_CHOICE') {
       const options = (question.options ?? [])
@@ -95,15 +103,36 @@ export const AddQuestionScreen: React.FC = () => {
     }
 
     try {
+      setUploading(true);
+      let imageUrl = question.imageUrl;
+      if (question.type === 'IMAGE') {
+        imageUrl = await uploadsApi.ensureRemoteImageUrl(question.imageUrl);
+        if (!imageUrl) {
+          throw new Error(t('createEvent.imageUploadFailed'));
+        }
+      }
+
+      const payload: CreateQuestionInput = {
+        ...question,
+        question: question.question.trim(),
+        answer: question.answer.trim(),
+        imageUrl: question.type === 'IMAGE' ? imageUrl : undefined,
+        language: question.language ?? getAppContentLanguage(),
+        options:
+          question.type === 'MULTIPLE_CHOICE'
+            ? (question.options ?? []).map(o => o.trim()).filter(Boolean)
+            : undefined,
+      };
+
       if (isEditing && questionId) {
-        await updateMutation.mutateAsync({ questionId, input: question });
+        await updateMutation.mutateAsync({ questionId, input: payload });
         Alert.alert(
           t('practice.updateSuccessTitle'),
           t('practice.updateSuccessMessage'),
           [{ text: t('common.ok'), onPress: () => navigation.goBack() }],
         );
       } else {
-        await createMutation.mutateAsync(question);
+        await createMutation.mutateAsync(payload);
         Alert.alert(
           t('practice.createSuccessTitle'),
           t('practice.createSuccessMessage'),
@@ -115,6 +144,8 @@ export const AddQuestionScreen: React.FC = () => {
         t('common.error'),
         (err as Error)?.message || t('practice.saveFailed'),
       );
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -140,7 +171,9 @@ export const AddQuestionScreen: React.FC = () => {
           isEditing ? t('practice.saveQuestion') : t('practice.publishQuestion')
         }
         onPress={handleSubmit}
-        loading={createMutation.isPending || updateMutation.isPending}
+        loading={
+          uploading || createMutation.isPending || updateMutation.isPending
+        }
         fullWidth
       />
     </ScrollView>

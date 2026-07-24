@@ -12,10 +12,12 @@ import {
   IsInt,
   IsArray,
   ArrayMaxSize,
+  IsIn,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventDifficulty } from '@prisma/client';
 import { Type } from 'class-transformer';
+import { CONTENT_LANGUAGES } from '../../common/content-language';
 
 export class CreateEventDto {
   @ApiProperty()
@@ -59,6 +61,14 @@ export class CreateEventDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Content language (vi | en | zh | ja)',
+    enum: CONTENT_LANGUAGES,
+  })
+  @IsOptional()
+  @IsIn([...CONTENT_LANGUAGES])
+  language?: string;
 
   @ApiPropertyOptional({ description: 'Set event join password (min 4 chars)' })
   @IsOptional()
@@ -149,6 +159,14 @@ export class UpdateEventDto {
   @IsBoolean()
   isActive?: boolean;
 
+  @ApiPropertyOptional({
+    description: 'Content language (vi | en | zh | ja)',
+    enum: CONTENT_LANGUAGES,
+  })
+  @IsOptional()
+  @IsIn([...CONTENT_LANGUAGES])
+  language?: string;
+
   @ApiPropertyOptional({ description: 'Set event join password (min 4 chars)' })
   @IsOptional()
   @IsString()
@@ -220,4 +238,11 @@ export class NearbyQueryDto {
   @Min(1)
   @Max(500)
   radiusKm?: number;
+
+  @ApiPropertyOptional({
+    description: 'Content language filter, or "all"',
+  })
+  @IsOptional()
+  @IsString()
+  language?: string;
 }

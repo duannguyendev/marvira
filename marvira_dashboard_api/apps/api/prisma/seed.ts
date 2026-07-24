@@ -60,7 +60,7 @@ async function main() {
 
   const event = await prisma.event.upsert({
     where: { id: 'seed-event-downtown' },
-    update: {},
+    update: { language: 'en' },
     create: {
       id: 'seed-event-downtown',
       title: 'Downtown Discovery Hunt',
@@ -70,6 +70,7 @@ async function main() {
       difficulty: EventDifficulty.MEDIUM,
       rewardPoints: 250,
       isActive: true,
+      language: 'en',
       createdBy: admin.id,
       coverImage: null,
     },
@@ -144,8 +145,8 @@ async function main() {
     const { placeId: _p, ...qData } = qDef;
     await prisma.question.upsert({
       where: { id: qDef.id },
-      update: {},
-      create: qData,
+      update: { language: 'en' },
+      create: { ...qData, language: 'en' },
     });
     await prisma.eventQuestion.upsert({
       where: {
@@ -176,7 +177,7 @@ async function main() {
 
   const bridgeQuestion = await prisma.question.upsert({
     where: { id: 'seed-question-bridge' },
-    update: {},
+    update: { language: 'en' },
     create: {
       id: 'seed-question-bridge',
       question: 'What color is the Golden Gate Bridge officially painted?',
@@ -184,12 +185,13 @@ async function main() {
       answer: 'International Orange',
       explanation: 'The official color is International Orange.',
       points: 30,
+      language: 'en',
     },
   });
 
   const event2 = await prisma.event.upsert({
     where: { id: 'seed-event-golden-gate' },
-    update: {},
+    update: { language: 'en' },
     create: {
       id: 'seed-event-golden-gate',
       title: 'Golden Gate Adventure',
@@ -198,6 +200,7 @@ async function main() {
       difficulty: EventDifficulty.HARD,
       rewardPoints: 400,
       isActive: true,
+      language: 'en',
       createdBy: admin.id,
     },
   });
@@ -271,6 +274,16 @@ async function main() {
       answer: 'Mars',
       points: 10,
     },
+    {
+      id: 'seed-practice-4',
+      question: 'Which San Francisco landmark is shown here?',
+      type: QuestionType.IMAGE,
+      imageUrl:
+        'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800',
+      answer: 'Golden Gate Bridge',
+      explanation: 'The Golden Gate Bridge is an icon of San Francisco.',
+      points: 15,
+    },
   ];
 
   for (const cq of communityQuestions) {
@@ -280,12 +293,14 @@ async function main() {
         source: QuestionSource.COMMUNITY,
         isPublished: true,
         createdBy: admin.id,
+        language: 'en',
       },
       create: {
         ...cq,
         source: QuestionSource.COMMUNITY,
         isPublished: true,
         createdBy: admin.id,
+        language: 'en',
       },
     });
   }

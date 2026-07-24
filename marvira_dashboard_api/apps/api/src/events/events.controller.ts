@@ -43,12 +43,19 @@ export class EventsController {
   @Get()
   @ApiOperation({ summary: 'List active events' })
   async findAll(
+    @Req() req: { user?: RequestUser },
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
+    @Query('search') search?: string,
+    @Query('language') language?: string,
   ) {
     const data = await this.eventsService.findAll(
       parseInt(page || '1', 10),
       parseInt(pageSize || '20', 10),
+      true,
+      search,
+      language,
+      req.user?.id,
     );
     return { success: true, data };
   }
@@ -56,11 +63,16 @@ export class EventsController {
   @Public()
   @Get('nearby')
   @ApiOperation({ summary: 'Find nearby events using PostGIS' })
-  async nearby(@Query() query: NearbyQueryDto) {
+  async nearby(
+    @Req() req: { user?: RequestUser },
+    @Query() query: NearbyQueryDto,
+  ) {
     const data = await this.eventsService.findNearby(
       query.latitude,
       query.longitude,
       query.radiusKm,
+      query.language,
+      req.user?.id,
     );
     return { success: true, data };
   }

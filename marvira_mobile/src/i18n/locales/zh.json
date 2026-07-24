@@ -112,6 +112,10 @@
     "sendFeedback": "发送反馈",
     "language": "语言",
     "languageDescription": "选择你偏好的语言",
+    "contentLanguage": "内容筛选",
+    "contentLanguageDescription": "默认只显示与应用语言相同的活动和练习题。",
+    "allLanguages": "显示所有语言",
+    "allLanguagesHint": "包含所有语言的活动和练习题",
     "languages": {
       "vi": "Tiếng Việt",
       "en": "English",
@@ -143,6 +147,7 @@
     "searchPlaceholder": "搜索活动...",
     "noEventsFound": "未找到活动",
     "adjustFilters": "请尝试调整筛选条件或搜索关键词",
+    "emptyLanguageHint": "提示：在设置中开启“显示所有语言”，或切换应用语言。",
     "loadFailed": "加载活动失败",
     "detailsLoadFailed": "加载活动详情失败",
     "progressComplete": "完成 {{progress}}%（{{completed}}/{{total}} 个地点）",
@@ -282,10 +287,21 @@
     "questionTypes": {
       "TEXT": "文本",
       "TRUE_FALSE": "判断题",
-      "MULTIPLE_CHOICE": "选择题"
+      "MULTIPLE_CHOICE": "选择题",
+      "IMAGE": "图片"
     },
     "questionText": "问题",
     "questionTextPlaceholder": "这个地方是哪一年建立的？",
+    "imageCaption": "说明文字",
+    "imageCaptionPlaceholder": "这张照片里是什么地标？",
+    "questionImage": "问题图片",
+    "noImageSelected": "未选择图片",
+    "takePhoto": "拍照",
+    "chooseFromLibrary": "从相册选择",
+    "removeImage": "移除图片",
+    "imageUploadHint": "JPEG、PNG 或 WebP，最大 5 MB。保存时上传。",
+    "imagePickFailed": "无法打开图片选择器",
+    "imageUploadFailed": "图片上传失败，请重试。",
     "options": "选项",
     "optionPlaceholder": "选项 {{n}}",
     "addOption": "+ 添加选项",
@@ -342,6 +358,7 @@
       "placeDescriptionMin": "描述至少5个字符",
       "questionMin": "问题至少3个字符",
       "answerRequired": "需要正确答案",
+      "imageRequired": "图片题需要添加照片",
       "optionsMin": "至少添加2个选项",
       "answerMustMatchOption": "答案必须匹配其中一个选项"
     }
@@ -369,6 +386,7 @@
     "emptyToPracticeMessage": "稍后再来，或添加题目供他人练习！",
     "emptyCompletedTitle": "尚无完成的练习",
     "emptyCompletedMessage": "完成一道练习题后会显示在这里。",
+    "emptyLanguageHint": "提示：在设置中开启“显示所有语言”，或切换应用语言。",
     "addQuestion": "添加题目",
     "editQuestion": "编辑题目",
     "addQuestionSubheading": "为社区练习库创建独立题目。",

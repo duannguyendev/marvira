@@ -1,108 +1,234 @@
 ================================================================================
-MARVIRA â€” GO-LIVE CHECKLIST (NEXT STEPS ONLY)
+MARVIRA — GO-LIVE CHECKLIST (NEXT STEPS ONLY)
 ================================================================================
-Updated: 2026-07-20
-Reference: requirement_all.txt | docs/deployment.md | docs/backup-restore.md
+Updated: 2026-07-24
+Reference: growth_plan.txt | monetization_todo.txt | analytics_requirement.txt
+           marvira_dashboard_api/docs/deployment.md
+           marvira_dashboard_api/docs/backup-restore.md
+           marvira_mobile/CODEMAGIC.md | marvira_mobile/FIREBASE_SETUP.md
 
 Legend:
   [P0] = Must do before public launch
   [P1] = Required for production scale / store release
+  [x]  = Done in source (no further build work)
+
+Scope (v1.0): users-first public launch. Ads / Plus / publish caps stay OFF
+(see monetization_todo.txt). Product core loop is ready; remaining work is
+mostly deploy, store, Firebase, invite web page, and launch-city content.
 
 ================================================================================
-0. FEEDBACK FEATURE â€” DATABASE (P0)
+0. ALREADY DONE IN SOURCE (do not rebuild — verify on staging/prod)
 ================================================================================
 
-[P0] Apply feedback migration on staging and production
-  - Migration: apps/api/prisma/migrations/20260720140000_add_feedback/
-  - Creates: feedback table + FeedbackCategory / FeedbackSource / FeedbackStatus enums
-  - Local: VERIFIED (prisma migrate status â†’ "Database schema is up to date", 11 migrations)
-  - Staging/production: run from apps/api after deploy:
-      pnpm exec prisma migrate deploy
-  - Verify:
-      pnpm exec prisma migrate status   â†’ no pending migrations
-      \dt feedback                      â†’ table exists (psql)
-      POST /feedback (website or mobile) â†’ 201/200 success
-      GET /admin/feedback (staff login) â†’ 200 with paginated list
-
-[P0] Marketing feedback form env (if /support is live)
-  - NEXT_PUBLIC_API_URL must point to staging/production API (not localhost)
-  - Rebuild marketing site after setting env (pnpm build)
+[x] Core loop: register/login → nearby → GPS unlock → answer → complete
+[x] Practice mode, create/draft/publish, leaderboards, feedback (mobile + web + admin)
+[x] Share/invite deep links in app (marvira://e/{id}; HTTPS share via MARKETING_SITE_URL)
+[x] API health: GET /health, GET /ready; production guards (JWT, Redis, OAUTH_DEV_BYPASS)
+[x] Feedback + articles + event completion gifts Prisma migrations in repo (13 total)
+[x] USE_MOCK_DATA=false; release API/marketing URLs required via ENV (constants.ts)
+[x] Android release cleartext off; Maps key from ENV / .env.local
+[x] iOS location permission text; Maps key inject script; marvira URL scheme
+[x] Codemagic android-release + ios-release workflows (codemagic.yaml)
+[x] Firebase Analytics/Crashlytics SDK + event wiring (placeholder configs remain)
+[x] Auth API: email + POST /auth/google|/apple|/facebook (mobile OAuth UI still open)
+[x] No AdMob / IAP / Plus paywall code in mobile — keep OFF for v1.0
 
 ================================================================================
-1. PRODUCTION DEPLOY
+1. PRODUCTION DEPLOY (API + DASHBOARD + MARKETING)
 ================================================================================
 
-[P0] Set production secrets (API + dashboard)
-  - JWT_SECRET, JWT_REFRESH_SECRET (32+ random chars each)
-  - DATABASE_URL with connection_limit
-  - REDIS_URL (REDIS_DISABLED must be false)
+[P0] Set production secrets (API)
+  - JWT_SECRET (32+ random chars) — enforced at boot
+  - DATABASE_URL with connection_limit (e.g. connection_limit=20)
+  - REDIS_URL (or REDIS_HOST/PORT); REDIS_DISABLED must be unset/false
   - OAUTH_DEV_BYPASS=false
-  - Rotate or remove seed passwords (demo@marvira.com / admin@marvira.com)
+  - CORS_ORIGIN = dashboard + marketing HTTPS origins (comma-separated)
+  - NODE_ENV=production
+  - Optional: SENTRY_DSN, S3_*/CDN_URL, SMTP_*, PASSWORD_RESET_URL
+  - Note: JWT_REFRESH_SECRET appears in .env.example/docs but is unused in API
+    code (refresh tokens are UUIDs in DB/Redis) — set if you keep docs parity
 
-[P0] Deploy API and dashboard with HTTPS
-  - API: https://api.yourdomain.com
-  - Dashboard: https://admin.yourdomain.com
-  - CORS_ORIGIN on API = dashboard origin only
-  - Run: prisma migrate deploy
-  - Health probes: GET /health, GET /ready
+[P0] Deploy API over HTTPS
+  - e.g. https://api.yourdomain.com
+  - From apps/api (or Docker entrypoint):
+      pnpm exec prisma migrate deploy
+  - Apply ALL pending migrations (not only feedback), including:
+      20260720140000_add_feedback
+      20260721000000_add_articles
+      20260722150000_event_completion_gifts
+  - Verify:
+      pnpm exec prisma migrate status   → no pending
+      GET /health → 200
+      GET /ready  → 200 (DB + Redis + gameplay timing columns)
+  - Restrict GET /metrics by network in prod
 
-[P0] Configure mobile production API URL
-  - marvira_mobile/src/utils/constants.ts â†’ https://api.yourdomain.com
-  - USE_MOCK_DATA=false in release builds
-  - Android: usesCleartextTraffic=false, release signing keystore
+[P0] Rotate or remove seed passwords if seed was run on that DB
+  - admin@marvira.com / admin123
+  - demo@marvira.com / demo123
+  - staff@marvira.com / staff123
+
+[P0] Deploy dashboard over HTTPS
+  - e.g. https://admin.yourdomain.com
+  - Build env (apps/dashboard/.env.production):
+      NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+      NEXT_PUBLIC_CDN_URL=https://cdn.yourdomain.com   # when S3/CDN ready
+
+[P0] Deploy marketing site over HTTPS
+  - e.g. https://www.yourdomain.com
+  - Build env:
+      NEXT_PUBLIC_SITE_URL=https://www.yourdomain.com
+      NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+      NEXT_PUBLIC_CDN_URL=https://cdn.yourdomain.com
+      NEXT_PUBLIC_APP_STORE_URL=   # set when stores live → STORE_READY
+      NEXT_PUBLIC_PLAY_STORE_URL=
+  - Rebuild after setting env (pnpm build)
+  - Confirm /support feedback form posts to production API (not localhost)
+
+[P0] Marketing invite page for real events (launch blocker for share loop)
+  - Current: /e/[id] only serves static seed-event-downtown + seed-event-golden-gate
+    (content/events.ts). Real shared event IDs → 404.
+  - Required: serve /e/{id} from public API (or equivalent) for any published event
+    so HTTPS invite links from the app work for real hunts
+  - App deep link marvira://e/{id} already works when the app is installed
 
 [P1] Production infrastructure
   - 2+ API instances behind load balancer
   - Managed PostgreSQL (+ PostGIS if available)
-  - Shared Redis
+  - Shared Redis (required — memory fallback banned in prod)
   - S3 bucket + CDN_URL for image uploads
-  - NEXT_PUBLIC_API_URL and NEXT_PUBLIC_CDN_URL on dashboard build
-  - NEXT_PUBLIC_API_URL on marketing build (for /support feedback form)
+  - SMTP + real PASSWORD_RESET_URL if email reset is required at launch
+  - Real support email (replace hello@marvira.example.com placeholders)
 
 ================================================================================
-2. PRE-LAUNCH VERIFICATION
+2. MOBILE RELEASE CONFIG
 ================================================================================
 
-[P0] End-to-end smoke test on staging/production
-  - Register / login on mobile
-  - Nearby events â†’ open event â†’ unlock place 1 (GPS) â†’ answer â†’ next place
-  - Complete event â†’ completion screen shows score and time
-  - Admin: events list â†’ participants page (search, sort)
-  - Feedback: submit from mobile (Settings â†’ Send feedback) and website (/support)
-  - Admin: Feedback inbox â†’ open message â†’ mark READ / RESOLVED
+[P0] Codemagic / release ENV (see marvira_mobile/CODEMAGIC.md)
+  - Env group marvira_mobile_secrets:
+      GOOGLE_MAPS_API_KEY
+      API_BASE_URL=https://api.yourdomain.com
+      MARKETING_SITE_URL=https://www.yourdomain.com
+  - Local release: same names in marvira_mobile/.env.local (from .env.example)
+  - Do NOT hardcode URLs in constants.ts — release builds fail if ENV missing
 
-[P1] Run load test before live event
-  - k6 run scripts/load-test.k6.js (set API_URL to staging)
+[P0] Replace Firebase placeholder configs
+  - android/app/google-services.json  (project_id still marvira-replace-me)
+  - ios/Marvira/GoogleService-Info.plist (+ ios/GoogleService-Info.plist)
+  - Or inject via Codemagic:
+      GOOGLE_SERVICES_JSON_BASE64
+      GOOGLE_SERVICE_INFO_PLIST_BASE64
+  - Verify once: Analytics DebugView + a test Crashlytics non-fatal
+
+[P0] Clear Login/Register demo prefill before store builds
+  - LoginScreen / RegisterScreen still default to user@example.com / password123
+  - Ship empty fields (or __DEV__-only prefill)
+
+[P1] Codemagic signing integrations
+  - Android keystore integration: marvira_android
+  - App Store Connect: marvira_asc
+  - First green android-release + ios-release builds
+
+[P1] Restrict Google Maps API key
+  - Android: package name + release SHA-1
+  - iOS: bundle ID
+
+================================================================================
+3. LAUNCH CONTENT + SOFT TEST (growth_plan G0)
+================================================================================
+
+[P0] G0.1 Pick ONE launch city (or district) — not “everywhere”
+[P0] G0.2 Seed 8–15 strong public hunts there
+[P0] Seed practice (community) questions so Practice tab is not empty at launch
+  - Practice list API only returns source=COMMUNITY + isPublished=true
+    (event/hunt questions do NOT appear in Practice)
+  - prisma/seed.ts already creates 3 demo items (seed-practice-1..3) —
+    fine for staging; for production prefer a stronger set (local trivia /
+    city-flavored questions) created via seed or admin, then publish
+  - Soft-test: open Practice → unfinished list → train → mark completed
+  - If you run full prisma seed on prod: rotate seed passwords (section 1)
+[P0] G0.3 Soft test with 20–50 people; fix GPS unlock + first-hunt drop-off
+[P1] G0.4–G0.5 Store listing + screenshots (real streets / people walking)
+[x]  G0.6 Share/invite product in app (still blocked by marketing /e/{id} gap above)
+[~]  G0.7 Analytics wired in app — finish real Firebase configs (section 2)
+
+================================================================================
+4. PRE-LAUNCH VERIFICATION
+================================================================================
+
+[P0] End-to-end smoke on staging/production
+  - Register / login on mobile (empty fields — no demo prefill)
+  - Nearby events → open event → unlock place 1 (GPS) → answer → next place
+  - Complete event → completion screen (score, time, share)
+  - Practice: unfinished list has community questions → train → completed tab
+  - Share invite HTTPS link → marketing /e/{id} loads for that real event
+  - Open marvira://e/{id} (or pending invite after login) → EventDetails
+  - Admin: events list → participants (search, sort)
+  - Feedback: Settings → Send feedback (mobile) and /support (website)
+  - Admin: Feedback inbox → mark READ / RESOLVED
+
+[P1] Run load test before a live event
+  - k6 run marvira_dashboard_api/scripts/load-test.k6.js (API_URL=staging)
   - Target: p95 < 500ms on gameplay endpoints; fix bottlenecks if failed
 
 [P1] Enable database backups
   - Daily snapshots + point-in-time recovery on managed Postgres
-  - See docs/backup-restore.md
+  - See marvira_dashboard_api/docs/backup-restore.md
 
 ================================================================================
-3. STORE RELEASE (if shipping to App Store / Play)
+5. STORE RELEASE
 ================================================================================
 
 [P1] Android Play Store
-  - Create upload keystore (not in repo)
-  - android/app/key.properties + signingConfigs.release
-  - Restrict Google Maps API key by package + SHA-1
+  - Create upload keystore (not in repo); key.properties from example
+  - Wire Codemagic marvira_android signing
   - Build release AAB and upload to Play Console
+  - Store privacy labels for Firebase Analytics / Crashlytics
 
-[P1] iOS App Store (requires Mac + Xcode)
-  - Run marvira_mobile/scripts/setup-ios.ps1 on Mac
-  - pod install, configure signing & provisioning
-  - Info.plist: location permission text, Maps API key
-  - TestFlight â†’ App Store review
+[P1] iOS App Store
+  - Codemagic marvira_asc + signing & provisioning
+  - TestFlight → App Store review
+  - Store privacy labels for Firebase Analytics / Crashlytics
+
+[P1] Flip marketing STORE_READY
+  - Set NEXT_PUBLIC_APP_STORE_URL + NEXT_PUBLIC_PLAY_STORE_URL
+  - Rebuild marketing so CTAs point at stores (not only /download)
 
 ================================================================================
-4. AUTH (when credentials are ready)
+6. AUTH (when credentials are ready — not required for email-only launch)
 ================================================================================
 
 [P1] Google / Apple sign-in on mobile
-  - Obtain GOOGLE_CLIENT_ID, Apple Sign-In credentials
+  - Obtain GOOGLE_CLIENT_ID / Apple Sign-In credentials
   - Add sign-in buttons on LoginScreen
-  - Wire to POST /auth/google and POST /auth/apple
+  - Wire to POST /auth/google and POST /auth/apple (API already exists)
+
+[P1] Optional: Android App Links / iOS Universal Links for HTTPS /e/{id}
+  - Today HTTPS opens marketing (or browser); app opens via marvira:// CTA
+  - Improves install → open conversion after invite
+
+================================================================================
+7. EXPLICITLY OUT OF SCOPE FOR v1.0
+================================================================================
+
+  - Do NOT ship live ads (AdMob / units)
+  - Do NOT ship Plus paywall or IAP
+  - Do NOT enforce publish caps
+  - Optional plumbing only if flagged OFF and invisible to users
+    (see monetization_todo.txt M0.*; growth_plan v1.0)
+
+================================================================================
+8. CONTENT LANGUAGE + MOBILE IMAGE (was deferred; now implemented)
+================================================================================
+
+  Spec: requirement_all.txt §23 (plan file removed after implementation)
+
+  [x] Content language on Event + Question; filter Practice + event discovery
+  [x] Mobile IMAGE question create (camera/gallery → POST /uploads)
+  [x] Create Event wizard IMAGE type
+  [x] "All languages" toggle; seed language tags (+ IMAGE practice seed)
+  [ ] Device manual pass (camera/gallery create + train IMAGE + GPS place)
+
+  Prefer shipping language filter before IMAGE create if soft-test mixes locales.
 
 ================================================================================
 END

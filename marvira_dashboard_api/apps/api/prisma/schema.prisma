@@ -132,6 +132,8 @@ model Event {
   difficulty        EventDifficulty @default(MEDIUM)
   rewardPoints      Int             @default(100) @map("reward_points")
   isActive          Boolean         @default(false) @map("is_active")
+  /// Content language: vi | en | zh | ja (not UI i18n)
+  language          String          @default("vi")
   joinPasswordHash  String?         @map("join_password_hash")
   completionMessage String?         @map("completion_message")
   giftTeaser        String?         @map("gift_teaser")
@@ -150,6 +152,7 @@ model Event {
 
   @@index([city])
   @@index([isActive])
+  @@index([language])
   @@map("events")
 }
 
@@ -183,6 +186,8 @@ model Question {
   answer      String
   explanation String?
   points      Int            @default(10)
+  /// Content language: vi | en | zh | ja (not UI i18n)
+  language    String         @default("vi")
   createdBy   String?        @map("created_by")
   source      QuestionSource @default(EVENT)
   isPublished Boolean        @default(false) @map("is_published")
@@ -196,7 +201,9 @@ model Question {
   favoritedBy         UserFavoriteQuestion[]
 
   @@index([source, isPublished])
+  @@index([source, isPublished, language])
   @@index([createdBy])
+  @@index([language])
   @@map("questions")
 }
 

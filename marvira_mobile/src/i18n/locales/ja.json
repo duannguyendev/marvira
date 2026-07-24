@@ -112,6 +112,10 @@
     "sendFeedback": "フィードバックを送る",
     "language": "言語",
     "languageDescription": "使用する言語を選択",
+    "contentLanguage": "コンテンツフィルター",
+    "contentLanguageDescription": "デフォルトではアプリ言語と同じイベントと練習問題のみ表示します。",
+    "allLanguages": "すべての言語を表示",
+    "allLanguagesHint": "すべての言語のイベントと練習問題を含めます",
     "languages": {
       "vi": "Tiếng Việt",
       "en": "English",
@@ -143,6 +147,7 @@
     "searchPlaceholder": "イベントを検索...",
     "noEventsFound": "イベントが見つかりません",
     "adjustFilters": "フィルターまたは検索条件を調整してください",
+    "emptyLanguageHint": "ヒント：設定で「すべての言語を表示」をオンにするか、アプリ言語を切り替えてください。",
     "loadFailed": "イベントの読み込みに失敗しました",
     "detailsLoadFailed": "イベント詳細の読み込みに失敗しました",
     "progressComplete": "{{progress}}% 完了（{{completed}}/{{total}} スポット）",
@@ -282,10 +287,21 @@
     "questionTypes": {
       "TEXT": "テキスト",
       "TRUE_FALSE": "正誤",
-      "MULTIPLE_CHOICE": "選択式"
+      "MULTIPLE_CHOICE": "選択式",
+      "IMAGE": "画像"
     },
     "questionText": "質問",
     "questionTextPlaceholder": "この場所は何年に設立されましたか？",
+    "imageCaption": "キャプション",
+    "imageCaptionPlaceholder": "この写真の名所は何ですか？",
+    "questionImage": "質問画像",
+    "noImageSelected": "画像未選択",
+    "takePhoto": "写真を撮る",
+    "chooseFromLibrary": "ライブラリから選択",
+    "removeImage": "画像を削除",
+    "imageUploadHint": "JPEG / PNG / WebP、最大5MB。保存時にアップロードします。",
+    "imagePickFailed": "画像ピッカーを開けませんでした",
+    "imageUploadFailed": "画像のアップロードに失敗しました。再試行してください。",
     "options": "選択肢",
     "optionPlaceholder": "選択肢 {{n}}",
     "addOption": "+ 選択肢を追加",
@@ -342,6 +358,7 @@
       "placeDescriptionMin": "説明は5文字以上必要です",
       "questionMin": "質問は3文字以上必要です",
       "answerRequired": "正解が必要です",
+      "imageRequired": "画像問題には写真を追加してください",
       "optionsMin": "選択肢を2つ以上追加してください",
       "answerMustMatchOption": "正解は選択肢のいずれかと一致する必要があります"
     }
@@ -369,6 +386,7 @@
     "emptyToPracticeMessage": "後で確認するか、問題を追加して他のユーザーと練習しましょう！",
     "emptyCompletedTitle": "完了した練習はまだありません",
     "emptyCompletedMessage": "練習問題を完了するとここに表示されます。",
+    "emptyLanguageHint": "ヒント：設定で「すべての言語を表示」をオンにするか、アプリ言語を切り替えてください。",
     "addQuestion": "問題を追加",
     "editQuestion": "問題を編集",
     "addQuestionSubheading": "コミュニティ練習用の独立した問題を作成します。",

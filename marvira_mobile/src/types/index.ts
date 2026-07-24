@@ -55,6 +55,7 @@ export interface Event {
   giftCodes?: string[];
   /** Owner-only on detail; also on completion payload */
   completionMessage?: string | null;
+  language?: string;
 }
 
 export interface EventDetails extends Event {
@@ -176,6 +177,7 @@ export interface CreateEventInput {
   city: string;
   difficulty: EventDifficulty;
   rewardPoints: number;
+  language?: string;
   completionMessage?: string | null;
   giftTeaser?: string | null;
   giftCodes?: string[];
@@ -215,6 +217,8 @@ export interface CreateQuestionInput {
   answer: string;
   options?: string[];
   points?: number;
+  imageUrl?: string;
+  language?: string;
 }
 
 export type QuestionSource = 'community' | 'event';
@@ -228,6 +232,7 @@ export interface PracticeQuestion {
   imageUrl?: string;
   options?: string[];
   points: number;
+  language?: string;
   answer: string;
   explanation?: string;
   authorId: string;
@@ -247,6 +252,7 @@ export interface PracticeQuestionListItem {
   imageUrl?: string;
   options?: string[];
   points: number;
+  language?: string;
   authorId: string;
   authorName: string;
   source: QuestionSource;

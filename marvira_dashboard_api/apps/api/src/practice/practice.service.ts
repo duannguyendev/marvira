@@ -12,6 +12,10 @@ import {
   CreateQuestionInput,
 } from '../questions/questions.service';
 import { buildPaginatedResponse, parsePagination } from '@marvira/shared-utils';
+import {
+  normalizeContentLanguage,
+  parseLanguageFilterQuery,
+} from '../common/content-language';
 
 type QuestionWithCreator = {
   id: string;
@@ -22,6 +26,7 @@ type QuestionWithCreator = {
   answer: string;
   explanation: string | null;
   points: number;
+  language: string;
   createdBy: string | null;
   source: QuestionSource;
   isPublished: boolean;
@@ -65,6 +70,7 @@ export class PracticeService {
       imageUrl: q.imageUrl,
       options: (q.options as string[] | null) ?? undefined,
       points: q.points,
+      language: q.language,
       ...(opts.includeAnswer ? { answer: q.answer } : {}),
       explanation: q.explanation,
       authorId,
@@ -101,6 +107,7 @@ export class PracticeService {
     status: 'unfinished' | 'completed' = 'unfinished',
     page = 1,
     pageSize = 50,
+    languageQuery?: string,
   ) {
     const { favoriteIds, completedIds } = await this.getUserSets(userId);
     const completedFilter =
@@ -108,14 +115,22 @@ export class PracticeService {
         ? { id: { in: [...completedIds] } }
         : { id: { notIn: [...completedIds] } };
 
+    const languageFilter = this.buildLanguageOrFavoriteFilter(
+      languageQuery,
+      favoriteIds,
+    );
+
     const { skip, take } = parsePagination({ page, pageSize });
 
+    const where = {
+      source: QuestionSource.COMMUNITY,
+      isPublished: true,
+      ...completedFilter,
+      ...languageFilter,
+    };
+
     const questions = await this.prisma.client.question.findMany({
-      where: {
-        source: QuestionSource.COMMUNITY,
-        isPublished: true,
-        ...completedFilter,
-      },
+      where,
       include: {
         creator: { select: { id: true, name: true } },
       },
@@ -127,15 +142,27 @@ export class PracticeService {
     const items = questions.map(q =>
       this.toListItem(q, { favoriteIds, completedIds }),
     );
-    const total = await this.prisma.client.question.count({
-      where: {
-        source: QuestionSource.COMMUNITY,
-        isPublished: true,
-        ...completedFilter,
-      },
-    });
+    const total = await this.prisma.client.question.count({ where });
 
     return buildPaginatedResponse(items, total, page, pageSize);
+  }
+
+  /** Favorites stay visible even when language filter would hide them. */
+  private buildLanguageOrFavoriteFilter(
+    languageQuery: string | undefined,
+    favoriteIds: Set<string>,
+  ): Record<string, unknown> {
+    const filter = parseLanguageFilterQuery(languageQuery);
+    if (filter === 'all') {
+      return {};
+    }
+    const favoriteIdList = [...favoriteIds];
+    if (favoriteIdList.length === 0) {
+      return { language: filter };
+    }
+    return {
+      OR: [{ language: filter }, { id: { in: favoriteIdList } }],
+    };
   }
 
   async getQuestion(userId: string, questionId: string, includeAnswer = false) {
@@ -219,7 +246,10 @@ export class PracticeService {
   }
 
   async createCommunityQuestion(userId: string, input: CreateQuestionInput) {
-    const base = await this.questionsService.create(input);
+    const base = await this.questionsService.create({
+      ...input,
+      language: normalizeContentLanguage(input.language),
+    });
     return this.prisma.client.question.update({
       where: { id: base.id },
       data: {

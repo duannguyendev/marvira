@@ -29,6 +29,11 @@ export enum EventDifficulty {
   HARD = 'HARD',
 }
 
+/** Content language for events / questions (independent of UI i18n). */
+export const CONTENT_LANGUAGES = ['vi', 'en', 'zh', 'ja'] as const;
+export type ContentLanguage = (typeof CONTENT_LANGUAGES)[number];
+export const DEFAULT_CONTENT_LANGUAGE: ContentLanguage = 'vi';
+
 export interface User {
   id: string;
   email: string;
@@ -49,6 +54,7 @@ export interface Event {
   difficulty: EventDifficulty;
   rewardPoints: number;
   isActive: boolean;
+  language: ContentLanguage | string;
   isPasswordProtected: boolean;
   hasAccess?: boolean;
   /** Derived: giftCodes.length > 0 — safe for public list/detail */
@@ -91,6 +97,7 @@ export interface Question {
   options: string[] | null;
   explanation: string | null;
   points: number;
+  language?: ContentLanguage | string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -366,6 +373,7 @@ export interface CreateEventDto {
   difficulty: EventDifficulty;
   rewardPoints: number;
   isActive?: boolean;
+  language?: ContentLanguage | string;
   completionMessage?: string | null;
   giftTeaser?: string | null;
   giftCodes?: string[];
@@ -404,6 +412,7 @@ export interface PracticeQuestionListItem {
   imageUrl?: string | null;
   options?: string[] | null;
   points: number;
+  language?: ContentLanguage | string;
   authorId: string;
   authorName: string;
   source: 'community' | 'event';
@@ -446,6 +455,7 @@ export interface CreateQuestionDto {
   answer: string;
   explanation?: string;
   points?: number;
+  language?: ContentLanguage | string;
 }
 
 export interface UpdateQuestionDto extends Partial<CreateQuestionDto> {}

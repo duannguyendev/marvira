@@ -114,6 +114,9 @@ export const PracticeListScreen: React.FC = () => {
                 ? t('practice.emptyToPracticeMessage')
                 : t('practice.emptyCompletedMessage')}
             </Text>
+            <Text style={styles.emptyHint}>
+              {t('practice.emptyLanguageHint')}
+            </Text>
           </View>
         }
         renderItem={({ item }) => (
@@ -191,6 +194,13 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
+  },
+  emptyHint: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginTop: spacing.md,
   },
   fab: {
     position: 'absolute',

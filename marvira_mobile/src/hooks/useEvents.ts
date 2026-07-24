@@ -1,10 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { eventsApi } from '../api/events';
 import { EventFilters, Location } from '../types';
+import { useShowAllLanguages } from './useContentLanguage';
 
 export const useEvents = (filters?: EventFilters, userLocation?: Location) => {
+  const { i18n } = useTranslation();
+  const { showAllLanguages } = useShowAllLanguages();
+
   return useQuery({
-    queryKey: ['events', filters, userLocation],
+    queryKey: [
+      'events',
+      filters,
+      userLocation,
+      i18n.language,
+      showAllLanguages,
+    ],
     queryFn: () => eventsApi.getEvents(filters, userLocation),
     staleTime: 30000,
   });

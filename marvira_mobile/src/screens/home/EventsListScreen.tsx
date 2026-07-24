@@ -195,6 +195,9 @@ export const EventsListScreen: React.FC = () => {
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>{t('events.noEventsFound')}</Text>
             <Text style={styles.emptySubtext}>{t('events.adjustFilters')}</Text>
+            <Text style={styles.emptySubtext}>
+              {t('events.emptyLanguageHint')}
+            </Text>
           </View>
         }
       />

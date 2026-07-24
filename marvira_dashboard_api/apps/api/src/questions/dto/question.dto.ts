@@ -10,9 +10,11 @@ import {
   MaxLength,
   ValidateIf,
   IsNotEmpty,
+  IsIn,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { QuestionType } from '@prisma/client';
+import { CONTENT_LANGUAGES } from '../../common/content-language';
 
 export class CreateQuestionDto {
   @ApiProperty({
@@ -63,6 +65,14 @@ export class CreateQuestionDto {
   @Min(1)
   @Max(1000)
   points?: number;
+
+  @ApiPropertyOptional({
+    description: 'Content language (vi | en | zh | ja)',
+    enum: CONTENT_LANGUAGES,
+  })
+  @IsOptional()
+  @IsIn([...CONTENT_LANGUAGES])
+  language?: string;
 }
 
 export class UpdateQuestionDto {
@@ -110,6 +120,14 @@ export class UpdateQuestionDto {
   @Min(1)
   @Max(1000)
   points?: number;
+
+  @ApiPropertyOptional({
+    description: 'Content language (vi | en | zh | ja)',
+    enum: CONTENT_LANGUAGES,
+  })
+  @IsOptional()
+  @IsIn([...CONTENT_LANGUAGES])
+  language?: string;
 }
 
 export class LinkQuestionToEventDto {

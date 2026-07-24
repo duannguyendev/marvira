@@ -38,6 +38,7 @@ export default function NewEventPage() {
       difficulty: EventDifficulty.MEDIUM,
       rewardPoints: 100,
       isActive: false,
+      language: 'vi',
       completionMessage: '',
       giftTeaser: '',
       giftCodes: [],
@@ -134,19 +135,38 @@ export default function NewEventPage() {
                 )}
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="rewardPoints">Reward Points *</Label>
-              <Input
-                id="rewardPoints"
-                type="number"
-                min={0}
-                {...register('rewardPoints')}
-              />
-              {errors.rewardPoints && (
-                <p className="text-sm text-destructive">
-                  {errors.rewardPoints.message}
-                </p>
-              )}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="rewardPoints">Reward Points *</Label>
+                <Input
+                  id="rewardPoints"
+                  type="number"
+                  min={0}
+                  {...register('rewardPoints')}
+                />
+                {errors.rewardPoints && (
+                  <p className="text-sm text-destructive">
+                    {errors.rewardPoints.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="language">Content language *</Label>
+                <select
+                  id="language"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  {...register('language')}>
+                  <option value="vi">Tiếng Việt</option>
+                  <option value="en">English</option>
+                  <option value="zh">中文</option>
+                  <option value="ja">日本語</option>
+                </select>
+                {errors.language && (
+                  <p className="text-sm text-destructive">
+                    {errors.language.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-4 border-t pt-4">

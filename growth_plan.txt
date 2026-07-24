@@ -4,6 +4,7 @@ MARVIRA — GROWTH PLAN (USERS FIRST)
 Updated: 2026-07-24
 Purpose: Acquire and retain users before monetization. One city → density → expand.
 Companion: monetization_todo.txt | analytics_requirement.txt | go_live_update_checklist.txt
+           | requirement_all.txt §23 (IMAGE create + content language — implemented)
 Status: Plan + v1.0 product code (share/invite deep links) done — execute city seed + store launch; ads/Plus deferred to post-v1.0.
 
 Legend:

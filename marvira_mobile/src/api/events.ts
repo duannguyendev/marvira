@@ -12,6 +12,7 @@ import { apiClient } from './client';
 import { ApiEvent, ApiPaginated, ApiPlace } from '../types/api';
 import { mapEvent, mapEventDetails } from './mappers';
 import { profileApi } from './profile';
+import { getContentLanguageQuery } from '../services/contentLanguage';
 
 async function getCompletedEventIds(): Promise<Set<string>> {
   try {
@@ -72,6 +73,7 @@ export const eventsApi = {
     }
 
     const completedIds = await getCompletedEventIds();
+    const language = await getContentLanguageQuery();
 
     if (filters?.status === 'completed') {
       const completed = await profileApi.getCompletedEvents();
@@ -99,6 +101,7 @@ export const eventsApi = {
           latitude: userLocation.latitude,
           longitude: userLocation.longitude,
           radiusKm,
+          language,
         },
       });
       apiEvents = response.data.data;
@@ -110,6 +113,7 @@ export const eventsApi = {
         params: {
           page: 1,
           pageSize: 50,
+          language,
           ...(filters?.searchQuery ? { search: filters.searchQuery } : {}),
         },
       });

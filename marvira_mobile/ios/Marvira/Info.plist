@@ -47,6 +47,10 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Marvira needs access to your location to play location-based events.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Marvira needs camera access so you can take photos for image questions.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Marvira needs photo library access so you can choose images for questions.</string>
 	<key>GMSApiKey</key>
 	<string>YOUR_GOOGLE_MAPS_API_KEY</string>
 	<key>UILaunchStoryboardName</key>

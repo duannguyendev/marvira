@@ -11,6 +11,8 @@ import { QuestionForm } from '../../components/QuestionForm';
 import { useCreatePlaceWithQuestion } from '../../hooks/useMyEvents';
 import { useLocation } from '../../hooks/useLocation';
 import { CreatePlaceInput, CreateQuestionInput, Location } from '../../types';
+import { getAppContentLanguage } from '../../services/contentLanguage';
+import { uploadsApi } from '../../api/uploads';
 import { HomeStackParamList } from '../../navigation/types';
 import { colors, spacing, fontSize, fontWeight } from '../../theme';
 
@@ -89,6 +91,9 @@ export const CreateEventPlaceScreen: React.FC = () => {
     if (question.type !== 'TRUE_FALSE' && question.answer.trim().length < 1) {
       nextErrors.answer = t('createEvent.validation.answerRequired');
     }
+    if (question.type === 'IMAGE' && !question.imageUrl?.trim()) {
+      nextErrors.imageUrl = t('createEvent.validation.imageRequired');
+    }
     if (question.type === 'MULTIPLE_CHOICE') {
       const options = (question.options ?? [])
         .map(o => o.trim())
@@ -120,17 +125,27 @@ export const CreateEventPlaceScreen: React.FC = () => {
       longitude: coordinate.longitude,
     };
 
-    const questionPayload: CreateQuestionInput = {
-      ...question,
-      question: question.question.trim(),
-      answer: question.answer.trim(),
-      options:
-        question.type === 'MULTIPLE_CHOICE'
-          ? (question.options ?? []).map(o => o.trim()).filter(Boolean)
-          : undefined,
-    };
-
     try {
+      let imageUrl = question.imageUrl;
+      if (question.type === 'IMAGE') {
+        imageUrl = await uploadsApi.ensureRemoteImageUrl(question.imageUrl);
+        if (!imageUrl) {
+          throw new Error(t('createEvent.imageUploadFailed'));
+        }
+      }
+
+      const questionPayload: CreateQuestionInput = {
+        ...question,
+        question: question.question.trim(),
+        answer: question.answer.trim(),
+        language: getAppContentLanguage(),
+        imageUrl: question.type === 'IMAGE' ? imageUrl : undefined,
+        options:
+          question.type === 'MULTIPLE_CHOICE'
+            ? (question.options ?? []).map(o => o.trim()).filter(Boolean)
+            : undefined,
+      };
+
       await createPlace.mutateAsync({
         eventId,
         orderIndex: placeIndex,
@@ -220,15 +235,16 @@ export const CreateEventPlaceScreen: React.FC = () => {
           placeholder={t('createEvent.hintPlaceholder')}
         />
 
-        <QuestionForm
-          value={question}
-          onChange={setQuestion}
-          errors={{
-            question: errors.question,
-            answer: errors.answer,
-            options: errors.options,
-          }}
-        />
+<QuestionForm
+  value={question}
+  onChange={setQuestion}
+  errors={{
+    question: errors.question,
+    answer: errors.answer,
+    options: errors.options,
+    imageUrl: errors.imageUrl,
+  }}
+/>
 
         <View style={styles.actions}>
           <Button

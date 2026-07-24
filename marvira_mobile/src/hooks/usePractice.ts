@@ -5,10 +5,21 @@ import {
   PracticeQuestionStatus,
   TrainingAnswerSubmission,
 } from '../types';
+import { useTranslation } from 'react-i18next';
+import { useShowAllLanguages } from './useContentLanguage';
 
 export const usePracticeQuestions = (status: PracticeQuestionStatus) => {
+  const { i18n } = useTranslation();
+  const { showAllLanguages } = useShowAllLanguages();
+
   return useQuery({
-    queryKey: ['practice', 'questions', status],
+    queryKey: [
+      'practice',
+      'questions',
+      status,
+      i18n.language,
+      showAllLanguages,
+    ],
     queryFn: () => practiceApi.getQuestions(status),
     staleTime: 15000,
   });

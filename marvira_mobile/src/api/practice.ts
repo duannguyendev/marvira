@@ -4,6 +4,10 @@ import { USE_MOCK_DATA } from '../utils/constants';
 const USE_PRACTICE_MOCK = USE_MOCK_DATA;
 import { practiceMockStore } from './practiceMockStore';
 import { practiceStorage } from '../services/practiceStorage';
+import {
+  getAppContentLanguage,
+  getContentLanguageQuery,
+} from '../services/contentLanguage';
 import { mockUser } from './mockData';
 import { storage } from '../utils/storage';
 import {
@@ -45,16 +49,25 @@ function toListItem(
   };
 }
 
+function withLanguage(input: CreateQuestionInput): CreateQuestionInput {
+  return {
+    ...input,
+    language: input.language ?? getAppContentLanguage(),
+  };
+}
+
 export const practiceApi = {
   getQuestions: async (
     status: PracticeQuestionStatus,
   ): Promise<ApiResponse<PracticeQuestionListItem[]>> => {
     if (USE_PRACTICE_MOCK) {
-      const [published, favoriteIds, completedIds] = await Promise.all([
-        practiceMockStore.getPublishedCommunityQuestions(),
-        practiceStorage.getFavoriteQuestionIds(),
-        practiceStorage.getTrainingCompletedIds(),
-      ]);
+      const [published, favoriteIds, completedIds, languageQuery] =
+        await Promise.all([
+          practiceMockStore.getPublishedCommunityQuestions(),
+          practiceStorage.getFavoriteQuestionIds(),
+          practiceStorage.getTrainingCompletedIds(),
+          getContentLanguageQuery(),
+        ]);
 
       const items = published
         .map(q => toListItem(q, favoriteIds, completedIds))
@@ -63,6 +76,11 @@ export const practiceApi = {
             ? q.isTrainingCompleted
             : !q.isTrainingCompleted,
         )
+        .filter(q => {
+          if (languageQuery === 'all') return true;
+          if (favoriteIds.has(q.id)) return true;
+          return (q.language ?? 'vi') === languageQuery;
+        })
         .sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -71,10 +89,11 @@ export const practiceApi = {
       return { success: true, data: items };
     }
 
+    const language = await getContentLanguageQuery();
     const response = await apiClient.get<{
       success: boolean;
       data: PracticeQuestionListItem[];
-    }>('/practice/questions', { params: { status } });
+    }>('/practice/questions', { params: { status, language } });
 
     return { success: true, data: response.data.data };
   },
@@ -167,11 +186,13 @@ export const practiceApi = {
       throw new Error('User not authenticated');
     }
 
+    const payload = withLanguage(input);
+
     if (USE_PRACTICE_MOCK) {
       const question = await practiceMockStore.createQuestion(
         user.id,
         user.name,
-        input,
+        payload,
       );
       return { success: true, data: question };
     }
@@ -179,7 +200,7 @@ export const practiceApi = {
     const response = await apiClient.post<{
       success: boolean;
       data: PracticeQuestion;
-    }>('/practice/questions', input);
+    }>('/practice/questions', payload);
 
     return { success: true, data: response.data.data };
   },
@@ -193,11 +214,13 @@ export const practiceApi = {
       throw new Error('User not authenticated');
     }
 
+    const payload = withLanguage(input);
+
     if (USE_PRACTICE_MOCK) {
       const question = await practiceMockStore.updateQuestion(
         questionId,
         user.id,
-        input,
+        payload,
       );
       return { success: true, data: question };
     }
@@ -205,7 +228,7 @@ export const practiceApi = {
     const response = await apiClient.patch<{
       success: boolean;
       data: PracticeQuestion;
-    }>(`/practice/questions/${questionId}`, input);
+    }>(`/practice/questions/${questionId}`, payload);
 
     return { success: true, data: response.data.data };
   },

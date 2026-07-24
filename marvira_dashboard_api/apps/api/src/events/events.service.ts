@@ -20,6 +20,10 @@ import {
   assertGiftCodesAppendOnly,
   validateGiftFields,
 } from './gift-codes.util';
+import {
+  normalizeContentLanguage,
+  parseLanguageFilterQuery,
+} from '../common/content-language';
 
 export interface CreateEventInput {
   title: string;
@@ -29,6 +33,7 @@ export interface CreateEventInput {
   difficulty: EventDifficulty;
   rewardPoints: number;
   isActive?: boolean;
+  language?: string;
   createdBy: string;
   joinPassword?: string;
   clearJoinPassword?: boolean;
@@ -57,7 +62,14 @@ export class EventsService {
     private readonly eventAccess: EventAccessService,
   ) {}
 
-  async findAll(page = 1, pageSize = 20, activeOnly = true, search?: string) {
+  async findAll(
+    page = 1,
+    pageSize = 20,
+    activeOnly = true,
+    search?: string,
+    languageQuery?: string,
+    userId?: string,
+  ) {
     const { skip, take } = parsePagination({ page, pageSize });
     const searchFilter = search
       ? {
@@ -68,13 +80,23 @@ export class EventsService {
           ],
         }
       : {};
+
+    const exceptionIds = userId
+      ? await this.getLanguageExceptionEventIds(userId)
+      : [];
+    const languageFilter = this.buildLanguageOrExceptionFilter(
+      languageQuery,
+      exceptionIds,
+    );
+
     const where = {
       ...(activeOnly ? { isActive: true } : {}),
       ...searchFilter,
+      ...languageFilter,
     };
 
     const cacheVersion = await this.getListCacheVersion();
-    const cacheKey = `events:list:${cacheVersion}:${page}:${pageSize}:${activeOnly}:${search ?? ''}`;
+    const cacheKey = `events:list:${cacheVersion}:${page}:${pageSize}:${activeOnly}:${search ?? ''}:${languageQuery ?? 'all'}:${userId ?? 'anon'}`;
     const cached = await this.redis.get(cacheKey);
     if (cached) return JSON.parse(cached);
 
@@ -98,8 +120,18 @@ export class EventsService {
     return mapped;
   }
 
-  async findNearby(latitude: number, longitude: number, radiusKm = 50) {
+  async findNearby(
+    latitude: number,
+    longitude: number,
+    radiusKm = 50,
+    languageQuery?: string,
+    userId?: string,
+  ) {
     const radiusMeters = radiusKm * 1000;
+    const exceptionIds = userId
+      ? await this.getLanguageExceptionEventIds(userId)
+      : [];
+    const languageFilter = parseLanguageFilterQuery(languageQuery);
 
     if (await this.geoQuery.isPostGisAvailable()) {
       try {
@@ -107,6 +139,8 @@ export class EventsService {
           latitude,
           longitude,
           radiusMeters,
+          languageFilter === 'all' ? undefined : languageFilter,
+          exceptionIds,
         );
         return rows.map(row =>
           this.eventAccess.toPublicFields({
@@ -118,6 +152,7 @@ export class EventsService {
             difficulty: row.difficulty,
             rewardPoints: row.reward_points,
             isActive: row.is_active,
+            language: row.language,
             joinPasswordHash: row.join_password_hash,
             giftTeaser: row.gift_teaser,
             giftCodes: row.gift_codes,
@@ -133,7 +168,10 @@ export class EventsService {
     }
 
     const events = await this.prisma.client.event.findMany({
-      where: { isActive: true },
+      where: {
+        isActive: true,
+        ...this.buildLanguageOrExceptionFilter(languageQuery, exceptionIds),
+      },
       include: { places: { select: { latitude: true, longitude: true } } },
     });
 
@@ -155,6 +193,44 @@ export class EventsService {
           distanceMeters,
         }),
       );
+  }
+
+  /**
+   * Favorites + in-progress hunts stay visible across language filters.
+   */
+  private async getLanguageExceptionEventIds(userId: string): Promise<string[]> {
+    const [favorites, inProgress] = await Promise.all([
+      this.prisma.client.userFavoriteEvent.findMany({
+        where: { userId },
+        select: { eventId: true },
+      }),
+      this.prisma.client.userEventProgress.findMany({
+        where: { userId, completed: false },
+        select: { eventId: true },
+      }),
+    ]);
+    return [
+      ...new Set([
+        ...favorites.map(f => f.eventId),
+        ...inProgress.map(p => p.eventId),
+      ]),
+    ];
+  }
+
+  private buildLanguageOrExceptionFilter(
+    languageQuery: string | undefined,
+    exceptionIds: string[],
+  ): Record<string, unknown> {
+    const filter = parseLanguageFilterQuery(languageQuery);
+    if (filter === 'all') {
+      return {};
+    }
+    if (exceptionIds.length === 0) {
+      return { language: filter };
+    }
+    return {
+      OR: [{ language: filter }, { id: { in: exceptionIds } }],
+    };
   }
 
   async findByCreator(userId: string, page = 1, pageSize = 20) {
@@ -311,7 +387,12 @@ export class EventsService {
       completionMessage,
     });
     const event = await this.prisma.client.event.create({
-      data: { ...rest, ...createData, ...giftFields },
+      data: {
+        ...rest,
+        language: normalizeContentLanguage(rest.language),
+        ...createData,
+        ...giftFields,
+      },
     });
     await this.invalidateCache();
     return this.eventAccess.toPublicFields(event, {
@@ -349,7 +430,14 @@ export class EventsService {
 
     const event = await this.prisma.client.event.update({
       where: { id },
-      data: { ...rest, ...passwordFields, ...giftPatch },
+      data: {
+        ...rest,
+        ...(rest.language !== undefined
+          ? { language: normalizeContentLanguage(rest.language) }
+          : {}),
+        ...passwordFields,
+        ...giftPatch,
+      },
     });
     await this.invalidateCache();
     return this.eventAccess.toPublicFields(event, {

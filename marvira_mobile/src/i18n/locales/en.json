@@ -114,6 +114,10 @@
     "sendFeedback": "Send feedback",
     "language": "Language",
     "languageDescription": "Choose your preferred language",
+    "contentLanguage": "Content filter",
+    "contentLanguageDescription": "By default you only see hunts and practice questions in your app language.",
+    "allLanguages": "Show all languages",
+    "allLanguagesHint": "Include events and practice questions in every language",
     "languages": {
       "vi": "Tiếng Việt",
       "en": "English",
@@ -145,6 +149,7 @@
     "searchPlaceholder": "Search events...",
     "noEventsFound": "No events found",
     "adjustFilters": "Try adjusting your filters or search query",
+    "emptyLanguageHint": "Tip: turn on “Show all languages” in Settings, or switch app language.",
     "loadFailed": "Failed to load events",
     "detailsLoadFailed": "Failed to load event details",
     "progressComplete": "{{progress}}% Complete ({{completed}}/{{total}} places)",
@@ -298,10 +303,21 @@
     "questionTypes": {
       "TEXT": "Text",
       "TRUE_FALSE": "True/False",
-      "MULTIPLE_CHOICE": "Multiple choice"
+      "MULTIPLE_CHOICE": "Multiple choice",
+      "IMAGE": "Image"
     },
     "questionText": "Question",
     "questionTextPlaceholder": "What year was this place founded?",
+    "imageCaption": "Caption",
+    "imageCaptionPlaceholder": "What landmark is shown in this photo?",
+    "questionImage": "Question image",
+    "noImageSelected": "No image selected",
+    "takePhoto": "Take photo",
+    "chooseFromLibrary": "Choose from library",
+    "removeImage": "Remove image",
+    "imageUploadHint": "JPEG, PNG, or WebP up to 5 MB. Upload happens when you save.",
+    "imagePickFailed": "Could not open the image picker",
+    "imageUploadFailed": "Image upload failed. Try again.",
     "options": "Answer options",
     "optionPlaceholder": "Option {{n}}",
     "addOption": "+ Add option",
@@ -384,6 +400,7 @@
       "placeDescriptionMin": "Description must be at least 5 characters",
       "questionMin": "Question must be at least 3 characters",
       "answerRequired": "Correct answer is required",
+      "imageRequired": "Add a photo for image questions",
       "optionsMin": "Add at least 2 options",
       "answerMustMatchOption": "Answer must match one of the options"
     }
@@ -420,6 +437,7 @@
     "emptyToPracticeMessage": "Check back later or add a question for others to train with!",
     "emptyCompletedTitle": "No completed practice yet",
     "emptyCompletedMessage": "Finish a training question and it will appear here.",
+    "emptyLanguageHint": "Tip: turn on “Show all languages” in Settings, or switch app language.",
     "addQuestion": "Add Question",
     "editQuestion": "Edit Question",
     "addQuestionSubheading": "Create a standalone question for the community practice pool.",

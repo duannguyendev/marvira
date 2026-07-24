@@ -67,6 +67,8 @@ export const eventCreationApi = {
       answer: input.answer,
       options: input.options,
       points: input.points ?? 10,
+      imageUrl: input.imageUrl,
+      language: input.language,
     });
     return response.data.data;
   },

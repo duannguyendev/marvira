@@ -5,11 +5,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Switch,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SUPPORTED_LANGUAGES, LanguageCode, setAppLanguage } from '../../i18n';
+import { useShowAllLanguages } from '../../hooks/useContentLanguage';
 import { ProfileStackParamList } from '../../navigation/types';
 import {
   colors,
@@ -28,6 +30,7 @@ export const SettingsScreen: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigation = useNavigation<SettingsNavigationProp>();
   const currentLanguage = i18n.language as LanguageCode;
+  const { showAllLanguages, setShowAllLanguages } = useShowAllLanguages();
 
   const handleSelectLanguage = async (code: LanguageCode) => {
     if (code !== currentLanguage) {
@@ -76,6 +79,33 @@ export const SettingsScreen: React.FC = () => {
               </TouchableOpacity>
             );
           })}
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>
+          {t('settings.contentLanguage')}
+        </Text>
+        <Text style={styles.sectionDescription}>
+          {t('settings.contentLanguageDescription')}
+        </Text>
+        <View style={styles.toggleRow}>
+          <View style={styles.toggleText}>
+            <Text style={styles.toggleLabel}>
+              {t('settings.allLanguages')}
+            </Text>
+            <Text style={styles.toggleHint}>
+              {t('settings.allLanguagesHint')}
+            </Text>
+          </View>
+          <Switch
+            value={showAllLanguages}
+            onValueChange={value => {
+              void setShowAllLanguages(value);
+            }}
+            trackColor={{ false: colors.border, true: colors.primary }}
+            thumbColor={colors.background}
+          />
         </View>
       </View>
     </ScrollView>
@@ -150,5 +180,29 @@ const styles = StyleSheet.create({
     fontSize: fontSize.lg,
     color: colors.primary,
     fontWeight: fontWeight.bold,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.background,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
+    borderColor: colors.border,
+    gap: spacing.md,
+  },
+  toggleText: {
+    flex: 1,
+  },
+  toggleLabel: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.medium,
+    color: colors.textDark,
+    marginBottom: spacing.xs,
+  },
+  toggleHint: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
   },
 });
