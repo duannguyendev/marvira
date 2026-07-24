@@ -1,5 +1,13 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import React, { useEffect, useState, useLayoutEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  Share,
+  TouchableOpacity,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -25,6 +33,8 @@ import {
 import { HomeStackParamList } from '../../navigation/types';
 import { calculateDistance } from '../../utils/distance';
 import { DEFAULT_MAP_REGION } from '../../utils/constants';
+import { AnalyticsEvents } from '../../services/analytics';
+import { buildInviteWebUrl } from '../../utils/inviteLinks';
 
 const { height } = Dimensions.get('window');
 const MAP_HEIGHT = height * 0.4;
@@ -63,22 +73,59 @@ export const EventDetailsScreen: React.FC = () => {
 
   const event = data?.data;
   const isLocked = !!event?.isPasswordProtected && event.hasAccess === false;
+  const eventTitle = event?.title;
+
+  const handleShare = useCallback(async () => {
+    if (!eventTitle) {
+      return;
+    }
+    try {
+      void AnalyticsEvents.shareTapped(eventId, 'event_detail');
+      await Share.share({
+        message: t('events.shareMessage', {
+          title: eventTitle,
+          url: buildInviteWebUrl(eventId),
+        }),
+      });
+    } catch {
+      // user dismissed share sheet
+    }
+  }, [eventId, eventTitle, t]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <FavoriteButton
-          isFavorite={favorited}
-          onPress={() => onFavoritePress(eventId, favorited)}
-          accessibilityLabel={
-            favorited
-              ? t('favorites.unfavoriteEventA11y')
-              : t('favorites.favoriteEventA11y')
-          }
-        />
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={handleShare}
+            style={styles.shareButton}
+            accessibilityLabel={t('events.shareA11y')}
+            accessibilityState={{ disabled: !eventTitle }}
+            disabled={!eventTitle}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Text style={styles.shareButtonText}>↗</Text>
+          </TouchableOpacity>
+          <FavoriteButton
+            isFavorite={favorited}
+            onPress={() => onFavoritePress(eventId, favorited)}
+            accessibilityLabel={
+              favorited
+                ? t('favorites.unfavoriteEventA11y')
+                : t('favorites.favoriteEventA11y')
+            }
+          />
+        </View>
       ),
     });
-  }, [navigation, eventId, favorited, onFavoritePress, t]);
+  }, [
+    navigation,
+    eventId,
+    favorited,
+    onFavoritePress,
+    t,
+    handleShare,
+    eventTitle,
+  ]);
 
   useEffect(() => {
     if (event?.places) {
@@ -314,6 +361,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.backgroundLight,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginRight: spacing.xs,
+  },
+  shareButton: {
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xs,
+  },
+  shareButtonText: {
+    fontSize: 22,
+    color: colors.background,
+    fontWeight: fontWeight.bold,
   },
   mapContainer: {
     height: MAP_HEIGHT,

@@ -1,2 +1,5 @@
-# Release signing — copy key.properties.example to key.properties
-# GOOGLE_MAPS_API_KEY=your-maps-api-key
+# Optional reference only — not required for Google Maps.
+# Maps key: set GOOGLE_MAPS_API_KEY in ../.env.local (local) or Codemagic Secure ENV (CI).
+# See ../CODEMAGIC.md and ../.env.example.
+#
+# Release signing: copy key.properties.example → key.properties (gitignored).

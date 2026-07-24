@@ -13,7 +13,56 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-def mapsApiKey = project.findProperty('GOOGLE_MAPS_API_KEY') ?: 'YOUR_GOOGLE_MAPS_API_KEY'
+def loadDotEnvLocal = {
+    def props = new Properties()
+    def envFile = rootProject.file('../.env.local')
+    if (!envFile.exists()) {
+        envFile = rootProject.file('../.env')
+    }
+    if (envFile.exists()) {
+        envFile.eachLine { raw ->
+            def line = raw.trim()
+            if (!line || line.startsWith('#')) {
+                return
+            }
+            def idx = line.indexOf('=')
+            if (idx > 0) {
+                def key = line.substring(0, idx).trim()
+                def value = line.substring(idx + 1).trim()
+                if ((value.startsWith('"') && value.endsWith('"')) ||
+                    (value.startsWith("'") && value.endsWith("'"))) {
+                    value = value.substring(1, value.length() - 1)
+                }
+                props.setProperty(key, value)
+            }
+        }
+    }
+    return props
+}
+
+def envLocal = loadDotEnvLocal()
+def PLACEHOLDER_MAPS_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'
+
+/**
+ * Codemagic / shell ENV wins, then local `.env.local`.
+ * Build fails if the key is missing (debug and release).
+ */
+def requireMapsApiKey() {
+    def key =
+        System.getenv('GOOGLE_MAPS_API_KEY')
+            ?: envLocal.getProperty('GOOGLE_MAPS_API_KEY')
+
+    if (!(key instanceof String) || !key.trim() || key.trim() == PLACEHOLDER_MAPS_KEY) {
+        throw new GradleException(
+            "GOOGLE_MAPS_API_KEY is missing or invalid.\n" +
+            "  Codemagic: set Secure ENV GOOGLE_MAPS_API_KEY\n" +
+            "  Local: create marvira_mobile/.env.local (see .env.example)"
+        )
+    }
+    return key.trim()
+}
+
+def mapsApiKey = requireMapsApiKey()
 
 react {
     autolinkLibrariesWithApp()

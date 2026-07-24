@@ -155,6 +155,8 @@
     "giftLabel": "Gift",
     "giftsForFirst": "Gifts for the first {{count}} finishers",
     "placesCount": "Places ({{count}})",
+    "shareA11y": "Share this hunt",
+    "shareMessage": "Join me on \"{{title}}\" — a scavenger hunt on Marvira!\n{{url}}",
     "passwordProtected": {
       "badge": "Invite only",
       "title": "Password required",
@@ -234,7 +236,9 @@
     "copyFailed": "Could not copy code",
     "giftsWentToFirst": "Gifts went to the first {{count}} finishers.",
     "youFinishedRank": "You finished #{{rank}}.",
-    "exploreMore": "Explore more events"
+    "exploreMore": "Explore more events",
+    "shareInvite": "Invite friends",
+    "shareMessage": "I just finished \"{{title}}\" on Marvira! Try this scavenger hunt:\n{{url}}"
   },
   "leaderboard": {
     "loadFailed": "Failed to load leaderboard",
@@ -338,7 +342,8 @@
       "passwordShareLabel": "Event password",
       "passwordWarning": "Save this password now. It will not be shown again.",
       "shareInvite": "Share invite",
-      "shareMessage": "Join my scavenger hunt! Password: {{password}}",
+      "shareMessage": "Join my scavenger hunt on Marvira!\n{{url}}\nPassword: {{password}}",
+      "shareMessagePublic": "Join my scavenger hunt on Marvira!\n{{url}}",
       "validation": {
         "passwordMin": "Password must be at least 4 characters",
         "passwordMismatch": "Passwords do not match"

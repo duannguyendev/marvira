@@ -15,6 +15,9 @@ See repo root `analytics_requirement.txt` for the full product spec.
 
 Placeholder files ship so the app can compile; they will **not** send real telemetry until replaced.
 
+**CI (Codemagic):** optional Secure env vars `GOOGLE_SERVICES_JSON_BASE64` /
+`GOOGLE_SERVICE_INFO_PLIST_BASE64` (decoded in `codemagic.yaml`). See `CODEMAGIC.md`.
+
 ## 2. Enable products in Firebase Console
 
 - Analytics

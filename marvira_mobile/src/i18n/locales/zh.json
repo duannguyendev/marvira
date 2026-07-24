@@ -149,6 +149,8 @@
     "visitHint": "按顺序访问地点。进入每个站点的范围内即可解锁并回答问题。",
     "viewLeaderboard": "查看排行榜",
     "placesCount": "地点（{{count}}）",
+    "shareA11y": "分享此寻宝活动",
+    "shareMessage": "一起来玩「{{title}}」—— Marvira 城市寻宝！\n{{url}}",
     "passwordProtected": {
       "badge": "仅限邀请",
       "title": "需要密码",
@@ -218,7 +220,9 @@
     "points": "积分",
     "viewLeaderboard": "查看排行榜",
     "backToEvents": "返回活动",
-    "viewEventDetails": "查看活动详情"
+    "viewEventDetails": "查看活动详情",
+    "shareInvite": "邀请朋友",
+    "shareMessage": "我刚在 Marvira 完成了「{{title}}」！来试试这场寻宝：\n{{url}}"
   },
   "leaderboard": {
     "loadFailed": "加载排行榜失败",
@@ -322,7 +326,8 @@
       "passwordShareLabel": "活动密码",
       "passwordWarning": "请立即保存此密码，之后不会再次显示。",
       "shareInvite": "分享邀请",
-      "shareMessage": "加入我的寻宝活动！密码：{{password}}",
+      "shareMessage": "加入我在 Marvira 的寻宝活动！\n{{url}}\n密码：{{password}}",
+      "shareMessagePublic": "加入我在 Marvira 的寻宝活动！\n{{url}}",
       "validation": {
         "passwordMin": "密码至少需要4个字符",
         "passwordMismatch": "两次输入的密码不一致"

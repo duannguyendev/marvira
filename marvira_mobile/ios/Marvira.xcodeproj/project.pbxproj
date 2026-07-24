@@ -114,6 +114,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				B7E4A91C0D2F4E6A8B1C3D5E /* Apply Google Maps API Key */,
 			);
 			buildRules = (
 			);
@@ -239,6 +240,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Marvira/Pods-Marvira-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B7E4A91C0D2F4E6A8B1C3D5E /* Apply Google Maps API Key */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/../.env.local",
+				"${SRCROOT}/../.env",
+			);
+			name = "Apply Google Maps API Key";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/scripts/apply-maps-api-key.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

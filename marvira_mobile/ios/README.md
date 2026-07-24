@@ -24,8 +24,9 @@ cd ios && pod install
 
 ## Required Info.plist keys
 
-- `NSLocationWhenInUseUsageDescription` â€” location for gameplay unlock
-- `GMSApiKey` â€” Google Maps (via `react-native-maps`)
+- `NSLocationWhenInUseUsageDescription` — location for gameplay unlock
+- `GMSApiKey` — set automatically at build time from Codemagic ENV or `../.env.local`
+  (Xcode phase `Apply Google Maps API Key`)
 
 ## Bundle identifier
 

@@ -155,6 +155,8 @@
     "giftLabel": "Quà",
     "giftsForFirst": "Quà dành cho {{count}} người hoàn thành sớm nhất",
     "placesCount": "Địa điểm ({{count}})",
+    "shareA11y": "Chia sẻ cuộc săn này",
+    "shareMessage": "Cùng chơi \"{{title}}\" — cuộc săn kho báu trên Marvira!\n{{url}}",
     "passwordProtected": {
       "badge": "Chỉ mời",
       "title": "Cần mật khẩu",
@@ -234,7 +236,9 @@
     "copyFailed": "Không thể sao chép mã",
     "giftsWentToFirst": "Quà đã được trao cho {{count}} người hoàn thành sớm nhất.",
     "youFinishedRank": "Bạn hoàn thành thứ #{{rank}}.",
-    "exploreMore": "Khám phá thêm sự kiện"
+    "exploreMore": "Khám phá thêm sự kiện",
+    "shareInvite": "Mời bạn bè",
+    "shareMessage": "Mình vừa hoàn thành \"{{title}}\" trên Marvira! Thử cuộc săn này nhé:\n{{url}}"
   },
   "leaderboard": {
     "loadFailed": "Không thể tải bảng xếp hạng",
@@ -338,7 +342,8 @@
       "passwordShareLabel": "Mật khẩu sự kiện",
       "passwordWarning": "Hãy lưu mật khẩu ngay. Sẽ không hiển thị lại.",
       "shareInvite": "Chia sẻ lời mời",
-      "shareMessage": "Tham gia cuộc săn kho báu của tôi! Mật khẩu: {{password}}",
+      "shareMessage": "Tham gia cuộc săn kho báu của tôi trên Marvira!\n{{url}}\nMật khẩu: {{password}}",
+      "shareMessagePublic": "Tham gia cuộc săn kho báu của tôi trên Marvira!\n{{url}}",
       "validation": {
         "passwordMin": "Mật khẩu phải có ít nhất 4 ký tự",
         "passwordMismatch": "Mật khẩu không khớp"

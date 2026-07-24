@@ -1,8 +1,3 @@
-export type RootStackParamList = {
-  Auth: undefined;
-  Main: undefined;
-};
-
 export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
@@ -54,6 +49,16 @@ export type MainTabParamList = {
     | {
         screen: keyof ProfileStackParamList;
         params?: ProfileStackParamList[keyof ProfileStackParamList];
+      };
+};
+
+export type RootStackParamList = {
+  Auth: undefined;
+  Main:
+    | undefined
+    | {
+        screen: keyof MainTabParamList;
+        params?: MainTabParamList[keyof MainTabParamList];
       };
 };
 

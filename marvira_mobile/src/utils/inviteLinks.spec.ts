@@ -1,4 +1,5 @@
-import { parseInviteUrl } from './inviteLinks';
+import { parseInviteUrl, buildInviteDeepLink, buildInviteWebUrl } from './inviteLinks';
+import { MARKETING_SITE_URL } from './constants';
 
 describe('parseInviteUrl', () => {
   it('parses marvira event deep links', () => {
@@ -23,5 +24,19 @@ describe('parseInviteUrl', () => {
     expect(parseInviteUrl('https://www.example.com/about')).toEqual({
       linkType: 'other',
     });
+  });
+});
+
+describe('buildInvite links', () => {
+  it('builds deep link and web invite url', () => {
+    expect(buildInviteDeepLink('evt-1')).toBe('marvira://e/evt-1');
+    expect(buildInviteWebUrl('evt-1')).toBe(
+      `${MARKETING_SITE_URL.replace(/\/$/, '')}/e/evt-1`,
+    );
+  });
+
+  it('encodes event ids in links', () => {
+    expect(buildInviteDeepLink('a/b')).toBe('marvira://e/a%2Fb');
+    expect(buildInviteWebUrl('a/b')).toContain('/e/a%2Fb');
   });
 });

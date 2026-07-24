@@ -7,6 +7,7 @@ import {
   Dimensions,
   Alert,
   ScrollView,
+  Share,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
@@ -27,6 +28,8 @@ import {
 } from '../../theme';
 import { formatDuration } from '../../utils/formatDuration';
 import { HomeStackParamList } from '../../navigation/types';
+import { AnalyticsEvents } from '../../services/analytics';
+import { buildInviteWebUrl } from '../../utils/inviteLinks';
 
 const { height } = Dimensions.get('window');
 
@@ -120,6 +123,20 @@ export const EventCompletionScreen: React.FC = () => {
       setTimeout(() => setCopied(false), 2500);
     } catch {
       Alert.alert(t('common.error'), t('completion.copyFailed'));
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      void AnalyticsEvents.shareTapped(eventId, 'post_hunt');
+      await Share.share({
+        message: t('completion.shareMessage', {
+          title: event.title,
+          url: buildInviteWebUrl(eventId),
+        }),
+      });
+    } catch {
+      // user dismissed share sheet
     }
   };
 
@@ -253,6 +270,12 @@ export const EventCompletionScreen: React.FC = () => {
           ) : null}
 
           <View style={styles.buttonContainer}>
+            <Button
+              title={t('completion.shareInvite')}
+              onPress={handleShare}
+              fullWidth
+              style={styles.button}
+            />
             <Button
               title={t('completion.viewLeaderboard')}
               onPress={() =>

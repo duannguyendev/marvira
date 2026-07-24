@@ -1,10 +1,10 @@
 ================================================================================
 MARVIRA — GROWTH PLAN (USERS FIRST)
 ================================================================================
-Updated: 2026-07-23
+Updated: 2026-07-24
 Purpose: Acquire and retain users before monetization. One city → density → expand.
 Companion: monetization_todo.txt | analytics_requirement.txt | go_live_update_checklist.txt
-Status: Plan only — execute alongside store launch; ads/Plus deferred to post-v1.0.
+Status: Plan + v1.0 product code (share/invite deep links) done — execute city seed + store launch; ads/Plus deferred to post-v1.0.
 
 Legend:
   [ ] = Not started
@@ -59,10 +59,12 @@ VERSION ROADMAP × MONETIZATION (see monetization_todo.txt)
   Goal: Win trust + first city density. Zero revenue pressure.
 
   Product
-    - Full free core loop (find → walk → GPS unlock → answer → finish)
-    - Practice mode, create/draft/publish, leaderboards, share/invite
-    - Marketing site + store listings live
-    - Seeded public hunts in ONE launch city
+    [x] Full free core loop (find → walk → GPS unlock → answer → finish)
+    [x] Practice mode, create/draft/publish, leaderboards
+    [x] Share/invite end-to-end (post-hunt + event detail + create success;
+        deep link marvira://e/{id} opens EventDetails; pending invite after login)
+    [~] Marketing site + store listings live (site ready; store URLs / STORE_READY TBD)
+    [ ] Seeded public hunts in ONE launch city
 
   Monetization (from monetization_todo.txt)
     - Ship: NONE active (ads off, no Plus paywall, no publish cap)
@@ -182,9 +184,11 @@ PHASE G0 — PRE-LAUNCH (1–2 weeks before v1.0)
   [ ] G0.3 Soft test with 20–50 real people; fix GPS unlock + first-hunt drop-off
   [ ] G0.4 Store listing + marketing site: one story (walk → unlock → answer → board)
   [ ] G0.5 Screenshots = real streets / people walking — not abstract UI chrome
-  [ ] G0.6 Share finish + invite link works end-to-end (cheapest acquisition)
-  [ ] G0.7 Analytics: Firebase v1.0 events live (see analytics_requirement.txt)
+  [x] G0.6 Share finish + invite link works end-to-end (cheapest acquisition)
+             App: post-hunt / event-detail / create-success share + deep-link → EventDetails
+  [~] G0.7 Analytics: Firebase v1.0 events wired in app (see analytics_requirement.txt)
              Track: install, first unlock, hunt complete, invite open, D1/D7 in Firebase
+             Remaining: real Firebase configs + console funnels (go_live checklist)
 
 ================================================================================
 PHASE G1 — LAUNCH: WIN ONE CITY (v1.0, weeks 1–6)
@@ -245,6 +249,7 @@ BUDGET (LEAN)
   Week 2
     [ ] Seed to 10 hunts
     [ ] Fix top first-session drop-offs
+    [x] Share / invite deep-link product ready (G0.6)
     [ ] Store listing + site download CTAs ready
 
   Week 3

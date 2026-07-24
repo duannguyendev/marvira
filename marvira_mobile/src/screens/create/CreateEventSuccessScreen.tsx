@@ -7,6 +7,7 @@ import { StepIndicator } from '../../components/StepIndicator';
 import { Button } from '../../components/Button';
 import { HomeStackParamList, MainTabParamList } from '../../navigation/types';
 import { AnalyticsEvents } from '../../services/analytics';
+import { buildInviteWebUrl } from '../../utils/inviteLinks';
 import {
   colors,
   spacing,
@@ -33,16 +34,17 @@ export const CreateEventSuccessScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const { eventId, published, joinPassword } = route.params;
 
-  const handleSharePassword = async () => {
-    if (!joinPassword) {
-      return;
-    }
+  const handleShareInvite = async () => {
     try {
       void AnalyticsEvents.shareTapped(eventId, 'other');
+      const url = buildInviteWebUrl(eventId);
       await Share.share({
-        message: t('createEvent.access.shareMessage', {
-          password: joinPassword,
-        }),
+        message: joinPassword
+          ? t('createEvent.access.shareMessage', {
+              password: joinPassword,
+              url,
+            })
+          : t('createEvent.access.shareMessagePublic', { url }),
       });
     } catch {
       // user dismissed share sheet
@@ -82,11 +84,20 @@ export const CreateEventSuccessScreen: React.FC = () => {
             </Text>
             <Button
               title={t('createEvent.access.shareInvite')}
-              onPress={handleSharePassword}
+              onPress={handleShareInvite}
               fullWidth
               style={styles.passwordButton}
             />
           </View>
+        ) : null}
+
+        {published && !joinPassword ? (
+          <Button
+            title={t('createEvent.access.shareInvite')}
+            onPress={handleShareInvite}
+            fullWidth
+            style={styles.button}
+          />
         ) : null}
 
         <Button

@@ -35,7 +35,15 @@ A production-ready React Native application for location-based gaming with event
    yarn install
    ```
 
-3. **iOS Setup**
+3. **Secrets (Maps / release URLs)**
+   ```bash
+   cp .env.example .env.local
+   # set GOOGLE_MAPS_API_KEY=...
+   ```
+   Then run the app as usual — no extra secrets script.
+   Codemagic uses Secure ENV instead — see `CODEMAGIC.md`.
+
+4. **iOS Setup**
    ```bash
    cd ios
    pod install
