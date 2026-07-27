@@ -3,7 +3,7 @@ MARVIRA — GROWTH PLAN (USERS FIRST)
 ================================================================================
 Updated: 2026-07-24
 Purpose: Acquire and retain users before monetization. One city → density → expand.
-Companion: monetization_todo.txt | analytics_requirement.txt | go_live_update_checklist.txt
+Companion: monetization_todo.txt | requirement_all.txt §24 | go_live_update_checklist.txt
            | requirement_all.txt §23 (IMAGE create + content language — implemented)
 Status: Plan + v1.0 product code (share/invite deep links) done — execute city seed + store launch; ads/Plus deferred to post-v1.0.
 
@@ -187,7 +187,7 @@ PHASE G0 — PRE-LAUNCH (1–2 weeks before v1.0)
   [ ] G0.5 Screenshots = real streets / people walking — not abstract UI chrome
   [x] G0.6 Share finish + invite link works end-to-end (cheapest acquisition)
              App: post-hunt / event-detail / create-success share + deep-link → EventDetails
-  [~] G0.7 Analytics: Firebase v1.0 events wired in app (see analytics_requirement.txt)
+  [~] G0.7 Analytics: Firebase v1.0 events wired in app (see requirement_all.txt §24)
              Track: install, first unlock, hunt complete, invite open, D1/D7 in Firebase
              Remaining: real Firebase configs + console funnels (go_live checklist)
 

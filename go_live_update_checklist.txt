@@ -2,7 +2,7 @@
 MARVIRA — GO-LIVE CHECKLIST (NEXT STEPS ONLY)
 ================================================================================
 Updated: 2026-07-24
-Reference: growth_plan.txt | monetization_todo.txt | analytics_requirement.txt
+Reference: growth_plan.txt | monetization_todo.txt | requirement_all.txt §24
            marvira_dashboard_api/docs/deployment.md
            marvira_dashboard_api/docs/backup-restore.md
            marvira_mobile/CODEMAGIC.md | marvira_mobile/FIREBASE_SETUP.md

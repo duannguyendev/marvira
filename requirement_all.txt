@@ -1,3 +1,40 @@
+================================================================================
+RECOVERY / SOURCE REGENERATE (read first)
+================================================================================
+Purpose of this file: product + architecture seed to rebuild Marvira if source
+is lost. It is NOT a bit-identical dump of the current repos.
+
+Humans onboarding to the product should NOT start here. Use:
+  docs/README.md              â€” reading map
+  docs/PRODUCT_OVERVIEW.md    â€” features & flows
+  docs/ARCHITECTURE.md        â€” system map
+
+If regenerating:
+  1. Prefer DELIVERED SCOPE Â§14â€“24 over early "ideal monorepo" sections.
+  2. Real layout (do NOT invent apps/mobile inside one Turborepo):
+       marvira_mobile/          â€” React Native app
+       marvira_dashboard_api/   â€” NestJS API + Next.js admin + marketing
+                                  (Turborepo under this folder)
+  3. Brand colors: end of this file (Indigo #6366F1, Pink #EC4899).
+  4. For schema fidelity after restore: prefer live Prisma schema + .env.example
+     over prose alone.
+
+Companion docs (keep alongside; not fully merged here):
+  docs/README.md                â€” human doc index
+  go_live_update_checklist.txt  â€” production / store release gates
+  store_privacy_labels.txt      â€” App Store / Play Data safety copy-paste
+  marvira_mobile/FIREBASE_SETUP.md
+  growth_plan.txt               â€” post-launch growth
+  monetization_todo.txt         â€” ads / IAP (later)
+  marvira_dashboard_api/docs/deployment.md
+  marvira_dashboard_api/docs/backup-restore.md
+
+Early sections below describe the original generation prompt (Turborepo
+apps/mobile shape). Treat them as historical baseline; Â§14â€“24 + companions
+are the current truth.
+
+================================================================================
+
 You are a principal mobile architect, senior full-stack engineer, senior DevOps engineer, and enterprise UI/UX architect.
 
 Your task is to generate a COMPLETE, PRODUCTION-READY monorepo platform for a location-based scavenger hunt / event exploration application.
@@ -1280,6 +1317,8 @@ ANALYTICS
 - practice completions trend (7d) â€” extend /dashboard/analytics
 - top practiced questions â€” extend /dashboard/analytics
 - community questions created (user vs admin) â€” extend /dashboard/analytics
+- Product MAU / DAU / retention / funnels: Firebase on mobile â€” see Â§24
+  (do NOT DIY these in the admin dashboard)
 
 ====================================================
 DASHBOARD UI REQUIREMENTS
@@ -2126,6 +2165,114 @@ development (mobile app remains a separate project).
      * Seed language + IMAGE practice samples: IMPLEMENTED
      * Device manual pass (camera/gallery/GPS IMAGE): NOT STARTED
      * Optional create-form language override picker: DEFERRED
+
+24. PRODUCT ANALYTICS â€” FIREBASE + LIGHT ADMIN (mobile + legal)
+   Purpose: Product metrics for v1.0+ (MAU, DAU, retention, funnels, crashes)
+   without building a DIY analytics suite. Ops/staff metrics stay on the existing
+   admin dashboard; do NOT rebuild MAU/retention there.
+   Spec: requirement_all.txt Â§24 (former analytics_requirement.txt removed
+   after implementation). Companion: store_privacy_labels.txt |
+   growth_plan.txt | go_live_update_checklist.txt
+   Status: IMPLEMENTED (2026-07-27) in marvira_mobile â€” replace Firebase
+   placeholder configs + complete store privacy labels / DebugView before
+   production release.
+
+   Decision (locked):
+   - Product metrics â†’ Firebase Analytics + Firebase Crashlytics on mobile
+   - Ops / staff metrics â†’ existing admin /dashboard + /dashboard/analytics
+   - Do NOT build a custom mobile analytics pipeline for growth metrics
+   - Existing API analytics_events may stay for sparse server-side ops logging;
+     it is NOT a substitute for Firebase
+   - No PII / precise GPS in Analytics event parameters (event_id / place_id only)
+
+   24.1 STACK (marvira_mobile)
+   - Packages: @react-native-firebase/app, analytics, crashlytics
+   - Config: Android google-services.json; iOS GoogleService-Info.plist
+   - Prefer separate Firebase projects/apps for staging vs production
+   - Debug builds MUST NOT flood prod (disable collection in __DEV__ unless
+     explicitly testing; see FORCE_ANALYTICS_IN_DEV in analytics.ts)
+
+   24.2 CENTRAL HELPER
+   - marvira_mobile/src/services/analytics.ts
+     * logEvent(name, params?), setUserId(userId | null), logScreenView
+     * Crashlytics: logBreadcrumb, recordError
+     * Fail soft: analytics MUST never block UX
+   - setUserId: internal user UUID only â€” never email; clear on logout
+   - Call sites MUST use AnalyticsEvents helpers (not ad-hoc Firebase imports)
+
+   24.3 EVENT TAXONOMY (v1.0 â€” snake_case, stable)
+   App lifecycle:
+   - app_open â€” cold start + foreground
+
+   Hunt (core loop):
+   - hunt_started(event_id)
+   - place_unlocked(event_id, place_id)
+   - place_answered(event_id, place_id, correct 0|1)
+   - hunt_completed(event_id, score?, duration_sec?)
+   - hunt_abandoned(event_id, places_done?) â€” when detectable
+
+   Practice:
+   - practice_opened(source list|training)
+   - practice_answered(question_id, correct 0|1)
+
+   Create / publish:
+   - event_draft_created(event_id?)
+   - event_published(event_id)
+   - event_unpublished(event_id) â€” helper ready; wire when unpublish UI exists
+
+   Growth / invites:
+   - invite_opened(event_id?, link_type invite|share|other)
+   - share_tapped(event_id, surface post_hunt|event_detail|other)
+
+   Feedback:
+   - feedback_submitted(category?)
+
+   Deferred (v1.1+ / monetization v1.2+):
+   - review_prompt_shown / review_prompt_result
+   - ad_impression / ad_click; paywall_view / purchase_* ; plus_cancel
+   - Optional rename admin "Active Users" â†’ "Hunt starts (30d)"
+
+   24.4 PRIVACY & STORE DISCLOSURE
+   - Marketing /privacy MUST mention Firebase Analytics + Crashlytics
+   - No precise lat/lng, passwords, tokens, or free-text answers in Analytics params
+   - Store privacy labels: see store_privacy_labels.txt (App Store Connect +
+     Play Data safety) â€” complete before release
+   - iOS ATT only if advertising ID is used later
+
+   24.5 CRASHLYTICS
+   - Enable for Android + iOS release builds
+   - Optional non-fatals for critical caught errors (do not spam)
+   - Verify test crash in staging; upload dSYM / mapping for readable stacks
+
+   24.6 ADMIN DASHBOARD (light touch only)
+   - Keep existing overview / analytics widgets for ops
+   - "Active Users" today = hunt starts in 30d (NOT MAU) â€” leave or rename later
+   - Do NOT in v1.0: DIY MAU widget, DIY retention charts, full Firebase event stream UI
+
+   24.7 FIREBASE CONSOLE (post-implement ops)
+   - Funnels: install/open â†’ hunt_started â†’ place_unlocked â†’ hunt_completed
+   - Funnels: invite_opened â†’ hunt_started â†’ hunt_completed
+   - Funnels: practice_opened â†’ practice_answered
+   - Funnels: event_draft_created â†’ event_published
+   - Retention: D1 / D7 especially after hunt_completed
+
+   24.8 OUT OF SCOPE
+   - DIY MAU/DAU/retention charts in dashboard
+   - Replacing Firebase with Mixpanel/Amplitude (revisit only if Firebase lacks)
+   - Duplicating every Firebase event into Postgres
+
+   Implementation status (section 24):
+     * Spec: requirement_all.txt Â§24 (plan file removed after implementation)
+     * RN Firebase packages + Android/iOS Gradle/plist wiring: IMPLEMENTED
+     * analytics.ts helper + setUserId on auth + app_open tracking: IMPLEMENTED
+     * Core hunt / practice / create / invite / share / feedback events: IMPLEMENTED
+     * Marketing Privacy Policy Firebase disclosure: IMPLEMENTED
+     * store_privacy_labels.txt copy-paste guide: IMPLEMENTED
+     * Real Firebase project configs (replace placeholders): NOT STARTED (launch)
+     * Store privacy labels submitted in App Store / Play Console: NOT STARTED (launch)
+     * Crashlytics test crash + dSYM/mapping verify: NOT STARTED (launch)
+     * Firebase DebugView + console funnels: NOT STARTED (launch)
+     * event_unpublished UI + review/ad/IAP events: DEFERRED
 
 ====================================================
 EXPECTED OUTPUT

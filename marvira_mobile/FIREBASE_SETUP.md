@@ -1,6 +1,6 @@
 # Firebase setup (Analytics + Crashlytics)
 
-See repo root `analytics_requirement.txt` for the full product spec.
+See repo root `requirement_all.txt` §24 for the full product analytics spec.
 
 ## 1. Create a Firebase project
 
@@ -40,4 +40,4 @@ cd ios && pod install && cd ..
 
 ## 5. Privacy
 
-Marketing `/privacy` must mention Firebase Analytics and Crashlytics (see analytics_requirement.txt).
+Marketing `/privacy` must mention Firebase Analytics and Crashlytics (see requirement_all.txt §24).

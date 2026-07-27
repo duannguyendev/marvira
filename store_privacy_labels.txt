@@ -1,0 +1,375 @@
+================================================================================
+MARVIRA — STORE PRIVACY LABELS (APPLE + GOOGLE)
+================================================================================
+Updated: 2026-07-27
+Purpose: Copy-paste answers for App Store Connect + Google Play Data safety.
+Companion: requirement_all.txt §24 | marketing /privacy
+Scope: v1.0 mobile (Firebase Analytics + Crashlytics; NO ads / IAP yet)
+
+IMPORTANT
+  - These are console form answers, not code.
+  - Revisit when you add ads, subscriptions, push, or ATT / advertising ID.
+  - Privacy Policy URL (set after marketing domain is live):
+      https://www.marvira.com/privacy
+    (or your real marketing URL + /privacy)
+
+Assumptions used below
+  - Data is linked to the user account when logged in (user UUID / email).
+  - Apple "Tracking" = NO (no cross-app advertising / data brokers in v1.0).
+  - Precise GPS is used for gameplay; NOT sent in Firebase Analytics params.
+  - Firebase/Google processes analytics + crash data (declare as shared where asked).
+  - Camera / photos: used for creator media / avatar / image content when user chooses.
+  - Children: not directed to under 13.
+
+================================================================================
+A) APPLE — APP STORE CONNECT → APP PRIVACY
+================================================================================
+Path: App Store Connect → Your App → App Privacy → Edit / Get Started
+
+--------------------------------------------------------------------------------
+A1) Quick answers (overview)
+--------------------------------------------------------------------------------
+
+  Do you or your third-party partners collect data from this app?
+    → Yes
+
+  Do you or your third-party partners use data for tracking?
+    → No
+    (No ATT / IDFA advertising in v1.0. Change to Yes if you add ads that track.)
+
+  Privacy Policy URL:
+    → https://www.marvira.com/privacy   (use your live URL)
+
+--------------------------------------------------------------------------------
+A2) Data types to declare (copy each block into the form)
+--------------------------------------------------------------------------------
+
+  ---------------------------------------------------------------------------
+  CONTACT INFO
+  ---------------------------------------------------------------------------
+
+  Name
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+
+  Email Address
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+      - Other Purposes (account recovery / support)  [optional if form allows]
+
+  ---------------------------------------------------------------------------
+  LOCATION
+  ---------------------------------------------------------------------------
+
+  Precise Location
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+    Notes (for you, not always a field):
+      GPS while playing to unlock hunt places and anti-cheat.
+      Not sent as lat/lng in Analytics event parameters.
+
+  Coarse Location
+    Collected: No   (or Yes only if you also send approx location elsewhere)
+    Recommendation for v1.0: leave Coarse UNCHECKED if you only use fine GPS
+      for unlock checks.
+
+  ---------------------------------------------------------------------------
+  IDENTIFIERS
+  ---------------------------------------------------------------------------
+
+  User ID
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+      - Analytics
+    Notes: internal account UUID (Firebase setUserId); never email in Analytics.
+
+  Device ID
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+      - Analytics
+    Notes: Firebase Analytics / Crashlytics device/app identifiers.
+
+  ---------------------------------------------------------------------------
+  USAGE DATA
+  ---------------------------------------------------------------------------
+
+  Product Interaction
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+      - Analytics
+    Notes: hunt_started, place_unlocked, practice_answered, etc.
+
+  Other Usage Data
+    Collected: No   (unless you add something beyond product interaction)
+
+  ---------------------------------------------------------------------------
+  DIAGNOSTICS
+  ---------------------------------------------------------------------------
+
+  Crash Data
+    Collected: Yes
+    Linked to user: Yes   (Crashlytics can attach user id when logged in)
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+
+  Performance Data
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+      - Analytics
+    Notes: optional but recommended with Crashlytics / Firebase.
+
+  Other Diagnostic Data
+    Collected: No
+
+  ---------------------------------------------------------------------------
+  USER CONTENT
+  ---------------------------------------------------------------------------
+
+  Photos or Videos
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+    Notes: user-uploaded avatar / event or place media / image questions
+      when the user chooses to upload. If a build never uploads photos,
+      you may leave this out — current Android permissions include camera/images.
+
+  Other User Content
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+    Notes: hunt answers, feedback messages, event titles/descriptions you create.
+
+  Customer Support
+    Collected: Yes
+    Linked to user: Yes
+    Used for tracking: No
+    Purposes:
+      - App Functionality
+    Notes: in-app feedback (name, email, message, category).
+
+  ---------------------------------------------------------------------------
+  DO NOT DECLARE (v1.0 — unless you add the feature)
+  ---------------------------------------------------------------------------
+
+  - Advertising Data / Advertising ID / Purchase History / Payment Info
+  - Health / Fitness / Sensitive Info / Financial Info
+  - Contacts / Search History / Browsing History
+  - Exact tracking / third-party ad networks
+
+================================================================================
+B) GOOGLE — PLAY CONSOLE → DATA SAFETY
+================================================================================
+Path: Play Console → Your app → App content → Data safety
+
+--------------------------------------------------------------------------------
+B1) Overview answers
+--------------------------------------------------------------------------------
+
+  Does your app collect or share any of the required user data types?
+    → Yes
+
+  Is all of the user data collected by your app encrypted in transit?
+    → Yes   (HTTPS / TLS to API + Firebase)
+
+  Do you provide a way for users to request that their data is deleted?
+    → Yes
+    How: email support (see Privacy Policy); account deletion flow if/when shipped.
+
+  Privacy policy URL:
+    → https://www.marvira.com/privacy   (use your live URL)
+
+  Is your app designed for children / COPPA / Families?
+    → No (not directed to children under 13)
+
+--------------------------------------------------------------------------------
+B2) Data types — Collected / Shared / Ephemeral / Required / Purposes
+--------------------------------------------------------------------------------
+Legend for each row:
+  Collected = app or SDK collects it
+  Shared    = sent to third party (Firebase/Google counts as shared)
+  Ephemeral = processed only in memory and not stored  → No for all below
+  Required  = needed for core app  → Yes unless optional upload/feedback
+
+  ---------------------------------------------------------------------------
+  LOCATION
+  ---------------------------------------------------------------------------
+
+  Approximate location
+    Collected: No
+    Shared: No
+
+  Precise location
+    Collected: Yes
+    Shared: Yes   (to your backend API for unlock / anti-cheat — not to Firebase Analytics params)
+    Ephemeral: No
+    Required: Yes
+    Purposes:
+      - App functionality
+    Notes: users can revoke OS location permission; gameplay may stop.
+
+  ---------------------------------------------------------------------------
+  PERSONAL INFO
+  ---------------------------------------------------------------------------
+
+  Name
+    Collected: Yes | Shared: Yes (backend) | Ephemeral: No | Required: Yes
+    Purposes: App functionality
+
+  Email address
+    Collected: Yes | Shared: Yes (backend) | Ephemeral: No | Required: Yes
+    Purposes: App functionality, Account management
+
+  User IDs
+    Collected: Yes | Shared: Yes (backend + Firebase setUserId) | Ephemeral: No | Required: Yes
+    Purposes: App functionality, Analytics
+
+  Address / Phone / Race-ethnicity / Political / Sexual orientation / Other
+    → Not collected
+
+  ---------------------------------------------------------------------------
+  PHOTOS AND VIDEOS
+  ---------------------------------------------------------------------------
+
+  Photos
+    Collected: Yes | Shared: Yes (backend / storage) | Ephemeral: No
+    Required: No   (only when user uploads)
+    Purposes: App functionality
+
+  Videos
+    Collected: No   (unless you add video upload)
+
+  ---------------------------------------------------------------------------
+  APP ACTIVITY
+  ---------------------------------------------------------------------------
+
+  App interactions
+    Collected: Yes | Shared: Yes (Firebase Analytics) | Ephemeral: No | Required: Yes
+    Purposes: Analytics, App functionality
+
+  In-app search history
+    Collected: No
+
+  Installed apps
+    Collected: No
+
+  Other user-generated content
+    Collected: Yes | Shared: Yes (backend) | Ephemeral: No | Required: Yes
+    Purposes: App functionality
+    Notes: answers, event content, feedback text
+
+  Other actions
+    Collected: No
+
+  ---------------------------------------------------------------------------
+  APP INFO AND PERFORMANCE
+  ---------------------------------------------------------------------------
+
+  Crash logs
+    Collected: Yes | Shared: Yes (Firebase Crashlytics) | Ephemeral: No | Required: Yes
+    Purposes: Analytics   (Play often maps crash reporting here)
+
+  Diagnostics
+    Collected: Yes | Shared: Yes (Firebase) | Ephemeral: No | Required: Yes
+    Purposes: Analytics
+
+  Other app performance data
+    Collected: No   (unless you add more)
+
+  ---------------------------------------------------------------------------
+  DEVICE OR OTHER IDs
+  ---------------------------------------------------------------------------
+
+  Device or other IDs
+    Collected: Yes | Shared: Yes (Firebase) | Ephemeral: No | Required: Yes
+    Purposes: Analytics, App functionality
+
+  ---------------------------------------------------------------------------
+  FINANCIAL / HEALTH / MESSAGES / FILES / CONTACTS / CALENDAR / WEB BROWSING
+  ---------------------------------------------------------------------------
+
+  → Not collected in v1.0
+  (Add Financial / Purchase history when IAP / subscriptions ship.)
+
+--------------------------------------------------------------------------------
+B3) Data sharing — third parties (short text you can reuse)
+--------------------------------------------------------------------------------
+
+  We share limited data with service providers that help us operate the app:
+  - Google Firebase Analytics — product usage events and identifiers
+  - Google Firebase Crashlytics — crash and diagnostic data
+  - Our hosting / API infrastructure — account, gameplay, and location checks
+
+  We do not sell user data.
+  We do not use data for third-party advertising in v1.0.
+
+================================================================================
+C) PASTE-READY SHORT SUMMARY (both stores)
+================================================================================
+
+App name: Marvira
+Category: Location-based scavenger hunt / outdoor exploration
+
+Data we collect:
+  - Account: name, email, user ID, auth identifiers
+  - Precise location while playing (gameplay unlock / anti-cheat)
+  - Gameplay and usage: event progress, answers, scores, practice activity
+  - User content: feedback messages; creator media / event content when uploaded
+  - Diagnostics: crash logs, app performance / device identifiers via Firebase
+
+Why:
+  - App functionality (account, hunts, location unlock, creator tools, support)
+  - Analytics (Firebase Analytics product events)
+  - Stability (Firebase Crashlytics)
+
+Tracking / ads (v1.0):
+  - No advertising tracking
+  - No sale of personal data
+
+User choices:
+  - Revoke location in OS settings (gameplay may stop)
+  - Update profile in app
+  - Request access / correction / deletion via support email in Privacy Policy
+
+Privacy Policy:
+  https://www.marvira.com/privacy
+
+================================================================================
+D) WHEN TO UPDATE THIS FILE
+================================================================================
+
+  [ ] Real Firebase project live (no change to labels; still Analytics + Crashlytics)
+  [ ] Add ads / ATT / advertising ID  → Tracking = Yes; declare Advertising data
+  [ ] Add IAP / subscriptions       → Purchase history / Financial info
+  [ ] Add push notifications        → Device tokens under Device or other IDs
+  [ ] Ship account self-delete UI   → keep Data safety deletion answer Yes
+  [ ] Remove camera/photo upload    → remove Photos declarations
+
+================================================================================
+END
+================================================================================

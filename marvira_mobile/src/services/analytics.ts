@@ -1,5 +1,5 @@
 /**
- * Central analytics + Crashlytics helper (see ../../analytics_requirement.txt).
+ * Central analytics + Crashlytics helper (see requirement_all.txt §24).
  * Fail-soft: never throw into UX. No PII / precise GPS in params.
  */
 import { AppState, type AppStateStatus } from 'react-native';
@@ -182,7 +182,7 @@ export const analytics = {
   },
 };
 
-/** Typed helpers matching analytics_requirement.txt taxonomy. */
+/** Typed helpers matching requirement_all.txt §24 taxonomy. */
 export const AnalyticsEvents = {
   huntStarted: (eventId: string) =>
     analytics.logEvent('hunt_started', { event_id: eventId }),
