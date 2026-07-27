@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "project_id": "marvira-replace-me",
-    "storage_bucket": "marvira-replace-me.appspot.com"
+    "project_number": "563117198235",
+    "project_id": "marvira-biggame",
+    "storage_bucket": "marvira-biggame.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:563117198235:android:55ebf53f0d7f7bb73a2f3e",
         "android_client_info": {
           "package_name": "com.marvira"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "REPLACE_WITH_FIREBASE_ANDROID_API_KEY"
+          "current_key": "AIzaSyAcFp57MsVl7FoFCI--LR0jxJAuHflwNB4"
         }
       ],
       "services": {
