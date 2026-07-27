@@ -8,6 +8,8 @@ import { ProgressModule } from '../progress/progress.module';
 import { PracticeModule } from '../practice/practice.module';
 import { FeedbackModule } from '../feedback/feedback.module';
 import { ArticlesModule } from '../articles/articles.module';
+import { PlacesModule } from '../places/places.module';
+import { AppSettingsModule } from '../settings/app-settings.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { ArticlesModule } from '../articles/articles.module';
     PracticeModule,
     FeedbackModule,
     ArticlesModule,
+    PlacesModule,
+    AppSettingsModule,
   ],
   controllers: [AdminController],
 })

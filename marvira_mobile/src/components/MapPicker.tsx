@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,6 +14,7 @@ import { DEFAULT_MAP_REGION } from '../utils/constants';
 
 const { height } = Dimensions.get('window');
 const MAP_HEIGHT = height * 0.32;
+const DEFAULT_DELTA = 0.01;
 
 interface MapPickerProps {
   coordinate: Location;
@@ -29,11 +30,25 @@ export const MapPicker: React.FC<MapPickerProps> = ({
   markers = [],
 }) => {
   const { t } = useTranslation();
+  const mapRef = useRef<MapView>(null);
   const [region, setRegion] = useState<Region>({
     ...coordinate,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
+    latitudeDelta: DEFAULT_DELTA,
+    longitudeDelta: DEFAULT_DELTA,
   });
+
+  useEffect(() => {
+    const nextRegion: Region = {
+      latitude: coordinate.latitude,
+      longitude: coordinate.longitude,
+      latitudeDelta: region.latitudeDelta || DEFAULT_DELTA,
+      longitudeDelta: region.longitudeDelta || DEFAULT_DELTA,
+    };
+    setRegion(nextRegion);
+    mapRef.current?.animateToRegion(nextRegion, 400);
+    // Only recenter when the selected pin moves, not when the user pans/zooms.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coordinate.latitude, coordinate.longitude]);
 
   const handleMapPress = (event: {
     nativeEvent: { coordinate: { latitude: number; longitude: number } };
@@ -52,9 +67,10 @@ export const MapPicker: React.FC<MapPickerProps> = ({
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
-        region={region}
+        initialRegion={region}
         onRegionChangeComplete={setRegion}
         onPress={handleMapPress}
         showsUserLocation

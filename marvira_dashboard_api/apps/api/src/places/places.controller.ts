@@ -11,6 +11,7 @@ import {
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { PlacesService } from './places.service';
+import { PlaceAnswerReportService } from './place-answer-report.service';
 import { ProgressService } from '../progress/progress.service';
 import { QuestionsService } from '../questions/questions.service';
 import { EventOwnershipService } from '../events/event-ownership.service';
@@ -31,6 +32,7 @@ export class PlacesController {
     private readonly progressService: ProgressService,
     private readonly questionsService: QuestionsService,
     private readonly ownershipService: EventOwnershipService,
+    private readonly reportService: PlaceAnswerReportService,
   ) {}
 
   @Public()
@@ -120,5 +122,17 @@ export class PlacesController {
     );
     const { warnings, ...data } = result;
     return { success: true, data, warnings: warnings ?? [] };
+  }
+
+  @Post('places/:id/report-wrong-answer')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Report a possibly wrong answer at this place' })
+  async reportWrongAnswer(
+    @Param('id') id: string,
+    @Req() req: { user: RequestUser },
+  ) {
+    const data = await this.reportService.reportWrongAnswer(req.user.id, id);
+    return { success: true, data };
   }
 }

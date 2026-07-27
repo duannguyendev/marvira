@@ -38,7 +38,6 @@ loadEnvFile(path.join(__dirname, '.env.local'));
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
   plugins: [
-    ['@babel/plugin-transform-private-methods', { loose: true }],
     [
       'module-resolver',
       {
@@ -67,5 +66,15 @@ module.exports = {
     ],
     // Reanimated 4's plugin is an alias of worklets; include only one (must be last).
     'react-native-worklets/plugin',
+  ],
+  // Avoid applying class/private transforms to react-native-maps: they turn
+  // declaration-only fields into instance props that shadow decorateMapComponent methods.
+  overrides: [
+    {
+      test: filename =>
+        !!filename &&
+        !filename.includes(`${path.sep}node_modules${path.sep}react-native-maps${path.sep}`),
+      plugins: [['@babel/plugin-transform-private-methods', { loose: true }]],
+    },
   ],
 };

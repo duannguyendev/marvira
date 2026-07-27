@@ -11,6 +11,7 @@ interface NearbyEventRow {
   difficulty: string;
   reward_points: number;
   is_active: boolean;
+  scheduled_publish_at: Date | null;
   language: string;
   created_by: string;
   created_at: Date;
@@ -76,6 +77,7 @@ export class GeoQueryService {
         e.difficulty,
         e.reward_points,
         e.is_active,
+        e.scheduled_publish_at,
         e.language,
         e.join_password_hash,
         e.gift_teaser,
@@ -91,7 +93,15 @@ export class GeoQueryService {
         )::float AS distance_meters
       FROM events e
       INNER JOIN places p ON p.event_id = e.id
-      WHERE e.is_active = true
+      WHERE (
+        e.is_active = true
+        OR (
+          e.is_active = false
+          AND e.ended_at IS NULL
+          AND e.scheduled_publish_at IS NOT NULL
+          AND e.scheduled_publish_at > NOW()
+        )
+      )
       ${languageClause}
       GROUP BY e.id
       HAVING MIN(

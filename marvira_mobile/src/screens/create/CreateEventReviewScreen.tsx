@@ -15,10 +15,15 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { StepIndicator } from '../../components/StepIndicator';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import {
+  ScheduleDateTimeField,
+  defaultScheduleDate,
+} from '../../components/ScheduleDateTimeField';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorView } from '../../components/ErrorView';
 import { useEventDetails } from '../../hooks/useEvents';
-import { usePublishEvent } from '../../hooks/useMyEvents';
+import { usePublishEvent, useSchedulePublish } from '../../hooks/useMyEvents';
+import { usePublishVerifyStatus } from '../../hooks/usePublishVerify';
 import { HomeStackParamList } from '../../navigation/types';
 import { AnalyticsEvents, analytics } from '../../services/analytics';
 import {
@@ -53,6 +58,10 @@ export const CreateEventReviewScreen: React.FC = () => {
   const { eventId } = route.params;
   const { data, isLoading, error, refetch } = useEventDetails(eventId);
   const publishEvent = usePublishEvent();
+  const schedulePublish = useSchedulePublish();
+  const { data: verifyStatus, refetch: refetchVerify } = usePublishVerifyStatus(
+    eventId,
+  );
 
   const [accessMode, setAccessMode] = useState<AccessMode>('public');
   const [joinPassword, setJoinPassword] = useState('');
@@ -65,6 +74,9 @@ export const CreateEventReviewScreen: React.FC = () => {
   const [completionMessage, setCompletionMessage] = useState('');
   const [giftCodesText, setGiftCodesText] = useState('');
   const [giftError, setGiftError] = useState<string | undefined>();
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [scheduleAt, setScheduleAt] = useState(defaultScheduleDate);
+  const [scheduleError, setScheduleError] = useState<string | undefined>();
   const giftsInitialized = useRef(false);
 
   const event = data?.data;
@@ -120,21 +132,43 @@ export const CreateEventReviewScreen: React.FC = () => {
     return Object.keys(nextErrors).length === 0;
   };
 
+  useEffect(() => {
+    if (route.params.verifyComplete) {
+      refetchVerify();
+    }
+  }, [route.params.verifyComplete, refetchVerify]);
+
+  const verifiedCount = verifyStatus?.verifiedCount ?? 0;
+  const verifyTotal = verifyStatus?.totalCount ?? event?.places.length ?? 0;
+  const allVerified = verifyStatus?.allVerified ?? false;
+
+  const goToVerify = () => {
+    navigation.navigate('AnswerVerify', { eventId, returnAction: 'publish' });
+  };
+
+  const buildPublishPayload = () => {
+    const codes = parseGiftCodes(giftCodesText);
+    return {
+      eventId,
+      ...(accessMode === 'password'
+        ? { joinPassword }
+        : { clearJoinPassword: true as const }),
+      giftTeaser: giftTeaser.trim() || null,
+      completionMessage: completionMessage.trim() || null,
+      giftCodes: codes,
+    };
+  };
+
   const handlePublish = async () => {
+    if (!allVerified) {
+      goToVerify();
+      return;
+    }
     if (!validateAccess() || !validateGifts()) {
       return;
     }
-    const codes = parseGiftCodes(giftCodesText);
     try {
-      await publishEvent.mutateAsync({
-        eventId,
-        ...(accessMode === 'password'
-          ? { joinPassword }
-          : { clearJoinPassword: true }),
-        giftTeaser: giftTeaser.trim() || null,
-        completionMessage: completionMessage.trim() || null,
-        giftCodes: codes,
-      });
+      await publishEvent.mutateAsync(buildPublishPayload());
       void AnalyticsEvents.eventPublished(eventId);
       navigation.navigate('CreateEventSuccess', {
         eventId,
@@ -148,6 +182,44 @@ export const CreateEventReviewScreen: React.FC = () => {
         err?.response?.data?.message ||
           err.message ||
           t('createEvent.publishFailed'),
+      );
+    }
+  };
+
+  /** Local Date → UTC ISO for the API. */
+  const handleSchedule = async () => {
+    if (!allVerified) {
+      goToVerify();
+      return;
+    }
+    if (!validateAccess() || !validateGifts()) {
+      return;
+    }
+    if (scheduleAt.getTime() <= Date.now()) {
+      setScheduleError(t('createEvent.schedule.mustBeFuture'));
+      return;
+    }
+    setScheduleError(undefined);
+    const utc = scheduleAt.toISOString();
+    try {
+      await schedulePublish.mutateAsync({
+        ...buildPublishPayload(),
+        scheduledPublishAt: utc,
+      });
+      navigation.navigate('CreateEventSuccess', {
+        eventId,
+        published: false,
+        scheduled: true,
+        scheduledPublishAt: utc,
+        ...(accessMode === 'password' ? { joinPassword } : {}),
+      });
+    } catch (err: any) {
+      analytics.recordError(err);
+      Alert.alert(
+        t('common.error'),
+        err?.response?.data?.message ||
+          err.message ||
+          t('createEvent.schedule.failed'),
       );
     }
   };
@@ -319,7 +391,30 @@ export const CreateEventReviewScreen: React.FC = () => {
             {allPlacesHaveQuestions ? '✓' : '○'}{' '}
             {t('createEvent.checkQuestions')}
           </Text>
+          <Text style={styles.checkItem}>
+            {allVerified ? '✓' : '○'}{' '}
+            {verifyTotal > 0
+              ? t('createEvent.verify.checklistItem', {
+                  verified: verifiedCount,
+                  total: verifyTotal,
+                })
+              : t('createEvent.verify.checklistPending')}
+          </Text>
         </View>
+
+        {!allVerified && allPlacesHaveQuestions ? (
+          <Button
+            title={
+              verifiedCount > 0
+                ? t('createEvent.verify.resumeVerify')
+                : t('createEvent.verify.startVerify')
+            }
+            onPress={goToVerify}
+            variant="outline"
+            fullWidth
+            style={styles.button}
+          />
+        ) : null}
 
         {event.places.map((place, index) => (
           <View key={place.id} style={styles.placeCard}>
@@ -336,10 +431,51 @@ export const CreateEventReviewScreen: React.FC = () => {
           title={t('createEvent.publishNow')}
           onPress={handlePublish}
           loading={publishEvent.isPending}
-          disabled={!allPlacesHaveQuestions}
+          disabled={!allPlacesHaveQuestions || !allVerified}
           fullWidth
           style={styles.button}
         />
+        <Button
+          title={
+            showSchedule
+              ? t('createEvent.schedule.confirm')
+              : t('createEvent.schedule.cta')
+          }
+          onPress={() => {
+            if (!allVerified) {
+              goToVerify();
+              return;
+            }
+            if (!showSchedule) {
+              setScheduleAt(defaultScheduleDate());
+              setScheduleError(undefined);
+              setShowSchedule(true);
+              return;
+            }
+            void handleSchedule();
+          }}
+          loading={schedulePublish.isPending}
+          disabled={!allPlacesHaveQuestions || (!allVerified && showSchedule)}
+          variant="outline"
+          fullWidth
+          style={styles.button}
+        />
+        {showSchedule ? (
+          <View style={styles.scheduleBox}>
+            <Text style={styles.accessSubheading}>
+              {t('createEvent.schedule.helper')}
+            </Text>
+            <ScheduleDateTimeField
+              value={scheduleAt}
+              onChange={next => {
+                setScheduleAt(next);
+                setScheduleError(undefined);
+              }}
+              error={scheduleError}
+              minimumDate={new Date()}
+            />
+          </View>
+        ) : null}
         <Button
           title={t('createEvent.saveDraft')}
           onPress={handleSaveDraft}
@@ -481,6 +617,12 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   button: {
+    marginTop: spacing.sm,
+  },
+  scheduleBox: {
+    backgroundColor: colors.background,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
     marginTop: spacing.sm,
   },
 });

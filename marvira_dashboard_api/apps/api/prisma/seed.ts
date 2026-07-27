@@ -18,6 +18,8 @@ async function hashPassword(password: string): Promise<string> {
 async function main() {
   console.log('Seeding database...');
 
+  await ensureAppSettings();
+
   const adminPasswordHash = await hashPassword('admin123');
   const demoPasswordHash = await hashPassword('demo123');
 
@@ -405,6 +407,18 @@ async function main() {
   console.log(`Admin: admin@marvira.com / admin123`);
   console.log(`Staff: staff@marvira.com / staff123`);
   console.log(`Demo user: demo@marvira.com / demo123`);
+}
+
+// Ensure default app settings exist (also inserted by migration)
+async function ensureAppSettings() {
+  await prisma.appSetting.upsert({
+    where: { key: 'event_live_duration_days' },
+    update: {},
+    create: {
+      key: 'event_live_duration_days',
+      value: '2',
+    },
+  });
 }
 
 main()

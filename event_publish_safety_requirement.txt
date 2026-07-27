@@ -1,0 +1,269 @@
+================================================================================
+EVENT PUBLISH SAFETY — REQUIREMENTS
+================================================================================
+Purpose:
+  Reduce player risk from creator mistakes on event questions (especially
+  typos on TEXT/IMAGE answers such as "Hanop" instead of "Hanoi"), and give
+  creators safer publish controls (verify before go-live, fix after publish,
+  optional scheduled publish). Also define player failure-state UX so stuck
+  players can report, get feedback, and benefit from fixes without rage-quits.
+
+  Today, answers are exact-match after trim + case-insensitive compare. There
+  is no alternate-answer support. Mobile creators cannot easily fix event
+  questions after publish. A simple "OK" review is easy to skip without
+  reading. Place hints exist in create flow but are optional and often low quality
+  (creators may enter unhelpful text). Do not treat hints as a primary
+  safety mechanism. This document defines v1 product requirements plus a
+  near-term v1.5 plan for answer flexibility.
+
+Status: Spec locked for implementation (do not treat as already shipped).
+Related code areas (for implementers):
+  - marvira_mobile create flow (CreateEvent* screens, QuestionForm)
+  - marvira_mobile gameplay (PlaceGameScreen, QuestionRenderer) + My Events
+  - marvira_dashboard_api events / questions / progress / notifications
+  - marvira_dashboard_api admin dashboard (events/new, events/[id])
+  - BullMQ + Redis (scheduled jobs)
+
+================================================================================
+1. FEATURE — ANSWER VERIFY BEFORE PUBLISH
+================================================================================
+Goal:
+  Force the creator to re-answer each question before the event can go live
+  or be scheduled, without requiring GPS / visiting place coordinates.
+
+Rules:
+  - Required before "Publish now" and "Schedule publish".
+  - "Save draft" may skip verify.
+  - For each question, show the question (and options for MC) but hide the
+    previously stored correct answer during verify.
+  - TEXT / IMAGE: creator must type the answer again.
+      - Block paste on the verify field (best-effort; soft safeguard).
+  - MULTIPLE_CHOICE / TRUE_FALSE: creator must tap the correct option /
+    True-False again (same interaction as a player). Do not skip these types.
+  - Matching uses the same rule as gameplay: trim + case-insensitive equality.
+  - On mismatch: that item fails; creator may retry or edit the original
+    answer, then verify again.
+  - Publish now / Schedule unlock only after ALL questions pass verify.
+
+Creator UX (required for long hunts):
+  - Show progress while verifying (e.g. "7 / 15 verified").
+  - Allow leave-and-resume mid-verify; persist which questions already passed
+    for this publish attempt (invalidate pass if that question's answer is
+    edited before publish).
+  - Re-verify applies to the publish/schedule gate only (draft → go live /
+    schedule). Do NOT require re-verify after editing a live event (too slow;
+    blocks recovery). See §3.
+  - Hint nudge during create/verify is optional / soft only; missing or
+    weird hints must not block publish (see §5).
+
+Admin / staff parity (publish gate):
+  - Admins typo too — do not skip verify only because the user is staff.
+  - Mobile app (any role, including admin creating from the app):
+      Required before Publish now / Schedule publish — same blind re-type /
+      re-tap flow as regular creators. No admin bypass on mobile.
+  - Admin dashboard (web):
+      Required before publish/schedule, but lighter UX is acceptable because
+      answers are already visible while editing. Use an explicit review step
+      that lists each place question + stored answer and requires confirm
+      (read + confirm checklist) before publish/schedule. Full blind re-type
+      on dashboard is optional; not required for v1 if confirm checklist is
+      shown.
+  - Live answer edits (creator or admin, mobile or dashboard):
+      No re-verify. New answer applies immediately (see §3). Same rule for
+      everyone.
+
+Out of scope for this feature (v1):
+  - Fuzzy matching / alternate accepted answers (see §8 v1.5).
+  - Full play-as-player with GPS.
+  - Re-verify after live answer edits.
+
+================================================================================
+2. FEATURE — REPORT WRONG ANSWER
+================================================================================
+Goal:
+  Let players signal that a stored answer seems wrong so creator and admin
+  can act — at the moment of frustration, not buried in a menu.
+
+Rules:
+  - Player can report a place/question as "wrong answer" from gameplay.
+  - Require the player has joined the event and attempted / engaged that
+    place (prevent drive-by spam). Prefer: at least one incorrect answer
+    submission for that place in this play session / progress.
+  - Rate-limit reports.
+  - Deduplicate: one active report per user per place/question (repeat taps
+    should not spam creator/admin; may refresh timestamp or show "already
+    reported").
+  - Do NOT reveal the correct stored answer in the report UI or confirmation.
+  - Notify BOTH the event creator AND admin.
+  - Creator / admin surfaces: show report count per place/stop (so creators
+    know which stop to fix first). Minimal queue fields for admin: event,
+    place, reporter count, last reported at.
+
+Player failure-state UX (required in v1):
+  - On incorrect answer alert / screen: primary "Try again" AND secondary
+    "Report problem" (or "Report wrong answer") — do not bury report only
+    in overflow menus.
+  - After successful report, show short confirmation, e.g.:
+      "Thanks — we notified the organizer. You can keep trying; they may
+       update the answer."
+  - Do not imply the player's typed answer is accepted; only that the report
+    was sent.
+  - When the creator (or admin) later changes that place's answer, notify
+    reporters of that place in v1. Message example:
+      "An answer was updated in [Event name]. You can try again."
+    Broader notify to all in-progress players is optional later if cheap.
+
+================================================================================
+3. FEATURE — CREATOR EDIT AFTER PUBLISH
+================================================================================
+Goal:
+  Allow fixing typos and wrong answers on live events without trapping
+  players or unfairly wiping progress.
+
+Rules:
+  - Event owner may edit questions/answers anytime after publish (no hard
+    lock after first player joins/starts).
+  - Admin may always edit.
+  - Live answer edits apply immediately — players can retry with the new
+    answer right away. Do NOT gate the new answer behind re-verify.
+  - No re-verify after live edits (verify is only for publish/schedule).
+  - Never revoke past place completions, points, or progress if the answer
+    changes later. Results already earned remain valid.
+  - New answer submissions use the current stored answer only.
+  - Do not over-engineer anti-abuse for mid-event edits: friends can already
+    share answers outside the app. Report + admin visibility is enough for v1.
+  - Optional "Creator-verified answers" badge (if used) may clear or show
+    "updated after verify" after a live edit — do not block play for that.
+
+Player / creator transparency (required in v1):
+  - After an answer edit on a live event, surface a light signal that the
+    stop was updated (e.g. "Answer updated" on that place for in-progress
+    players, and/or lastUpdated timestamp). Goal: stuck players know to retry.
+  - Creator edit UI copy (short): "Players who already passed keep credit;
+    new attempts use the new answer."
+
+================================================================================
+4. FEATURE — SCHEDULED PUBLISH
+================================================================================
+Goal:
+  Creator prepares an event now and has it go live automatically at a chosen
+  future time.
+
+Data model:
+  - Add scheduledPublishAt (nullable DateTime) on Event.
+  - Keep isActive as the primary "live" flag.
+  - Suggested states:
+      Draft:     isActive = false, scheduledPublishAt = null
+      Scheduled: isActive = false, scheduledPublishAt = future UTC
+      Live:      isActive = true  (clear scheduledPublishAt when published)
+
+UX:
+  - After verify passes: offer Publish now | Schedule publish | Save draft.
+  - Save draft does not require verify.
+  - Date/time picker shows the creator's local timezone.
+  - App converts that local moment to UTC and stores UTC on the server.
+  - Worker publishes when server UTC now >= scheduledPublishAt UTC (the
+    exact moment the creator intended in their local time).
+   - Scheduled events must not be joinable via share link / deep link / join
+     API until live (same gate as gameplay).
+   - Scheduled events MAY appear in public list/nearby/search as Incoming
+     (non-interactive card; clear “Starts {{when}}”; no tap / no join).
+   - Creator My Events (and detail) must show clear state, e.g.:
+      "Scheduled · goes live Tue 7:00 PM" (local time).
+   - Creator can cancel / reschedule while the event is not yet live.
+
+Auto-publish mechanics:
+  - Primary: BullMQ delayed job (Redis required in production;
+    REDIS_DISABLED must not be true).
+  - Backup: light safety cron/interval to catch missed jobs.
+  - Fallback: if scheduledPublishAt <= now but isActive still false, treat
+    as live on read and preferably self-heal (set isActive = true, clear
+    schedule, run publish side effects once).
+  - Publishing (now or scheduled) must run the same readiness validation
+    as today (places + questions present, etc.). If validation fails at
+    fire time, leave draft/scheduled and notify the creator.
+
+================================================================================
+5. FEATURE — PLACE HINTS WHEN STUCK (OPTIONAL / LOW PRIORITY)
+================================================================================
+Goal:
+  If a useful place.hint already exists, optionally surface it when stuck.
+  Hints are NOT a primary safety feature — creators often leave them empty
+  or enter unhelpful / weird text.
+
+Rules:
+  - Optional field stays optional; never block publish for missing hint.
+  - Do not heavily nudge creators to fill hints in v1.
+  - If implementing display at all: only show when non-empty; never reveal
+    the stored correct answer string.
+  - Prefer shipping report + live edit first; hint display can slip to
+    later / v1.5 if time is tight.
+
+================================================================================
+6. BUILD ORDER
+================================================================================
+  1. Answer verify gate (all question types: type or tap) + progress /
+     resume for the publish/schedule attempt only
+  2. Report wrong answer (failure-state UX + creator/admin notify + counts)
+     + owner edit (immediate apply, keep past results, "answer updated"
+     signal, notify reporters on fix)
+  3. Scheduled publish (BullMQ delay + safety cron + read fallback;
+     not joinable until live)
+  4. (Optional) Place hint display in gameplay if non-empty
+
+================================================================================
+7. NON-GOALS (v1)
+================================================================================
+  - Alternate accepted answers / fuzzy match (planned v1.5 — see §8)
+  - GPS-based play-as-player preview
+  - Hard edit lock after first player
+  - Revoking or regrading past completions when answers change
+  - Re-verify after live answer edits
+  - Heavy anti-abuse beyond rate-limit + dedupe + admin visibility
+  - Relying on place hints as the main fix for wrong/typo answers
+
+================================================================================
+8. NEAR-TERM (v1.5) — ANSWER FLEXIBILITY
+================================================================================
+Why:
+  Verify catches creator typos at publish time. It does NOT fix player
+  variants: "Hanoi" vs "Ha Noi" vs "Hà Nội", punctuation, or reasonable
+  mobile typos. Many reports will be "app too strict," not "creator typo."
+
+Planned:
+  - Alternate accepted answers: allow 1–3 extra accepted strings per TEXT /
+    IMAGE question (same trim + case-insensitive match as primary).
+  - Diacritic-insensitive compare for TEXT / IMAGE (normalize accents before
+    compare) — high value for VN / local hunts; keep MC / TRUE_FALSE exact.
+  - Optional later: light punctuation / multi-space normalize (not full fuzzy).
+  - Creator UI: "Also accept" fields next to primary answer; verify gate
+    should still require re-entry of the PRIMARY answer (alternates may be
+    shown for confirmation, not hidden re-type of every alternate in v1.5).
+
+Nice-to-have (same window if cheap):
+  - From create/review: deep link or CTA to try the question in Training
+    (no GPS) as an optional preview before publish.
+  - Optional gameplay hint display if still not done in v1.
+
+================================================================================
+9. POSITIONING / COPY (optional product language)
+================================================================================
+  Invisible safety does not sell hunts. Use honest trust language:
+
+  Creators:
+    - "Answer check before publish — catch typos before players do."
+
+  Players:
+    - "Something wrong? Report it — organizers can fix live hunts without
+       resetting your progress."
+
+  Event cards (only if verify actually ran for current answers, and answers
+  have not been silently changed without a clear "updated" state):
+    - "Creator-verified answers"
+
+  Do NOT promise "no wrong answers." Promise fast recovery when something
+  breaks.
+
+================================================================================
+END
+================================================================================

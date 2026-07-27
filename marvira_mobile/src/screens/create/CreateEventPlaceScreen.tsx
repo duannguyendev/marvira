@@ -12,6 +12,7 @@ import { useCreatePlaceWithQuestion } from '../../hooks/useMyEvents';
 import { useLocation } from '../../hooks/useLocation';
 import { CreatePlaceInput, CreateQuestionInput, Location } from '../../types';
 import { getAppContentLanguage } from '../../services/contentLanguage';
+import { locationService } from '../../services/location.service';
 import { uploadsApi } from '../../api/uploads';
 import { HomeStackParamList } from '../../navigation/types';
 import { colors, spacing, fontSize, fontWeight } from '../../theme';
@@ -72,8 +73,15 @@ export const CreateEventPlaceScreen: React.FC = () => {
       Alert.alert(t('game.locationRequired'), t('game.enableGps'));
       return;
     }
-    if (location) {
-      handleCoordinateChange(location);
+    try {
+      const current = await locationService.getCurrentLocation();
+      handleCoordinateChange(current);
+    } catch {
+      if (location) {
+        handleCoordinateChange(location);
+      } else {
+        Alert.alert(t('game.locationRequired'), t('game.enableGps'));
+      }
     }
   };
 

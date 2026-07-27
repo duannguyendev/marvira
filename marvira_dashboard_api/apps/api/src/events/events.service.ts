@@ -15,6 +15,9 @@ import {
 import { GeoQueryService } from './geo-query.service';
 import { AuthService } from '../auth/auth.service';
 import { EventAccessService } from './event-access.service';
+import { PublishVerifyService } from './publish-verify.service';
+import { ScheduledPublishService } from './scheduled-publish.service';
+import { EventEndService } from './event-end.service';
 import { CreateEventDto, UpdateEventDto } from './dto/event.dto';
 import {
   assertGiftCodesAppendOnly,
@@ -40,6 +43,7 @@ export interface CreateEventInput {
   completionMessage?: string | null;
   giftTeaser?: string | null;
   giftCodes?: string[];
+  publishReviewConfirmed?: boolean;
 }
 
 const publicQuestionSelect = {
@@ -50,6 +54,7 @@ const publicQuestionSelect = {
   options: true,
   explanation: true,
   points: true,
+  answerUpdatedAt: true,
 } as const;
 
 @Injectable()
@@ -60,6 +65,9 @@ export class EventsService {
     private readonly geoQuery: GeoQueryService,
     private readonly auth: AuthService,
     private readonly eventAccess: EventAccessService,
+    private readonly publishVerify: PublishVerifyService,
+    private readonly scheduledPublish: ScheduledPublishService,
+    private readonly eventEnd: EventEndService,
   ) {}
 
   async findAll(
@@ -89,10 +97,11 @@ export class EventsService {
       exceptionIds,
     );
 
+    const discoverFilter = activeOnly ? this.publicDiscoverWhere() : {};
     const where = {
-      ...(activeOnly ? { isActive: true } : {}),
-      ...searchFilter,
-      ...languageFilter,
+      AND: [discoverFilter, searchFilter, languageFilter].filter(
+        (part) => Object.keys(part).length > 0,
+      ),
     };
 
     const cacheVersion = await this.getListCacheVersion();
@@ -118,6 +127,21 @@ export class EventsService {
     };
     await this.redis.set(cacheKey, JSON.stringify(mapped), 60);
     return mapped;
+  }
+
+  /** Live events + future-scheduled (Incoming) for public browse/search. */
+  private publicDiscoverWhere() {
+    const now = new Date();
+    return {
+      OR: [
+        { isActive: true },
+        {
+          isActive: false,
+          endedAt: null,
+          scheduledPublishAt: { gt: now },
+        },
+      ],
+    };
   }
 
   async findNearby(
@@ -152,6 +176,7 @@ export class EventsService {
             difficulty: row.difficulty,
             rewardPoints: row.reward_points,
             isActive: row.is_active,
+            scheduledPublishAt: row.scheduled_publish_at,
             language: row.language,
             joinPasswordHash: row.join_password_hash,
             giftTeaser: row.gift_teaser,
@@ -169,8 +194,10 @@ export class EventsService {
 
     const events = await this.prisma.client.event.findMany({
       where: {
-        isActive: true,
-        ...this.buildLanguageOrExceptionFilter(languageQuery, exceptionIds),
+        AND: [
+          this.publicDiscoverWhere(),
+          this.buildLanguageOrExceptionFilter(languageQuery, exceptionIds),
+        ].filter((part) => Object.keys(part).length > 0),
       },
       include: { places: { select: { latitude: true, longitude: true } } },
     });
@@ -270,6 +297,7 @@ export class EventsService {
     userId: string,
     role: string,
     data: Partial<CreateEventInput>,
+    options?: { allowChecklistBypass?: boolean },
   ) {
     if (role !== 'ADMIN' && role !== 'STAFF') {
       const event = await this.prisma.client.event.findUnique({
@@ -279,8 +307,18 @@ export class EventsService {
       if (event.createdBy !== userId) {
         throw new ForbiddenException('You can only update your own events');
       }
+      const { publishReviewConfirmed: _, ...rest } = data;
+      return this.update(id, rest);
     }
-    return this.update(id, data);
+
+    // Staff on mobile must still blind-verify — checklist only from dashboard.
+    if (!options?.allowChecklistBypass) {
+      const { publishReviewConfirmed: _, ...rest } = data;
+      return this.update(id, rest, role, { allowChecklistBypass: false });
+    }
+    return this.update(id, data, role, {
+      allowChecklistBypass: true,
+    });
   }
 
   async removeForUser(id: string, userId: string, role: string) {
@@ -292,11 +330,17 @@ export class EventsService {
       if (event.createdBy !== userId) {
         throw new ForbiddenException('You can only delete your own events');
       }
+      if (event.isActive || event.endedAt) {
+        throw new BadRequestException('Only draft events can be deleted');
+      }
     }
     return this.remove(id);
   }
 
   async findOne(id: string, userId?: string) {
+    await this.scheduledPublish.ensureLiveIfDue(id);
+    await this.eventEnd.ensureEndedIfDue(id);
+
     const event = await this.prisma.client.event.findUnique({
       where: { id },
       include: {
@@ -315,10 +359,25 @@ export class EventsService {
     });
     if (!event) throw new NotFoundException('Event not found');
 
+    const isOwner = !!userId && event.createdBy === userId;
+    const staff = !!userId && (await this.isStaffOrAdmin(userId));
+
+    // Hide inactive/scheduled/ended events from non-owners unless they already
+    // started (so mid-hunt players can finish after End).
+    if (!event.isActive && !isOwner && !staff) {
+      const progress = userId
+        ? await this.prisma.client.userEventProgress.findUnique({
+            where: { userId_eventId: { userId, eventId: id } },
+            select: { id: true },
+          })
+        : null;
+      if (!progress) {
+        throw new NotFoundException('Event not found');
+      }
+    }
+
     const hasAccess = await this.eventAccess.hasAccess(userId, event);
-    const includeOwnerGiftFields =
-      !!userId &&
-      (event.createdBy === userId || (await this.isStaffOrAdmin(userId)));
+    const includeOwnerGiftFields = isOwner || staff;
     const publicEvent = this.eventAccess.toPublicFields(event, {
       hasAccess,
       includeOwnerGiftFields,
@@ -394,16 +453,37 @@ export class EventsService {
         ...giftFields,
       },
     });
+    let result = event;
+    if (event.isActive) {
+      result = await this.eventEnd.scheduleAutoEnd(event.id);
+    }
     await this.invalidateCache();
-    return this.eventAccess.toPublicFields(event, {
+    return this.eventAccess.toPublicFields(result, {
       includeOwnerGiftFields: true,
     });
   }
 
-  async update(id: string, data: Partial<CreateEventInput>) {
+  async update(
+    id: string,
+    data: Partial<CreateEventInput>,
+    actorRole?: string,
+    options?: { allowChecklistBypass?: boolean },
+  ) {
     const existing = await this.findOneInternal(id);
     if (data.isActive) {
-      await this.validateEventForPublish(id);
+      await this.validateEventForPublish(id, {
+        publishReviewConfirmed: data.publishReviewConfirmed,
+        actorRole,
+        allowChecklistBypass: options?.allowChecklistBypass === true,
+      });
+      // Persist checklist so any later schedule/self-heal path stays consistent
+      if (
+        options?.allowChecklistBypass &&
+        data.publishReviewConfirmed &&
+        (actorRole === 'ADMIN' || actorRole === 'STAFF')
+      ) {
+        await this.publishVerify.markAllVerifiedFromChecklist(id);
+      }
     }
     const {
       joinPassword,
@@ -411,6 +491,7 @@ export class EventsService {
       giftCodes,
       giftTeaser,
       completionMessage,
+      publishReviewConfirmed: _publishReviewConfirmed,
       ...rest
     } = data;
     const passwordFields = await this.applyJoinPasswordFields(
@@ -437,10 +518,20 @@ export class EventsService {
           : {}),
         ...passwordFields,
         ...giftPatch,
+        ...(data.isActive === true ? { scheduledPublishAt: null } : {}),
       },
     });
+
+    let result = event;
+    if (data.isActive === true) {
+      await this.scheduledPublish
+        .cancelScheduleJobOnly(id)
+        .catch(() => undefined);
+      result = await this.eventEnd.scheduleAutoEnd(id);
+    }
+
     await this.invalidateCache();
-    return this.eventAccess.toPublicFields(event, {
+    return this.eventAccess.toPublicFields(result, {
       includeOwnerGiftFields: true,
     });
   }
@@ -511,6 +602,8 @@ export class EventsService {
 
   async remove(id: string) {
     await this.findOneInternal(id);
+    await this.scheduledPublish.cancelScheduleJobOnly(id);
+    await this.eventEnd.cancelEndJobOnly(id);
     await this.prisma.client.event.delete({ where: { id } });
     await this.invalidateCache();
     return { deleted: true };
@@ -539,7 +632,11 @@ export class EventsService {
 
   private async validateEventForPublish(
     eventId: string | null,
-    _draft?: Partial<CreateEventInput>,
+    options?: {
+      publishReviewConfirmed?: boolean;
+      actorRole?: string;
+      allowChecklistBypass?: boolean;
+    },
   ) {
     if (!eventId) {
       throw new BadRequestException(
@@ -564,6 +661,37 @@ export class EventsService {
         `Each place must have a question before publishing (${missing.length} place(s) missing)`,
       );
     }
+
+    const canUseChecklist =
+      options?.allowChecklistBypass === true &&
+      options.publishReviewConfirmed === true &&
+      (options.actorRole === 'ADMIN' || options.actorRole === 'STAFF');
+    if (canUseChecklist) {
+      return;
+    }
+
+    await this.publishVerify.assertAllVerified(eventId);
+  }
+
+  async getOwnerPlaces(eventId: string, userId: string, role: string) {
+    if (role !== 'ADMIN' && role !== 'STAFF') {
+      const event = await this.prisma.client.event.findUnique({
+        where: { id: eventId },
+        select: { createdBy: true },
+      });
+      if (!event) throw new NotFoundException('Event not found');
+      if (event.createdBy !== userId) {
+        throw new ForbiddenException('Not allowed');
+      }
+    }
+
+    return this.prisma.client.place.findMany({
+      where: { eventId },
+      orderBy: { orderIndex: 'asc' },
+      include: {
+        question: true,
+      },
+    });
   }
 
   private async getListCacheVersion(): Promise<string> {

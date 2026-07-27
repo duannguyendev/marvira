@@ -30,6 +30,9 @@ export interface ApiEvent {
   difficulty: string;
   rewardPoints: number;
   isActive: boolean;
+  scheduledPublishAt?: string | null;
+  endsAt?: string | null;
+  endedAt?: string | null;
   language?: string;
   isPasswordProtected?: boolean;
   hasAccess?: boolean;
@@ -69,6 +72,7 @@ export interface ApiQuestionPublic {
   options: string[] | null;
   explanation: string | null;
   points: number;
+  answerUpdatedAt?: string | null;
 }
 
 export interface ApiAnswerResponse {

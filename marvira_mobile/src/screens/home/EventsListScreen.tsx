@@ -181,7 +181,14 @@ export const EventsListScreen: React.FC = () => {
         data={sortedEvents}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <EventCard event={item} onPress={() => handleEventPress(item.id)} />
+          <EventCard
+            event={item}
+            onPress={() => {
+              if (!item.isIncoming) {
+                handleEventPress(item.id);
+              }
+            }}
+          />
         )}
         contentContainerStyle={styles.listContent}
         refreshControl={

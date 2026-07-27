@@ -102,7 +102,8 @@ export function PlaceQuestionEditor({
                 <DialogHeader>
                   <DialogTitle>Edit Question</DialogTitle>
                   <DialogDescription>
-                    Update this place&apos;s question.
+                    Players who already passed keep credit; new attempts use
+                    the new answer.
                   </DialogDescription>
                 </DialogHeader>
                 <QuestionForm

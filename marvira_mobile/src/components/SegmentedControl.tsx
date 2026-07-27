@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   segment: {
     flex: 1,
     paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: spacing.xs,
     borderRadius: borderRadius.md,
     alignItems: 'center',
   },
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   label: {
-    fontSize: fontSize.sm,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.medium,
     color: colors.textSecondary,
     textAlign: 'center',

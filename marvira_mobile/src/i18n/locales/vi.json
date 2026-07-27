@@ -31,6 +31,8 @@
     "leaderboard": "Bảng xếp hạng",
     "finishers": "Người hoàn thành",
     "editGifts": "Chỉnh sửa quà",
+    "editAnswers": "Sửa đáp án",
+    "answerVerify": "Kiểm tra đáp án",
     "globalRankings": "Xếp hạng toàn cầu",
     "settings": "Cài đặt",
     "globalLeaderboardA11y": "Bảng xếp hạng toàn cầu",
@@ -159,6 +161,8 @@
     "viewCompletion": "Xem kết quả hoàn thành",
     "giftLabel": "Quà",
     "giftsForFirst": "Quà dành cho {{count}} người hoàn thành sớm nhất",
+    "startsAt": "Bắt đầu {{when}}",
+    "incomingHint": "Sắp mở — chưa tham gia được",
     "placesCount": "Địa điểm ({{count}})",
     "shareA11y": "Chia sẻ cuộc săn này",
     "shareMessage": "Cùng chơi \"{{title}}\" — cuộc săn kho báu trên Marvira!\n{{url}}",
@@ -180,7 +184,8 @@
   "eventStatus": {
     "not_started": "Chưa bắt đầu",
     "in_progress": "Đang diễn ra",
-    "completed": "Đã hoàn thành"
+    "completed": "Đã hoàn thành",
+    "incoming": "Sắp tới"
   },
   "placeStatus": {
     "completed": "Đã hoàn thành",
@@ -215,7 +220,11 @@
     "completePreviousFirst": "Hãy hoàn thành địa điểm trước để mở khóa địa điểm này.",
     "moveWithinToUnlock": "Di chuyển vào phạm vi {{radius}} mét để mở khóa và trả lời câu hỏi.",
     "tryUnlockNow": "Thử mở khóa ngay",
-    "enterYourAnswer": "Nhập câu trả lời"
+    "enterYourAnswer": "Nhập câu trả lời",
+    "reportProblem": "Báo lỗi đáp án",
+    "reportSentTitle": "Đã gửi báo cáo",
+    "answerUpdated": "Đáp án đã được cập nhật — hãy thử lại.",
+    "hintLabel": "Gợi ý"
   },
   "anticheat": {
     "title": "Thông báo vị trí",
@@ -343,6 +352,49 @@
     "createFailed": "Không thể tạo sự kiện",
     "placeFailed": "Không thể lưu địa điểm",
     "publishFailed": "Không thể xuất bản sự kiện",
+    "verify": {
+      "heading": "Kiểm tra đáp án",
+      "subheading": "Nhập lại từng đáp án đúng để bắt lỗi chính tả trước khi người chơi gặp.",
+      "progress": "{{verified}} / {{total}} đã xác nhận",
+      "typeAnswer": "Nhập lại đáp án (không dán)",
+      "checkAnswer": "Kiểm tra",
+      "mismatchTitle": "Không khớp",
+      "mismatchMessage": "Không khớp đáp án đã lưu. Thử lại hoặc sửa đáp án.",
+      "editAnswer": "Sửa đáp án",
+      "retry": "Thử lại",
+      "answerRequired": "Hãy nhập đáp án trước.",
+      "verified": "Đã xác nhận",
+      "allDoneTitle": "Đã xác nhận mọi đáp án",
+      "allDoneMessage": "Bạn có thể xuất bản hoặc lên lịch từ màn hình xem lại.",
+      "backToReview": "Quay lại xem lại",
+      "saveAndResume": "Lưu tiến độ và quay lại xem lại",
+      "checklistItem": "Đáp án đã xác nhận ({{verified}}/{{total}})",
+      "checklistPending": "Cần kiểm tra đáp án trước khi xuất bản",
+      "startVerify": "Bắt đầu kiểm tra đáp án",
+      "resumeVerify": "Tiếp tục kiểm tra đáp án"
+    },
+    "schedule": {
+      "cta": "Lên lịch xuất bản",
+      "confirm": "Xác nhận lịch",
+      "helper": "Chọn ngày giờ theo giờ địa phương. Hệ thống lưu UTC và mở đúng thời điểm đó.",
+      "localLabel": "Mở vào (giờ địa phương)",
+      "tapToChange": "Chạm để đổi ngày & giờ",
+      "placeholder": "2026-08-01T19:00",
+      "invalid": "Dùng định dạng YYYY-MM-DDTHH:mm",
+      "mustBeFuture": "Phải là thời điểm trong tương lai",
+      "failed": "Không thể lên lịch xuất bản",
+      "successTitle": "Đã lên lịch xuất bản!",
+      "successMessage": "Sự kiện sẽ mở lúc {{when}} (giờ địa phương của bạn)."
+    },
+    "editAnswers": {
+      "heading": "Sửa đáp án",
+      "subheading": "Người chơi đã vượt qua vẫn giữ điểm; lần thử mới dùng đáp án mới.",
+      "save": "Lưu đáp án",
+      "savedTitle": "Đã cập nhật đáp án",
+      "savedMessage": "Đáp án mới đã áp dụng. Người chơi mắc kẹt có thể thử lại.",
+      "updatedTag": "Đã cập nhật trước đó",
+      "reportCount": "{{count}} báo cáo đáp án sai"
+    },
     "access": {
       "heading": "Ai có thể chơi?",
       "subheading": "Chọn cho mọi người tham gia hoặc chỉ người có mật khẩu.",
@@ -416,7 +468,41 @@
     "published": "Đã xuất bản",
     "draft": "Bản nháp",
     "viewFinishers": "Xem người hoàn thành",
-    "editGifts": "Chỉnh sửa quà"
+    "editGifts": "Chỉnh sửa quà",
+    "editAnswers": "Sửa đáp án",
+    "scheduled": "Đã lên lịch",
+    "goesLive": "Mở lúc {{when}}",
+    "cancelSchedule": "Hủy lịch",
+    "reschedule": "Đổi giờ",
+    "continuePublish": "Tiếp tục / Xuất bản",
+    "managePublish": "Xem lại / Xuất bản",
+    "deleteDraft": "Xóa bản nháp",
+    "deleteTitle": "Xóa bản nháp?",
+    "deleteMessage": "Xóa \"{{title}}\"? Hành động này không thể hoàn tác.",
+    "deleteFailed": "Không thể xóa bản nháp",
+    "endEvent": "Kết thúc",
+    "endTitle": "Kết thúc sự kiện?",
+    "endMessage": "Kết thúc \"{{title}}\" ngay? Sự kiện sẽ biến mất khỏi tìm kiếm công khai. Người chơi đã bắt đầu vẫn có thể hoàn thành.",
+    "endFailed": "Không thể kết thúc sự kiện",
+    "endsAt": "Kết thúc {{when}}",
+    "endedAt": "Đã kết thúc {{when}}",
+    "done": "Đã xong",
+    "tabs": {
+      "draft": "Nháp",
+      "scheduled": "Lịch",
+      "published": "Live",
+      "done": "Xong"
+    },
+    "empty": {
+      "draftTitle": "Không có bản nháp",
+      "draftMessage": "Tạo cuộc săn và lưu nháp để xem tại đây.",
+      "scheduledTitle": "Chưa có lịch",
+      "scheduledMessage": "Lên lịch xuất bản bản nháp để thấy tại đây.",
+      "publishedTitle": "Không có sự kiện live",
+      "publishedMessage": "Xuất bản cuộc săn để người chơi tìm thấy.",
+      "doneTitle": "Chưa có sự kiện kết thúc",
+      "doneMessage": "Sự kiện đã kết thúc được giữ lại để xem lịch sử."
+    }
   },
   "finishers": {
     "loadFailed": "Không thể tải danh sách người hoàn thành",

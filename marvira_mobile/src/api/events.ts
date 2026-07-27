@@ -133,9 +133,9 @@ export const eventsApi = {
     }
 
     if (filters?.status === 'in_progress') {
-      events = events.filter(e => e.status === 'in_progress');
+      events = events.filter(e => !e.isIncoming && e.status === 'in_progress');
     } else if (filters?.status === 'not_started') {
-      events = events.filter(e => e.status === 'not_started');
+      events = events.filter(e => !e.isIncoming && e.status === 'not_started');
     }
 
     return { success: true, data: events };

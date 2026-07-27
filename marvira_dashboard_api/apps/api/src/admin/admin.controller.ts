@@ -37,6 +37,9 @@ import { UpdateFeedbackDto } from '../feedback/dto/admin-feedback.dto';
 import { SetUserRoleDto } from '../users/dto/set-user-role.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { RequestUser } from '../common/types/request-user';
+import { PlaceAnswerReportService } from '../places/place-answer-report.service';
+import { AppSettingsService } from '../settings/app-settings.service';
+import { UpdateAppSettingsDto } from '../settings/dto/update-app-settings.dto';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -52,7 +55,23 @@ export class AdminController {
     private readonly practiceService: PracticeService,
     private readonly feedbackService: FeedbackService,
     private readonly articlesService: ArticlesService,
+    private readonly reportService: PlaceAnswerReportService,
+    private readonly appSettingsService: AppSettingsService,
   ) {}
+
+  @Get('settings')
+  @ApiOperation({ summary: 'Get global app settings' })
+  async getSettings() {
+    const data = await this.appSettingsService.getSettings();
+    return { success: true, data };
+  }
+
+  @Patch('settings')
+  @ApiOperation({ summary: 'Update global app settings' })
+  async updateSettings(@Body() dto: UpdateAppSettingsDto) {
+    const data = await this.appSettingsService.updateSettings(dto);
+    return { success: true, data };
+  }
 
   @Get('users')
   @ApiOperation({ summary: 'List all users' })
@@ -93,6 +112,17 @@ export class AdminController {
       parseInt(pageSize || '20', 10),
       false,
       search,
+    );
+    return { success: true, data };
+  }
+
+  @Get('answer-reports')
+  @ApiOperation({
+    summary: 'Wrong-answer report queue (event, place, counts)',
+  })
+  async answerReports(@Query('limit') limit?: string) {
+    const data = await this.reportService.listAdminQueue(
+      parseInt(limit || '50', 10),
     );
     return { success: true, data };
   }

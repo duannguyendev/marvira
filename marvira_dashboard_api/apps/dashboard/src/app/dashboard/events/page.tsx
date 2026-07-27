@@ -51,12 +51,17 @@ export default function EventsPage() {
 
   const toggleMutation = useMutation({
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
-      api.patch<Event>(`/events/${id}`, { isActive }),
+      api.patch<Event>(`/events/${id}`, {
+        isActive,
+        // Staff unpublish/republish from list: republish requires review on edit page
+        ...(isActive ? { publishReviewConfirmed: true } : {}),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-events'] });
       toast.success('Event updated');
     },
-    onError: () => toast.error('Failed to update event'),
+    onError: (err: Error) =>
+      toast.error(err.message || 'Failed to update event'),
   });
 
   const deleteMutation = useMutation({
@@ -171,19 +176,37 @@ export default function EventsPage() {
                         {event.rewardPoints}
                       </TableCell>
                       <TableCell onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={event.isActive}
-                            onCheckedChange={checked =>
-                              toggleMutation.mutate({
-                                id: event.id,
-                                isActive: checked,
-                              })
-                            }
-                          />
-                          <span className="text-xs text-muted-foreground">
-                            {event.isActive ? 'Published' : 'Draft'}
-                          </span>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={event.isActive}
+                              onCheckedChange={checked => {
+                                if (checked && !event.isActive) {
+                                  toast.message(
+                                    'Open the event editor to review answers, then publish or schedule.',
+                                  );
+                                  router.push(`/dashboard/events/${event.id}`);
+                                  return;
+                                }
+                                toggleMutation.mutate({
+                                  id: event.id,
+                                  isActive: checked,
+                                });
+                              }}
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {event.isActive
+                                ? 'Live'
+                                : event.scheduledPublishAt
+                                  ? 'Scheduled'
+                                  : 'Draft'}
+                            </span>
+                          </div>
+                          {event.scheduledPublishAt && !event.isActive ? (
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(event.scheduledPublishAt).toLocaleString()}
+                            </span>
+                          ) : null}
                         </div>
                       </TableCell>
                       <TableCell

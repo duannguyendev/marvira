@@ -35,6 +35,8 @@
     "createEvent": "创建活动",
     "addPlace": "添加地点",
     "reviewEvent": "审核活动",
+    "answerVerify": "核对答案",
+    "editAnswers": "编辑答案",
     "eventCreated": "活动已创建",
     "myEvents": "我的活动",
     "practice": "练习",
@@ -153,6 +155,8 @@
     "progressComplete": "完成 {{progress}}%（{{completed}}/{{total}} 个地点）",
     "visitHint": "按顺序访问地点。进入每个站点的范围内即可解锁并回答问题。",
     "viewLeaderboard": "查看排行榜",
+    "startsAt": "{{when}} 开始",
+    "incomingHint": "即将开放 — 暂不可加入",
     "placesCount": "地点（{{count}}）",
     "shareA11y": "分享此寻宝活动",
     "shareMessage": "一起来玩「{{title}}」—— Marvira 城市寻宝！\n{{url}}",
@@ -174,7 +178,8 @@
   "eventStatus": {
     "not_started": "未开始",
     "in_progress": "进行中",
-    "completed": "已完成"
+    "completed": "已完成",
+    "incoming": "即将开始"
   },
   "placeStatus": {
     "completed": "已完成",
@@ -209,7 +214,11 @@
     "completePreviousFirst": "请先完成上一个地点，才能解锁此地点。",
     "moveWithinToUnlock": "移动到 {{radius}} 米范围内以解锁并回答问题。",
     "tryUnlockNow": "立即尝试解锁",
-    "enterYourAnswer": "输入你的答案"
+    "enterYourAnswer": "输入你的答案",
+    "reportProblem": "报告问题",
+    "reportSentTitle": "已提交报告",
+    "answerUpdated": "答案已更新 — 请用新答案再试。",
+    "hintLabel": "提示"
   },
   "anticheat": {
     "title": "位置提示",
@@ -327,6 +336,49 @@
     "createFailed": "创建活动失败",
     "placeFailed": "保存地点失败",
     "publishFailed": "发布活动失败",
+    "verify": {
+      "heading": "核对答案",
+      "subheading": "再次输入每个正确答案，在玩家遇到前发现错别字。",
+      "progress": "已核对 {{verified}} / {{total}}",
+      "typeAnswer": "再次输入答案（请勿粘贴）",
+      "checkAnswer": "检查答案",
+      "mismatchTitle": "不匹配",
+      "mismatchMessage": "与已保存的答案不匹配。请重试或修改答案。",
+      "editAnswer": "修改答案",
+      "retry": "重试",
+      "answerRequired": "请先输入答案。",
+      "verified": "已核对",
+      "allDoneTitle": "全部答案已核对",
+      "allDoneMessage": "你可以在审核页面发布或安排发布时间。",
+      "backToReview": "返回审核",
+      "saveAndResume": "保存进度并返回审核",
+      "checklistItem": "答案已核对（{{verified}}/{{total}}）",
+      "checklistPending": "发布前需要核对答案",
+      "startVerify": "开始核对答案",
+      "resumeVerify": "继续核对答案"
+    },
+    "schedule": {
+      "cta": "安排发布",
+      "confirm": "确认安排",
+      "helper": "选择本地日期时间。我们存储 UTC，并在该时刻上线。",
+      "localLabel": "上线时间（本地）",
+      "tapToChange": "点按更改日期和时间",
+      "placeholder": "2026-08-01T19:00",
+      "invalid": "请使用格式 YYYY-MM-DDTHH:mm",
+      "mustBeFuture": "必须是未来时间",
+      "failed": "安排发布失败",
+      "successTitle": "已安排发布！",
+      "successMessage": "活动将于 {{when}}（你的本地时间）上线。"
+    },
+    "editAnswers": {
+      "heading": "编辑答案",
+      "subheading": "已通过的玩家保留成绩；新尝试使用新答案。",
+      "save": "保存答案",
+      "savedTitle": "答案已更新",
+      "savedMessage": "新答案已生效。卡住的玩家可以重试。",
+      "updatedTag": "此前已更新",
+      "reportCount": "{{count}} 条错误答案举报"
+    },
     "access": {
       "heading": "谁可以参加？",
       "subheading": "选择公开参加或仅限知道密码的玩家。",
@@ -372,7 +424,43 @@
     "emptyMessage": "创建基于位置的寻宝活动并与他人分享。",
     "loadFailed": "加载活动失败",
     "published": "已发布",
-    "draft": "草稿"
+    "draft": "草稿",
+    "viewFinishers": "查看完赛者",
+    "editGifts": "编辑礼物",
+    "editAnswers": "编辑答案",
+    "scheduled": "已安排",
+    "goesLive": "{{when}} 上线",
+    "cancelSchedule": "取消安排",
+    "reschedule": "更改时间",
+    "continuePublish": "继续 / 发布",
+    "managePublish": "查看 / 发布",
+    "deleteDraft": "删除草稿",
+    "deleteTitle": "删除草稿？",
+    "deleteMessage": "删除「{{title}}」？此操作无法撤销。",
+    "deleteFailed": "删除草稿失败",
+    "endEvent": "结束活动",
+    "endTitle": "结束活动？",
+    "endMessage": "立即结束「{{title}}」？它将从公开搜索中消失。已开始的玩家仍可完成。",
+    "endFailed": "结束活动失败",
+    "endsAt": "{{when}} 结束",
+    "endedAt": "已于 {{when}} 结束",
+    "done": "已结束",
+    "tabs": {
+      "draft": "草稿",
+      "scheduled": "预约",
+      "published": "进行中",
+      "done": "已结束"
+    },
+    "empty": {
+      "draftTitle": "暂无草稿",
+      "draftMessage": "创建寻宝并保存为草稿后会显示在这里。",
+      "scheduledTitle": "暂无预约",
+      "scheduledMessage": "预约发布草稿后会显示在这里。",
+      "publishedTitle": "暂无进行中活动",
+      "publishedMessage": "发布寻宝后玩家才能搜索到。",
+      "doneTitle": "暂无已结束活动",
+      "doneMessage": "已结束的寻宝会保留在这里供查看。"
+    }
   },
   "practice": {
     "heading": "练习",

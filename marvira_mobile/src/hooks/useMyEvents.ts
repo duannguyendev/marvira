@@ -69,6 +69,57 @@ export const usePublishEvent = () => {
   });
 };
 
+export const useSchedulePublish = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      eventId,
+      ...input
+    }: { eventId: string } & import('../types').SchedulePublishInput) =>
+      eventCreationApi.schedulePublish(eventId, input),
+    onSuccess: (_data, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+    },
+  });
+};
+
+export const useCancelSchedule = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (eventId: string) => eventCreationApi.cancelSchedule(eventId),
+    onSuccess: (_data, eventId) => {
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+    },
+  });
+};
+
+export const useDeleteEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (eventId: string) => eventCreationApi.deleteEvent(eventId),
+    onSuccess: (_data, eventId) => {
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+    },
+  });
+};
+
+export const useEndEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (eventId: string) => eventCreationApi.endEvent(eventId),
+    onSuccess: (_data, eventId) => {
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+    },
+  });
+};
+
 export const useUpdateEventGifts = () => {
   const queryClient = useQueryClient();
   return useMutation({

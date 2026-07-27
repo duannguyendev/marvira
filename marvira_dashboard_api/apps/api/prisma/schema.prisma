@@ -103,6 +103,7 @@ model User {
   moderationActionsBy   UserModerationAction[]   @relation("ModerationAdmin")
   feedbackMessages      Feedback[]
   articles              Article[]                @relation("ArticleCreator")
+  placeAnswerReports    PlaceAnswerReport[]
 
   @@index([warningPoints])
   @@map("users")
@@ -132,6 +133,11 @@ model Event {
   difficulty        EventDifficulty @default(MEDIUM)
   rewardPoints      Int             @default(100) @map("reward_points")
   isActive          Boolean         @default(false) @map("is_active")
+  scheduledPublishAt DateTime?      @map("scheduled_publish_at")
+  /// When the live event is scheduled to auto-end (UTC)
+  endsAt            DateTime?       @map("ends_at")
+  /// When the event actually ended (manual or auto)
+  endedAt           DateTime?       @map("ended_at")
   /// Content language: vi | en | zh | ja (not UI i18n)
   language          String          @default("vi")
   joinPasswordHash  String?         @map("join_password_hash")
@@ -149,9 +155,14 @@ model Event {
   favoritedBy    UserFavoriteEvent[]
   accessGrants   UserEventAccess[]
   articles       Article[]
+  publishVerifyPasses EventPublishVerifyPass[]
+  answerReports       PlaceAnswerReport[]
 
   @@index([city])
   @@index([isActive])
+  @@index([scheduledPublishAt])
+  @@index([endsAt])
+  @@index([endedAt])
   @@index([language])
   @@map("events")
 }
@@ -172,6 +183,7 @@ model Place {
   event       Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
   question    Question?             @relation(fields: [questionId], references: [id], onDelete: SetNull)
   completions UserPlaceCompletion[]
+  answerReports PlaceAnswerReport[]
 
   @@index([eventId, orderIndex])
   @@map("places")
@@ -184,6 +196,7 @@ model Question {
   imageUrl    String?        @map("image_url")
   options     Json?
   answer      String
+  answerUpdatedAt DateTime? @map("answer_updated_at")
   explanation String?
   points      Int            @default(10)
   /// Content language: vi | en | zh | ja (not UI i18n)
@@ -199,6 +212,7 @@ model Question {
   places              Place[]
   practiceCompletions UserPracticeCompletion[]
   favoritedBy         UserFavoriteQuestion[]
+  publishVerifyPasses EventPublishVerifyPass[]
 
   @@index([source, isPublished])
   @@index([source, isPublished, language])
@@ -432,4 +446,45 @@ model Article {
   @@index([placeName])
   @@index([city])
   @@map("articles")
+}
+
+model EventPublishVerifyPass {
+  id         String   @id @default(uuid())
+  eventId    String   @map("event_id")
+  questionId String   @map("question_id")
+  verifiedAt DateTime @default(now()) @map("verified_at")
+
+  event    Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, questionId])
+  @@index([eventId])
+  @@map("event_publish_verify_passes")
+}
+
+model PlaceAnswerReport {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  placeId        String   @map("place_id")
+  eventId        String   @map("event_id")
+  reportedAt     DateTime @default(now()) @map("reported_at")
+  lastReportedAt DateTime @default(now()) @map("last_reported_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, placeId])
+  @@index([placeId])
+  @@index([eventId])
+  @@map("place_answer_reports")
+}
+
+/// Global key/value product settings (admin/staff editable).
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
 }

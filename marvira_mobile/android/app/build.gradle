@@ -46,8 +46,9 @@ def PLACEHOLDER_MAPS_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'
 /**
  * Codemagic / shell ENV wins, then local `.env.local`.
  * Build fails if the key is missing (debug and release).
+ * Use a closure (not a method) so script locals are visible to Gradle Groovy.
  */
-def requireMapsApiKey() {
+def requireMapsApiKey = {
     def key =
         System.getenv('GOOGLE_MAPS_API_KEY')
             ?: envLocal.getProperty('GOOGLE_MAPS_API_KEY')
@@ -143,6 +144,7 @@ dependencies {
     }
 
     implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'androidx.core:core-splashscreen:1.0.1'
 }
 
 configurations.all {

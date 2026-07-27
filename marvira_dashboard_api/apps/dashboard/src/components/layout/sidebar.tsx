@@ -17,6 +17,8 @@ import {
   ShieldAlert,
   MessageSquareText,
   Newspaper,
+  Flag,
+  Settings,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
@@ -31,6 +33,7 @@ const navItems = [
   { href: '/dashboard/articles', label: 'Articles', icon: Newspaper },
   { href: '/dashboard/questions', label: 'Questions', icon: HelpCircle },
   { href: '/dashboard/practice', label: 'Practice', icon: BookOpen },
+  { href: '/dashboard/answer-reports', label: 'Answer reports', icon: Flag },
   { href: '/dashboard/feedback', label: 'Feedback', icon: MessageSquareText },
   { href: '/dashboard/users', label: 'Users', icon: Users },
   {
@@ -40,6 +43,7 @@ const navItems = [
     adminOnly: true,
   },
   { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
 export function Sidebar() {

@@ -10,7 +10,7 @@ Humans onboarding to the product should NOT start here. Use:
   docs/ARCHITECTURE.md        â€” system map
 
 If regenerating:
-  1. Prefer DELIVERED SCOPE Â§14â€“24 over early "ideal monorepo" sections.
+  1. Prefer DELIVERED SCOPE Â§14â€“25 over early "ideal monorepo" sections.
   2. Real layout (do NOT invent apps/mobile inside one Turborepo):
        marvira_mobile/          â€” React Native app
        marvira_dashboard_api/   â€” NestJS API + Next.js admin + marketing
@@ -23,6 +23,7 @@ Companion docs (keep alongside; not fully merged here):
   docs/README.md                â€” human doc index
   go_live_update_checklist.txt  â€” production / store release gates
   store_privacy_labels.txt      â€” App Store / Play Data safety copy-paste
+  event_publish_safety_requirement.txt â€” verify / report / schedule / live-edit detail
   marvira_mobile/FIREBASE_SETUP.md
   growth_plan.txt               â€” post-launch growth
   monetization_todo.txt         â€” ads / IAP (later)
@@ -30,7 +31,7 @@ Companion docs (keep alongside; not fully merged here):
   marvira_dashboard_api/docs/backup-restore.md
 
 Early sections below describe the original generation prompt (Turborepo
-apps/mobile shape). Treat them as historical baseline; Â§14â€“24 + companions
+apps/mobile shape). Treat them as historical baseline; Â§14â€“25 + companions
 are the current truth.
 
 ================================================================================
@@ -272,11 +273,11 @@ AUTH
 - auto-login
 
 HOME SCREEN
-- events list
+- events list (live + Incoming scheduled â€” see Â§25.8)
 - nearby search
 - pull-to-refresh
 - distance calculation
-- modern cards
+- modern cards (Incoming: non-tappable; clear Starts {{when}})
 - loading skeletons
 
 EVENT DETAILS
@@ -308,7 +309,7 @@ EVENT COMPLETION
 PROFILE
 - user profile
 - completed events
-- my created events (draft + published) â€” see DELIVERED SCOPE Â§14
+- my created events (Draft / Scheduled / Live / Done tabs) â€” see DELIVERED SCOPE Â§14 + Â§25
 - logout
 - settings screen (language selection)
 
@@ -670,10 +671,14 @@ events
 - difficulty
 - reward_points
 - is_active
+- scheduled_publish_at (nullable DateTime UTC â€” go-live schedule; see Â§25)
+- ends_at (nullable DateTime UTC â€” planned auto-end while live; see Â§25)
+- ended_at (nullable DateTime UTC â€” when event actually ended; see Â§25)
 - join_password_hash (nullable â€” bcrypt hash; null = public event, anyone can play)
 - created_by
 - created_at
 - updated_at
+- Indexes: is_active, scheduled_publish_at, ends_at, ended_at, language, city
 
 places
 - id
@@ -918,9 +923,16 @@ GET /events/mine (paginated â€” events created by current user; JWT require
 GET /events/nearby
 GET /events/:id (includes isPasswordProtected; hasAccess when JWT present)
 POST /events
-PATCH /events/:id (creator may set/clear joinPassword on create, update, or publish)
-DELETE /events/:id
+PATCH /events/:id (creator may set/clear joinPassword on create, update, or publish;
+  isActive true goes live and schedules auto-end â€” see Â§25)
+DELETE /events/:id (USER: draft/scheduled only â€” not live or ended; STAFF/ADMIN any)
 POST /events/:id/join (JWT required â€” body: { password }; grants user_event_access on success)
+POST /events/:id/schedule (JWT owner â€” body: { scheduledPublishAt }; requires verify gate Â§25)
+DELETE /events/:id/schedule (JWT owner â€” cancel pending schedule; stays draft)
+POST /events/:id/end (JWT owner â€” end live event early; leaves public search Â§25)
+GET /events/:id/publish-verify/status
+GET /events/:id/publish-verify/questions
+POST /events/:id/publish-verify (submit one answer for publish verify gate)
 
 PLACES
 GET /events/:id/places
@@ -995,6 +1007,8 @@ GET /admin/questions/:id
 POST /admin/events/:eventId/questions
 DELETE /admin/events/:eventId/questions/:questionId
 GET /admin/analytics
+GET /admin/settings (global product settings â€” eventLiveDurationDays; ADMIN/STAFF)
+PATCH /admin/settings
 GET /admin/practice/questions?page=&pageSize=&search=&published=
 PATCH /admin/practice/questions/:id
 PATCH /admin/practice/questions/:id/publish
@@ -1130,6 +1144,7 @@ Queues:
 - analytics
 - image processing
 - cleanup
+- event-publish (delayed publish-scheduled + end-scheduled jobs; safety poll backup â€” Â§25)
 
 ====================================================
 WEBSOCKET REQUIREMENTS
@@ -1258,6 +1273,7 @@ NAVIGATION (sidebar)
 - Feedback (user messages inbox â€” see Â§20)
 - Users
 - Analytics
+- Settings (global product knobs â€” event live duration; see Â§25)
 
 AUTH
 - admin login
@@ -1602,9 +1618,10 @@ development (mobile app remains a separate project).
      Step 4 â€” Success: confirmation with links to My Events and event details; if private, show
        one-time password reminder with copy/share actions (password not shown again on server)
    - Entry points: FAB "+" on Events List; "My Events" link on Profile
-   - My Events screen (Profile stack): list user's created events with draft/published badge,
-     place count, lock icon when password-protected, pull-to-refresh; tap opens Event Details
-     (owner can view draft events and always has play access)
+   - My Events screen (Profile stack): 4 status tabs â€” Draft / Scheduled / Live / Done
+     (see Â§25); badge + place count; lock icon when password-protected; pull-to-refresh;
+     tap opens Event Details (owner can view draft events and always has play access);
+     draft/scheduled: Delete draft; live: End event; finishers for live/done
    - i18n: all create-event and my-events UI strings in vi/en/zh/ja locale files
 
 15. MOBILE â€” PASSWORD-PROTECTED EVENTS (private hunts)
@@ -2273,6 +2290,121 @@ development (mobile app remains a separate project).
      * Crashlytics test crash + dSYM/mapping verify: NOT STARTED (launch)
      * Firebase DebugView + console funnels: NOT STARTED (launch)
      * event_unpublished UI + review/ad/IAP events: DEFERRED
+
+25. EVENT PUBLISH SAFETY + LIFECYCLE (verify, schedule, My Events, auto-end, Incoming)
+   Purpose: Safer go-live for creators, clearer owner event management, automatic
+   retirement of live hunts from search, and teaser discovery for scheduled hunts.
+   Detail companion: event_publish_safety_requirement.txt (verify / report / live-edit).
+   Status: IMPLEMENTED (2026-07-27).
+
+   -------------------------------------------------------------------------
+   SUMMARY â€” NEW PRODUCT RULES (this workstream)
+   -------------------------------------------------------------------------
+   1) My Events tabs: Draft | Scheduled | Live | Done (with counts).
+   2) Creators can Delete draft/scheduled events (confirm); not live/done for USER.
+   3) Live hunts auto-end after N days (default 2); owner may End sooner.
+   4) Ended (Done) leave public search/nearby; mid-hunt players may still finish.
+   5) Live duration N is a dashboard Setting (ADMIN/STAFF), not an env var.
+   6) Future-scheduled hunts appear in public search as Incoming â€” visible start
+      time, not tappable, not joinable until live.
+   7) Publish gate: answer verify (mobile blind / dashboard checklist) + optional
+      schedule; report wrong answer + live answer edit (see companion).
+
+   25.1 LIFECYCLE STATES (locked)
+   | State     | Rule                                                         |
+   |-----------|--------------------------------------------------------------|
+   | Draft     | isActive=false, scheduledPublishAt=null, endedAt=null        |
+   | Scheduled | isActive=false, scheduledPublishAt=future UTC, endedAt=null  |
+   | Live      | isActive=true, endedAt=null (endsAt set on go-live)          |
+   | Done      | endedAt set; isActive=false (leaves public search/nearby)    |
+   | Incoming  | = Scheduled, when shown on public list/nearby/search cards   |
+
+   Do NOT reuse isActive=false alone for Done â€” that would collapse Done into Draft.
+   Fields: scheduled_publish_at, ends_at (planned auto-end), ended_at (actual end).
+
+   25.2 ANSWER VERIFY BEFORE PUBLISH
+   - Required before Publish now and Schedule publish (Save draft may skip).
+   - Blind re-type / re-tap each place question (same match rule as gameplay).
+   - Progress + leave-and-resume for the publish attempt; invalidate pass if answer edited.
+   - Mobile (any role): full blind verify. Dashboard admin/staff: confirm checklist OK.
+   - No re-verify after live answer edits (see 25.4).
+
+   25.3 REPORT WRONG ANSWER (player failure-state)
+   - From incorrect-answer UX: Try again + Report problem.
+   - Require engagement (e.g. at least one wrong attempt); rate-limit + dedupe per user/place.
+   - Notify creator + admin; do not reveal stored answer.
+   - On later answer fix: notify reporters of that place.
+
+   25.4 CREATOR EDIT AFTER PUBLISH
+   - Owner (and admin) may edit questions/answers on live events anytime.
+   - New answer applies immediately; past completions/points stay valid.
+   - Light "answer updated" signal for in-progress players.
+
+   25.5 SCHEDULED PUBLISH
+   - After verify: Publish now | Schedule publish | Save draft.
+   - Store scheduledPublishAt as UTC; worker activates when server UTC >= schedule.
+   - Primary: BullMQ delayed job on `event-publish` queue; backup safety interval;
+     read-path self-heal if overdue.
+   - Owner can cancel or reschedule while not yet live.
+   - On go-live (now or scheduled): clear scheduledPublishAt; schedule auto-end (25.6).
+
+   25.6 AUTO-END + MANUAL END
+   - On go-live: set endsAt = now + eventLiveDurationDays from AppSetting
+     (dashboard Settings; default 2 days). Code fallback 2 only if row missing.
+   - No EVENT_LIVE_DURATION_DAYS env â€” duration is DB-backed and editable by
+     ADMIN/STAFF via GET/PATCH /admin/settings (/dashboard/settings).
+   - Changing the setting applies to events that go live after save (does not
+     rewrite endsAt on already-live events).
+   - BullMQ delayed `end-scheduled` job + safety poll; read-path ensureEndedIfDue.
+   - Owner End early: POST /events/:id/end â†’ isActive=false, endedAt=now; cancel end job.
+   - Ended events leave public search/nearby/join for new players.
+   - Mid-hunt players with existing user_event_progress MAY continue/finish after End.
+
+   25.7 MY EVENTS TABS + DRAFT DELETE (mobile)
+   - Profile â†’ My Events: SegmentedControl tabs Draft | Scheduled | Live | Done with counts.
+   - Draft/Scheduled: Continue/Publish, reschedule/cancel schedule, Delete draft (confirm).
+   - Live: show Ends {{when}}; End event (confirm); edit answers/gifts; view finishers.
+   - Done: show Ended {{when}}; view finishers; no republish/delete in v1 for regular USER.
+   - DELETE /events/:id â€” USER may delete only draft/scheduled (!isActive && !endedAt);
+     STAFF/ADMIN may delete any. Cancel publish + end jobs on delete.
+
+   25.8 PUBLIC SEARCH â€” LIVE + INCOMING (locked)
+   Discoverable set for GET /events (activeOnly) and /events/nearby:
+     OR { isActive: true }
+     OR { isActive: false, endedAt: null, scheduledPublishAt > now }
+   Mobile EventCard for Incoming:
+     - Badge: Incoming (eventStatus.incoming)
+     - Clear line: Starts {{when}} (local time from scheduledPublishAt)
+     - Non-interactive: not TouchableOpacity; no navigate to details; no favorite
+     - Hint: "Opens soon â€” not joinable yet"
+   Status filters (not_started / in_progress / completed) exclude Incoming.
+   Join / assertCanPlay / deep-link detail for non-owners: still blocked until live
+   (scheduled remains 404/unavailable for strangers; mid-hunt after End allowed).
+
+   25.9 API SURFACE (summary)
+   - GET/POST publish-verify; POST/DELETE /events/:id/schedule; POST /events/:id/end
+   - GET/PATCH /admin/settings â€” { eventLiveDurationDays } (ADMIN/STAFF)
+   - PATCH publish (isActive true) schedules auto-end
+   - shared-types: scheduledPublishAt, endsAt, endedAt; AppSettings
+   - Migrations: *_event_ends_at, *_app_settings (default event_live_duration_days=2)
+   - Dashboard: /dashboard/settings
+
+   25.10 OUT OF SCOPE (v1)
+   - Soft-delete / archive columns beyond endedAt
+   - Reopen Done â†’ Live (staff tool optional later)
+   - Per-event custom live duration in creator UI
+   - Incoming tap â†’ teaser detail page (v1 is card-only, no interaction)
+   - Fuzzy / alternate answers (see event_publish_safety_requirement.txt v1.5)
+
+   Implementation status (section 25):
+     * Answer verify gate (mobile + dashboard checklist): IMPLEMENTED
+     * Report wrong answer + owner live edit answers: IMPLEMENTED
+     * Scheduled publish + BullMQ + safety poll: IMPLEMENTED
+     * endsAt / endedAt + auto-end worker + End early: IMPLEMENTED
+     * My Events 4 tabs + draft delete + End UX + i18n: IMPLEMENTED
+     * AppSetting live duration (default 2) + dashboard Settings: IMPLEMENTED
+     * Public Incoming cards (list/nearby) non-interactive + Starts {{when}}: IMPLEMENTED
+     * Per-event duration / reopen Done / Incoming teaser detail: NOT STARTED
 
 ====================================================
 EXPECTED OUTPUT

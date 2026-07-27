@@ -20,6 +20,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { EventAccessService } from '../events/event-access.service';
 import { AnticheatService } from '../anticheat/anticheat.service';
 import { buildCompletionPayload } from '../events/gift-codes.util';
+import { isAnswerCorrect as matchAnswer } from '../common/utils/answer-match.util';
 
 const COOLDOWN_SECONDS = 5;
 
@@ -596,24 +597,7 @@ export class ProgressService {
     },
     submitted: string,
   ): boolean {
-    const normalized = submitted.trim().toLowerCase();
-    const expected = question.answer.trim().toLowerCase();
-
-    if (question.type === QuestionType.MULTIPLE_CHOICE) {
-      const options = (question.options as string[] | null) ?? [];
-      return (
-        options.some(o => o.trim().toLowerCase() === normalized) &&
-        normalized === expected
-      );
-    }
-
-    if (question.type === QuestionType.TRUE_FALSE) {
-      return normalized === 'true' || normalized === 'false'
-        ? normalized === expected
-        : false;
-    }
-
-    return normalized === expected;
+    return matchAnswer(question, submitted);
   }
 
   private async checkRateLimit(userId: string, action: string) {

@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
 import { RedisService } from '../common/redis/redis.service';
@@ -27,6 +28,7 @@ export class EventAccessService {
     private readonly auth: AuthService,
     private readonly redis: RedisService,
     private readonly userModeration: UserModerationService,
+    private readonly moduleRef: ModuleRef,
   ) {}
 
   isPasswordProtected(event: { joinPasswordHash: string | null }): boolean {
@@ -62,21 +64,100 @@ export class EventAccessService {
   async assertCanPlay(userId: string, eventId: string): Promise<void> {
     await this.userModeration.assertCanPlay(userId);
 
-    const event = await this.prisma.client.event.findUnique({
+    let event = await this.prisma.client.event.findUnique({
       where: { id: eventId },
-      select: { id: true, createdBy: true, joinPasswordHash: true },
+      select: {
+        id: true,
+        createdBy: true,
+        joinPasswordHash: true,
+        isActive: true,
+        scheduledPublishAt: true,
+        endedAt: true,
+      },
     });
     if (!event) {
       throw new NotFoundException('Event not found');
     }
+
+    if (
+      !event.isActive &&
+      !event.endedAt &&
+      event.scheduledPublishAt &&
+      event.scheduledPublishAt.getTime() <= Date.now()
+    ) {
+      await this.ensureLiveIfDue(eventId);
+      event = await this.reloadAccessEvent(eventId);
+      if (!event) throw new NotFoundException('Event not found');
+    }
+
+    await this.ensureEndedIfDue(eventId);
+    event = await this.reloadAccessEvent(eventId);
+    if (!event) throw new NotFoundException('Event not found');
+
+    if ((!event.isActive || event.endedAt) && event.createdBy !== userId) {
+      const progress = await this.prisma.client.userEventProgress.findUnique({
+        where: { userId_eventId: { userId, eventId } },
+        select: { id: true },
+      });
+      if (!progress) {
+        throw new NotFoundException('Event not found');
+      }
+    }
+
     if (await this.hasAccess(userId, event)) {
       return;
     }
     throw new ForbiddenException('Password required to play this event');
   }
 
+  private async reloadAccessEvent(eventId: string) {
+    return this.prisma.client.event.findUnique({
+      where: { id: eventId },
+      select: {
+        id: true,
+        createdBy: true,
+        joinPasswordHash: true,
+        isActive: true,
+        scheduledPublishAt: true,
+        endedAt: true,
+      },
+    });
+  }
+
+  private async ensureLiveIfDue(eventId: string): Promise<void> {
+    try {
+      const { ScheduledPublishService } = await import(
+        './scheduled-publish.service'
+      );
+      const service = this.moduleRef.get(ScheduledPublishService, {
+        strict: false,
+      });
+      if (service) {
+        await service.ensureLiveIfDue(eventId);
+      }
+    } catch {
+      // Optional when circular/missing
+    }
+  }
+
+  private async ensureEndedIfDue(eventId: string): Promise<void> {
+    try {
+      const { EventEndService } = await import('./event-end.service');
+      const service = this.moduleRef.get(EventEndService, {
+        strict: false,
+      });
+      if (service) {
+        await service.ensureEndedIfDue(eventId);
+      }
+    } catch {
+      // Optional when circular/missing
+    }
+  }
+
   async joinEvent(userId: string, eventId: string, password: string) {
     await this.userModeration.assertCanPlay(userId);
+    await this.ensureLiveIfDue(eventId);
+    await this.ensureEndedIfDue(eventId);
 
     const event = await this.prisma.client.event.findUnique({
       where: { id: eventId },
@@ -85,12 +166,13 @@ export class EventAccessService {
         createdBy: true,
         joinPasswordHash: true,
         isActive: true,
+        endedAt: true,
       },
     });
     if (!event) {
       throw new NotFoundException('Event not found');
     }
-    if (!event.isActive) {
+    if (!event.isActive || event.endedAt) {
       throw new NotFoundException('Event not found');
     }
     if (!this.isPasswordProtected(event)) {

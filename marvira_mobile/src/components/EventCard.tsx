@@ -31,8 +31,12 @@ export const EventCard: React.FC<EventCardProps> = ({
   onFavoritePress,
 }) => {
   const { t } = useTranslation();
+  const isIncoming = !!event.isIncoming;
 
   const getStatusColor = () => {
+    if (isIncoming) {
+      return colors.info;
+    }
     switch (event.status) {
       case 'completed':
         return colors.completed;
@@ -47,11 +51,12 @@ export const EventCard: React.FC<EventCardProps> = ({
     ? (event.completedPlaces / event.totalPlaces) * 100
     : 0;
 
-  return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={onPress}
-      activeOpacity={0.8}>
+  const startWhen = event.scheduledPublishAt
+    ? new Date(event.scheduledPublishAt).toLocaleString()
+    : '';
+
+  const body = (
+    <>
       {event.imageUrl ? (
         <Image source={{ uri: event.imageUrl }} style={styles.image} />
       ) : (
@@ -62,7 +67,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           end={{ x: 1, y: 1 }}
         />
       )}
-      {onFavoritePress ? (
+      {!isIncoming && onFavoritePress ? (
         <FavoriteButton
           isFavorite={!!isFavorite}
           onPress={onFavoritePress}
@@ -91,10 +96,18 @@ export const EventCard: React.FC<EventCardProps> = ({
           <View
             style={[styles.statusBadge, { backgroundColor: getStatusColor() }]}>
             <Text style={styles.statusText}>
-              {t(`eventStatus.${event.status}`)}
+              {isIncoming
+                ? t('eventStatus.incoming')
+                : t(`eventStatus.${event.status}`)}
             </Text>
           </View>
         </View>
+
+        {isIncoming && startWhen ? (
+          <Text style={styles.incomingLine}>
+            {t('events.startsAt', { when: startWhen })}
+          </Text>
+        ) : null}
 
         <Text style={styles.description} numberOfLines={2}>
           {event.description}
@@ -110,21 +123,48 @@ export const EventCard: React.FC<EventCardProps> = ({
             </View>
           )}
 
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { width: `${progress}%`, backgroundColor: getStatusColor() },
-                ]}
-              />
+          {!isIncoming ? (
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBar}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${progress}%`,
+                      backgroundColor: getStatusColor(),
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.progressText}>
+                {event.completedPlaces}/{event.totalPlaces} {t('common.places')}
+              </Text>
             </View>
-            <Text style={styles.progressText}>
-              {event.completedPlaces}/{event.totalPlaces} {t('common.places')}
-            </Text>
-          </View>
+          ) : (
+            <Text style={styles.incomingHint}>{t('events.incomingHint')}</Text>
+          )}
         </View>
       </View>
+    </>
+  );
+
+  if (isIncoming) {
+    return (
+      <View
+        style={[styles.container, styles.incomingContainer]}
+        accessibilityState={{ disabled: true }}
+        accessibilityHint={t('events.incomingHint')}>
+        {body}
+      </View>
+    );
+  }
+
+  return (
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
+      activeOpacity={0.8}>
+      {body}
     </TouchableOpacity>
   );
 };
@@ -143,6 +183,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
     position: 'relative',
+  },
+  incomingContainer: {
+    opacity: 0.92,
   },
   favoriteButton: {
     position: 'absolute',
@@ -201,6 +244,17 @@ const styles = StyleSheet.create({
     fontSize: fontSize.xs,
     color: colors.background,
     fontWeight: fontWeight.semibold,
+  },
+  incomingLine: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+    color: colors.info,
+    marginBottom: spacing.sm,
+  },
+  incomingHint: {
+    fontSize: fontSize.xs,
+    color: colors.textSecondary,
+    fontWeight: fontWeight.medium,
   },
   description: {
     fontSize: fontSize.sm,

@@ -1,9 +1,10 @@
-import { Controller, Post, Patch, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Post, Patch, Delete, Body, Param, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto, UpdateQuestionDto } from './dto/question.dto';
 import { Roles } from '../common/decorators/roles.decorator';
+import { RequestUser } from '../common/types/request-user';
 
 @ApiTags('questions')
 @Controller('questions')
@@ -20,10 +21,19 @@ export class QuestionsController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN, UserRole.STAFF)
-  @ApiOperation({ summary: 'Update question (admin/staff)' })
-  async update(@Param('id') id: string, @Body() dto: UpdateQuestionDto) {
-    const data = await this.questionsService.update(id, dto);
+  @Roles(UserRole.ADMIN, UserRole.STAFF, UserRole.USER)
+  @ApiOperation({ summary: 'Update question (owner, admin, or staff)' })
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateQuestionDto,
+    @Req() req: { user: RequestUser },
+  ) {
+    const data = await this.questionsService.updateForUser(
+      id,
+      req.user.id,
+      req.user.role,
+      dto,
+    );
     return { success: true, data };
   }
 

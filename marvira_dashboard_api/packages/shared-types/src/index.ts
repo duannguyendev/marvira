@@ -54,6 +54,12 @@ export interface Event {
   difficulty: EventDifficulty;
   rewardPoints: number;
   isActive: boolean;
+  /** When set and isActive=false, event goes live at this UTC instant */
+  scheduledPublishAt?: string | null;
+  /** When the live event is scheduled to auto-end (UTC) */
+  endsAt?: string | null;
+  /** When the event actually ended (manual or auto) */
+  endedAt?: string | null;
   language: ContentLanguage | string;
   isPasswordProtected: boolean;
   hasAccess?: boolean;
@@ -98,6 +104,8 @@ export interface Question {
   explanation: string | null;
   points: number;
   language?: ContentLanguage | string;
+  /** Set when the stored answer was changed after create */
+  answerUpdatedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -566,3 +574,13 @@ export interface CreateArticleDto {
 }
 
 export interface UpdateArticleDto extends Partial<CreateArticleDto> {}
+
+/** Global product settings editable by ADMIN/STAFF in the dashboard. */
+export interface AppSettings {
+  /** Days a live event stays searchable before auto-ending (1–3650). */
+  eventLiveDurationDays: number;
+}
+
+export interface UpdateAppSettingsDto {
+  eventLiveDurationDays?: number;
+}

@@ -6,6 +6,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
+import { EventPublishModule } from './events/event-publish.module';
 import { PlacesModule } from './places/places.module';
 import { QuestionsModule } from './questions/questions.module';
 import { ProgressModule } from './progress/progress.module';
@@ -27,6 +28,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { AnticheatModule } from './anticheat/anticheat.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { ArticlesModule } from './articles/articles.module';
+import { AppSettingsModule } from './settings/app-settings.module';
 
 const redisDisabled = process.env.REDIS_DISABLED === 'true';
 
@@ -35,6 +37,7 @@ const redisDisabled = process.env.REDIS_DISABLED === 'true';
     ConfigModule.forRoot({ isGlobal: true }),
     EmailModule,
     MetricsModule,
+    AppSettingsModule,
     ThrottlerModule.forRoot([
       { name: 'short', ttl: 1000, limit: 10 },
       { name: 'medium', ttl: 60000, limit: 100 },
@@ -61,7 +64,7 @@ const redisDisabled = process.env.REDIS_DISABLED === 'true';
     ProgressModule,
     AnalyticsModule,
     UploadsModule,
-    ...(redisDisabled ? [] : [NotificationsModule]),
+    ...(redisDisabled ? [] : [NotificationsModule, EventPublishModule]),
     AdminModule,
     HealthModule,
     LeaderboardModule,

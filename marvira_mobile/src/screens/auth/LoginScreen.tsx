@@ -34,8 +34,8 @@ export const LoginScreen: React.FC = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const { login, isLoggingIn, loginError } = useAuth();
 
-  const [email, setEmail] = useState('user@example.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('demo@marvira.com');
+  const [password, setPassword] = useState('demo123');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {},
   );

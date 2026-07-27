@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { MapPicker } from '@/features/events/map-picker';
 import { PlaceEditor } from '@/features/events/place-editor';
 import { AddPlaceForm } from '@/features/events/add-place-form';
+import { PublishReviewDialog } from '@/features/events/publish-review-dialog';
 import { EventDifficulty, type AdminEvent } from '@marvira/shared-types';
 import {
   createEditEventSchema,
@@ -35,6 +36,10 @@ export default function EditEventPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [publishReviewOpen, setPublishReviewOpen] = useState(false);
+  const [pendingPublish, setPendingPublish] = useState<EventFormValues | null>(
+    null,
+  );
 
   const { data: event, isLoading } = useQuery({
     queryKey: ['admin-event', id],
@@ -48,6 +53,20 @@ export default function EditEventPage() {
   );
 
   const placesWithoutQuestion = places.filter(p => !p.question).length;
+
+  const { data: answerReports } = useQuery({
+    queryKey: ['event-answer-reports', id],
+    queryFn: () =>
+      api.get<
+        Array<{
+          placeId: string;
+          placeTitle: string;
+          orderIndex: number;
+          reporterCount: number;
+          lastReportedAt: string | null;
+        }>
+      >(`/events/${id}/answer-reports`),
+  });
 
   const {
     register,
@@ -98,8 +117,13 @@ export default function EditEventPage() {
   };
 
   const updateMutation = useMutation({
-    mutationFn: (data: EventFormValues) =>
-      api.patch(`/events/${id}`, normalizeGiftFields(data)),
+    mutationFn: (data: EventFormValues & { publishReviewConfirmed?: boolean }) =>
+      api.patch(`/events/${id}`, {
+        ...normalizeGiftFields(data),
+        ...(data.publishReviewConfirmed
+          ? { publishReviewConfirmed: true }
+          : {}),
+      }),
     onSuccess: () => {
       invalidateEvent();
       toast.success('Event saved');
@@ -191,7 +215,14 @@ export default function EditEventPage() {
                 );
                 return;
               }
-              updateMutation.mutate(result.data);
+              const values = result.data;
+              const publishingNow = values.isActive && !event.isActive;
+              if (publishingNow) {
+                setPendingPublish(values);
+                setPublishReviewOpen(true);
+                return;
+              }
+              updateMutation.mutate(values);
             })}
             className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -271,6 +302,58 @@ export default function EditEventPage() {
                 />
                 <Label htmlFor="isActive">Published</Label>
               </div>
+              {event.scheduledPublishAt && !event.isActive ? (
+                <div className="space-y-2 rounded-md border border-border p-3">
+                  <p className="text-sm text-muted-foreground">
+                    Scheduled · goes live{' '}
+                    {new Date(event.scheduledPublishAt).toLocaleString()}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setPendingPublish({
+                          title: event.title,
+                          description: event.description,
+                          city: event.city,
+                          difficulty: event.difficulty as EventFormValues['difficulty'],
+                          rewardPoints: event.rewardPoints,
+                          isActive: false,
+                          language:
+                            (event.language as EventFormValues['language']) ??
+                            'vi',
+                          completionMessage: event.completionMessage ?? '',
+                          giftTeaser: event.giftTeaser ?? '',
+                          giftCodes: event.giftCodes ?? [],
+                        });
+                        setPublishReviewOpen(true);
+                      }}>
+                      Reschedule
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          await api.delete(`/events/${id}/schedule`);
+                          invalidateEvent();
+                          toast.success('Schedule cancelled');
+                        } catch (err) {
+                          toast.error(
+                            err instanceof Error
+                              ? err.message
+                              : 'Failed to cancel schedule',
+                          );
+                        }
+                      }}>
+                      Cancel schedule
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
               {errors.isActive && (
                 <p className="text-sm text-destructive">
                   {errors.isActive.message}
@@ -376,6 +459,35 @@ export default function EditEventPage() {
         />
       </div>
 
+      {answerReports &&
+      answerReports.some(r => r.reporterCount > 0) ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Wrong-answer reports</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {answerReports
+              .filter(r => r.reporterCount > 0)
+              .map(r => (
+                <div
+                  key={r.placeId}
+                  className="flex items-center justify-between rounded-md border px-3 py-2">
+                  <span>
+                    {r.orderIndex + 1}. {r.placeTitle}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {r.reporterCount} report
+                    {r.reporterCount === 1 ? '' : 's'}
+                    {r.lastReportedAt
+                      ? ` · last ${new Date(r.lastReportedAt).toLocaleString()}`
+                      : ''}
+                  </span>
+                </div>
+              ))}
+          </CardContent>
+        </Card>
+      ) : null}
+
       {places.length > 0 && (
         <MapPicker
           places={places}
@@ -400,6 +512,39 @@ export default function EditEventPage() {
           />
         ))}
       </div>
+
+      <PublishReviewDialog
+        open={publishReviewOpen}
+        onOpenChange={setPublishReviewOpen}
+        places={places}
+        onConfirmPublish={() => {
+          if (!pendingPublish) return;
+          updateMutation.mutate({
+            ...pendingPublish,
+            publishReviewConfirmed: true,
+          });
+          setPublishReviewOpen(false);
+          setPendingPublish(null);
+        }}
+        onConfirmSchedule={async scheduledPublishAt => {
+          if (!pendingPublish) return;
+          try {
+            await api.patch(`/events/${id}`, normalizeGiftFields(pendingPublish));
+            await api.post(`/events/${id}/schedule`, {
+              scheduledPublishAt,
+              publishReviewConfirmed: true,
+            });
+            invalidateEvent();
+            toast.success('Event scheduled');
+            setPublishReviewOpen(false);
+            setPendingPublish(null);
+          } catch (err) {
+            toast.error(
+              err instanceof Error ? err.message : 'Failed to schedule',
+            );
+          }
+        }}
+      />
     </div>
   );
 }

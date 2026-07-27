@@ -200,4 +200,14 @@ export const placesApi = {
       },
     };
   },
+
+  reportWrongAnswer: async (
+    placeId: string,
+  ): Promise<{ message: string; alreadyReported: boolean }> => {
+    const response = await apiClient.post<{
+      success: boolean;
+      data: { message: string; alreadyReported: boolean };
+    }>(`/places/${placeId}/report-wrong-answer`);
+    return response.data.data;
+  },
 };

@@ -56,6 +56,11 @@ export interface Event {
   /** Owner-only on detail; also on completion payload */
   completionMessage?: string | null;
   language?: string;
+  /** False for scheduled Incoming hunts not yet live */
+  isActive?: boolean;
+  scheduledPublishAt?: string | null;
+  /** Derived: scheduled for future go-live; shown in search but not tappable */
+  isIncoming?: boolean;
 }
 
 export interface EventDetails extends Event {
@@ -91,6 +96,7 @@ export interface PlaceQuestion {
   imageUrl?: string;
   options?: string[];
   points: number;
+  answerUpdatedAt?: string | null;
 }
 
 // Answer Types
@@ -166,8 +172,18 @@ export interface EventFilters {
 
 export type EventDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
 
+export type MyEventLifecycleStatus =
+  | 'draft'
+  | 'scheduled'
+  | 'published'
+  | 'done';
+
 export interface MyCreatedEvent extends Event {
   isPublished: boolean;
+  scheduledPublishAt?: string | null;
+  endsAt?: string | null;
+  endedAt?: string | null;
+  lifecycleStatus: MyEventLifecycleStatus;
   difficulty: EventDifficulty;
 }
 
@@ -189,6 +205,11 @@ export interface PublishEventInput {
   completionMessage?: string | null;
   giftTeaser?: string | null;
   giftCodes?: string[];
+}
+
+export interface SchedulePublishInput extends PublishEventInput {
+  /** ISO-8601 UTC instant */
+  scheduledPublishAt: string;
 }
 
 export interface EventCompletionInfo {

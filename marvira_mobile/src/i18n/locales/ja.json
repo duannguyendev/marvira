@@ -35,6 +35,8 @@
     "createEvent": "イベント作成",
     "addPlace": "場所を追加",
     "reviewEvent": "イベント確認",
+    "answerVerify": "回答チェック",
+    "editAnswers": "回答を編集",
     "eventCreated": "イベント作成完了",
     "myEvents": "マイイベント",
     "practice": "練習",
@@ -153,6 +155,8 @@
     "progressComplete": "{{progress}}% 完了（{{completed}}/{{total}} スポット）",
     "visitHint": "順番にスポットを訪問してください。各スポットの範囲内に入るとロック解除され、質問に答えられます。",
     "viewLeaderboard": "ランキングを見る",
+    "startsAt": "{{when}} に開始",
+    "incomingHint": "まもなく公開 — まだ参加できません",
     "placesCount": "スポット（{{count}}）",
     "shareA11y": "このハントを共有",
     "shareMessage": "「{{title}}」に参加しよう — Marviraの宝探し！\n{{url}}",
@@ -174,7 +178,8 @@
   "eventStatus": {
     "not_started": "未開始",
     "in_progress": "進行中",
-    "completed": "完了"
+    "completed": "完了",
+    "incoming": "近日公開"
   },
   "placeStatus": {
     "completed": "完了",
@@ -209,7 +214,11 @@
     "completePreviousFirst": "このスポットをアンロックする前に、前のスポットを完了してください。",
     "moveWithinToUnlock": "{{radius}} メートル以内に移動してロックを解除し、質問に答えてください。",
     "tryUnlockNow": "今すぐ解除を試す",
-    "enterYourAnswer": "回答を入力"
+    "enterYourAnswer": "回答を入力",
+    "reportProblem": "問題を報告",
+    "reportSentTitle": "報告を送信しました",
+    "answerUpdated": "回答が更新されました — 新しい回答でもう一度試してください。",
+    "hintLabel": "ヒント"
   },
   "anticheat": {
     "title": "位置情報のお知らせ",
@@ -327,6 +336,49 @@
     "createFailed": "イベントの作成に失敗しました",
     "placeFailed": "場所の保存に失敗しました",
     "publishFailed": "イベントの公開に失敗しました",
+    "verify": {
+      "heading": "回答チェック",
+      "subheading": "公開前に各正解を再入力して誤字を防ぎます。",
+      "progress": "{{verified}} / {{total}} 確認済み",
+      "typeAnswer": "回答を再入力（貼り付け不可）",
+      "checkAnswer": "回答を確認",
+      "mismatchTitle": "一致しません",
+      "mismatchMessage": "保存済みの回答と一致しません。再試行するか回答を編集してください。",
+      "editAnswer": "回答を編集",
+      "retry": "再試行",
+      "answerRequired": "先に回答を入力してください。",
+      "verified": "確認済み",
+      "allDoneTitle": "すべての回答を確認しました",
+      "allDoneMessage": "確認画面から公開またはスケジュールできます。",
+      "backToReview": "確認に戻る",
+      "saveAndResume": "進捗を保存して確認に戻る",
+      "checklistItem": "回答確認済み（{{verified}}/{{total}}）",
+      "checklistPending": "公開前に回答チェックが必要です",
+      "startVerify": "回答チェックを開始",
+      "resumeVerify": "回答チェックを続ける"
+    },
+    "schedule": {
+      "cta": "公開を予約",
+      "confirm": "予約を確定",
+      "helper": "ローカル日時を選択。UTCで保存し、その瞬間に公開します。",
+      "localLabel": "公開時刻（ローカル）",
+      "tapToChange": "タップして日時を変更",
+      "placeholder": "2026-08-01T19:00",
+      "invalid": "形式は YYYY-MM-DDTHH:mm",
+      "mustBeFuture": "未来の時刻を選んでください",
+      "failed": "公開予約に失敗しました",
+      "successTitle": "公開を予約しました！",
+      "successMessage": "イベントは {{when}}（ローカル時刻）に公開されます。"
+    },
+    "editAnswers": {
+      "heading": "回答を編集",
+      "subheading": "すでに通過したプレイヤーの記録は保持されます。新しい挑戦は新しい回答を使います。",
+      "save": "回答を保存",
+      "savedTitle": "回答を更新しました",
+      "savedMessage": "新しい回答が反映されました。詰まったプレイヤーは再挑戦できます。",
+      "updatedTag": "以前に更新済み",
+      "reportCount": "誤答レポート {{count}} 件"
+    },
     "access": {
       "heading": "誰がプレイできますか？",
       "subheading": "誰でも参加できるか、パスワードを知っている人だけにするかを選びます。",
@@ -372,7 +424,43 @@
     "emptyMessage": "位置ベースのハントを作成して共有しましょう。",
     "loadFailed": "イベントの読み込みに失敗しました",
     "published": "公開中",
-    "draft": "下書き"
+    "draft": "下書き",
+    "viewFinishers": "完走者を見る",
+    "editGifts": "ギフトを編集",
+    "editAnswers": "回答を編集",
+    "scheduled": "予約済み",
+    "goesLive": "{{when}} に公開",
+    "cancelSchedule": "予約をキャンセル",
+    "reschedule": "時間を変更",
+    "continuePublish": "続ける / 公開",
+    "managePublish": "確認 / 公開",
+    "deleteDraft": "下書きを削除",
+    "deleteTitle": "下書きを削除しますか？",
+    "deleteMessage": "「{{title}}」を削除しますか？この操作は取り消せません。",
+    "deleteFailed": "下書きの削除に失敗しました",
+    "endEvent": "終了する",
+    "endTitle": "イベントを終了しますか？",
+    "endMessage": "「{{title}}」を今すぐ終了しますか？公開検索から消えます。すでに開始したプレイヤーは完走できます。",
+    "endFailed": "イベントの終了に失敗しました",
+    "endsAt": "{{when}} に終了",
+    "endedAt": "{{when}} に終了済み",
+    "done": "終了",
+    "tabs": {
+      "draft": "下書き",
+      "scheduled": "予約",
+      "published": "公開中",
+      "done": "終了"
+    },
+    "empty": {
+      "draftTitle": "下書きはありません",
+      "draftMessage": "ハントを作成して下書き保存するとここに表示されます。",
+      "scheduledTitle": "予約はありません",
+      "scheduledMessage": "下書きの公開予約をするとここに表示されます。",
+      "publishedTitle": "公開中のイベントはありません",
+      "publishedMessage": "ハントを公開するとプレイヤーが検索できます。",
+      "doneTitle": "終了したイベントはありません",
+      "doneMessage": "終了したハントは履歴としてここに残ります。"
+    }
   },
   "practice": {
     "heading": "練習",

@@ -82,11 +82,15 @@ export type HomeStackParamList = {
   GlobalLeaderboard: undefined;
   CreateEventInfo: undefined;
   CreateEventPlace: { eventId: string; placeIndex: number };
-  CreateEventReview: { eventId: string };
+  CreateEventReview: { eventId: string; verifyComplete?: boolean; returnAction?: 'publish' };
+  AnswerVerify: { eventId: string; returnAction?: 'publish' };
   CreateEventSuccess: {
     eventId: string;
     published: boolean;
+    scheduled?: boolean;
+    scheduledPublishAt?: string;
     joinPassword?: string;
   };
   EditEventGifts: { eventId: string };
+  EditEventAnswers: { eventId: string; returnToVerify?: boolean };
 };

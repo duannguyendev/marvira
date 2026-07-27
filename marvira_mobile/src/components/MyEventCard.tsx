@@ -10,6 +10,12 @@ interface MyEventCardProps {
   onPress: () => void;
   onFinishersPress?: () => void;
   onEditGiftsPress?: () => void;
+  onEditAnswersPress?: () => void;
+  onCancelSchedulePress?: () => void;
+  onReschedulePress?: () => void;
+  onContinuePublishPress?: () => void;
+  onDeletePress?: () => void;
+  onEndPress?: () => void;
 }
 
 export const MyEventCard: React.FC<MyEventCardProps> = ({
@@ -17,8 +23,15 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
   onPress,
   onFinishersPress,
   onEditGiftsPress,
+  onEditAnswersPress,
+  onCancelSchedulePress,
+  onReschedulePress,
+  onContinuePublishPress,
+  onDeletePress,
+  onEndPress,
 }) => {
   const { t } = useTranslation();
+  const status = event.lifecycleStatus;
 
   return (
     <TouchableOpacity
@@ -43,15 +56,40 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
           <View
             style={[
               styles.badge,
-              event.isPublished ? styles.publishedBadge : styles.draftBadge,
+              status === 'published'
+                ? styles.publishedBadge
+                : status === 'scheduled'
+                  ? styles.scheduledBadge
+                  : status === 'done'
+                    ? styles.doneBadge
+                    : styles.draftBadge,
             ]}>
             <Text style={styles.badgeText}>
-              {event.isPublished
-                ? t('myEvents.published')
-                : t('myEvents.draft')}
+              {t(`myEvents.${status}`)}
             </Text>
           </View>
         </View>
+        {status === 'scheduled' && event.scheduledPublishAt ? (
+          <Text style={styles.scheduleLine}>
+            {t('myEvents.goesLive', {
+              when: new Date(event.scheduledPublishAt).toLocaleString(),
+            })}
+          </Text>
+        ) : null}
+        {status === 'published' && event.endsAt ? (
+          <Text style={styles.scheduleLine}>
+            {t('myEvents.endsAt', {
+              when: new Date(event.endsAt).toLocaleString(),
+            })}
+          </Text>
+        ) : null}
+        {status === 'done' && event.endedAt ? (
+          <Text style={styles.endedLine}>
+            {t('myEvents.endedAt', {
+              when: new Date(event.endedAt).toLocaleString(),
+            })}
+          </Text>
+        ) : null}
         <Text style={styles.meta}>
           {event.city} · {t(`createEvent.difficulties.${event.difficulty}`)} ·{' '}
           {event.totalPlaces} {t('common.places')}
@@ -61,7 +99,62 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
           {event.description}
         </Text>
         <View style={styles.actions}>
-          {onEditGiftsPress ? (
+          {(status === 'draft' || status === 'scheduled') &&
+          onContinuePublishPress ? (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onContinuePublishPress();
+              }}
+              style={styles.actionLink}
+              accessibilityRole="button">
+              <Text style={styles.actionLinkText}>
+                {status === 'scheduled'
+                  ? t('myEvents.managePublish')
+                  : t('myEvents.continuePublish')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {status === 'scheduled' && onReschedulePress ? (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onReschedulePress();
+              }}
+              style={styles.actionLink}
+              accessibilityRole="button">
+              <Text style={styles.actionLinkText}>
+                {t('myEvents.reschedule')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {status === 'scheduled' && onCancelSchedulePress ? (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onCancelSchedulePress();
+              }}
+              style={styles.actionLink}
+              accessibilityRole="button">
+              <Text style={styles.actionLinkText}>
+                {t('myEvents.cancelSchedule')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {status !== 'done' && onEditAnswersPress ? (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onEditAnswersPress();
+              }}
+              style={styles.actionLink}
+              accessibilityRole="button">
+              <Text style={styles.actionLinkText}>
+                {t('myEvents.editAnswers')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {status !== 'done' && onEditGiftsPress ? (
             <TouchableOpacity
               onPress={e => {
                 e.stopPropagation?.();
@@ -74,7 +167,8 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
               </Text>
             </TouchableOpacity>
           ) : null}
-          {event.isPublished && onFinishersPress ? (
+          {(status === 'published' || status === 'done') &&
+          onFinishersPress ? (
             <TouchableOpacity
               onPress={e => {
                 e.stopPropagation?.();
@@ -84,6 +178,32 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
               accessibilityRole="button">
               <Text style={styles.actionLinkText}>
                 {t('myEvents.viewFinishers')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {status === 'published' && onEndPress ? (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onEndPress();
+              }}
+              style={styles.actionLink}
+              accessibilityRole="button">
+              <Text style={[styles.actionLinkText, styles.endLinkText]}>
+                {t('myEvents.endEvent')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {(status === 'draft' || status === 'scheduled') && onDeletePress ? (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onDeletePress();
+              }}
+              style={styles.actionLink}
+              accessibilityRole="button">
+              <Text style={[styles.actionLinkText, styles.deleteLinkText]}>
+                {t('myEvents.deleteDraft')}
               </Text>
             </TouchableOpacity>
           ) : null}
@@ -136,6 +256,24 @@ const styles = StyleSheet.create({
   draftBadge: {
     backgroundColor: colors.warningLight,
   },
+  scheduledBadge: {
+    backgroundColor: colors.infoLight,
+  },
+  doneBadge: {
+    backgroundColor: colors.backgroundGray,
+  },
+  scheduleLine: {
+    fontSize: fontSize.sm,
+    color: colors.info,
+    fontWeight: fontWeight.medium,
+    marginBottom: spacing.xs,
+  },
+  endedLine: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    fontWeight: fontWeight.medium,
+    marginBottom: spacing.xs,
+  },
   badgeText: {
     fontSize: fontSize.xs,
     fontWeight: fontWeight.semibold,
@@ -164,5 +302,11 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     fontWeight: fontWeight.semibold,
     color: colors.primary,
+  },
+  deleteLinkText: {
+    color: colors.error,
+  },
+  endLinkText: {
+    color: colors.error,
   },
 });

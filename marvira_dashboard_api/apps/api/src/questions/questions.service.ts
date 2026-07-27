@@ -9,6 +9,7 @@ import { QuestionType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { buildPaginatedResponse, parsePagination } from '@marvira/shared-utils';
 import { EventAccessService } from '../events/event-access.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { normalizeContentLanguage } from '../common/content-language';
 
 export interface CreateQuestionInput {
@@ -30,6 +31,7 @@ const publicQuestionSelect = {
   options: true,
   explanation: true,
   points: true,
+  answerUpdatedAt: true,
 } as const;
 
 @Injectable()
@@ -37,6 +39,7 @@ export class QuestionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly eventAccess: EventAccessService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   private validateQuestionData(data: {
@@ -170,6 +173,36 @@ export class QuestionsService {
     });
   }
 
+  async updateForUser(
+    id: string,
+    userId: string,
+    role: string,
+    data: Partial<CreateQuestionInput>,
+  ) {
+    if (role !== 'ADMIN' && role !== 'STAFF') {
+      await this.assertUserOwnsQuestionEvent(id, userId);
+    }
+    return this.update(id, data);
+  }
+
+  private async assertUserOwnsQuestionEvent(
+    questionId: string,
+    userId: string,
+  ) {
+    const place = await this.prisma.client.place.findFirst({
+      where: { questionId },
+      include: { event: { select: { createdBy: true } } },
+    });
+    if (!place) {
+      throw new NotFoundException('Question not linked to an event place');
+    }
+    if (place.event.createdBy !== userId) {
+      throw new ForbiddenException(
+        'You can only edit questions on your own events',
+      );
+    }
+  }
+
   async update(id: string, data: Partial<CreateQuestionInput>) {
     const existing = await this.prisma.client.question.findUnique({
       where: { id },
@@ -192,7 +225,11 @@ export class QuestionsService {
         ? merged.imageUrl
         : null;
 
-    return this.prisma.client.question.update({
+    const answerChanged =
+      data.answer !== undefined &&
+      data.answer.trim().toLowerCase() !== existing.answer.trim().toLowerCase();
+
+    const question = await this.prisma.client.question.update({
       where: { id },
       data: {
         question: data.question,
@@ -200,6 +237,7 @@ export class QuestionsService {
         imageUrl,
         options: data.options,
         answer: data.answer,
+        ...(answerChanged ? { answerUpdatedAt: new Date() } : {}),
         ...(data.language !== undefined
           ? { language: normalizeContentLanguage(data.language) }
           : {}),
@@ -207,6 +245,40 @@ export class QuestionsService {
         points: data.points,
       },
     });
+
+    if (answerChanged) {
+      await this.prisma.client.eventPublishVerifyPass.deleteMany({
+        where: { questionId: id },
+      });
+      await this.notifyReportersOfAnswerUpdate(id);
+    }
+
+    return question;
+  }
+
+  private async notifyReportersOfAnswerUpdate(questionId: string) {
+    const places = await this.prisma.client.place.findMany({
+      where: { questionId },
+      include: { event: { select: { title: true } } },
+    });
+    if (places.length === 0) return;
+
+    const placeIds = places.map(p => p.id);
+    const eventTitle = places[0].event.title;
+    const reports = await this.prisma.client.placeAnswerReport.findMany({
+      where: { placeId: { in: placeIds } },
+      select: { userId: true },
+      distinct: ['userId'],
+    });
+
+    const message = `An answer was updated in ${eventTitle}. You can try again.`;
+    for (const report of reports) {
+      await this.notifications.sendNotification(
+        report.userId,
+        message,
+        'answer_updated',
+      );
+    }
   }
 
   async remove(id: string) {

@@ -40,6 +40,7 @@ export function mapQuestion(apiQuestion: ApiQuestionPublic): PlaceQuestion {
     imageUrl: apiQuestion.imageUrl ?? undefined,
     options: apiQuestion.options ?? undefined,
     points: apiQuestion.points,
+    answerUpdatedAt: apiQuestion.answerUpdatedAt ?? undefined,
   };
 }
 
@@ -77,6 +78,12 @@ export function mapEvent(
   const totalPlaces =
     apiEvent._count?.places ?? apiEvent.places?.length ?? places.length;
   const completedPlaces = places.filter(p => p.isCompleted).length;
+  const scheduledPublishAt = apiEvent.scheduledPublishAt ?? null;
+  const isActive = apiEvent.isActive;
+  const isIncoming =
+    !isActive &&
+    !!scheduledPublishAt &&
+    new Date(scheduledPublishAt).getTime() > Date.now();
 
   return {
     id: apiEvent.id,
@@ -100,6 +107,9 @@ export function mapEvent(
     giftCodes: apiEvent.giftCodes,
     completionMessage: apiEvent.completionMessage ?? null,
     language: apiEvent.language,
+    isActive,
+    scheduledPublishAt,
+    isIncoming,
   };
 }
 

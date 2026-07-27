@@ -13,6 +13,7 @@ import {
   CreateQuestionInput,
   MyCreatedEvent,
   PublishEventInput,
+  SchedulePublishInput,
 } from '../types';
 import { apiClient } from './client';
 import { mapEvent } from './mappers';
@@ -20,9 +21,23 @@ import { mapEvent } from './mappers';
 function mapMyCreatedEvent(apiEvent: ApiEvent): MyCreatedEvent {
   const base = mapEvent(apiEvent);
   const firstPlace = apiEvent.places?.[0];
+  const endedAt = apiEvent.endedAt ?? null;
+  const scheduledPublishAt = apiEvent.scheduledPublishAt ?? null;
+  const isPublished = apiEvent.isActive && !endedAt;
+  const lifecycleStatus: MyCreatedEvent['lifecycleStatus'] = endedAt
+    ? 'done'
+    : isPublished
+      ? 'published'
+      : scheduledPublishAt
+        ? 'scheduled'
+        : 'draft';
   return {
     ...base,
-    isPublished: apiEvent.isActive,
+    isPublished,
+    scheduledPublishAt,
+    endsAt: apiEvent.endsAt ?? null,
+    endedAt,
+    lifecycleStatus,
     difficulty:
       (apiEvent.difficulty as MyCreatedEvent['difficulty']) ?? 'MEDIUM',
     location: firstPlace
@@ -142,6 +157,53 @@ export const eventCreationApi = {
       success: boolean;
       data: ApiEvent;
     }>(`/events/${eventId}`, { isActive: true, ...input });
+    return response.data.data;
+  },
+
+  schedulePublish: async (
+    eventId: string,
+    input: SchedulePublishInput,
+  ): Promise<{ id: string; scheduledPublishAt: string | null }> => {
+    const { scheduledPublishAt, ...rest } = input;
+    if (Object.keys(rest).length > 0) {
+      await apiClient.patch(`/events/${eventId}`, rest);
+    }
+    const response = await apiClient.post<{
+      success: boolean;
+      data: { id: string; scheduledPublishAt: string | null };
+    }>(`/events/${eventId}/schedule`, { scheduledPublishAt });
+    return response.data.data;
+  },
+
+  cancelSchedule: async (
+    eventId: string,
+  ): Promise<{ id: string; scheduledPublishAt: string | null }> => {
+    const response = await apiClient.delete<{
+      success: boolean;
+      data: { id: string; scheduledPublishAt: string | null };
+    }>(`/events/${eventId}/schedule`);
+    return response.data.data;
+  },
+
+  deleteEvent: async (eventId: string): Promise<void> => {
+    await apiClient.delete(`/events/${eventId}`);
+  },
+
+  endEvent: async (
+    eventId: string,
+  ): Promise<{
+    id: string;
+    endsAt: string | null;
+    endedAt: string | null;
+  }> => {
+    const response = await apiClient.post<{
+      success: boolean;
+      data: {
+        id: string;
+        endsAt: string | null;
+        endedAt: string | null;
+      };
+    }>(`/events/${eventId}/end`);
     return response.data.data;
   },
 

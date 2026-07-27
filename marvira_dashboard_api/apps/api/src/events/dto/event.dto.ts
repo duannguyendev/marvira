@@ -206,6 +206,14 @@ export class UpdateEventDto {
   @IsString({ each: true })
   @MaxLength(64, { each: true })
   giftCodes?: string[];
+
+  @ApiPropertyOptional({
+    description:
+      'Admin/staff dashboard publish checklist confirmed (web only; not a mobile bypass)',
+  })
+  @IsOptional()
+  @IsBoolean()
+  publishReviewConfirmed?: boolean;
 }
 
 export class JoinEventDto {

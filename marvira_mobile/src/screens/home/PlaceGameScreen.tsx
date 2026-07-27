@@ -76,6 +76,7 @@ export const PlaceGameScreen: React.FC = () => {
   const [answer, setAnswer] = useState('');
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [distance, setDistance] = useState<number | null>(null);
+  const [hadIncorrectAttempt, setHadIncorrectAttempt] = useState(false);
   const unlockAttemptedRef = useRef(false);
   const completingRef = useRef(false);
 
@@ -177,6 +178,32 @@ export const PlaceGameScreen: React.FC = () => {
     }
   }, [location, place, attemptUnlock]);
 
+  const handleReportWrongAnswer = async () => {
+    try {
+      const result = await placesApi.reportWrongAnswer(placeId);
+      Alert.alert(t('game.reportSentTitle'), result.message);
+    } catch (error: any) {
+      analytics.recordError(error);
+      Alert.alert(
+        t('common.error'),
+        error?.response?.data?.message || error.message || t('common.error'),
+      );
+    }
+  };
+
+  const showIncorrectAlert = (message: string) => {
+    Alert.alert(t('game.incorrect'), message || t('game.tryAgain'), [
+      {
+        text: t('game.reportProblem'),
+        style: 'cancel',
+        onPress: () => {
+          void handleReportWrongAnswer();
+        },
+      },
+      { text: t('game.tryAgain'), style: 'default' },
+    ]);
+  };
+
   const handleSubmitAnswer = async () => {
     if (!answer.trim()) {
       Alert.alert(t('common.error'), t('game.enterAnswer'));
@@ -275,10 +302,8 @@ export const PlaceGameScreen: React.FC = () => {
           ],
         );
       } else {
-        Alert.alert(
-          t('game.incorrect'),
-          response.data.message || t('game.tryAgain'),
-        );
+        setHadIncorrectAttempt(true);
+        showIncorrectAlert(response.data.message || t('game.tryAgain'));
       }
     } catch (error: any) {
       analytics.recordError(error);
@@ -393,11 +418,39 @@ export const PlaceGameScreen: React.FC = () => {
               {questionLoading ? (
                 <LoadingSpinner />
               ) : question ? (
-                <QuestionRenderer
-                  question={question}
-                  answer={answer}
-                  onChangeAnswer={setAnswer}
-                />
+                <>
+                  {question.answerUpdatedAt ? (
+                    <View style={styles.updatedBanner}>
+                      <Text style={styles.updatedBannerText}>
+                        {t('game.answerUpdated')}
+                      </Text>
+                    </View>
+                  ) : null}
+                  {hadIncorrectAttempt && place.hint ? (
+                    <View style={styles.hintBanner}>
+                      <Text style={styles.hintBannerLabel}>
+                        {t('game.hintLabel')}
+                      </Text>
+                      <Text style={styles.hintBannerText}>{place.hint}</Text>
+                    </View>
+                  ) : null}
+                  <QuestionRenderer
+                    question={question}
+                    answer={answer}
+                    onChangeAnswer={setAnswer}
+                  />
+                  {hadIncorrectAttempt ? (
+                    <Button
+                      title={t('game.reportProblem')}
+                      onPress={() => {
+                        void handleReportWrongAnswer();
+                      }}
+                      variant="outline"
+                      fullWidth
+                      style={styles.reportButton}
+                    />
+                  ) : null}
+                </>
               ) : (
                 <ErrorView message={t('game.couldNotLoadQuestion')} />
               )}
@@ -503,6 +556,37 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: spacing.sm,
+  },
+  reportButton: {
+    marginBottom: spacing.sm,
+  },
+  updatedBanner: {
+    backgroundColor: colors.infoLight,
+    padding: spacing.sm,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.sm,
+  },
+  updatedBannerText: {
+    fontSize: fontSize.sm,
+    color: colors.info,
+    fontWeight: fontWeight.medium,
+  },
+  hintBanner: {
+    backgroundColor: colors.warningLight ?? colors.infoLight,
+    padding: spacing.sm,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.sm,
+  },
+  hintBannerLabel: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+  },
+  hintBannerText: {
+    fontSize: fontSize.sm,
+    color: colors.textDark,
+    lineHeight: 20,
   },
   lockedContainer: {
     alignItems: 'center',

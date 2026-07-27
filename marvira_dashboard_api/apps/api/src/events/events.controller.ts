@@ -8,13 +8,17 @@ import {
   Param,
   Query,
   Req,
-  UseGuards,
+  Headers,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { EventsService } from './events.service';
 import { EventOwnershipService } from './event-ownership.service';
 import { EventAccessService } from './event-access.service';
+import { PublishVerifyService } from './publish-verify.service';
+import { ScheduledPublishService } from './scheduled-publish.service';
+import { EventEndService } from './event-end.service';
+import { PlaceAnswerReportService } from '../places/place-answer-report.service';
 import {
   CreateEventDto,
   UpdateEventDto,
@@ -27,6 +31,9 @@ import { RequestUser } from '../common/types/request-user';
 import { ProgressService } from '../progress/progress.service';
 import { QuestionsService } from '../questions/questions.service';
 import { LinkQuestionToEventDto } from '../questions/dto/question.dto';
+import { SubmitPublishVerifyDto } from './dto/publish-verify.dto';
+import { SchedulePublishDto } from './dto/schedule-publish.dto';
+import { isDashboardClient } from '../common/utils/client-source.util';
 
 @ApiTags('events')
 @Controller('events')
@@ -37,6 +44,10 @@ export class EventsController {
     private readonly ownershipService: EventOwnershipService,
     private readonly questionsService: QuestionsService,
     private readonly eventAccessService: EventAccessService,
+    private readonly publishVerifyService: PublishVerifyService,
+    private readonly scheduledPublishService: ScheduledPublishService,
+    private readonly eventEndService: EventEndService,
+    private readonly reportService: PlaceAnswerReportService,
   ) {}
 
   @Public()
@@ -130,6 +141,158 @@ export class EventsController {
     return { success: true, data };
   }
 
+  @Get(':id/owner-places')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Places with full questions for owner edit (includes answers)',
+  })
+  async ownerPlaces(
+    @Param('id') id: string,
+    @Req() req: { user: RequestUser },
+  ) {
+    const data = await this.eventsService.getOwnerPlaces(
+      id,
+      req.user.id,
+      req.user.role,
+    );
+    return { success: true, data };
+  }
+
+  @Get(':id/answer-reports')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Wrong-answer report counts per place (owner/staff)' })
+  async answerReports(
+    @Param('id') id: string,
+    @Req() req: { user: RequestUser },
+  ) {
+    const data = await this.reportService.getReportSummaryForEvent(
+      id,
+      req.user.id,
+    );
+    return { success: true, data };
+  }
+
+  @Get(':id/publish-verify/status')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Publish verify progress for draft event' })
+  async publishVerifyStatus(
+    @Param('id') id: string,
+    @Req() req: { user: RequestUser },
+  ) {
+    await this.ownershipService.assertCanManage(id, req.user);
+    const data = await this.publishVerifyService.getStatus(id);
+    return { success: true, data };
+  }
+
+  @Get(':id/publish-verify/questions')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Questions for blind answer verify (answers hidden)',
+  })
+  async publishVerifyQuestions(
+    @Param('id') id: string,
+    @Req() req: { user: RequestUser },
+  ) {
+    await this.ownershipService.assertCanManage(id, req.user);
+    const data = await this.publishVerifyService.getQuestions(id);
+    return { success: true, data };
+  }
+
+  @Post(':id/publish-verify')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Submit one answer for publish verify' })
+  async submitPublishVerify(
+    @Param('id') id: string,
+    @Body() dto: SubmitPublishVerifyDto,
+    @Req() req: { user: RequestUser },
+  ) {
+    await this.ownershipService.assertCanManage(id, req.user);
+    const data = await this.publishVerifyService.submitVerify(
+      id,
+      dto.questionId,
+      dto.answer,
+    );
+    return { success: true, data };
+  }
+
+  @Post(':id/schedule')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Schedule event to go live at a future UTC time' })
+  async schedulePublish(
+    @Param('id') id: string,
+    @Body() dto: SchedulePublishDto,
+    @Req() req: { user: RequestUser },
+    @Headers() headers: Record<string, string | string[] | undefined>,
+  ) {
+    await this.ownershipService.assertCanManage(id, req.user);
+    const at = new Date(dto.scheduledPublishAt);
+    const event = await this.scheduledPublishService.schedulePublish(id, at, {
+      publishReviewConfirmed: dto.publishReviewConfirmed,
+      actorRole: req.user.role,
+      allowChecklistBypass: isDashboardClient(headers),
+    });
+    return {
+      success: true,
+      data: {
+        id: event.id,
+        title: event.title,
+        isActive: event.isActive,
+        scheduledPublishAt: event.scheduledPublishAt,
+      },
+    };
+  }
+
+  @Delete(':id/schedule')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Cancel a pending scheduled publish' })
+  async cancelSchedule(
+    @Param('id') id: string,
+    @Req() req: { user: RequestUser },
+  ) {
+    await this.ownershipService.assertCanManage(id, req.user);
+    const event = await this.scheduledPublishService.cancelSchedule(id);
+    return {
+      success: true,
+      data: {
+        id: event.id,
+        title: event.title,
+        isActive: event.isActive,
+        scheduledPublishAt: event.scheduledPublishAt,
+      },
+    };
+  }
+
+  @Post(':id/end')
+  @Roles(UserRole.USER, UserRole.STAFF, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'End a live event early (removes from public search)',
+  })
+  async endEvent(
+    @Param('id') id: string,
+    @Req() req: { user: RequestUser },
+  ) {
+    await this.ownershipService.assertCanManage(id, req.user);
+    const event = await this.eventEndService.endByOwner(id);
+    return {
+      success: true,
+      data: {
+        id: event.id,
+        title: event.title,
+        isActive: event.isActive,
+        endsAt: event.endsAt,
+        endedAt: event.endedAt,
+      },
+    };
+  }
+
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get event by ID' })
@@ -193,12 +356,14 @@ export class EventsController {
     @Param('id') id: string,
     @Body() dto: UpdateEventDto,
     @Req() req: { user: RequestUser },
+    @Headers() headers: Record<string, string | string[] | undefined>,
   ) {
     const data = await this.eventsService.updateForUser(
       id,
       req.user.id,
       req.user.role,
       dto,
+      { allowChecklistBypass: isDashboardClient(headers) },
     );
     return { success: true, data };
   }

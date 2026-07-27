@@ -78,6 +78,7 @@ class ApiClient {
   ): Promise<T> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'X-Marvira-Client': 'dashboard',
       ...(options.headers as Record<string, string>),
     };
 
@@ -155,7 +156,9 @@ class ApiClient {
   async upload(file: File) {
     const formData = new FormData();
     formData.append('file', file);
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = {
+      'X-Marvira-Client': 'dashboard',
+    };
     if (this.accessToken) headers.Authorization = `Bearer ${this.accessToken}`;
 
     const response = await fetch(`${API_URL}/uploads`, {

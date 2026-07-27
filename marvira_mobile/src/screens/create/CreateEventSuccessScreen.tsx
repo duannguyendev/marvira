@@ -32,7 +32,12 @@ export const CreateEventSuccessScreen: React.FC = () => {
   const { t } = useTranslation();
   const route = useRoute<CreateEventSuccessRouteProp>();
   const navigation = useNavigation<NavigationProp>();
-  const { eventId, published, joinPassword } = route.params;
+  const { eventId, published, joinPassword, scheduled, scheduledPublishAt } =
+    route.params;
+
+  const scheduledLocalLabel = scheduledPublishAt
+    ? new Date(scheduledPublishAt).toLocaleString()
+    : '';
 
   const handleShareInvite = async () => {
     try {
@@ -59,18 +64,26 @@ export const CreateEventSuccessScreen: React.FC = () => {
         labels={STEP_LABELS.map(key => t(`createEvent.steps.${key}`))}
       />
       <View style={styles.content}>
-        <Text style={styles.emoji}>{published ? '🎉' : '📝'}</Text>
+        <Text style={styles.emoji}>
+          {published ? '🎉' : scheduled ? '🗓️' : '📝'}
+        </Text>
         <Text style={styles.heading}>
           {published
             ? t('createEvent.successPublished')
-            : t('createEvent.successDraft')}
+            : scheduled
+              ? t('createEvent.schedule.successTitle')
+              : t('createEvent.successDraft')}
         </Text>
         <Text style={styles.subheading}>
           {published
             ? joinPassword
               ? t('createEvent.successPublishedPrivateMessage')
               : t('createEvent.successPublishedMessage')
-            : t('createEvent.successDraftMessage')}
+            : scheduled
+              ? t('createEvent.schedule.successMessage', {
+                  when: scheduledLocalLabel,
+                })
+              : t('createEvent.successDraftMessage')}
         </Text>
 
         {published && joinPassword ? (

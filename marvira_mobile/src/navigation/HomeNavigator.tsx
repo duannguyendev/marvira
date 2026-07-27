@@ -11,8 +11,10 @@ import { GlobalLeaderboardScreen } from '../screens/home/GlobalLeaderboardScreen
 import { CreateEventInfoScreen } from '../screens/create/CreateEventInfoScreen';
 import { CreateEventPlaceScreen } from '../screens/create/CreateEventPlaceScreen';
 import { CreateEventReviewScreen } from '../screens/create/CreateEventReviewScreen';
+import { AnswerVerifyScreen } from '../screens/create/AnswerVerifyScreen';
 import { CreateEventSuccessScreen } from '../screens/create/CreateEventSuccessScreen';
 import { EditEventGiftsScreen } from '../screens/create/EditEventGiftsScreen';
+import { EditEventAnswersScreen } from '../screens/create/EditEventAnswersScreen';
 import { EventFinishersScreen } from '../screens/home/EventFinishersScreen';
 import { withScreenSafeArea } from '../components/Screen';
 import { HomeStackParamList } from './types';
@@ -101,6 +103,11 @@ export const HomeNavigator: React.FC = () => {
         options={{ title: t('nav.reviewEvent') }}
       />
       <Stack.Screen
+        name="AnswerVerify"
+        component={AnswerVerifyScreen}
+        options={{ title: t('nav.answerVerify') }}
+      />
+      <Stack.Screen
         name="CreateEventSuccess"
         component={CreateEventSuccessScreen}
         options={{ title: t('nav.eventCreated') }}
@@ -109,6 +116,11 @@ export const HomeNavigator: React.FC = () => {
         name="EditEventGifts"
         component={EditEventGiftsScreen}
         options={{ title: t('nav.editGifts') }}
+      />
+      <Stack.Screen
+        name="EditEventAnswers"
+        component={EditEventAnswersScreen}
+        options={{ title: t('nav.editAnswers') }}
       />
     </Stack.Navigator>
   );
