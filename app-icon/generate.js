@@ -1,0 +1,120 @@
+/**
+ * Generate Marvira platform icons from SVG masters in this folder.
+ *
+ * Edit:
+ *   marvira-app-icon.svg              — full icon (iOS / marketing / Android legacy)
+ *     - scale(...): mark size (currently 0.95)
+ *     - stroke-width: letter weight (currently 50); i-dot r ~= half of that
+ *   marvira-app-icon-foreground.svg   — Android adaptive foreground (transparent)
+ *     - scale(...): currently 0.92
+ *
+ * Run (from repo root or this folder):
+ *   npm install --no-save @resvg/resvg-js sharp
+ *   node app-icon/generate.js
+ *
+ * Writes:
+ *   - preview PNGs in this folder
+ *   - marvira_mobile iOS AppIcon + Android mipmaps
+ *   - marvira_dashboard_api marketing favicon / PWA / mark
+ */
+const fs = require('fs');
+const path = require('path');
+const { Resvg } = require('@resvg/resvg-js');
+const sharp = require('sharp');
+
+const iconDir = __dirname;
+const root = path.join(__dirname, '..');
+const masterSvg = fs.readFileSync(path.join(iconDir, 'marvira-app-icon.svg'));
+const fgSvg = fs.readFileSync(path.join(iconDir, 'marvira-app-icon-foreground.svg'));
+
+function renderSvg(svgBuffer, size) {
+  const resvg = new Resvg(svgBuffer, {
+    fitTo: { mode: 'width', value: size },
+  });
+  return Buffer.from(resvg.render().asPng());
+}
+
+async function writePng(filePath, buffer) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  await sharp(buffer).png().toFile(filePath);
+  console.log('wrote', path.relative(root, filePath));
+}
+
+async function solidColorPng(filePath, size, hex) {
+  const buf = await sharp({
+    create: {
+      width: size,
+      height: size,
+      channels: 3,
+      background: hex,
+    },
+  })
+    .png()
+    .toBuffer();
+  await writePng(filePath, buf);
+}
+
+async function resizeFrom(masterBuf, filePath, size) {
+  const buf = await sharp(masterBuf).resize(size, size).png().toBuffer();
+  await writePng(filePath, buf);
+}
+
+async function main() {
+  const master1024 = renderSvg(masterSvg, 1024);
+  await writePng(path.join(iconDir, 'marvira-app-icon.png'), master1024);
+  await writePng(path.join(iconDir, 'marvira-icon-master.png'), master1024);
+
+  const master1536 = await sharp(master1024).resize(1536, 1536).png().toBuffer();
+  await writePng(path.join(iconDir, 'marvira-app-icon-expanded-1.5x.png'), master1536);
+
+  const iosDir = path.join(
+    root,
+    'marvira_mobile/ios/Marvira/Images.xcassets/AppIcon.appiconset'
+  );
+  const iosSizes = [
+    ['AppIcon-20x20@2x.png', 40],
+    ['AppIcon-20x20@3x.png', 60],
+    ['AppIcon-29x29@2x.png', 58],
+    ['AppIcon-29x29@3x.png', 87],
+    ['AppIcon-40x40@2x.png', 80],
+    ['AppIcon-40x40@3x.png', 120],
+    ['AppIcon-60x60@2x.png', 120],
+    ['AppIcon-60x60@3x.png', 180],
+    ['AppIcon-1024x1024@1x.png', 1024],
+  ];
+  for (const [name, size] of iosSizes) {
+    await resizeFrom(master1024, path.join(iosDir, name), size);
+  }
+
+  const android = {
+    mdpi: { launcher: 48, adaptive: 108 },
+    hdpi: { launcher: 72, adaptive: 162 },
+    xhdpi: { launcher: 96, adaptive: 216 },
+    xxhdpi: { launcher: 144, adaptive: 324 },
+    xxxhdpi: { launcher: 192, adaptive: 432 },
+  };
+  const resRoot = path.join(root, 'marvira_mobile/android/app/src/main/res');
+  const fg1024 = renderSvg(fgSvg, 1024);
+
+  for (const [density, sizes] of Object.entries(android)) {
+    const dir = path.join(resRoot, `mipmap-${density}`);
+    await resizeFrom(master1024, path.join(dir, 'ic_launcher.png'), sizes.launcher);
+    await resizeFrom(master1024, path.join(dir, 'ic_launcher_round.png'), sizes.launcher);
+    await resizeFrom(fg1024, path.join(dir, 'ic_launcher_foreground.png'), sizes.adaptive);
+    await solidColorPng(path.join(dir, 'ic_launcher_background.png'), sizes.adaptive, '#4F46E5');
+  }
+
+  const mkt = path.join(root, 'marvira_dashboard_api/apps/marketing');
+  await resizeFrom(master1024, path.join(mkt, 'src/app/icon.png'), 48);
+  await resizeFrom(master1024, path.join(mkt, 'src/app/apple-icon.png'), 180);
+  await resizeFrom(master1024, path.join(mkt, 'public/icons/icon-192.png'), 192);
+  await resizeFrom(master1024, path.join(mkt, 'public/icons/icon-512.png'), 512);
+  await resizeFrom(master1024, path.join(mkt, 'public/images/marvira-mark.png'), 256);
+
+  console.log('Done. Preview PNGs in app-icon/; platform icons updated.');
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -2469,5 +2469,7 @@ Marketing CSS variable mapping (metaphor names, same hex values):
 - --ink #1E293B | --mist #F8FAFC | --fog #E2E8F0
 - --forest #6366F1 (= primary indigo) | --canopy #4F46E5 | --sun #EC4899 (= accent pink) | --trail #F8FAFC
 
-App icon: indigo gradient background (#6366F1 -> #4F46E5), white location pin,
-indigo "M" mark, pink (#EC4899) route accents. Master: assets/marvira-icon-master.png.
+App icon: indigo gradient background (#6366F1 -> #4F46E5), overlapped M/A/V/i/r
+letter strokes (Option 27: M #E879F9, A #EC4899, V #F97316, i #FACC15, r #9A3412),
+soft shadow, stroke 50. Masters + generator: app-icon/ (see app-icon/README.md).
+Regenerate: npm install --no-save @resvg/resvg-js sharp && node app-icon/generate.js

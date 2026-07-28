@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Marvira app icon foreground">
+  <!-- Adaptive foreground: transparent bg, same mark as master (safe-zone scale). -->
+  <defs>
+    <filter id="letterShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Adaptive foreground: transparent bg. Scale ~0.92 fills circle better
+       while keeping tips inside typical launcher masks. -->
+  <g id="mark" transform="translate(512 512) scale(0.92) translate(-512 -512)">
+    <g
+      id="letters"
+      transform="translate(312 312)"
+      fill="none"
+      stroke-width="50"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      opacity="1"
+      filter="url(#letterShadow)">
+
+      <g id="letter-M" stroke="#E879F9">
+        <path d="M60 340 L60 60 L200 240 L340 60 L340 340"/>
+      </g>
+
+      <g id="letter-A" stroke="#EC4899">
+        <path d="M60 340 L60 60"/>
+        <path d="M60 60 L200 240"/>
+        <path d="M60 193 C140 147 250 147 340 193"/>
+      </g>
+
+      <g id="letter-V" stroke="#F97316">
+        <path d="M60 60 L200 240 L340 60"/>
+      </g>
+
+      <g id="letter-r" stroke="#9A3412">
+        <path d="M60 340 L60 153"/>
+        <path d="M60 193 C140 147 250 147 340 193"/>
+      </g>
+
+      <g id="letter-i" stroke="#FACC15" fill="none">
+        <path d="M340 60 L340 340"/>
+        <circle cx="340" cy="0" r="25" fill="#FACC15" stroke="none"/>
+      </g>
+    </g>
+  </g>
+</svg>
