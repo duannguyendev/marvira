@@ -3,10 +3,10 @@
  *
  * Edit:
  *   marvira-app-icon.svg              — full icon (iOS / marketing / Android legacy)
- *     - scale(...): mark size (currently 0.95)
- *     - stroke-width: letter weight (currently 50); i-dot r ~= half of that
+ *     - scale(...): mark size (currently 1.2)
+ *     - stroke-width: letter weight (currently 64); i-dot r ~= half of that
  *   marvira-app-icon-foreground.svg   — Android adaptive foreground (transparent)
- *     - scale(...): currently 0.92
+ *     - scale(...): currently 1.1
  *
  * Run (from repo root or this folder):
  *   npm install --no-save @resvg/resvg-js sharp
@@ -64,9 +64,6 @@ async function main() {
   await writePng(path.join(iconDir, 'marvira-app-icon.png'), master1024);
   await writePng(path.join(iconDir, 'marvira-icon-master.png'), master1024);
 
-  const master1536 = await sharp(master1024).resize(1536, 1536).png().toBuffer();
-  await writePng(path.join(iconDir, 'marvira-app-icon-expanded-1.5x.png'), master1536);
-
   const iosDir = path.join(
     root,
     'marvira_mobile/ios/Marvira/Images.xcassets/AppIcon.appiconset'
@@ -101,7 +98,7 @@ async function main() {
     await resizeFrom(master1024, path.join(dir, 'ic_launcher.png'), sizes.launcher);
     await resizeFrom(master1024, path.join(dir, 'ic_launcher_round.png'), sizes.launcher);
     await resizeFrom(fg1024, path.join(dir, 'ic_launcher_foreground.png'), sizes.adaptive);
-    await solidColorPng(path.join(dir, 'ic_launcher_background.png'), sizes.adaptive, '#4F46E5');
+    await solidColorPng(path.join(dir, 'ic_launcher_background.png'), sizes.adaptive, '#818CF8');
   }
 
   const mkt = path.join(root, 'marvira_dashboard_api/apps/marketing');

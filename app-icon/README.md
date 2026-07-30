@@ -1,24 +1,23 @@
 # Marvira app icon
 
-Source of truth for the launcher / marketing icon (Option 27 letter lockup).
+Source of truth for the launcher / marketing icon (Option 27 letter lockup, light indigo).
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `marvira-app-icon.svg` | Full icon (gradient bg) — iOS, marketing, Android legacy |
+| `marvira-app-icon.svg` | Full icon (light indigo bg) — iOS, marketing, Android legacy |
 | `marvira-app-icon-foreground.svg` | Android adaptive foreground (transparent) |
 | `marvira-app-icon.png` | 1024 preview |
-| `marvira-app-icon-expanded-1.5x.png` | 1536 preview |
 | `marvira-icon-master.png` | 1024 master PNG |
 | `generate.js` | Rasterize SVG → all platform sizes |
 
-## Tweak scale or stroke
+## Current settings
 
-In `marvira-app-icon.svg` / `marvira-app-icon-foreground.svg`:
-
-- **Mark size:** `scale(0.95)` on `#mark` (foreground uses `0.92`)
-- **Stroke:** `stroke-width="50"` (keep i-dot `r` ≈ half, e.g. `25`)
+- **Background:** `#A5B4FC` → `#818CF8`
+- **Mark size:** `scale(1.2)` on master; foreground `scale(1.1)`
+- **Stroke:** `64` (i-dot `r=32`, cy=`63`, cutout halo `r=40`)
+- **M:** no right vertical; yellow `i` stem fills that edge up to the cutout
 
 ## Regenerate platform icons
 
