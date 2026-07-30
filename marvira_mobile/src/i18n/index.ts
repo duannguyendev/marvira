@@ -24,9 +24,29 @@ const resources = {
   ja: { translation: ja },
 };
 
+function isSupportedLanguage(code: string): code is LanguageCode {
+  return SUPPORTED_LANGUAGES.some(lang => lang.code === code);
+}
+
+/** Map device system locale to a supported app language (unsupported/failed → Vietnamese). */
+export function resolveDeviceLanguage(): LanguageCode {
+  try {
+    const locale = Intl.DateTimeFormat().resolvedOptions().locale || '';
+    const languageCode = locale.split(/[-_]/)[0]?.toLowerCase();
+    if (languageCode && isSupportedLanguage(languageCode)) {
+      return languageCode;
+    }
+  } catch {
+    // Fall through to Vietnamese
+  }
+  return 'vi';
+}
+
+const defaultLanguage = resolveDeviceLanguage();
+
 i18n.use(initReactI18next).init({
   resources,
-  lng: 'vi',
+  lng: defaultLanguage,
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false,
@@ -37,11 +57,16 @@ i18n.use(initReactI18next).init({
 export async function loadStoredLanguage(): Promise<void> {
   try {
     const stored = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (stored && SUPPORTED_LANGUAGES.some(lang => lang.code === stored)) {
+    if (stored && isSupportedLanguage(stored)) {
       await i18n.changeLanguage(stored);
+      return;
     }
+    // First launch only: detect device language and persist so later launches keep it
+    const language = resolveDeviceLanguage();
+    await i18n.changeLanguage(language);
+    await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, language);
   } catch {
-    // Keep default Vietnamese
+    await i18n.changeLanguage(resolveDeviceLanguage());
   }
 }
 

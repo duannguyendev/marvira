@@ -1,16 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import i18n, { LanguageCode, SUPPORTED_LANGUAGES } from '../i18n';
+import i18n, {
+  LanguageCode,
+  SUPPORTED_LANGUAGES,
+  resolveDeviceLanguage,
+} from '../i18n';
 
 export const ALL_LANGUAGES_STORAGE_KEY = '@marvira/all_languages';
 
 export type ContentLanguage = LanguageCode;
 
 export function getAppContentLanguage(): ContentLanguage {
-  const code = i18n.language as string;
+  const code = (i18n.language as string)?.split(/[-_]/)[0];
   if (SUPPORTED_LANGUAGES.some(l => l.code === code)) {
     return code as ContentLanguage;
   }
-  return 'vi';
+  return resolveDeviceLanguage();
 }
 
 export async function getShowAllLanguages(): Promise<boolean> {
