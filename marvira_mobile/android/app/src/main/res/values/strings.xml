@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Marvira</string>
-    <!-- Owner: replace from release_credentials.txt section E before Facebook Login works -->
-    <string name="facebook_app_id">0</string>
-    <string name="facebook_client_token">PLACEHOLDER_FACEBOOK_CLIENT_TOKEN</string>
-    <string name="fb_login_protocol_scheme">fb0</string>
+    <string name="facebook_app_id">1089629620413446</string>
+    <string name="facebook_client_token">64ee43bf2168c7486ae73d3cafe90ea2</string>
+    <string name="fb_login_protocol_scheme">fb1089629620413446</string>
 </resources>

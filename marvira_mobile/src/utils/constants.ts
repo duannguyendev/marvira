@@ -3,7 +3,8 @@ import { Platform } from 'react-native';
 // Set USE_MOCK_API=true in dev only when running without backend
 export const USE_MOCK_DATA = false;
 
-// Android emulator: 10.0.2.2 → host machine localhost
+// Android emulator: 10.0.2.2 → host machine localhost.
+// Real device: set API_BASE_URL=http://<your-pc-lan-ip>:3001 in .env.local
 const DEV_API_HOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
 
 function requireReleaseUrl(name: string, value: string | undefined): string {
@@ -17,9 +18,9 @@ function requireReleaseUrl(name: string, value: string | undefined): string {
   return trimmed;
 }
 
-/** Debug/Metro → localhost. Release → Codemagic ENV or .env.local (inlined by Babel). */
+/** Debug: .env.local API_BASE_URL if set (real device), else emulator/simulator host. Release: required ENV. */
 export const API_BASE_URL = __DEV__
-  ? `http://${DEV_API_HOST}:3001`
+  ? process.env.API_BASE_URL?.trim() || `http://${DEV_API_HOST}:3001`
   : requireReleaseUrl('API_BASE_URL', process.env.API_BASE_URL);
 
 /** Marketing site used for share / invite HTTPS links (`/e/{eventId}`). */

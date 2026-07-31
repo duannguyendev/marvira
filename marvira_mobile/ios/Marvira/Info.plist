@@ -37,7 +37,7 @@
 			<string>GoogleSignIn</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>GOOGLE_REVERSED_CLIENT_ID</string>
+				<string>com.googleusercontent.apps.563117198235-n46g12jl7itkh1535c9hlh8i5u4hrdbe</string>
 			</array>
 		</dict>
 		<dict>
@@ -45,14 +45,14 @@
 			<string>Facebook</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fbFACEBOOK_APP_ID</string>
+				<string>fb1089629620413446</string>
 			</array>
 		</dict>
 	</array>
 	<key>FacebookAppID</key>
-	<string>FACEBOOK_APP_ID</string>
+	<string>1089629620413446</string>
 	<key>FacebookClientToken</key>
-	<string>FACEBOOK_CLIENT_TOKEN</string>
+	<string>64ee43bf2168c7486ae73d3cafe90ea2</string>
 	<key>FacebookDisplayName</key>
 	<string>Marvira</string>
 	<key>LSApplicationQueriesSchemes</key>

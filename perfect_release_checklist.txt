@@ -314,17 +314,23 @@ Date       | Track | Item                         | Notes
 NEXT UP
 ================================================================================
 
-WAITING ON OWNER — review and fill:
-  1) release_credentials.txt section A + B  → WEB-DEPLOY + Meta /privacy
-  2) release_credentials.txt sections C–E → Google / Apple / Facebook live login
-     Also replace iOS Info.plist + Android strings.xml placeholders (listed in B3)
+OWNER — get OAuth credentials now (full steps in release_credentials.txt C–E):
 
-Developer next (after credentials or in parallel polish):
-  - A3 WEB-DEPLOY when A2 provided
-  - `pnpm exec prisma migrate deploy` (provider_user_id) on each DB
-  - Mac: `cd marvira_mobile/ios && pod install`
-  - Optional B4: yarn vs npm / root CI
-  - Track C soft test once social keys work on staging
+  1) Google Cloud → OAuth clients (Web + iOS + Android)
+     Minimum to send: GOOGLE_OAUTH_WEB_CLIENT_ID (= API GOOGLE_CLIENT_ID)
+
+  2) Apple Developer → App ID com.marvira → enable Sign In with Apple
+     Send: APPLE_CLIENT_ID=com.marvira
+
+  3) Meta Developers → Create App → Facebook Login
+     Send: FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, FACEBOOK_CLIENT_TOKEN
+
+  Paste into release_credentials.LOCAL.txt (gitignored) — do not commit secrets.
+  Tell the team when ready; we wire hosting env + placeholders.
+
+Still needed for WEB-DEPLOY (parallel):
+  - Postgres + Redis + JWT_SECRET + host api.marvira.com / www.marvira.com
+  (www + support@ already recorded)
 
 ================================================================================
 END

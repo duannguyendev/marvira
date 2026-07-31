@@ -12,7 +12,20 @@
           "package_name": "com.marvira"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "563117198235-hc9cc8qqc2e8hncv2bi8hv6pgl75mfns.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marvira",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "563117198235-b0ifoaf81cmgbifs899h81ln1h0i7ebq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAcFp57MsVl7FoFCI--LR0jxJAuHflwNB4"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "563117198235-b0ifoaf81cmgbifs899h81ln1h0i7ebq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "563117198235-n46g12jl7itkh1535c9hlh8i5u4hrdbe.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.marvira"
+              }
+            }
+          ]
         }
       }
     }
