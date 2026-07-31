@@ -24,7 +24,7 @@ export const API_BASE_URL = __DEV__
 
 /** Marketing site used for share / invite HTTPS links (`/e/{eventId}`). */
 export const MARKETING_SITE_URL = __DEV__
-  ? 'http://localhost:3000'
+  ? 'http://localhost:3002'
   : requireReleaseUrl('MARKETING_SITE_URL', process.env.MARKETING_SITE_URL);
 
 // Location Configuration

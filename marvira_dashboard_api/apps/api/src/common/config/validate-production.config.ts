@@ -28,4 +28,28 @@ export function validateProductionConfig(logger: Logger): void {
   if (process.env.OAUTH_DEV_BYPASS !== 'false') {
     throw new Error('Set OAUTH_DEV_BYPASS=false in production');
   }
+
+  if (!process.env.FACEBOOK_APP_ID?.trim() || !process.env.FACEBOOK_APP_SECRET?.trim()) {
+    throw new Error(
+      'FACEBOOK_APP_ID and FACEBOOK_APP_SECRET are required in production',
+    );
+  }
+
+  const googleAudiences = (
+    process.env.GOOGLE_CLIENT_IDS ||
+    process.env.GOOGLE_CLIENT_ID ||
+    ''
+  )
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+  if (googleAudiences.length === 0) {
+    throw new Error(
+      'GOOGLE_CLIENT_ID (or GOOGLE_CLIENT_IDS) is required in production',
+    );
+  }
+
+  if (!process.env.APPLE_CLIENT_ID?.trim()) {
+    throw new Error('APPLE_CLIENT_ID is required in production');
+  }
 }

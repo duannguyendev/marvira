@@ -43,7 +43,9 @@
     "favorites": "お気に入り",
     "myQuestions": "マイ問題",
     "feedback": "フィードバックを送る",
-    "questionTraining": "トレーニング"
+    "questionTraining": "トレーニング",
+    "finishers": "Finishers",
+    "editGifts": "Edit gifts"
   },
   "auth": {
     "welcomeBack": "おかえりなさい",
@@ -57,6 +59,11 @@
     "loginFailed": "ログイン失敗",
     "pleaseTryAgain": "もう一度お試しください",
     "loginFailedShort": "ログインに失敗しました",
+    "orContinueWith": "または次で続行",
+    "continueWithGoogle": "Google で続行",
+    "continueWithApple": "Apple で続行",
+    "continueWithFacebook": "Facebook で続行",
+    "socialNotConfigured": "ソーシャルログインはまだ設定されていません。",
     "createAccount": "アカウント作成",
     "registerSubtitle": "冒険に参加して探索を始めましょう",
     "namePlaceholder": "名前を入力",
@@ -173,7 +180,11 @@
       "submit": "参加する",
       "hint": "パスワードが違いますか？主催者に確認してください。",
       "incorrectPassword": "パスワードが正しくありません"
-    }
+    },
+    "viewYourGift": "View your gift",
+    "viewCompletion": "View completion",
+    "giftLabel": "Gift",
+    "giftsForFirst": "Gifts for the first {{count}} finishers"
   },
   "eventStatus": {
     "not_started": "未開始",
@@ -236,7 +247,17 @@
     "backToEvents": "イベントに戻る",
     "viewEventDetails": "イベント詳細を見る",
     "shareInvite": "友達を招待",
-    "shareMessage": "Marviraで「{{title}}」をクリアしたよ！この宝探しに挑戦してね：\n{{url}}"
+    "shareMessage": "Marviraで「{{title}}」をクリアしたよ！この宝探しに挑戦してね：\n{{url}}",
+    "fromCreator": "Message from the creator",
+    "finisherRank": "You're finisher #{{rank}}",
+    "yourGift": "Your gift: {{teaser}}",
+    "giftCode": "Gift code",
+    "copyCode": "Copy code",
+    "codeCopied": "Copied!",
+    "copyFailed": "Could not copy code",
+    "giftsWentToFirst": "Gifts went to the first {{count}} finishers.",
+    "youFinishedRank": "You finished #{{rank}}.",
+    "exploreMore": "Explore more events"
   },
   "leaderboard": {
     "loadFailed": "ランキングの読み込みに失敗しました",
@@ -413,6 +434,32 @@
       "imageRequired": "画像問題には写真を追加してください",
       "optionsMin": "選択肢を2つ以上追加してください",
       "answerMustMatchOption": "正解は選択肢のいずれかと一致する必要があります"
+    },
+    "gifts": {
+      "heading": "Completion gifts",
+      "subheading": "Add gifts to reward the fastest finishers and drive more completions.",
+      "editSubheading": "Update teaser, redeem message, and append gift codes. Awarded codes cannot be changed.",
+      "teaserLabel": "Gift teaser",
+      "teaserPlaceholder": "Free drink, 10% off, Merch code…",
+      "messageLabel": "Completion message",
+      "messagePlaceholder": "Thanks for playing! Show this code at the counter.",
+      "codesLabel": "Gift codes (one per line)",
+      "codesPlaceholder": "CODE1\nCODE2\nCODE3",
+      "codePlaceholder": "Code {{n}}",
+      "addCode": "+ Add gift code",
+      "awarded": "Assigned",
+      "freezeHint": "The first {{count}} code(s) are already assigned and locked. You can only append new codes.",
+      "helper": "Codes go to the soonest finishers in order (1st code → 1st finisher, …). Max 10.",
+      "preview": "Players will see: {{teaser}} · Gifts for the first {{count}} finishers",
+      "save": "Save gifts",
+      "saved": "Gifts updated",
+      "saveFailed": "Failed to update gifts",
+      "validation": {
+        "maxCodes": "At most 10 gift codes are allowed",
+        "teaserRequired": "Gift teaser is required when codes are set",
+        "unique": "Gift codes must be unique",
+        "appendOnly": "Existing gift codes cannot be changed or removed; append new codes only"
+      }
     }
   },
   "myEvents": {
@@ -530,5 +577,12 @@
     "deleteMessage": "「{{question}}」を削除しますか？元に戻せません。",
     "deleteFailed": "問題の削除に失敗しました",
     "fromEvent": "イベント: {{event}}"
+  },
+  "finishers": {
+    "loadFailed": "Failed to load finishers",
+    "assignedSummary": "{{assigned}}/{{total}} gifts assigned",
+    "noGifts": "No gifts configured for this event",
+    "empty": "No one has finished yet",
+    "code": "Gift code"
   }
 }

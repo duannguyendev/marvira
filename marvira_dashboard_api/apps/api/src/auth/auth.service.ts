@@ -261,21 +261,59 @@ export class AuthService {
     return bcrypt.compare(password, hash);
   }
 
+  /**
+   * Account linking policy:
+   * 1. Match by (provider + providerUserId) when present — stable for Apple returns.
+   * 2. Else match by email — same email links to the existing account (LOCAL or OAuth).
+   *    LOCAL passwordHash is preserved so email/password login still works.
+   * 3. Else create a new user (email required for new accounts).
+   */
   private async loginWithProvider(
     profile: OAuthProfile,
     provider: AuthProvider,
   ): Promise<{ user: PublicUser; tokens: TokenPair }> {
-    let user = await this.prisma.client.user.findUnique({
-      where: { email: profile.email },
-    });
+    let user =
+      profile.providerUserId
+        ? await this.prisma.client.user.findFirst({
+            where: {
+              provider,
+              providerUserId: profile.providerUserId,
+            },
+          })
+        : null;
+
+    if (!user && profile.email) {
+      user = await this.prisma.client.user.findUnique({
+        where: { email: profile.email },
+      });
+      if (user) {
+        user = await this.prisma.client.user.update({
+          where: { id: user.id },
+          data: {
+            providerUserId: user.providerUserId ?? profile.providerUserId,
+            avatar: user.avatar ?? profile.avatar ?? null,
+            name: user.name || profile.name,
+            // Keep LOCAL so password login / reset remain available when hash exists.
+            provider:
+              user.provider === AuthProvider.LOCAL ? AuthProvider.LOCAL : provider,
+          },
+        });
+      }
+    }
 
     if (!user) {
+      if (!profile.email) {
+        throw new UnauthorizedException(
+          'No email available for this sign-in. Use the same provider account you used before, or register with email.',
+        );
+      }
       user = await this.prisma.client.user.create({
         data: {
           email: profile.email,
           name: profile.name,
           avatar: profile.avatar ?? null,
           provider,
+          providerUserId: profile.providerUserId,
           role: UserRole.USER,
         },
       });
@@ -307,6 +345,7 @@ export class AuthService {
       email: input.email,
       name: input.name,
       avatar: input.avatar,
+      providerUserId: `dev_${provider.toLowerCase()}_${input.email}`,
     };
   }
 

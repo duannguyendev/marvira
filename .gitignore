@@ -21,6 +21,7 @@ coverage/
 .env
 .env.local
 .env.*.local
+release_credentials.LOCAL.txt
 
 # ---- Runtime uploads (keep folder, ignore contents) ----
 uploads/*

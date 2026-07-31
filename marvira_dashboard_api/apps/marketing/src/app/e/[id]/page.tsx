@@ -3,18 +3,30 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/page-shell';
-import { getFeaturedEvent } from '@/content/events';
+import { getInviteEvent } from '@/lib/events';
 import { loadMarketingContent, withLang } from '@/lib/content-loader';
 import { SITE, STORE_READY } from '@/lib/site';
+
+export const dynamic = 'force-dynamic';
 
 type Props = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ lang?: string }>;
 };
 
+function coverNeedsUnoptimized(src: string): boolean {
+  if (src.startsWith('/')) return false;
+  try {
+    const host = new URL(src).hostname;
+    return host !== 'images.unsplash.com' && host !== 'localhost';
+  } catch {
+    return true;
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const event = getFeaturedEvent(id);
+  const event = await getInviteEvent(id);
   if (!event) {
     return { title: 'Hunt invite' };
   }
@@ -37,15 +49,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return [{ id: 'seed-event-downtown' }, { id: 'seed-event-golden-gate' }];
-}
-
 export default async function EventInvitePage({ params, searchParams }: Props) {
   const { id } = await params;
   const { lang } = await searchParams;
   const { content, locale } = await loadMarketingContent(lang);
-  const event = getFeaturedEvent(id);
+  const event = await getInviteEvent(id);
 
   if (!event) {
     notFound();
@@ -55,6 +63,7 @@ export default async function EventInvitePage({ params, searchParams }: Props) {
   const storeHref = STORE_READY
     ? SITE.appStoreUrl || SITE.playStoreUrl
     : withLang('/download', locale);
+  const unoptimized = coverNeedsUnoptimized(event.coverImage);
 
   return (
     <PageShell content={content} locale={locale}>
@@ -65,6 +74,7 @@ export default async function EventInvitePage({ params, searchParams }: Props) {
             alt={event.title}
             fill
             priority
+            unoptimized={unoptimized}
             className="object-cover"
             sizes="100vw"
           />

@@ -7,22 +7,37 @@ class AuthService {
   private currentUser: User | null = null;
 
   /**
+   * Persist session from an auth API response
+   */
+  private async persistAuth(response: {
+    success: boolean;
+    data?: {
+      token: string;
+      refreshToken?: string;
+      user: User;
+    };
+    message?: string;
+  }): Promise<User> {
+    if (response.success && response.data) {
+      await storage.setToken(response.data.token);
+      if (response.data.refreshToken) {
+        await storage.setRefreshToken(response.data.refreshToken);
+      }
+      await storage.setUser(response.data.user);
+      this.currentUser = response.data.user;
+      await analytics.setUserId(response.data.user.id);
+      return response.data.user;
+    }
+    throw new Error(response.message || 'Login failed');
+  }
+
+  /**
    * Login user
    */
   async login(credentials: LoginCredentials): Promise<User> {
     try {
       const response = await authApi.login(credentials);
-      if (response.success && response.data) {
-        await storage.setToken(response.data.token);
-        if (response.data.refreshToken) {
-          await storage.setRefreshToken(response.data.refreshToken);
-        }
-        await storage.setUser(response.data.user);
-        this.currentUser = response.data.user;
-        await analytics.setUserId(response.data.user.id);
-        return response.data.user;
-      }
-      throw new Error(response.message || 'Login failed');
+      return this.persistAuth(response);
     } catch (error: any) {
       throw new Error(error.message || 'Login failed');
     }
@@ -34,19 +49,36 @@ class AuthService {
   async register(credentials: RegisterCredentials): Promise<User> {
     try {
       const response = await authApi.register(credentials);
-      if (response.success && response.data) {
-        await storage.setToken(response.data.token);
-        if (response.data.refreshToken) {
-          await storage.setRefreshToken(response.data.refreshToken);
-        }
-        await storage.setUser(response.data.user);
-        this.currentUser = response.data.user;
-        await analytics.setUserId(response.data.user.id);
-        return response.data.user;
-      }
-      throw new Error(response.message || 'Registration failed');
+      return this.persistAuth(response);
     } catch (error: any) {
       throw new Error(error.message || 'Registration failed');
+    }
+  }
+
+  async loginWithGoogle(idToken: string): Promise<User> {
+    try {
+      const response = await authApi.loginWithGoogle(idToken);
+      return this.persistAuth(response);
+    } catch (error: any) {
+      throw new Error(error.message || 'Google sign-in failed');
+    }
+  }
+
+  async loginWithApple(identityToken: string, name?: string): Promise<User> {
+    try {
+      const response = await authApi.loginWithApple(identityToken, name);
+      return this.persistAuth(response);
+    } catch (error: any) {
+      throw new Error(error.message || 'Apple sign-in failed');
+    }
+  }
+
+  async loginWithFacebook(accessToken: string): Promise<User> {
+    try {
+      const response = await authApi.loginWithFacebook(accessToken);
+      return this.persistAuth(response);
+    } catch (error: any) {
+      throw new Error(error.message || 'Facebook sign-in failed');
     }
   }
 

@@ -164,7 +164,7 @@ const en = {
       },
       {
         q: 'How do I contact support?',
-        a: 'Use the feedback form below — we read every message. You can also email hello@marvira.example.com.',
+        a: 'Use the feedback form below — we read every message. You can also email {{supportEmail}}.',
       },
     ],
     form: {
@@ -205,7 +205,7 @@ const en = {
   legal: {
     privacyTitle: 'Privacy Policy',
     termsTitle: 'Terms of Service',
-    updated: 'Last updated: July 20, 2026',
+    updated: 'Last updated: July 30, 2026',
     counselNote:
       'Draft for product and store readiness. Final legal review by counsel is required before go-live.',
   },

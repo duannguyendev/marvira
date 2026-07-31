@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { PageShell } from '@/components/page-shell';
 import { loadMarketingContent } from '@/lib/content-loader';
-import { SITE } from '@/lib/site';
+import { LEGAL_DRAFT, SITE } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -23,9 +23,11 @@ export default async function TermsPage({
           {content.legal.termsTitle}
         </h1>
         <p className="mt-2 text-sm text-ink/55">{content.legal.updated}</p>
-        <p className="mt-4 rounded-xl bg-sun/15 px-4 py-3 text-sm text-ink/80">
-          {content.legal.counselNote}
-        </p>
+        {LEGAL_DRAFT && (
+          <p className="mt-4 rounded-xl bg-sun/15 px-4 py-3 text-sm text-ink/80">
+            {content.legal.counselNote}
+          </p>
+        )}
 
         <h2>1. Agreement</h2>
         <p>
@@ -49,7 +51,11 @@ export default async function TermsPage({
             You must provide accurate registration information and keep
             credentials secure.
           </li>
-          <li>You are responsible for activity under your account.</li>
+          <li>
+            You may sign in with email/password or with Google, Apple, or
+            Facebook. You are responsible for activity under your account,
+            including activity through linked social login providers.
+          </li>
           <li>
             We may suspend accounts that violate these Terms or harm other
             users.

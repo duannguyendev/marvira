@@ -32,13 +32,24 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<
 export const LoginScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<LoginScreenNavigationProp>();
-  const { login, isLoggingIn, loginError } = useAuth();
+  const {
+    login,
+    loginWithGoogle,
+    loginWithApple,
+    loginWithFacebook,
+    isLoggingIn,
+    isSocialPending,
+    loginError,
+    appleAvailable,
+    isSocialCancelled,
+  } = useAuth();
 
-  const [email, setEmail] = useState('demo@marvira.com');
-  const [password, setPassword] = useState('demo123');
+  const [email, setEmail] = useState(__DEV__ ? 'demo@marvira.com' : '');
+  const [password, setPassword] = useState(__DEV__ ? 'demo123' : '');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {},
   );
+  const busy = isLoggingIn || isSocialPending;
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -71,6 +82,39 @@ export const LoginScreen: React.FC = () => {
         t('auth.loginFailed'),
         error.message || t('auth.pleaseTryAgain'),
       );
+    }
+  };
+
+  const handleSocialError = (error: unknown) => {
+    if (isSocialCancelled(error)) {
+      return;
+    }
+    const message =
+      error instanceof Error ? error.message : t('auth.pleaseTryAgain');
+    Alert.alert(t('auth.loginFailed'), message);
+  };
+
+  const handleGoogle = async () => {
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      handleSocialError(error);
+    }
+  };
+
+  const handleApple = async () => {
+    try {
+      await loginWithApple();
+    } catch (error) {
+      handleSocialError(error);
+    }
+  };
+
+  const handleFacebook = async () => {
+    try {
+      await loginWithFacebook();
+    } catch (error) {
+      handleSocialError(error);
     }
   };
 
@@ -127,8 +171,47 @@ export const LoginScreen: React.FC = () => {
                 title={t('auth.signIn')}
                 onPress={handleLogin}
                 loading={isLoggingIn}
+                disabled={busy}
                 fullWidth
                 style={styles.button}
+              />
+
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>{t('auth.orContinueWith')}</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              <Button
+                title={t('auth.continueWithGoogle')}
+                onPress={handleGoogle}
+                loading={isSocialPending}
+                disabled={busy}
+                variant="outline"
+                fullWidth
+                style={styles.socialButton}
+              />
+
+              {appleAvailable && (
+                <Button
+                  title={t('auth.continueWithApple')}
+                  onPress={handleApple}
+                  loading={isSocialPending}
+                  disabled={busy}
+                  variant="outline"
+                  fullWidth
+                  style={styles.socialButton}
+                />
+              )}
+
+              <Button
+                title={t('auth.continueWithFacebook')}
+                onPress={handleFacebook}
+                loading={isSocialPending}
+                disabled={busy}
+                variant="outline"
+                fullWidth
+                style={styles.socialButton}
               />
 
               <View style={styles.footer}>
@@ -189,6 +272,25 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: spacing.md,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.lg,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  dividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.border,
+  },
+  dividerText: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+  },
+  socialButton: {
+    marginTop: spacing.sm,
   },
   forgotLink: {
     fontSize: fontSize.sm,

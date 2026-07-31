@@ -43,7 +43,9 @@
     "favorites": "收藏",
     "myQuestions": "我的题目",
     "feedback": "发送反馈",
-    "questionTraining": "训练"
+    "questionTraining": "训练",
+    "finishers": "Finishers",
+    "editGifts": "Edit gifts"
   },
   "auth": {
     "welcomeBack": "欢迎回来",
@@ -57,6 +59,11 @@
     "loginFailed": "登录失败",
     "pleaseTryAgain": "请重试",
     "loginFailedShort": "登录失败",
+    "orContinueWith": "或使用以下方式继续",
+    "continueWithGoogle": "使用 Google 继续",
+    "continueWithApple": "使用 Apple 继续",
+    "continueWithFacebook": "使用 Facebook 继续",
+    "socialNotConfigured": "社交登录尚未配置。",
     "createAccount": "创建账号",
     "registerSubtitle": "加入冒险，开始探索",
     "namePlaceholder": "输入姓名",
@@ -173,7 +180,11 @@
       "submit": "加入活动",
       "hint": "密码错误？请联系活动组织者。",
       "incorrectPassword": "密码不正确"
-    }
+    },
+    "viewYourGift": "View your gift",
+    "viewCompletion": "View completion",
+    "giftLabel": "Gift",
+    "giftsForFirst": "Gifts for the first {{count}} finishers"
   },
   "eventStatus": {
     "not_started": "未开始",
@@ -236,7 +247,17 @@
     "backToEvents": "返回活动",
     "viewEventDetails": "查看活动详情",
     "shareInvite": "邀请朋友",
-    "shareMessage": "我刚在 Marvira 完成了「{{title}}」！来试试这场寻宝：\n{{url}}"
+    "shareMessage": "我刚在 Marvira 完成了「{{title}}」！来试试这场寻宝：\n{{url}}",
+    "fromCreator": "Message from the creator",
+    "finisherRank": "You're finisher #{{rank}}",
+    "yourGift": "Your gift: {{teaser}}",
+    "giftCode": "Gift code",
+    "copyCode": "Copy code",
+    "codeCopied": "Copied!",
+    "copyFailed": "Could not copy code",
+    "giftsWentToFirst": "Gifts went to the first {{count}} finishers.",
+    "youFinishedRank": "You finished #{{rank}}.",
+    "exploreMore": "Explore more events"
   },
   "leaderboard": {
     "loadFailed": "加载排行榜失败",
@@ -413,6 +434,32 @@
       "imageRequired": "图片题需要添加照片",
       "optionsMin": "至少添加2个选项",
       "answerMustMatchOption": "答案必须匹配其中一个选项"
+    },
+    "gifts": {
+      "heading": "Completion gifts",
+      "subheading": "Add gifts to reward the fastest finishers and drive more completions.",
+      "editSubheading": "Update teaser, redeem message, and append gift codes. Awarded codes cannot be changed.",
+      "teaserLabel": "Gift teaser",
+      "teaserPlaceholder": "Free drink, 10% off, Merch code…",
+      "messageLabel": "Completion message",
+      "messagePlaceholder": "Thanks for playing! Show this code at the counter.",
+      "codesLabel": "Gift codes (one per line)",
+      "codesPlaceholder": "CODE1\nCODE2\nCODE3",
+      "codePlaceholder": "Code {{n}}",
+      "addCode": "+ Add gift code",
+      "awarded": "Assigned",
+      "freezeHint": "The first {{count}} code(s) are already assigned and locked. You can only append new codes.",
+      "helper": "Codes go to the soonest finishers in order (1st code → 1st finisher, …). Max 10.",
+      "preview": "Players will see: {{teaser}} · Gifts for the first {{count}} finishers",
+      "save": "Save gifts",
+      "saved": "Gifts updated",
+      "saveFailed": "Failed to update gifts",
+      "validation": {
+        "maxCodes": "At most 10 gift codes are allowed",
+        "teaserRequired": "Gift teaser is required when codes are set",
+        "unique": "Gift codes must be unique",
+        "appendOnly": "Existing gift codes cannot be changed or removed; append new codes only"
+      }
     }
   },
   "myEvents": {
@@ -530,5 +577,12 @@
     "deleteMessage": "删除「{{question}}」？此操作无法撤销。",
     "deleteFailed": "删除题目失败",
     "fromEvent": "来自活动：{{event}}"
+  },
+  "finishers": {
+    "loadFailed": "Failed to load finishers",
+    "assignedSummary": "{{assigned}}/{{total}} gifts assigned",
+    "noGifts": "No gifts configured for this event",
+    "empty": "No one has finished yet",
+    "code": "Gift code"
   }
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { PageShell } from '@/components/page-shell';
 import { FeedbackForm } from '@/components/feedback-form';
 import { loadMarketingContent } from '@/lib/content-loader';
+import { SITE } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Support & FAQ',
@@ -25,6 +26,9 @@ export default async function SupportPage({
         <p className="animate-fade-up-delay mt-4 max-w-2xl text-lg text-ink/70">
           {content.support.intro}
         </p>
+        <p className="mt-3 text-sm text-ink/55">
+          {SITE.supportEmail}
+        </p>
 
         <div className="mt-12 max-w-3xl space-y-6">
           {content.support.faqs.map(item => (
@@ -40,7 +44,7 @@ export default async function SupportPage({
                 </span>
               </summary>
               <p className="mt-3 text-sm leading-relaxed text-ink/70">
-                {item.a}
+                {item.a.replaceAll('{{supportEmail}}', SITE.supportEmail)}
               </p>
             </details>
           ))}

@@ -138,4 +138,35 @@ export const authApi = {
     }
     await apiClient.post('/auth/reset-password', { token, password });
   },
+
+  loginWithGoogle: async (
+    idToken: string,
+  ): Promise<ApiResponse<AuthResponse>> => {
+    const response = await apiClient.post<{
+      success: boolean;
+      data: ApiLoginData;
+    }>('/auth/google', { idToken });
+    return { success: true, data: mapAuthData(response.data.data) };
+  },
+
+  loginWithApple: async (
+    identityToken: string,
+    name?: string,
+  ): Promise<ApiResponse<AuthResponse>> => {
+    const response = await apiClient.post<{
+      success: boolean;
+      data: ApiLoginData;
+    }>('/auth/apple', { identityToken, name });
+    return { success: true, data: mapAuthData(response.data.data) };
+  },
+
+  loginWithFacebook: async (
+    accessToken: string,
+  ): Promise<ApiResponse<AuthResponse>> => {
+    const response = await apiClient.post<{
+      success: boolean;
+      data: ApiLoginData;
+    }>('/auth/facebook', { accessToken });
+    return { success: true, data: mapAuthData(response.data.data) };
+  },
 };

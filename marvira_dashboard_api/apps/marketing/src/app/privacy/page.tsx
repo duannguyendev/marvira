@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { PageShell } from '@/components/page-shell';
 import { loadMarketingContent } from '@/lib/content-loader';
-import { SITE } from '@/lib/site';
+import { LEGAL_DRAFT, SITE } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -23,9 +23,11 @@ export default async function PrivacyPage({
           {content.legal.privacyTitle}
         </h1>
         <p className="mt-2 text-sm text-ink/55">{content.legal.updated}</p>
-        <p className="mt-4 rounded-xl bg-sun/15 px-4 py-3 text-sm text-ink/80">
-          {content.legal.counselNote}
-        </p>
+        {LEGAL_DRAFT && (
+          <p className="mt-4 rounded-xl bg-sun/15 px-4 py-3 text-sm text-ink/80">
+            {content.legal.counselNote}
+          </p>
+        )}
 
         <h2>1. Who we are</h2>
         <p>
@@ -38,7 +40,7 @@ export default async function PrivacyPage({
         <ul>
           <li>
             Account data: name, email, authentication identifiers (including
-            OAuth).
+            Sign in with Google, Sign in with Apple, and Facebook Login).
           </li>
           <li>
             Location data: device GPS while you play, to check in at hunt places
@@ -74,11 +76,30 @@ export default async function PrivacyPage({
           <li>Comply with law and store review requirements.</li>
         </ul>
 
-        <h2>4. Sharing</h2>
+        <h2>4. Sign-in with Google, Apple, and Facebook</h2>
+        <p>
+          You may create or access a Marvira account using{' '}
+          <strong>Google</strong>, <strong>Apple</strong>, or{' '}
+          <strong>Facebook</strong>. When you choose one of these providers, we
+          receive basic profile information they share with us (typically name,
+          email address, and a provider user identifier, and sometimes a profile
+          photo). We use that information only to authenticate you, create or
+          link your Marvira account, and secure the service. We do not post to
+          your social accounts. You can revoke Marvira’s access in your Google,
+          Apple, or Facebook account settings; that may prevent future social
+          sign-in until you connect again.
+        </p>
+        <p>
+          Each provider processes your data under its own privacy policy when
+          you authenticate. Marvira’s processing of the data we receive is
+          described in this policy.
+        </p>
+
+        <h2>5. Sharing</h2>
         <p>
           We do not sell personal information. We may share data with
           infrastructure providers (hosting, analytics, email,
-          payments/subscriptions, ad partners if you use a free ad- supported
+          payments/subscriptions, ad partners if you use a free ad-supported
           experience), and when required by law. Public leaderboards may show
           display names and scores for events you join. Public invite pages
           never expose answers, exact GPS spoilers, or private participant
@@ -94,14 +115,14 @@ export default async function PrivacyPage({
           documentation for how Google processes this data on our behalf.
         </p>
 
-        <h2>5. Retention & security</h2>
+        <h2>6. Retention & security</h2>
         <p>
           We retain data as long as your account is active and as needed for
           legitimate business or legal purposes. We use industry-standard
           safeguards; no method of transmission is 100% secure.
         </p>
 
-        <h2>6. Your choices</h2>
+        <h2>7. Your choices</h2>
         <ul>
           <li>Update profile data in the app.</li>
           <li>
@@ -117,21 +138,21 @@ export default async function PrivacyPage({
           </li>
         </ul>
 
-        <h2>7. Children</h2>
+        <h2>8. Children</h2>
         <p>
           Marvira is not directed to children under 13 (or the minimum age in
           your country). We do not knowingly collect data from children under
           that age.
         </p>
 
-        <h2>8. International transfers</h2>
+        <h2>9. International transfers</h2>
         <p>
           If you use Marvira from outside the country where servers are located,
           your data may be processed in other regions with appropriate
           safeguards.
         </p>
 
-        <h2>9. Changes</h2>
+        <h2>10. Changes</h2>
         <p>
           We may update this policy. Material changes will be posted on this
           page with a new “Last updated” date.

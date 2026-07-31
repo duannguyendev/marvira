@@ -34,10 +34,12 @@ export const RegisterScreen: React.FC = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { register, isRegistering, registerError } = useAuth();
 
-  const [name, setName] = useState('John Doe');
-  const [email, setEmail] = useState('user@example.com');
-  const [password, setPassword] = useState('password123');
-  const [confirmPassword, setConfirmPassword] = useState('password123');
+  const [name, setName] = useState(__DEV__ ? 'John Doe' : '');
+  const [email, setEmail] = useState(__DEV__ ? 'user@example.com' : '');
+  const [password, setPassword] = useState(__DEV__ ? 'password123' : '');
+  const [confirmPassword, setConfirmPassword] = useState(
+    __DEV__ ? 'password123' : '',
+  );
   const [errors, setErrors] = useState<{
     name?: string;
     email?: string;

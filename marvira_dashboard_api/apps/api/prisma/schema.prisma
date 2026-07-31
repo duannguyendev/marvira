@@ -80,6 +80,8 @@ model User {
   avatar             String?
   passwordHash       String?      @map("password_hash")
   provider           AuthProvider @default(LOCAL)
+  /// Stable id from Google sub / Apple sub / Facebook id (null for LOCAL)
+  providerUserId     String?      @map("provider_user_id")
   role               UserRole     @default(USER)
   isActive           Boolean      @default(true) @map("is_active")
   warningPoints      Int          @default(0) @map("warning_points")
@@ -105,6 +107,7 @@ model User {
   articles              Article[]                @relation("ArticleCreator")
   placeAnswerReports    PlaceAnswerReport[]
 
+  @@unique([provider, providerUserId])
   @@index([warningPoints])
   @@map("users")
 }

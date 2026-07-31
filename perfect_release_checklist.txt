@@ -1,0 +1,331 @@
+================================================================================
+MARVIRA — PERFECT RELEASE CHECKLIST (v1.0)
+================================================================================
+Updated: 2026-07-30
+
+PRIORITY ORDER (why website first)
+  Meta App Review needs a live HTTPS Privacy Policy URL.
+  So: finish marketing website code → deploy marketing (+ API if needed)
+  → submit Meta review early → continue mobile / social in parallel.
+
+HOW THIS WORKS
+  1. DEV-WEB — finish website code (placeholders OK for store URLs).
+  2. Owner provides WEB-FIRST credentials (domain, support email, API host).
+  3. WEB-DEPLOY — go live with /privacy /terms (enough for Meta).
+  4. DEV-MOBILE / DEV-AUTH — continue app work while Meta reviews.
+  5. OPS full stack + STORE when social keys + signing are ready.
+
+References:
+  release_credentials.txt          ← keys / accounts (section A first for web)
+  go_live_update_checklist.txt
+  growth_plan.txt | monetization_todo.txt | store_privacy_labels.txt
+  marvira_dashboard_api/docs/deployment.md
+
+Legend:
+  [ ]  = Not started
+  [~]  = In progress / partial
+  [x]  = Done (verified)
+  DEV  = Code (no production secrets required to implement)
+  WEB  = Website path (do first)
+  OPS  = Needs credentials from release_credentials.txt
+  STORE= Signing + store / Meta accounts
+
+Scope (v1.0):
+  - Auth: email/password + Google + Apple + Facebook
+  - Ads / Plus / IAP / publish caps OFF
+  - ONE launch city first
+
+================================================================================
+0. ALREADY DONE IN SOURCE (verify on staging later — do not rebuild)
+================================================================================
+
+[x] Marketing app exists (landing, explore, support, privacy, terms, download)
+[x] Core mobile loop + practice + create + leaderboards + feedback
+[x] Auth API: POST /auth/google | /auth/apple | /auth/facebook
+[x] API health + production boot guards
+[x] Codemagic workflows defined; Firebase SDK wired
+[x] No AdMob / IAP / Plus in mobile
+
+================================================================================
+================================================================================
+TRACK A — WEBSITE FIRST (finish + deploy for Meta)
+================================================================================
+Goal: public https://www.<domain>/privacy (and /terms) live ASAP.
+Store badges can stay “coming soon” (STORE_READY=false) until apps ship.
+================================================================================
+
+--------------------------------------------------------------------------------
+A1. DEV-WEB — marketing code (do now, no prod keys)
+--------------------------------------------------------------------------------
+
+[x] Support email from ENV (not hard-coded *.example.com)
+    Path: apps/marketing/src/lib/site.ts → NEXT_PUBLIC_SUPPORT_EMAIL
+    FAQ uses {{supportEmail}}; /support, /privacy, /terms use SITE.supportEmail
+    DONE 2026-07-30 — real value still needed from owner (see A2 / release_credentials)
+
+[x] Privacy + Terms mention Google, Apple, Facebook Login
+    Paths: privacy/page.tsx (new §4), terms/page.tsx (accounts)
+    DONE 2026-07-30 — counsel should still review before/at WEB-DEPLOY
+
+[x] Soften “draft / counsel” banner for public deploy
+    counselNote only when NEXT_PUBLIC_LEGAL_DRAFT=true (default off)
+    DONE 2026-07-30
+
+[x] Marketing /e/{id} loads ANY published event from API
+    Paths: apps/marketing/src/lib/events.ts + app/e/[id]/page.tsx
+    dynamic force-dynamic; seed featured hunts kept as offline fallback only
+    DONE 2026-07-30 — needs live API + a published event to verify on deploy
+
+[x] /support feedback posts via NEXT_PUBLIC_API_URL
+    Verified: components/feedback-form.tsx already uses NEXT_PUBLIC_API_URL
+    DONE 2026-07-30 (code review; confirm on WEB-DEPLOY)
+
+[x] Download page OK when STORE_READY=false
+    Verified: shows content.download.storesSoon — launch-safe
+    DONE 2026-07-30
+
+[x] Marketing .env.example lists all public vars
+    Includes SUPPORT_EMAIL, LEGAL_DRAFT, store URLs, API, CDN, SITE_URL
+    DONE 2026-07-30
+
+[~] Smoke locally: home, privacy, terms, support, explore, /e/{id}
+    tsc --noEmit passed for marketing app
+    Full browser smoke: do when local/prod API is up (before WEB-DEPLOY)
+    NOTE FOR OWNER/DEV: run through checklist A3 verify list once API is deployed
+
+--------------------------------------------------------------------------------
+A2. WEB-FIRST credentials (OWNER — PROVIDE THESE; blocks deploy + Meta)
+--------------------------------------------------------------------------------
+>>> See release_credentials.txt “How to get API URL / JWT / DB / Redis”
+
+[x] PRODUCTION_MARKETING_URL = https://www.marvira.com   (2026-07-31)
+[x] SUPPORT_EMAIL = support@marvira.com                  (2026-07-31)
+
+[ ] PRODUCTION_API_URL  (recommended https://api.marvira.com)
+    → create hosting + DNS; guide in release_credentials.txt
+
+[ ] JWT_SECRET + DATABASE_URL + REDIS_URL
+    → generate JWT; create managed Postgres + Redis (hosting secrets only)
+
+[ ] OAUTH_DEV_BYPASS=false on that API
+
+[ ] CORS_ORIGIN includes https://www.marvira.com (+ admin when live)
+
+[ ] Counsel OK (or interim) Privacy + Terms text to publish
+    Current copy is product-ready interim; counsel can refine anytime
+    Set NEXT_PUBLIC_LEGAL_DRAFT=true only if you want the yellow draft banner back
+
+Not required yet for Meta Privacy URL:
+  Google/Apple/Facebook mobile client secrets, Codemagic signing, store URLs
+
+--------------------------------------------------------------------------------
+A3. WEB-DEPLOY — go live (marketing + API)
+--------------------------------------------------------------------------------
+
+[ ] Deploy API over HTTPS + prisma migrate deploy; /health + /ready = 200
+[ ] Deploy marketing over HTTPS with:
+      NEXT_PUBLIC_SITE_URL=https://www.marvira.com
+      NEXT_PUBLIC_API_URL=https://api.marvira.com
+      NEXT_PUBLIC_SUPPORT_EMAIL=support@marvira.com
+      Store URLs empty → STORE_READY=false is fine
+[ ] Verify live:
+      [ ] /privacy
+      [ ] /terms
+      [ ] /support (form reaches API)
+      [ ] /e/{id} for a real published event (create one via admin/seed)
+[ ] Point DNS; HTTPS cert valid
+[ ] Meta Developer app → Privacy Policy URL = https://www.marvira.com/privacy
+[ ] Submit Meta App Review (email permission) — START NOW, do not wait for stores
+
+--------------------------------------------------------------------------------
+A4. WEB DONE GATE
+--------------------------------------------------------------------------------
+
+[ ] A1 all [x]
+[ ] A3 live Privacy/Terms verified
+[ ] Meta review submitted (or scheduled same day as deploy)
+
+→ Then continue TRACK B (mobile/auth code) while Meta reviews.
+
+================================================================================
+================================================================================
+TRACK B — MOBILE + AUTH DEVELOPMENT (after WEB code; parallel with Meta)
+================================================================================
+No production OAuth keys required to implement — use ENV placeholders.
+================================================================================
+
+--------------------------------------------------------------------------------
+B1. Mobile hygiene
+--------------------------------------------------------------------------------
+
+[x] Clear Login demo prefills (LoginScreen.tsx)
+    Release: empty fields; __DEV__ keeps demo@marvira.com / demo123
+    DONE 2026-07-30
+
+[x] Clear Register demo prefills (RegisterScreen.tsx)
+    Release: empty; __DEV__ keeps sample values
+    DONE 2026-07-30
+
+[x] Fill missing zh/ja gift/completion i18n keys (~43)
+    Filled from en.json as interim strings — OWNER: native zh/ja polish later if desired
+    DONE 2026-07-30
+
+[~] Document IMAGE + GPS manual test steps (device pass in OPS)
+    Use docs/MANUAL_TEST_CASES.md on device after WEB-DEPLOY / staging
+    Deferred to Track C device pass
+
+--------------------------------------------------------------------------------
+B2. Social login — API hardening
+--------------------------------------------------------------------------------
+
+[x] Google: multi-audience ID token verify
+    GOOGLE_CLIENT_ID or comma-separated GOOGLE_CLIENT_IDS
+    DONE 2026-07-30
+
+[x] Persist provider user id (Google sub / Apple sub / Facebook id)
+    Migration: 20260730120000_user_provider_user_id
+    OWNER: run `pnpm exec prisma migrate deploy` on each environment
+    DONE 2026-07-30 (source)
+
+[x] Require FACEBOOK_APP_ID + SECRET in production; always debug_token
+    Also requires GOOGLE_* and APPLE_CLIENT_ID in production boot
+    DONE 2026-07-30
+
+[x] Email linking policy across LOCAL + 3 providers
+    Match providerUserId first, else email link (keep LOCAL password), else create
+    Documented in auth.service.ts loginWithProvider
+    DONE 2026-07-30
+
+[x] .env.example → point to ../release_credentials.txt
+    DONE 2026-07-30
+
+[x] OAUTH_DEV_BYPASS local-only; production validate rejects unless false
+    DONE 2026-07-30 (already enforced; unchanged)
+
+--------------------------------------------------------------------------------
+B3. Social login — mobile UI
+--------------------------------------------------------------------------------
+
+[x] Packages: google-signin, apple-authentication, react-native-fbsdk-next
+    DONE 2026-07-30 — OWNER/DEV: `cd ios && pod install` on Mac before iOS build
+
+[x] Native scaffolding (entitlements, URL schemes, manifest slots)
+    iOS: Marvira.entitlements + Info.plist placeholders
+    Android: Facebook meta-data + strings.xml placeholders
+    DONE 2026-07-30
+    OWNER: replace placeholders when credentials arrive (see below)
+
+[x] .env.example social ENV names
+    GOOGLE_WEB_CLIENT_ID, FACEBOOK_APP_ID, FACEBOOK_CLIENT_TOKEN
+    DONE 2026-07-30
+
+[x] auth.ts: loginWithGoogle / Apple / Facebook → API
+    DONE 2026-07-30
+
+[x] useAuth / auth.service → same token storage as email
+    DONE 2026-07-30
+
+[x] LoginScreen buttons (Apple iOS-only; Google+Facebook both)
+    Shows clear error if ENV not configured; cancel is silent
+    DONE 2026-07-30
+
+[x] i18n en/vi/zh/ja for social buttons
+    DONE 2026-07-30
+
+[x] CODEMAGIC.md notes for social ENV
+    DONE 2026-07-30
+
+>>> OWNER PROVIDE (for social to work on device) — release_credentials.txt C–E:
+    GOOGLE_WEB_CLIENT_ID (+ iOS/Android clients; API GOOGLE_CLIENT_IDS)
+    APPLE_CLIENT_ID (= com.marvira) + Apple Developer Sign In capability
+    FACEBOOK_APP_ID, FACEBOOK_APP_SECRET (API), FACEBOOK_CLIENT_TOKEN (mobile)
+    Then replace:
+      ios Info.plist: GOOGLE_REVERSED_CLIENT_ID, fbFACEBOOK_APP_ID, Facebook keys
+      android strings.xml: facebook_app_id, facebook_client_token, fb_login_protocol_scheme
+
+--------------------------------------------------------------------------------
+B4. Repo polish (optional before full handoff)
+--------------------------------------------------------------------------------
+
+[ ] Align yarn vs npm docs for mobile
+[ ] Root GitHub Actions (nested workflows may not run)
+[x] release_credentials.LOCAL.txt in .gitignore
+
+--------------------------------------------------------------------------------
+B DONE GATE
+--------------------------------------------------------------------------------
+
+[x] B1–B3 code complete; tsc clean (mobile + API)
+[~] Native build verify after pod install + owner credentials
+[x] Invite page already coded in Track A (live after WEB-DEPLOY)
+
+================================================================================
+================================================================================
+TRACK C — FULL OPS (after social credentials + soft test prep)
+================================================================================
+Prerequisite: release_credentials sections C–E (Google/Apple/Facebook) PROVIDED.
+Website (Track A) already live.
+================================================================================
+
+[ ] Inject Google / Apple / Facebook secrets into API + Codemagic / mobile
+[ ] Deploy/restart API with OAuth env; smoke social token verify on staging
+[ ] SMTP + PASSWORD_RESET_URL for email users
+[ ] Lock down /metrics + Swagger; restrict Maps API key
+[ ] DB backups + PITR
+[ ] Rotate seed passwords if used on prod
+[ ] Device manual pass: IMAGE + GPS
+[ ] Soft test 20–50 people (email + Google + Apple + Facebook)
+[ ] Firebase Analytics + Crashlytics on real devices
+[ ] Meta App Review approved; Facebook app Live
+[ ] Final counsel sign-off if interim legal text was used at WEB-DEPLOY
+
+================================================================================
+================================================================================
+TRACK D — STORE
+================================================================================
+
+[ ] Codemagic green AAB + IPA (signing from release_credentials F)
+[ ] Listings + screenshots + privacy labels (3 social logins)
+[ ] Apple review (Sign in with Apple + demo account)
+[ ] Play production release
+[ ] Set APP_STORE_URL + PLAY_STORE_URL → rebuild marketing STORE_READY=true
+[ ] Optional: Universal Links / App Links
+[ ] Load test before first big live event
+
+================================================================================
+OUT OF SCOPE FOR v1.0
+================================================================================
+
+  - Ads / AdMob, Plus, IAP, publish caps
+
+================================================================================
+IMPLEMENTATION LOG
+================================================================================
+
+Date       | Track | Item                         | Notes
+-----------+-------+------------------------------+---------------------------
+2026-07-30 |  —    | Checklist created            | DEV vs credentials split
+2026-07-30 |  A    | Website-first reorder        | Meta needs live /privacy
+2026-07-30 |  A1   | DEV-WEB marketing code       | support ENV, legal, /e/{id}
+2026-07-30 |  B1-3 | Prefills + social auth code  | WAITING: owner A2 + C–E keys
+           |       |                              | migrate provider_user_id; pod install
+
+================================================================================
+NEXT UP
+================================================================================
+
+WAITING ON OWNER — review and fill:
+  1) release_credentials.txt section A + B  → WEB-DEPLOY + Meta /privacy
+  2) release_credentials.txt sections C–E → Google / Apple / Facebook live login
+     Also replace iOS Info.plist + Android strings.xml placeholders (listed in B3)
+
+Developer next (after credentials or in parallel polish):
+  - A3 WEB-DEPLOY when A2 provided
+  - `pnpm exec prisma migrate deploy` (provider_user_id) on each DB
+  - Mac: `cd marvira_mobile/ios && pod install`
+  - Optional B4: yarn vs npm / root CI
+  - Track C soft test once social keys work on staging
+
+================================================================================
+END
+================================================================================

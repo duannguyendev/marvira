@@ -15,7 +15,14 @@ If required values are missing, the **build fails**.
 |----------|---------------------|-----------------------------|
 | `GOOGLE_MAPS_API_KEY` | Required (native) | Required |
 | `API_BASE_URL` | Not used (`__DEV__` → localhost) | Required |
-| `MARKETING_SITE_URL` | Not used (`__DEV__` → localhost) | Required |
+| `MARKETING_SITE_URL` | Not used (`__DEV__` → localhost:3002) | Required |
+| `GOOGLE_WEB_CLIENT_ID` | Optional until social login | Required for Google Sign-In |
+| `FACEBOOK_APP_ID` | Optional until social login | Required for Facebook Login |
+| `FACEBOOK_CLIENT_TOKEN` | Optional until social login | Required for Facebook Login |
+
+Apple Sign-In: enable capability on App ID `com.marvira`; set API `APPLE_CLIENT_ID`. Replace iOS Info.plist placeholders `GOOGLE_REVERSED_CLIENT_ID` / `fbFACEBOOK_APP_ID` / Facebook keys when credentials arrive (see `release_credentials.txt`).
+
+Also replace Android `strings.xml` Facebook placeholders before testing Facebook Login.
 
 ## How each platform reads them
 

@@ -61,7 +61,7 @@ module.exports = {
     [
       'transform-inline-environment-variables',
       {
-        include: ['API_BASE_URL', 'MARKETING_SITE_URL'],
+        include: ['API_BASE_URL', 'MARKETING_SITE_URL', 'GOOGLE_WEB_CLIENT_ID', 'FACEBOOK_APP_ID', 'FACEBOOK_CLIENT_TOKEN'],
       },
     ],
     // Reanimated 4's plugin is an alias of worklets; include only one (must be last).

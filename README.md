@@ -30,6 +30,8 @@ Read the **RECOVERY** header first, then **§14–24**. Not required for day-to-
 
 ## Launch companions
 
+- [perfect_release_checklist.txt](./perfect_release_checklist.txt) — **v1.0 tracking** (website first → Meta → mobile → stores)
+- [release_credentials.txt](./release_credentials.txt) — **API keys / accounts** (section A first for web deploy)
 - [go_live_update_checklist.txt](./go_live_update_checklist.txt)
 - [store_privacy_labels.txt](./store_privacy_labels.txt)
 - [growth_plan.txt](./growth_plan.txt)

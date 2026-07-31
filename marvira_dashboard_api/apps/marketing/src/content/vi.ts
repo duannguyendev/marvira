@@ -166,7 +166,7 @@ const vi: MarketingContent = {
       },
       {
         q: 'Làm sao liên hệ hỗ trợ?',
-        a: 'Dùng biểu mẫu phản hồi bên dưới — chúng tôi đọc mọi tin nhắn. Bạn cũng có thể gửi email hello@marvira.example.com.',
+        a: 'Dùng biểu mẫu phản hồi bên dưới — chúng tôi đọc mọi tin nhắn. Bạn cũng có thể gửi email {{supportEmail}}.',
       },
     ],
     form: {
@@ -206,7 +206,7 @@ const vi: MarketingContent = {
   legal: {
     privacyTitle: 'Chính sách quyền riêng tư',
     termsTitle: 'Điều khoản dịch vụ',
-    updated: 'Cập nhật lần cuối: 20 tháng 7, 2026',
+    updated: 'Cập nhật lần cuối: 30 tháng 7, 2026',
     counselNote:
       'Bản nháp phục vụ sản phẩm và cửa hàng ứng dụng. Cần luật sư rà soát cuối trước khi chính thức phát hành.',
   },
