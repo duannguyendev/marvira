@@ -18,6 +18,8 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8080
+# Migrations run in Railway preDeployCommand — avoid double-migrate on every boot
+ENV SKIP_MIGRATE_ON_BOOT=true
 
 COPY --from=builder /app/deploy ./
 COPY --from=builder /app/apps/api/prisma ./prisma
