@@ -15,19 +15,71 @@ async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
 
+function requireSeedPassword(
+  envName: string,
+  devDefault: string,
+  minLength = 12,
+): string {
+  const fromEnv = process.env[envName]?.trim();
+  if (fromEnv) {
+    if (
+      process.env.NODE_ENV === 'production' &&
+      fromEnv.length < minLength
+    ) {
+      throw new Error(
+        `${envName} must be at least ${minLength} characters in production`,
+      );
+    }
+    return fromEnv;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      `${envName} is required when seeding in production (do not use weak defaults)`,
+    );
+  }
+  return devDefault;
+}
+
+/** Optional accounts — skipped in production if env not set. */
+function optionalSeedPassword(
+  envName: string,
+  devDefault: string,
+): string | null {
+  const fromEnv = process.env[envName]?.trim();
+  if (fromEnv) return fromEnv;
+  if (process.env.NODE_ENV === 'production') return null;
+  return devDefault;
+}
+
 async function main() {
   console.log('Seeding database...');
 
   await ensureAppSettings();
 
-  const adminPasswordHash = await hashPassword('admin123');
-  const demoPasswordHash = await hashPassword('demo123');
+  const adminEmail =
+    process.env.SEED_ADMIN_EMAIL?.trim() || 'admin@marvira.com';
+  const demoEmail =
+    process.env.SEED_DEMO_EMAIL?.trim() || 'demo@marvira.com';
+  const staffEmail =
+    process.env.SEED_STAFF_EMAIL?.trim() || 'staff@marvira.com';
+  const supportEmail =
+    process.env.SEED_SUPPORT_EMAIL?.trim() || 'support@marvira.com';
+
+  const adminPassword = requireSeedPassword('SEED_ADMIN_PASSWORD', 'admin123');
+  const demoPassword = optionalSeedPassword('SEED_DEMO_PASSWORD', 'demo123');
+  const staffPassword = optionalSeedPassword('SEED_STAFF_PASSWORD', 'staff123');
+  const supportPassword = optionalSeedPassword(
+    'SEED_SUPPORT_PASSWORD',
+    'support123',
+  );
+
+  const adminPasswordHash = await hashPassword(adminPassword);
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@marvira.com' },
+    where: { email: adminEmail },
     update: { passwordHash: adminPasswordHash },
     create: {
-      email: 'admin@marvira.com',
+      email: adminEmail,
       name: 'Admin User',
       passwordHash: adminPasswordHash,
       provider: AuthProvider.LOCAL,
@@ -35,30 +87,51 @@ async function main() {
     },
   });
 
-  await prisma.user.upsert({
-    where: { email: 'demo@marvira.com' },
-    update: { passwordHash: demoPasswordHash },
-    create: {
-      email: 'demo@marvira.com',
-      name: 'Demo Player',
-      passwordHash: demoPasswordHash,
-      provider: AuthProvider.LOCAL,
-      role: UserRole.USER,
-    },
-  });
+  if (demoPassword) {
+    const demoPasswordHash = await hashPassword(demoPassword);
+    await prisma.user.upsert({
+      where: { email: demoEmail },
+      update: { passwordHash: demoPasswordHash },
+      create: {
+        email: demoEmail,
+        name: 'Demo Player',
+        passwordHash: demoPasswordHash,
+        provider: AuthProvider.LOCAL,
+        role: UserRole.USER,
+      },
+    });
+  }
 
-  const staffPasswordHash = await hashPassword('staff123');
-  await prisma.user.upsert({
-    where: { email: 'staff@marvira.com' },
-    update: { passwordHash: staffPasswordHash, role: UserRole.STAFF },
-    create: {
-      email: 'staff@marvira.com',
-      name: 'Staff User',
-      passwordHash: staffPasswordHash,
-      provider: AuthProvider.LOCAL,
-      role: UserRole.STAFF,
-    },
-  });
+  if (staffPassword) {
+    const staffPasswordHash = await hashPassword(staffPassword);
+    await prisma.user.upsert({
+      where: { email: staffEmail },
+      update: { passwordHash: staffPasswordHash, role: UserRole.STAFF },
+      create: {
+        email: staffEmail,
+        name: 'Staff User',
+        passwordHash: staffPasswordHash,
+        provider: AuthProvider.LOCAL,
+        role: UserRole.STAFF,
+      },
+    });
+  }
+
+  // Support uses STAFF role (no separate SUPPORT role in schema)
+  if (supportPassword) {
+    const supportPasswordHash = await hashPassword(supportPassword);
+    await prisma.user.upsert({
+      where: { email: supportEmail },
+      update: { passwordHash: supportPasswordHash, role: UserRole.STAFF },
+      create: {
+        email: supportEmail,
+        name: 'Support',
+        passwordHash: supportPasswordHash,
+        provider: AuthProvider.LOCAL,
+        role: UserRole.STAFF,
+      },
+    });
+  }
 
   const event = await prisma.event.upsert({
     where: { id: 'seed-event-downtown' },
@@ -404,9 +477,18 @@ async function main() {
   }
 
   console.log('Seed complete!');
-  console.log(`Admin: admin@marvira.com / admin123`);
-  console.log(`Staff: staff@marvira.com / staff123`);
-  console.log(`Demo user: demo@marvira.com / demo123`);
+  console.log(`Admin: ${adminEmail} / (from SEED_ADMIN_PASSWORD)`);
+  if (staffPassword) {
+    console.log(`Staff: ${staffEmail} / (from SEED_STAFF_PASSWORD or dev default)`);
+  }
+  if (supportPassword) {
+    console.log(
+      `Support: ${supportEmail} / (from SEED_SUPPORT_PASSWORD or dev default) [STAFF role]`,
+    );
+  }
+  if (demoPassword) {
+    console.log(`Demo user: ${demoEmail} / (from SEED_DEMO_PASSWORD or dev default)`);
+  }
 }
 
 // Ensure default app settings exist (also inserted by migration)
