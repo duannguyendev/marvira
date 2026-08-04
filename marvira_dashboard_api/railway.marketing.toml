@@ -1,0 +1,21 @@
+# Marketing / www service only.
+# Railway → Marketing → Settings → Config-as-code:
+#   /marvira_dashboard_api/railway.marketing.toml
+# Root Directory: marvira_dashboard_api
+#
+# Required build-time variables (no quotes):
+#   NEXT_PUBLIC_API_URL=https://marvira-production.up.railway.app
+#   NEXT_PUBLIC_SITE_URL=https://YOUR-MARKETING-DOMAIN.up.railway.app
+# Optional:
+#   NEXT_PUBLIC_SUPPORT_EMAIL=support@marvira.com
+#   NEXT_PUBLIC_CDN_URL=
+#   NEXT_PUBLIC_APP_STORE_URL=
+#   NEXT_PUBLIC_PLAY_STORE_URL=
+# Domain / target port: 3000
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "docker/marketing.Dockerfile"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
