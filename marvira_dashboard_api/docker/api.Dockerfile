@@ -16,12 +16,13 @@ RUN pnpm --filter @marvira/api deploy --prod /app/deploy
 FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-# Railway "Generate Domain" target port defaults to 8080 and sets PORT to match
 ENV PORT=8080
 
 COPY --from=builder /app/deploy ./
 COPY --from=builder /app/apps/api/prisma ./prisma
-RUN npm install -g prisma@6.19.3
+# prisma CLI + regenerate client into THIS node_modules (deploy drops .prisma)
+RUN npm install -g prisma@6.19.3 \
+  && prisma generate --schema=./prisma/schema.prisma
 
 RUN mkdir -p uploads
 EXPOSE 8080
