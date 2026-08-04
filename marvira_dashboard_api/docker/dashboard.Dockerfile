@@ -1,4 +1,5 @@
 FROM node:22-alpine AS base
+RUN apk add --no-cache libc6-compat
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 WORKDIR /app
 
@@ -6,17 +7,18 @@ FROM base AS builder
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json ./
 COPY apps/dashboard ./apps/dashboard
 COPY packages ./packages
-ARG NEXT_PUBLIC_API_URL=http://localhost:3001
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+# Railway provides NEXT_PUBLIC_API_URL as a build-time ENV (set it on the service before building)
+RUN test -n "$NEXT_PUBLIC_API_URL" || (echo "NEXT_PUBLIC_API_URL must be set on the Railway service before build" && exit 1)
 RUN pnpm install --frozen-lockfile --filter @marvira/dashboard...
 RUN pnpm --filter @marvira/shared-types build
 RUN pnpm --filter @marvira/shared-utils build
 RUN pnpm --filter @marvira/dashboard build
 
-FROM node:22-alpine AS runner
+FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 COPY --from=builder /app/apps/dashboard/.next ./apps/dashboard/.next
 COPY --from=builder /app/apps/dashboard/public ./apps/dashboard/public
@@ -28,5 +30,4 @@ COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 WORKDIR /app/apps/dashboard
 EXPOSE 3000
-ENV PORT=3000
 CMD ["pnpm", "start"]

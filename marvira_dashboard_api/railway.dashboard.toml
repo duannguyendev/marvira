@@ -1,0 +1,9 @@
+# Railway dashboard — Root Directory: marvira_dashboard_api
+# Set NEXT_PUBLIC_API_URL before build (baked into Next.js).
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "docker/dashboard.Dockerfile"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
