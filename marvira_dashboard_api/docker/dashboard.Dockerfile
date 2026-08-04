@@ -16,6 +16,8 @@ RUN pnpm install --frozen-lockfile --filter @marvira/dashboard...
 RUN pnpm --filter @marvira/shared-types build
 RUN pnpm --filter @marvira/shared-utils build
 RUN pnpm --filter @marvira/dashboard build
+# Next may have no static assets; ensure public/ exists for the runner COPY
+RUN mkdir -p apps/dashboard/public
 
 FROM base AS runner
 WORKDIR /app
