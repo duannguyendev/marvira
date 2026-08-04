@@ -2,18 +2,12 @@ FROM node:22-alpine AS base
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 WORKDIR /app
 
-FROM base AS deps
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* ./
-COPY apps/api/package.json ./apps/api/
-COPY packages/shared-types/package.json ./packages/shared-types/
-COPY packages/shared-utils/package.json ./packages/shared-utils/
-COPY packages/tsconfig/package.json ./packages/tsconfig/
-RUN pnpm install --frozen-lockfile || pnpm install
-
+# Install + build in one stage so pnpm workspace links (e.g. @marvira/tsconfig) exist.
 FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
-COPY . .
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json ./
+COPY apps/api ./apps/api
+COPY packages ./packages
+RUN pnpm install --frozen-lockfile --filter @marvira/api...
 RUN pnpm --filter @marvira/shared-types build
 RUN pnpm --filter @marvira/shared-utils build
 RUN cd apps/api && npx prisma generate
