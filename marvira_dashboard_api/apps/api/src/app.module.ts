@@ -30,6 +30,7 @@ import { AnticheatModule } from './anticheat/anticheat.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { ArticlesModule } from './articles/articles.module';
 import { AppSettingsModule } from './settings/app-settings.module';
+import { getRedisConnectionOptions } from './common/redis/redis-connection';
 
 const redisDisabled = process.env.REDIS_DISABLED === 'true';
 
@@ -47,12 +48,7 @@ const redisDisabled = process.env.REDIS_DISABLED === 'true';
       ? []
       : [
           BullModule.forRoot({
-            connection: process.env.REDIS_URL
-              ? { url: process.env.REDIS_URL }
-              : {
-                  host: process.env.REDIS_HOST || 'localhost',
-                  port: parseInt(process.env.REDIS_PORT || '6379', 10),
-                },
+            connection: getRedisConnectionOptions(),
           }),
         ]),
     PrismaModule,

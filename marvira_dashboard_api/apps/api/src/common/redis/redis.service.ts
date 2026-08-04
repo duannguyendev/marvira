@@ -1,5 +1,6 @@
 import { Global, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
+import { getRedisConnectionOptions } from './redis-connection';
 
 interface MemoryEntry {
   value: string;
@@ -26,8 +27,14 @@ export class RedisService implements OnModuleDestroy {
       this.logger.warn('Redis disabled — using in-memory cache (dev mode)');
       return;
     }
-    const url = process.env.REDIS_URL || 'redis://localhost:6379';
-    this.client = new Redis(url, { maxRetriesPerRequest: null });
+
+    this.client = new Redis(getRedisConnectionOptions());
+    this.client.on('error', err => {
+      this.logger.error(`Redis error: ${err.message}`);
+    });
+    this.client.on('connect', () => {
+      this.logger.log('Redis connected');
+    });
   }
 
   get redis(): Redis {
