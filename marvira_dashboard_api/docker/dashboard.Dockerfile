@@ -35,4 +35,4 @@ COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 WORKDIR /app/apps/dashboard
 EXPOSE 3000
-CMD ["pnpm", "start"]
+CMD ["pnpm", "start", "--", "-H", "0.0.0.0", "-p", "3000"]
