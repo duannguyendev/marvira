@@ -7,8 +7,11 @@ FROM base AS builder
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json ./
 COPY apps/dashboard ./apps/dashboard
 COPY packages ./packages
-# Railway provides NEXT_PUBLIC_API_URL as a build-time ENV (set it on the service before building)
-RUN test -n "$NEXT_PUBLIC_API_URL" || (echo "NEXT_PUBLIC_API_URL must be set on the Railway service before build" && exit 1)
+# Railway passes service vars into Docker only when declared as ARG (same name)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+RUN test -n "$NEXT_PUBLIC_API_URL" || (echo "NEXT_PUBLIC_API_URL must be set on the Railway dashboard service (no quotes)" && exit 1)
+RUN echo "Building dashboard with NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL"
 RUN pnpm install --frozen-lockfile --filter @marvira/dashboard...
 RUN pnpm --filter @marvira/shared-types build
 RUN pnpm --filter @marvira/shared-utils build
