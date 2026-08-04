@@ -12,7 +12,7 @@ RUN pnpm --filter @marvira/shared-utils build
 RUN cd apps/api && npx prisma generate
 RUN pnpm --filter @marvira/api build
 # Flatten workspace + deps into a portable folder (Prisma client lives under pnpm store, not apps/api/node_modules/.prisma)
-RUN pnpm --filter @marvira/api deploy --prod --legacy /app/deploy
+RUN pnpm --filter @marvira/api deploy --prod /app/deploy
 
 FROM node:22-alpine AS runner
 WORKDIR /app
