@@ -1,5 +1,8 @@
-# Railway dashboard — Root Directory: marvira_dashboard_api
-# Set NEXT_PUBLIC_API_URL before build (baked into Next.js).
+# Dashboard service only — do NOT use railway.api.toml here (that runs Prisma).
+# In Railway → Dashboard → Settings → Config-as-code path:
+#   /marvira_dashboard_api/railway.dashboard.toml
+# Root Directory: marvira_dashboard_api
+# Variable (required before build): NEXT_PUBLIC_API_URL=https://marvira-production.up.railway.app
 
 [build]
 builder = "DOCKERFILE"

@@ -1,0 +1,14 @@
+# API service only.
+# In Railway → API → Settings → Config-as-code path:
+#   /marvira_dashboard_api/railway.api.toml
+# Root Directory: marvira_dashboard_api
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "docker/api.Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+preDeployCommand = ["prisma migrate deploy --schema=./prisma/schema.prisma"]
