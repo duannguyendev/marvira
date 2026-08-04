@@ -48,9 +48,10 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   const port = parseInt(process.env.PORT || '3001', 10);
-  await app.listen(port);
-  logger.log(`API running on http://localhost:${port}`);
-  logger.log(`Swagger docs at http://localhost:${port}/docs`);
+  // Railway healthchecks require binding all interfaces, not just localhost
+  await app.listen(port, '0.0.0.0');
+  logger.log(`API running on http://0.0.0.0:${port}`);
+  logger.log(`Swagger docs at http://0.0.0.0:${port}/docs`);
 }
 
 bootstrap();

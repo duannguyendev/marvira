@@ -50,6 +50,9 @@ export function validateProductionConfig(logger: Logger): void {
   }
 
   if (!process.env.APPLE_CLIENT_ID?.trim()) {
-    throw new Error('APPLE_CLIENT_ID is required in production');
+    // Soft-launch: Apple Sign-In can be enabled later; missing id must not block API boot.
+    logger.warn(
+      'APPLE_CLIENT_ID is not set — Apple Sign-In will fail until it is configured',
+    );
   }
 }

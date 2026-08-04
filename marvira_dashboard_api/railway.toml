@@ -1,11 +1,13 @@
-# Railway API service — set service Root Directory to `marvira_dashboard_api`
-# (repo root has no package.json; Railpack fails without that root).
-# Config file path in Railway UI (if asked): /marvira_dashboard_api/railway.toml
+# Railway API — Root Directory: marvira_dashboard_api
+# Config path in UI if needed: /marvira_dashboard_api/railway.toml
 
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "docker/api.Dockerfile"
 
 [deploy]
-healthcheckPath = "/health"
+# Temporarily empty healthcheck so a boot crash shows in Deploy Logs instead of a 5‑min Network timeout.
+# After /health works in the browser, set this back to "/health" (or in Railway Settings).
+healthcheckPath = ""
 restartPolicyType = "ON_FAILURE"
+preDeployCommand = ["prisma migrate deploy --schema=./prisma/schema.prisma"]

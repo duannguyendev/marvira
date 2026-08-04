@@ -20,7 +20,21 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit() {
-    await prismaClient.$connect();
+    const timeoutMs = 20_000;
+    await Promise.race([
+      prismaClient.$connect(),
+      new Promise((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                `Prisma $connect timed out after ${timeoutMs}ms — check DATABASE_URL (use Railway Postgres variable reference)`,
+              ),
+            ),
+          timeoutMs,
+        ),
+      ),
+    ]);
   }
 
   async onModuleDestroy() {
