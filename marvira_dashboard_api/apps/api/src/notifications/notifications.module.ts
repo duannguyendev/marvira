@@ -7,34 +7,37 @@ import {
   NotificationsProcessor,
   AnalyticsProcessor,
   ImageProcessingProcessor,
-  CleanupProcessor,
 } from './notifications.processor';
+import { SessionCleanupService } from './session-cleanup.service';
 
 const redisDisabled = process.env.REDIS_DISABLED === 'true';
+/** Stub log-only queues — off by default (Upstash free-tier friendly). */
+const stubQueuesEnabled = process.env.BULL_STUB_QUEUES === 'true';
 
 @Module({
   imports: [
     PrismaModule,
-    ...(redisDisabled
-      ? []
-      : [
+    ...(!redisDisabled && stubQueuesEnabled
+      ? [
           BullModule.registerQueue(
             { name: 'notifications' },
             { name: 'analytics' },
             { name: 'image-processing' },
-            { name: 'cleanup' },
           ),
-        ]),
+        ]
+      : []),
   ],
-  providers: redisDisabled
-    ? [NotificationsService]
-    : [
-        NotificationsService,
-        NotificationsProcessor,
-        AnalyticsProcessor,
-        ImageProcessingProcessor,
-        CleanupProcessor,
-      ],
+  providers: [
+    NotificationsService,
+    SessionCleanupService,
+    ...(!redisDisabled && stubQueuesEnabled
+      ? [
+          NotificationsProcessor,
+          AnalyticsProcessor,
+          ImageProcessingProcessor,
+        ]
+      : []),
+  ],
   exports: [NotificationsService],
 })
 export class NotificationsModule {}
