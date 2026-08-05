@@ -32,6 +32,8 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     padding: spacing.xs,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   icon: {
     color: colors.warning,

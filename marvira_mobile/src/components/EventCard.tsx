@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Dimensions,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import LinearGradient from 'react-native-linear-gradient';
@@ -20,9 +19,6 @@ interface EventCardProps {
   isFavorite?: boolean;
   onFavoritePress?: () => void;
 }
-
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = width - spacing.lg * 2;
 
 export const EventCard: React.FC<EventCardProps> = ({
   event,
@@ -171,7 +167,6 @@ export const EventCard: React.FC<EventCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: CARD_WIDTH,
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
     borderRadius: borderRadius.xl,
@@ -191,8 +186,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: spacing.sm,
     right: spacing.sm,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: borderRadius.round,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
   },
   image: {
     width: '100%',

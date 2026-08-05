@@ -44,10 +44,13 @@ yarn ios
 
 ## Codemagic setup
 
-1. Use root `codemagic.yaml`.
-2. Env group **`marvira_mobile_secrets`** with the required Secure vars.
-3. Wire Android signing (`marvira_android`) and App Store Connect (`marvira_asc`).
-4. Start Build — workflows verify ENV, then build.
+1. Use root `codemagic.yaml` (committed at repo root).
+2. Env group **`marvira_mobile_secrets`** with all Required variables above.
+3. Code signing identities:
+   - Android keystore reference: **`marvira_android`**
+   - App Store Connect integration: **`marvira_asc`**
+4. Start Build → `android-release` or `ios-release`.
+   Workflows verify ENV, install with **yarn**, then build (AAB / IPA).
 
 ### Optional Firebase via base64
 

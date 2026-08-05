@@ -5,7 +5,7 @@ import { PracticeListScreen } from '../screens/practice/PracticeListScreen';
 import { QuestionTrainingScreen } from '../screens/practice/QuestionTrainingScreen';
 import { AddQuestionScreen } from '../screens/practice/AddQuestionScreen';
 import { PracticeStackParamList } from './types';
-import { colors } from '../theme';
+import { primaryStackScreenOptions } from './stackOptions';
 
 const Stack = createNativeStackNavigator<PracticeStackParamList>();
 
@@ -13,17 +13,7 @@ export const PracticeNavigator: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.primary,
-        },
-        headerTintColor: colors.background,
-        headerTitleStyle: {
-          fontWeight: '600',
-        },
-        contentStyle: { backgroundColor: colors.backgroundLight },
-      }}>
+    <Stack.Navigator screenOptions={primaryStackScreenOptions}>
       <Stack.Screen
         name="PracticeList"
         component={PracticeListScreen}

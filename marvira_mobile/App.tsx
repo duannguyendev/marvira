@@ -40,7 +40,7 @@ const App: React.FC = () => {
                 <StatusBar
                   barStyle="light-content"
                   backgroundColor={colors.primary}
-                  translucent
+                  translucent={false}
                 />
                 <RootNavigator />
               </View>

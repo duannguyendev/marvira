@@ -96,7 +96,7 @@ export const FavoritesScreen: React.FC = () => {
         <FlatList
           data={events}
           keyExtractor={item => item.id}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={styles.eventsList}
           refreshControl={
             <RefreshControl
               refreshing={refreshing || eventsQuery.isRefetching}
@@ -104,7 +104,7 @@ export const FavoritesScreen: React.FC = () => {
             />
           }
           ListEmptyComponent={
-            <View style={styles.empty}>
+            <View style={[styles.empty, styles.eventsEmpty]}>
               <Text style={styles.emptyIcon}>⭐</Text>
               <Text style={styles.emptyTitle}>
                 {t('favorites.emptyEventsTitle')}
@@ -134,7 +134,7 @@ export const FavoritesScreen: React.FC = () => {
         <FlatList
           data={questions}
           keyExtractor={item => item.id}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={styles.questionsList}
           refreshControl={
             <RefreshControl
               refreshing={refreshing || questionsQuery.isRefetching}
@@ -217,8 +217,12 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
-  list: {
-    padding: spacing.md,
+  eventsList: {
+    paddingTop: 0,
+    paddingBottom: spacing.xxl,
+  },
+  questionsList: {
+    paddingHorizontal: spacing.md,
     paddingTop: 0,
     paddingBottom: spacing.xxl,
   },
@@ -228,6 +232,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderRadius: borderRadius.lg,
     marginTop: spacing.md,
+  },
+  eventsEmpty: {
+    marginHorizontal: spacing.lg,
   },
   emptyIcon: {
     fontSize: 40,

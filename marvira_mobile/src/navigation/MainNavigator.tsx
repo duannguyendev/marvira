@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,17 +9,37 @@ import { FavoritesNavigator } from './FavoritesNavigator';
 import { ProfileNavigator } from './ProfileNavigator';
 import { MainTabParamList } from './types';
 import { colors } from '../theme';
-import { Text } from 'react-native';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
+
+/** Icon + label + padding; keep tall enough so emoji don't collide with titles. */
+const TAB_BAR_CONTENT_HEIGHT = 58;
+
+const tabIconStyle = {
+  fontSize: 22,
+  lineHeight: 24,
+  includeFontPadding: false,
+} as const;
+
+const TabIcon: React.FC<{ emoji: string }> = ({ emoji }) => (
+  <Text style={tabIconStyle}>{emoji}</Text>
+);
 
 export const MainNavigator: React.FC = () => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const tabBarPaddingBottom = Math.max(insets.bottom, 8);
+  /**
+   * Android (edgeToEdgeEnabled=false + opaque status bar): the window already
+   * sits above the system nav bar — applying insets.bottom again creates a
+   * blank strip above the tab bar. iOS still needs the home-indicator inset.
+   */
+  const bottomInset = Platform.OS === 'ios' ? Math.max(insets.bottom, 8) : 6;
 
   return (
     <Tab.Navigator
+      safeAreaInsets={
+        Platform.OS === 'android' ? { bottom: 0 } : undefined
+      }
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
@@ -27,20 +48,25 @@ export const MainNavigator: React.FC = () => {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          paddingBottom: tabBarPaddingBottom,
-          paddingTop: 8,
-          height: 52 + tabBarPaddingBottom,
+          paddingTop: 4,
+          paddingBottom: bottomInset,
+          height: TAB_BAR_CONTENT_HEIGHT + bottomInset,
+        },
+        tabBarIconStyle: {
+          marginTop: 2,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '500',
+          marginTop: 2,
+          marginBottom: 2,
         },
       }}>
       <Tab.Screen
         name="Home"
         component={HomeNavigator}
         options={{
-          tabBarIcon: () => <Text style={{ fontSize: 24 }}>🏠</Text>,
+          tabBarIcon: () => <TabIcon emoji="🏠" />,
           tabBarLabel: t('nav.events'),
         }}
       />
@@ -48,7 +74,7 @@ export const MainNavigator: React.FC = () => {
         name="Practice"
         component={PracticeNavigator}
         options={{
-          tabBarIcon: () => <Text style={{ fontSize: 24 }}>📚</Text>,
+          tabBarIcon: () => <TabIcon emoji="📚" />,
           tabBarLabel: t('nav.practice'),
         }}
       />
@@ -56,7 +82,7 @@ export const MainNavigator: React.FC = () => {
         name="Favorites"
         component={FavoritesNavigator}
         options={{
-          tabBarIcon: () => <Text style={{ fontSize: 24 }}>⭐</Text>,
+          tabBarIcon: () => <TabIcon emoji="⭐" />,
           tabBarLabel: t('nav.favorites'),
         }}
       />
@@ -64,7 +90,7 @@ export const MainNavigator: React.FC = () => {
         name="Profile"
         component={ProfileNavigator}
         options={{
-          tabBarIcon: () => <Text style={{ fontSize: 24 }}>👤</Text>,
+          tabBarIcon: () => <TabIcon emoji="👤" />,
           tabBarLabel: t('nav.profile'),
         }}
       />

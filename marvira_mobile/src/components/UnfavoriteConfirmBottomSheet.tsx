@@ -97,6 +97,5 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     flex: 1,
-    backgroundColor: colors.error,
   },
 });

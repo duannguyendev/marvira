@@ -11,49 +11,32 @@ import { NotificationListScreen } from '../screens/notifications/NotificationLis
 import { NotificationDetailScreen } from '../screens/notifications/NotificationDetailScreen';
 import { withScreenSafeArea } from '../components/Screen';
 import { ProfileStackParamList } from './types';
-import { colors } from '../theme';
+import { primaryStackScreenOptions } from './stackOptions';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
+/** Profile home has no stack header — pad under status bar. */
 const ProfileScreenSafe = withScreenSafeArea(ProfileScreen, [
   'top',
   'left',
   'right',
 ]);
-const SettingsScreenSafe = withScreenSafeArea(SettingsScreen, [
-  'top',
-  'left',
-  'right',
-]);
-const FeedbackScreenSafe = withScreenSafeArea(FeedbackScreen, [
-  'top',
-  'left',
-  'right',
-]);
+/** Headered screens: only horizontal safe area (header owns the top inset). */
+const headeredEdges = ['left', 'right'] as const;
+const SettingsScreenSafe = withScreenSafeArea(SettingsScreen, [...headeredEdges]);
+const FeedbackScreenSafe = withScreenSafeArea(FeedbackScreen, [...headeredEdges]);
 const NotificationListScreenSafe = withScreenSafeArea(NotificationListScreen, [
-  'top',
-  'left',
-  'right',
+  ...headeredEdges,
 ]);
 const NotificationDetailScreenSafe = withScreenSafeArea(
   NotificationDetailScreen,
-  ['top', 'left', 'right'],
+  [...headeredEdges],
 );
 
 export const ProfileNavigator: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.primary,
-        },
-        headerTintColor: colors.background,
-        headerTitleStyle: {
-          fontWeight: '600',
-        },
-        contentStyle: { backgroundColor: colors.backgroundLight },
-      }}>
+    <Stack.Navigator screenOptions={primaryStackScreenOptions}>
       <Stack.Screen
         name="ProfileMain"
         component={ProfileScreenSafe}

@@ -1,0 +1,29 @@
+diff --git a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt
+index c99ca36..2ed9d9d 100644
+--- a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt
++++ b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt
+@@ -365,10 +365,20 @@ class Screen(
+                     ) { "[RNScreens] DecorView is required for applying inset correction, but was null." }
+ 
+                 val topInset = getDecorViewTopInset(topLevelDecorView)
+-                val correctedHeight = height - topInset
+-                val correctedOffsetY = t + topInset
+-
+-                dispatchShadowStateUpdate(width, correctedHeight, correctedOffsetY)
++                val locationOnScreen = IntArray(2)
++                getLocationOnScreen(locationOnScreen)
++                // Only shrink the Fabric layout when this view actually draws under the
++                // status bar. Nested tab stacks with edgeToEdgeEnabled=false already sit
++                // below it — subtracting topInset there leaves a permanent bottom gap
++                // above the tab bar (software-mansion/react-native-screens#3690).
++                if (topInset > 0 && locationOnScreen[1] < topInset) {
++                    val correctedHeight = height - topInset
++                    val correctedOffsetY = t + topInset
++
++                    dispatchShadowStateUpdate(width, correctedHeight, correctedOffsetY)
++                } else {
++                    dispatchShadowStateUpdate(width, height, t)
++                }
+             } else {
+                 dispatchShadowStateUpdate(width, height, t)
+             }

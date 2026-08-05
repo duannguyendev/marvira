@@ -1,14 +1,24 @@
 # Codemagic CI for Marvira mobile (React Native)
 #
-# Setup:
-# 1. Connect this repo in Codemagic
-# 2. Create env group `marvira_mobile_secrets` with Secure vars from
-#    marvira_mobile/.env.example (GOOGLE_MAPS_API_KEY, API_BASE_URL, MARKETING_SITE_URL)
-# 3. Optional: GOOGLE_SERVICES_JSON_BASE64, GOOGLE_SERVICE_INFO_PLIST_BASE64
-# 4. Configure iOS code signing + Android keystore in Codemagic UI
+# Setup checklist (Codemagic UI):
+# 1. Connect this repo → Applications → check for this yaml
+# 2. Env group `marvira_mobile_secrets` (Secure) with:
+#      GOOGLE_MAPS_API_KEY
+#      API_BASE_URL              (e.g. https://api.marvira.com)
+#      MARKETING_SITE_URL        (e.g. https://www.marvira.com)
+#      GOOGLE_WEB_CLIENT_ID      (Web OAuth client — Google Sign-In)
+#      FACEBOOK_APP_ID
+#      FACEBOOK_CLIENT_TOKEN
+# 3. Optional override (repo already has placeholder Firebase configs):
+#      GOOGLE_SERVICES_JSON_BASE64
+#      GOOGLE_SERVICE_INFO_PLIST_BASE64
+# 4. Code signing identities:
+#      Android keystore reference name: marvira_android
+#      iOS: App Store Connect integration name: marvira_asc
+# 5. Start Build → pick android-release or ios-release
 #
-# No manual secrets script — Start Build is enough.
-# Local: copy .env.example → .env.local, then yarn android / yarn ios (or Run in IDE).
+# Local: copy marvira_mobile/.env.example → .env.local, then yarn android / yarn ios.
+# See marvira_mobile/CODEMAGIC.md
 
 workflows:
   android-release:
@@ -28,19 +38,40 @@ workflows:
     scripts:
       - name: Verify required ENV
         script: |
-          test -n "$GOOGLE_MAPS_API_KEY"
-          test -n "$API_BASE_URL"
-          test -n "$MARKETING_SITE_URL"
-      - name: Install npm dependencies
+          set -e
+          for v in \
+            GOOGLE_MAPS_API_KEY \
+            API_BASE_URL \
+            MARKETING_SITE_URL \
+            GOOGLE_WEB_CLIENT_ID \
+            FACEBOOK_APP_ID \
+            FACEBOOK_CLIENT_TOKEN
+          do
+            eval "val=\${$v:-}"
+            if [ -z "$val" ]; then
+              echo "Missing required Secure ENV: $v (group marvira_mobile_secrets)"
+              exit 1
+            fi
+          done
+          echo "Required ENV present."
+      - name: Install yarn dependencies
         script: |
-          npm ci
+          yarn install --frozen-lockfile
       - name: Write Firebase config (optional)
         script: |
           if [ -n "${GOOGLE_SERVICES_JSON_BASE64:-}" ]; then
             echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > android/app/google-services.json
+            echo "Wrote android/app/google-services.json from ENV"
+          else
+            echo "Using committed google-services.json"
           fi
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
       - name: Build Android App Bundle
         script: |
+          # Signed via CM_* env from android_signing (see app/build.gradle)
+          test -n "$CM_KEYSTORE_PATH"
           cd android
           ./gradlew bundleRelease
     artifacts:
@@ -49,7 +80,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - hello@marvira.example.com
+          - support@marvira.com
         notify:
           success: true
           failure: true
@@ -76,17 +107,33 @@ workflows:
     scripts:
       - name: Verify required ENV
         script: |
-          test -n "$GOOGLE_MAPS_API_KEY"
-          test -n "$API_BASE_URL"
-          test -n "$MARKETING_SITE_URL"
-      - name: Install npm dependencies
+          set -e
+          for v in \
+            GOOGLE_MAPS_API_KEY \
+            API_BASE_URL \
+            MARKETING_SITE_URL \
+            GOOGLE_WEB_CLIENT_ID \
+            FACEBOOK_APP_ID \
+            FACEBOOK_CLIENT_TOKEN
+          do
+            eval "val=\${$v:-}"
+            if [ -z "$val" ]; then
+              echo "Missing required Secure ENV: $v (group marvira_mobile_secrets)"
+              exit 1
+            fi
+          done
+          echo "Required ENV present."
+      - name: Install yarn dependencies
         script: |
-          npm ci
+          yarn install --frozen-lockfile
       - name: Write Firebase config (optional)
         script: |
           if [ -n "${GOOGLE_SERVICE_INFO_PLIST_BASE64:-}" ]; then
             echo "$GOOGLE_SERVICE_INFO_PLIST_BASE64" | base64 --decode > ios/Marvira/GoogleService-Info.plist
             cp ios/Marvira/GoogleService-Info.plist ios/GoogleService-Info.plist
+            echo "Wrote GoogleService-Info.plist from ENV"
+          else
+            echo "Using committed GoogleService-Info.plist"
           fi
       - name: CocoaPods
         script: |
@@ -103,7 +150,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - hello@marvira.example.com
+          - support@marvira.com
         notify:
           success: true
           failure: true

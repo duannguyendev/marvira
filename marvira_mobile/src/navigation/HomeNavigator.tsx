@@ -18,7 +18,7 @@ import { EditEventAnswersScreen } from '../screens/create/EditEventAnswersScreen
 import { EventFinishersScreen } from '../screens/home/EventFinishersScreen';
 import { withScreenSafeArea } from '../components/Screen';
 import { HomeStackParamList } from './types';
-import { colors } from '../theme';
+import { primaryStackScreenOptions } from './stackOptions';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const EventCompletionScreenSafe = withScreenSafeArea(EventCompletionScreen, [
@@ -31,17 +31,7 @@ export const HomeNavigator: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.primary,
-        },
-        headerTintColor: colors.background,
-        headerTitleStyle: {
-          fontWeight: '600',
-        },
-        contentStyle: { backgroundColor: colors.backgroundLight },
-      }}>
+    <Stack.Navigator screenOptions={primaryStackScreenOptions}>
       <Stack.Screen
         name="EventsList"
         component={EventsListScreen}
