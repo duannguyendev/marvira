@@ -11,6 +11,7 @@ import { PublishVerifyService } from './publish-verify.service';
 import { ScheduledPublishService } from './scheduled-publish.service';
 import { EventEndService } from './event-end.service';
 import { PlacesModule } from '../places/places.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PlacesModule } from '../places/places.module';
     EventAccessModule,
     AuthModule,
     forwardRef(() => PlacesModule),
+    NotificationsModule,
   ],
   controllers: [EventsController],
   providers: [

@@ -16,6 +16,13 @@ export const authSession = {
     } catch {
       // ignore
     }
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { pushNotifications } = require('./pushNotifications') as typeof import('./pushNotifications');
+      void pushNotifications.unregister();
+    } catch {
+      // ignore
+    }
     listeners.forEach(listener => listener());
   },
 };

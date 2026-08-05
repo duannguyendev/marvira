@@ -15,6 +15,7 @@
     "prisma:generate": "prisma generate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.750.0",
     "@marvira/shared-types": "workspace:*",
     "@marvira/shared-utils": "workspace:*",
     "@nestjs/bullmq": "^10.2.3",
@@ -27,13 +28,13 @@
     "@nestjs/swagger": "^8.1.0",
     "@nestjs/throttler": "^6.3.0",
     "@prisma/client": "^6.1.0",
-    "@aws-sdk/client-s3": "^3.750.0",
     "apple-signin-auth": "^2.0.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.34.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.7",
+    "firebase-admin": "^13.0.0",
     "google-auth-library": "^9.15.1",
     "helmet": "^8.0.0",
     "ioredis": "^5.4.2",

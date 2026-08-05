@@ -45,6 +45,8 @@
     "favorites": "Favorites",
     "myQuestions": "My Questions",
     "feedback": "Send Feedback",
+    "notifications": "Notifications",
+    "notificationDetail": "Notification",
     "questionTraining": "Training"
   },
   "auth": {
@@ -113,12 +115,31 @@
     "logoutConfirmMessage": "Are you sure you want to logout?",
     "logoutFailed": "Failed to logout",
     "settings": "Settings",
+    "notifications": "Notifications",
     "myEvents": "My Events",
     "myQuestions": "My Questions"
+  },
+  "notifications": {
+    "emptyTitle": "No notifications yet",
+    "emptyBody": "When Marvira has updates about your hunts, they will show up here.",
+    "markAllRead": "Mark all as read",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago",
+    "openEvent": "Open event",
+    "backToList": "Back to notifications"
   },
   "settings": {
     "title": "Settings",
     "sendFeedback": "Send feedback",
+    "notifications": "Notification inbox",
+    "notificationPrefs": "Push preferences",
+    "notificationPrefsDescription": "Control which alerts can appear in the system tray. Inbox items are always saved.",
+    "gameplayNotifications": "Gameplay",
+    "gameplayNotificationsHint": "Completions and answer updates",
+    "creatorNotifications": "Creator",
+    "creatorNotificationsHint": "Reports, publish, and hunt status",
     "language": "Language",
     "languageDescription": "Choose your preferred language",
     "contentLanguage": "Content filter",

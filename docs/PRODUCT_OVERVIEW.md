@@ -60,6 +60,7 @@ Admin configures the full hunt; **mobile enforces linear unlock** (you cannot sk
 - Practice question moderation + stats
 - Ops analytics (completions, engagement — **not** Firebase MAU)
 - Feedback inbox
+- Push notifications + in-app notification inbox (FCM; transactional gameplay/creator alerts)
 - Articles for marketing Explore
 
 ### Marketing site

@@ -70,7 +70,7 @@ export class PlaceAnswerReportService {
       };
     }
 
-    await this.prisma.client.placeAnswerReport.create({
+    const report = await this.prisma.client.placeAnswerReport.create({
       data: {
         userId,
         placeId,
@@ -78,7 +78,7 @@ export class PlaceAnswerReportService {
       },
     });
 
-    await this.notifyStakeholders(place);
+    await this.notifyStakeholders(place, report.id);
 
     return {
       reported: true,
@@ -181,26 +181,34 @@ export class PlaceAnswerReportService {
       eventId: string;
       event: { title: string; createdBy: string };
     },
+    reportId: string,
   ) {
-    const message = `Wrong answer report at "${place.title}" in ${place.event.title}`;
-    await this.notifications.sendNotification(
-      place.event.createdBy,
-      message,
-      'wrong_answer_report',
-    );
-
+    const recipients = new Set<string>([place.event.createdBy]);
     const admins = await this.prisma.client.user.findMany({
       where: { role: 'ADMIN', isActive: true },
       select: { id: true },
     });
     for (const admin of admins) {
-      if (admin.id !== place.event.createdBy) {
-        await this.notifications.sendNotification(
-          admin.id,
-          message,
-          'wrong_answer_report',
-        );
-      }
+      recipients.add(admin.id);
+    }
+
+    for (const userId of recipients) {
+      await this.notifications.createAndEnqueue({
+        userId,
+        type: 'WRONG_ANSWER_REPORT',
+        copyParams: {
+          placeTitle: place.title,
+          eventTitle: place.event.title,
+        },
+        data: {
+          eventId: place.eventId,
+          placeId: place.id,
+          reportId,
+        },
+        relatedEntityType: 'place',
+        relatedEntityId: place.id,
+        dedupeKey: `wrong_answer_report:${reportId}:${userId}`,
+      });
     }
   }
 

@@ -7,6 +7,8 @@ import { MyQuestionsScreen } from '../screens/profile/MyQuestionsScreen';
 import { AddQuestionScreen } from '../screens/practice/AddQuestionScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
 import { FeedbackScreen } from '../screens/settings/FeedbackScreen';
+import { NotificationListScreen } from '../screens/notifications/NotificationListScreen';
+import { NotificationDetailScreen } from '../screens/notifications/NotificationDetailScreen';
 import { withScreenSafeArea } from '../components/Screen';
 import { ProfileStackParamList } from './types';
 import { colors } from '../theme';
@@ -27,6 +29,15 @@ const FeedbackScreenSafe = withScreenSafeArea(FeedbackScreen, [
   'left',
   'right',
 ]);
+const NotificationListScreenSafe = withScreenSafeArea(NotificationListScreen, [
+  'top',
+  'left',
+  'right',
+]);
+const NotificationDetailScreenSafe = withScreenSafeArea(
+  NotificationDetailScreen,
+  ['top', 'left', 'right'],
+);
 
 export const ProfileNavigator: React.FC = () => {
   const { t } = useTranslation();
@@ -57,6 +68,16 @@ export const ProfileNavigator: React.FC = () => {
         name="Feedback"
         component={FeedbackScreenSafe}
         options={{ title: t('nav.feedback') }}
+      />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationListScreenSafe}
+        options={{ title: t('nav.notifications') }}
+      />
+      <Stack.Screen
+        name="NotificationDetail"
+        component={NotificationDetailScreenSafe}
+        options={{ title: t('nav.notificationDetail') }}
       />
       <Stack.Screen
         name="MyEvents"

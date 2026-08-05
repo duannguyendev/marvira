@@ -186,4 +186,16 @@ export const storage = {
       this.removeUser(),
     ]);
   },
+
+  async setItem(key: string, value: string): Promise<void> {
+    await getStorage().setItem(key, value);
+  },
+
+  async getItem(key: string): Promise<string | null> {
+    return getStorage().getItem(key);
+  },
+
+  async removeItem(key: string): Promise<void> {
+    await getStorage().removeItem(key);
+  },
 };

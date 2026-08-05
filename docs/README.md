@@ -23,6 +23,7 @@ Human reading map for the Marvira project. **Do not start with `requirement_all.
 - [`../marvira_mobile/README.md`](../marvira_mobile/README.md) — run the app
 - [`../marvira_mobile/ANDROID_SETUP.md`](../marvira_mobile/ANDROID_SETUP.md)
 - [`../marvira_mobile/FIREBASE_SETUP.md`](../marvira_mobile/FIREBASE_SETUP.md)
+- [`../push_notification_requirement.txt`](../push_notification_requirement.txt) — FCM push + inbox (not shipped yet)
 - [`../marvira_mobile/TROUBLESHOOTING.md`](../marvira_mobile/TROUBLESHOOTING.md)
 - [`../marvira_mobile/CODEMAGIC.md`](../marvira_mobile/CODEMAGIC.md) — CI builds
 
@@ -66,3 +67,4 @@ marvira/
 | `go_live_update_checklist.txt` | Launch | Production / store gates |
 | `store_privacy_labels.txt` | Launch | Store privacy forms |
 | `monetization_todo.txt` | Later | Ads / subscriptions |
+| `push_notification_requirement.txt` | Engineers | FCM + in-app inbox implement plan |

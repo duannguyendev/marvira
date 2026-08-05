@@ -2103,6 +2103,11 @@
   dependencies:
     stacktrace-js "^2.0.2"
 
+"@react-native-firebase/messaging@25.1.0":
+  version "25.1.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/messaging/-/messaging-25.1.0.tgz#21d46ba446a728c44e7c5bc3622099ba355f915c"
+  integrity sha512-YVhGWr6uthySTNHqnXsDh6DX4WtK4AittU9oDeKaBSjN4uoMDOe2X74TYnBFEUdcCQxOAsUavFNAexQx/o8dsw==
+
 "@react-native-google-signin/google-signin@^16.1.4":
   version "16.1.4"
   resolved "https://registry.yarnpkg.com/@react-native-google-signin/google-signin/-/google-signin-16.1.4.tgz#64838d2c39d0f001081a900a008817841f42eeea"

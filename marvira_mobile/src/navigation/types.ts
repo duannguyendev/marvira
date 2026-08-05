@@ -9,6 +9,8 @@ export type ProfileStackParamList = {
   ProfileMain: undefined;
   Settings: undefined;
   Feedback: undefined;
+  Notifications: undefined;
+  NotificationDetail: { notificationId: string };
   MyEvents: undefined;
   MyQuestions: undefined;
   AddQuestion: { questionId?: string } | undefined;

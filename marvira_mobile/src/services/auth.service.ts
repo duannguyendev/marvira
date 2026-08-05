@@ -2,6 +2,7 @@ import { storage } from '../utils/storage';
 import { authApi } from '../api/auth';
 import { User, LoginCredentials, RegisterCredentials } from '../types';
 import { analytics } from './analytics';
+import { pushNotifications } from './pushNotifications';
 
 class AuthService {
   private currentUser: User | null = null;
@@ -26,6 +27,7 @@ class AuthService {
       await storage.setUser(response.data.user);
       this.currentUser = response.data.user;
       await analytics.setUserId(response.data.user.id);
+      void pushNotifications.registerIfAuthenticated();
       return response.data.user;
     }
     throw new Error(response.message || 'Login failed');
@@ -86,6 +88,11 @@ class AuthService {
    * Logout user
    */
   async logout(): Promise<void> {
+    try {
+      await pushNotifications.unregister();
+    } catch {
+      // continue
+    }
     try {
       await authApi.logout();
     } catch (error) {

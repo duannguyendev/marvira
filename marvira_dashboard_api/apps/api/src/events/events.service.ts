@@ -27,6 +27,7 @@ import {
   normalizeContentLanguage,
   parseLanguageFilterQuery,
 } from '../common/content-language';
+import { NotificationsService } from '../notifications/notifications.service';
 
 export interface CreateEventInput {
   title: string;
@@ -68,6 +69,7 @@ export class EventsService {
     private readonly publishVerify: PublishVerifyService,
     private readonly scheduledPublish: ScheduledPublishService,
     private readonly eventEnd: EventEndService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async findAll(
@@ -456,6 +458,7 @@ export class EventsService {
     let result = event;
     if (event.isActive) {
       result = await this.eventEnd.scheduleAutoEnd(event.id);
+      await this.notifyWentLive(event.createdBy, event.id, event.title);
     }
     await this.invalidateCache();
     return this.eventAccess.toPublicFields(result, {
@@ -528,12 +531,35 @@ export class EventsService {
         .cancelScheduleJobOnly(id)
         .catch(() => undefined);
       result = await this.eventEnd.scheduleAutoEnd(id);
+      if (!existing.isActive) {
+        await this.notifyWentLive(result.createdBy, result.id, result.title);
+      }
     }
 
     await this.invalidateCache();
     return this.eventAccess.toPublicFields(result, {
       includeOwnerGiftFields: true,
     });
+  }
+
+  private async notifyWentLive(
+    userId: string,
+    eventId: string,
+    eventTitle: string,
+  ) {
+    try {
+      await this.notifications.createAndEnqueue({
+        userId,
+        type: 'EVENT_WENT_LIVE',
+        copyParams: { eventTitle },
+        data: { eventId },
+        relatedEntityType: 'event',
+        relatedEntityId: eventId,
+        dedupeKey: `event_live:${eventId}`,
+      });
+    } catch {
+      // optional
+    }
   }
 
   private buildGiftUpdatePatch(

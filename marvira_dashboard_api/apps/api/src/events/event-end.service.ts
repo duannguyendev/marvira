@@ -15,6 +15,7 @@ import {
   scheduledEndJobId,
 } from './event-live-duration';
 import { AppSettingsService } from '../settings/app-settings.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const QUEUE_NAME = 'event-publish';
 const SAFETY_INTERVAL_MS = 60_000;
@@ -153,7 +154,37 @@ export class EventEndService implements OnModuleInit, OnModuleDestroy {
     });
     await this.invalidateCache();
     await this.removeDelayedJob(eventId);
+    await this.notifyEventEnded(
+      updated.createdBy,
+      eventId,
+      updated.title,
+    );
     return updated;
+  }
+
+  private async notifyEventEnded(
+    userId: string,
+    eventId: string,
+    eventTitle: string,
+  ) {
+    try {
+      const notifications = this.moduleRef.get(NotificationsService, {
+        strict: false,
+      });
+      if (notifications) {
+        await notifications.createAndEnqueue({
+          userId,
+          type: 'EVENT_ENDED',
+          copyParams: { eventTitle },
+          data: { eventId },
+          relatedEntityType: 'event',
+          relatedEntityId: eventId,
+          dedupeKey: `event_ended:${eventId}`,
+        });
+      }
+    } catch {
+      // optional
+    }
   }
 
   private getQueue(): Queue | null {

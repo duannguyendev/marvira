@@ -201,8 +201,10 @@ export class ProgressService {
         const giftFields = completed.giftFields;
         await this.enqueueEventCompletedNotification(
           userId,
+          place.eventId,
           place.event.title,
           totalScore,
+          progress.id,
         );
         return {
           correct: true,
@@ -331,8 +333,10 @@ export class ProgressService {
         giftFields = completed.giftFields;
         await this.enqueueEventCompletedNotification(
           userId,
+          place.eventId,
           place.event.title,
           totalScore,
+          progress.id,
         );
       }
     }
@@ -613,19 +617,25 @@ export class ProgressService {
 
   private async enqueueEventCompletedNotification(
     userId: string,
+    eventId: string,
     eventTitle: string,
     score: number,
+    progressId: string,
   ) {
     try {
       const notifications = this.moduleRef.get(NotificationsService, {
         strict: false,
       });
       if (notifications) {
-        await notifications.sendNotification(
+        await notifications.createAndEnqueue({
           userId,
-          `You completed "${eventTitle}" with ${score} points!`,
-          'event_completed',
-        );
+          type: 'EVENT_COMPLETED',
+          copyParams: { eventTitle, score },
+          data: { eventId },
+          relatedEntityType: 'event',
+          relatedEntityId: eventId,
+          dedupeKey: `event_completed:${progressId}`,
+        });
       }
     } catch {
       // Notifications queue unavailable (e.g. REDIS_DISABLED dev mode)

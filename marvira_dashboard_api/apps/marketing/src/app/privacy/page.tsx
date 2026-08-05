@@ -106,12 +106,15 @@ export default async function PrivacyPage({
           lists.
         </p>
         <p>
-          The mobile app uses <strong>Google Firebase Analytics</strong> and{' '}
-          <strong>Firebase Crashlytics</strong> to measure feature usage
-          (for example hunt starts and completions), app stability, and crash
-          reports. These services may process device and app identifiers and
-          crash logs. We do not send precise GPS coordinates or answer text to
-          Analytics event parameters. See Google’s Firebase privacy
+          The mobile app uses <strong>Google Firebase Analytics</strong>,{' '}
+          <strong>Firebase Crashlytics</strong>, and{' '}
+          <strong>Firebase Cloud Messaging (FCM)</strong> to measure feature
+          usage (for example hunt starts and completions), app stability and
+          crash reports, and to deliver push notifications about gameplay and
+          creator activity. These services may process device and app
+          identifiers, crash logs, and device push tokens. We do not send
+          precise GPS coordinates, answer text, or gift codes to Analytics
+          event parameters or push payloads. See Google’s Firebase privacy
           documentation for how Google processes this data on our behalf.
         </p>
 
@@ -132,6 +135,11 @@ export default async function PrivacyPage({
           <li>
             Request access, correction, or deletion by emailing{' '}
             {SITE.supportEmail}.
+          </li>
+          <li>
+            Control push categories in the app Settings (gameplay / creator).
+            You can also revoke notification permission in device settings;
+            the in-app notification inbox still lists messages you received.
           </li>
           <li>
             Unsubscribe from marketing emails via the link in those messages.

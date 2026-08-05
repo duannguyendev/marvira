@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../hooks/useAuth';
 import { useCompletedEvents } from '../../hooks/useProfile';
+import { useUnreadNotificationCount } from '../../hooks/useNotifications';
 import { Button } from '../../components/Button';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { EventCard } from '../../components/EventCard';
@@ -45,6 +46,8 @@ export const ProfileScreen: React.FC = () => {
   const { user, logout, isLoggingOut } = useAuth();
   const { data: completedData, isLoading: eventsLoading } =
     useCompletedEvents();
+  const { data: unreadData } = useUnreadNotificationCount(!!user);
+  const unreadCount = unreadData?.unreadCount ?? 0;
 
   const handleLogout = () => {
     Alert.alert(
@@ -93,6 +96,21 @@ export const ProfileScreen: React.FC = () => {
       </LinearGradient>
 
       <View style={styles.content}>
+        <TouchableOpacity
+          style={styles.settingsButton}
+          onPress={() => navigation.navigate('Notifications')}>
+          <Text style={styles.settingsIcon}>🔔</Text>
+          <Text style={styles.settingsText}>{t('profile.notifications')}</Text>
+          {unreadCount > 0 ? (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {unreadCount > 9 ? '9+' : String(unreadCount)}
+              </Text>
+            </View>
+          ) : null}
+          <Text style={styles.settingsChevron}>›</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => navigation.navigate('Settings')}>
@@ -256,6 +274,21 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     fontWeight: fontWeight.semibold,
     color: colors.textDark,
+  },
+  badge: {
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    marginRight: spacing.sm,
+  },
+  badgeText: {
+    color: colors.background,
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.bold,
   },
   settingsChevron: {
     fontSize: fontSize.xxl,

@@ -271,13 +271,19 @@ export class QuestionsService {
       distinct: ['userId'],
     });
 
-    const message = `An answer was updated in ${eventTitle}. You can try again.`;
     for (const report of reports) {
-      await this.notifications.sendNotification(
-        report.userId,
-        message,
-        'answer_updated',
-      );
+      await this.notifications.createAndEnqueue({
+        userId: report.userId,
+        type: 'ANSWER_UPDATED',
+        copyParams: { eventTitle },
+        data: {
+          eventId: places[0].eventId,
+          questionId,
+        },
+        relatedEntityType: 'question',
+        relatedEntityId: questionId,
+        dedupeKey: `answer_updated:${questionId}:${report.userId}`,
+      });
     }
   }
 

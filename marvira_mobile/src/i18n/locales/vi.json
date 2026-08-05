@@ -45,6 +45,8 @@
     "favorites": "Yêu thích",
     "myQuestions": "Câu hỏi của tôi",
     "feedback": "Gửi phản hồi",
+    "notifications": "Thông báo",
+    "notificationDetail": "Chi tiết thông báo",
     "questionTraining": "Luyện tập"
   },
   "auth": {
@@ -113,12 +115,31 @@
     "logoutConfirmMessage": "Bạn có chắc muốn đăng xuất?",
     "logoutFailed": "Không thể đăng xuất",
     "settings": "Cài đặt",
+    "notifications": "Thông báo",
     "myEvents": "Sự kiện của tôi",
     "myQuestions": "Câu hỏi của tôi"
+  },
+  "notifications": {
+    "emptyTitle": "Chưa có thông báo",
+    "emptyBody": "Khi Marvira có cập nhật về các cuộc săn tìm của bạn, chúng sẽ hiện ở đây.",
+    "markAllRead": "Đánh dấu đã đọc tất cả",
+    "justNow": "Vừa xong",
+    "minutesAgo": "{{count}} phút trước",
+    "hoursAgo": "{{count}} giờ trước",
+    "daysAgo": "{{count}} ngày trước",
+    "openEvent": "Mở sự kiện",
+    "backToList": "Quay lại thông báo"
   },
   "settings": {
     "title": "Cài đặt",
     "sendFeedback": "Gửi phản hồi",
+    "notifications": "Hộp thư thông báo",
+    "notificationPrefs": "Tùy chọn đẩy",
+    "notificationPrefsDescription": "Điều khiển thông báo hệ thống. Mục trong hộp thư vẫn luôn được lưu.",
+    "gameplayNotifications": "Chơi game",
+    "gameplayNotificationsHint": "Hoàn thành và cập nhật đáp án",
+    "creatorNotifications": "Người tạo",
+    "creatorNotificationsHint": "Báo cáo, xuất bản và trạng thái sự kiện",
     "language": "Ngôn ngữ",
     "languageDescription": "Chọn ngôn ngữ bạn muốn dùng",
     "contentLanguage": "Bộ lọc nội dung",

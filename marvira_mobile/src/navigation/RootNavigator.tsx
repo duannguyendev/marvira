@@ -1,18 +1,27 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Linking } from 'react-native';
+import { AppState, Linking } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { AuthNavigator } from './AuthNavigator';
 import { MainNavigator } from './MainNavigator';
-import { navigationRef, navigateToEventDetails } from './navigationRef';
+import {
+  consumePendingNotificationId,
+  navigationRef,
+  navigateToEventDetails,
+  navigateToNotificationDetail,
+  resolveNotificationNavigation,
+  setPendingNotificationId,
+} from './navigationRef';
 import { RootStackParamList } from './types';
 import { useAuth } from '../hooks/useAuth';
 import { Screen } from '../components/Screen';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { authSession } from '../services/authSession';
 import { AnalyticsEvents } from '../services/analytics';
+import { pushNotifications } from '../services/pushNotifications';
+import { invalidateNotificationQueries } from '../hooks/useNotifications';
 import {
   consumePendingInviteEventId,
   parseInviteUrl,
@@ -20,6 +29,21 @@ import {
 } from '../utils/inviteLinks';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+function extractPushPayload(remoteMessage: unknown): {
+  notificationId?: string;
+  eventId?: string;
+  type?: string;
+} {
+  if (!remoteMessage || typeof remoteMessage !== 'object') return {};
+  const data = (remoteMessage as { data?: Record<string, string> }).data;
+  if (!data) return {};
+  return {
+    notificationId: data.notificationId,
+    eventId: data.eventId,
+    type: data.type,
+  };
+}
 
 function trackAndResolveInvite(
   url: string | null,
@@ -54,6 +78,13 @@ function openPendingInviteIfAny(): void {
   }
 }
 
+function openPendingNotificationIfAny(): void {
+  const id = consumePendingNotificationId();
+  if (!id) return;
+  const navigated = navigateToNotificationDetail(id);
+  if (!navigated) setPendingNotificationId(id);
+}
+
 export const RootNavigator: React.FC = () => {
   const { i18n } = useTranslation();
   const { isAuthenticated, isLoading } = useAuth();
@@ -78,15 +109,67 @@ export const RootNavigator: React.FC = () => {
     return () => sub.remove();
   }, []);
 
+  useEffect(() => {
+    if (!isAuthenticated || isLoading) return;
+
+    void pushNotifications.registerIfAuthenticated();
+    const unsubRefresh = pushNotifications.subscribeTokenRefresh();
+
+    const unsubForeground = pushNotifications.onForegroundMessage(msg => {
+      const payload = extractPushPayload(msg);
+      void AnalyticsEvents.notificationReceived(payload.type);
+      invalidateNotificationQueries(queryClient);
+    });
+
+    const unsubOpened = pushNotifications.onNotificationOpened(msg => {
+      const payload = extractPushPayload(msg);
+      void AnalyticsEvents.notificationOpened(
+        payload.type,
+        payload.notificationId,
+      );
+      resolveNotificationNavigation(payload);
+    });
+
+    void pushNotifications.getInitialNotification().then(msg => {
+      if (!msg) return;
+      const payload = extractPushPayload(msg);
+      void AnalyticsEvents.notificationOpened(
+        payload.type,
+        payload.notificationId,
+      );
+      if (canNavigateRef.current) {
+        resolveNotificationNavigation(payload);
+      } else if (payload.notificationId) {
+        setPendingNotificationId(payload.notificationId);
+      }
+    });
+
+    const appStateSub = AppState.addEventListener('change', state => {
+      if (state === 'active' && canNavigateRef.current) {
+        void pushNotifications.registerIfAuthenticated();
+        invalidateNotificationQueries(queryClient);
+      }
+    });
+
+    return () => {
+      unsubRefresh();
+      unsubForeground();
+      unsubOpened();
+      appStateSub.remove();
+    };
+  }, [isAuthenticated, isLoading, queryClient]);
+
   const handleNavigationReady = useCallback(() => {
     if (isAuthenticated) {
       openPendingInviteIfAny();
+      openPendingNotificationIfAny();
     }
   }, [isAuthenticated]);
 
   useEffect(() => {
     if (isAuthenticated && !isLoading && navigationRef.isReady()) {
       openPendingInviteIfAny();
+      openPendingNotificationIfAny();
     }
   }, [isAuthenticated, isLoading]);
 

@@ -1686,6 +1686,83 @@ Requires Android emulator/device and Metro bundler. API must be reachable at `10
 
 ---
 
+### TC-MOB-PUSH-001 — Register device + inbox list
+
+| Field | Value |
+|-------|-------|
+| **Priority** | P1 |
+| **Screen** | Profile → Notifications |
+
+**Steps:**
+
+1. Log in on a physical device (or emulator with Google Play)
+2. Allow notification permission when prompted
+3. Open Profile → Notifications
+4. From another session/admin path, trigger an answer update / report / completion
+
+**Expected:**
+
+- `user_devices` row exists for the user
+- Inbox shows the notification
+- Unread badge appears on Profile notifications row
+
+---
+
+### TC-MOB-PUSH-002 — Tap tray → detail
+
+| Field | Value |
+|-------|-------|
+| **Priority** | P1 |
+
+**Steps:**
+
+1. Background or kill the app
+2. Trigger a push (with Firebase Admin credentials configured)
+3. Tap the system notification
+
+**Expected:**
+
+- App opens Notification detail (or related event)
+- Item marked read; badge decreases
+
+---
+
+### TC-MOB-PUSH-003 — Preferences skip FCM only
+
+| Field | Value |
+|-------|-------|
+| **Priority** | P2 |
+| **Screen** | Settings |
+
+**Steps:**
+
+1. Settings → turn off Gameplay push preference
+2. Complete an event (EVENT_COMPLETED)
+
+**Expected:**
+
+- Inbox still has the item
+- No tray push (when FCM configured)
+
+---
+
+### TC-MOB-PUSH-004 — Logout unregisters token
+
+| Field | Value |
+|-------|-------|
+| **Priority** | P1 |
+
+**Steps:**
+
+1. Log in (token registered)
+2. Log out
+
+**Expected:**
+
+- Device token removed for that user (DELETE /devices)
+
+---
+
 ## 5. Automated Test Cases
 
 ### TC-AUTO-001 â€” Unit tests (platform)

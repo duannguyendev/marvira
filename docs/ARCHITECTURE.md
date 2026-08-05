@@ -23,7 +23,10 @@ Mobile is **separate** from the API Turborepo. Point the app at the API base URL
 │ marvira_mobile  │ ─────────────────► │ apps/api (Nest)  │
 │  Maps + GPS     │                    │  Prisma / PG     │
 │  Firebase       │ ── Analytics ────► │  optional Redis  │
-└─────────────────┘    Crashlytics     └────────┬─────────┘
+│  (mobile)       │ ── Crashlytics     │  BullMQ queues   │
+│                 │ ── FCM push ◄──────│  notifications   │
+│                 │                    │  event-publish   │
+└─────────────────┘                    └────────┬─────────┘
                                                │
          ┌─────────────────────────────────────┼─────────────────────┐
          ▼                                     ▼                     ▼
@@ -67,12 +70,12 @@ Dashboard may show **all** places for editing; mobile play stays sequential.
 | PostgreSQL + PostGIS-style geo | Users, events, places, progress, practice, feedback |
 | Redis (optional locally) | Cache / queues; can disable for Windows dev |
 | File uploads or S3/CDN | Question / event images |
-| Firebase (mobile) | Product analytics + Crashlytics — not a substitute for API DB |
+| Firebase (mobile) | Product analytics + Crashlytics + FCM push — not a substitute for API DB |
 
 ## Admin vs product analytics
 
 - **Admin `/dashboard/analytics`**: ops (completions, engagement, practice stats). “Active users” ≈ hunt starts in 30d, **not** MAU.
-- **Firebase (mobile)**: product MAU / funnels / crashes. Spec: `requirement_all.txt` §24.
+- **Firebase (mobile)**: product MAU / funnels / crashes + FCM delivery. Spec: `requirement_all.txt` §24 and `push_notification_requirement.txt`. Inbox rows live in Postgres.
 
 ## Local ports (typical)
 
@@ -91,5 +94,5 @@ Dashboard may show **all** places for editing; mobile play stays sequential.
 | Run API + admin | `marvira_dashboard_api/README.md` |
 | Run mobile | `marvira_mobile/README.md` |
 | Deploy / backup | `marvira_dashboard_api/docs/*.md` |
-| Firebase | `marvira_mobile/FIREBASE_SETUP.md` |
+| Firebase | `marvira_mobile/FIREBASE_SETUP.md` + `push_notification_requirement.txt` |
 | Full acceptance | `requirement_all.txt` (RECOVERY + §14–24) |

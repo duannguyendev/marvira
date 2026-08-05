@@ -119,6 +119,13 @@ mostly deploy, store, Firebase, invite web page, and launch-city content.
       GOOGLE_SERVICE_INFO_PLIST_BASE64
   - Verify once: Analytics DebugView + a test Crashlytics non-fatal
 
+[P0] Firebase Admin + FCM (push) — see push_notification_requirement.txt
+  - Enable Cloud Messaging in Firebase Console
+  - Set FIREBASE_ADMIN_CREDENTIALS_JSON or _BASE64 on API
+  - iOS: upload APNs auth key (.p8) to Firebase
+  - Run Prisma migration 20260805140000_push_notifications
+  - Smoke: login → device row; trigger answer_updated → inbox + tray
+
 [P0] Clear Login/Register demo prefill before store builds
   - LoginScreen / RegisterScreen still default to user@example.com / password123
   - Ship empty fields (or __DEV__-only prefill)

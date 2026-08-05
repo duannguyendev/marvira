@@ -256,4 +256,18 @@ export const AnalyticsEvents = {
     analytics.logEvent('feedback_submitted', {
       category: category ?? undefined,
     }),
+
+  notificationInboxOpened: () =>
+    analytics.logEvent('notification_inbox_opened'),
+
+  notificationReceived: (type?: string) =>
+    analytics.logEvent('notification_received', {
+      notification_type: type ?? undefined,
+    }),
+
+  notificationOpened: (type?: string, notificationId?: string) =>
+    analytics.logEvent('notification_opened', {
+      notification_type: type ?? undefined,
+      notification_id: notificationId ?? undefined,
+    }),
 };

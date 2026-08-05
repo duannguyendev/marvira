@@ -24,6 +24,7 @@ Companion docs (keep alongside; not fully merged here):
   go_live_update_checklist.txt  â€” production / store release gates
   store_privacy_labels.txt      â€” App Store / Play Data safety copy-paste
   event_publish_safety_requirement.txt â€” verify / report / schedule / live-edit detail
+  push_notification_requirement.txt â€” FCM push + in-app inbox (implement steps)
   marvira_mobile/FIREBASE_SETUP.md
   growth_plan.txt               â€” post-launch growth
   monetization_todo.txt         â€” ads / IAP (later)

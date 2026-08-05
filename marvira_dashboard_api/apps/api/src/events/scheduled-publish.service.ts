@@ -171,7 +171,7 @@ export class ScheduledPublishService implements OnModuleInit, OnModuleDestroy {
         `Scheduled publish blocked for ${eventId}: ${message}`,
       );
       if (options?.notifyOnFailure !== false) {
-        await this.notifyCreator(event.createdBy, event.title, message);
+        await this.notifyCreator(event.createdBy, eventId, event.title, message);
       }
       return { activated: false, reason: 'validation_failed' };
     }
@@ -191,6 +191,7 @@ export class ScheduledPublishService implements OnModuleInit, OnModuleDestroy {
       .catch(err =>
         this.logger.warn(`Failed to schedule auto-end for ${eventId}: ${err}`),
       );
+    await this.notifyEventWentLive(event.createdBy, eventId, event.title);
     this.logger.log(`Activated scheduled event ${eventId}`);
     return { activated: true };
   }
@@ -308,6 +309,7 @@ export class ScheduledPublishService implements OnModuleInit, OnModuleDestroy {
 
   private async notifyCreator(
     userId: string,
+    eventId: string,
     eventTitle: string,
     reason: string,
   ) {
@@ -315,13 +317,40 @@ export class ScheduledPublishService implements OnModuleInit, OnModuleDestroy {
       const notifications = this.moduleRef.get(NotificationsService, {
         strict: false,
       });
-      await notifications.sendNotification(
+      await notifications.createAndEnqueue({
         userId,
-        `Scheduled publish failed for "${eventTitle}": ${reason}`,
-        'scheduled_publish_failed',
-      );
+        type: 'SCHEDULED_PUBLISH_FAILED',
+        copyParams: { eventTitle, reason },
+        data: { eventId },
+        relatedEntityType: 'event',
+        relatedEntityId: eventId,
+        dedupeKey: `sched_fail:${eventId}:${reason.slice(0, 80)}`,
+      });
     } catch {
       // Notifications optional when REDIS_DISABLED
+    }
+  }
+
+  private async notifyEventWentLive(
+    userId: string,
+    eventId: string,
+    eventTitle: string,
+  ) {
+    try {
+      const notifications = this.moduleRef.get(NotificationsService, {
+        strict: false,
+      });
+      await notifications.createAndEnqueue({
+        userId,
+        type: 'EVENT_WENT_LIVE',
+        copyParams: { eventTitle },
+        data: { eventId },
+        relatedEntityType: 'event',
+        relatedEntityId: eventId,
+        dedupeKey: `event_live:${eventId}`,
+      });
+    } catch {
+      // optional
     }
   }
 

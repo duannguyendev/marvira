@@ -1,0 +1,565 @@
+================================================================================
+PUSH NOTIFICATIONS + IN-APP INBOX — REQUIREMENTS & IMPLEMENTATION STEPS
+================================================================================
+Purpose:
+  Add Firebase Cloud Messaging (FCM) push delivery and a server-backed
+  notification inbox so players/creators can list, open, and act on messages
+  even if they missed the system tray alert.
+
+Status: IMPLEMENTED in source (2026-08-05). Real tray pushes require Firebase
+Admin credentials + APNs (ops) — see Phase F secrets note.
+Updated: 2026-08-05
+
+Related (read alongside):
+  - requirement_all.txt §22 (gift codes — NEVER in push body), §24 (Firebase)
+  - growth_plan.txt G2.3 (retention pushes — later, opt-in only)
+  - store_privacy_labels.txt (device tokens when push ships)
+  - marvira_mobile/FIREBASE_SETUP.md (extend for Cloud Messaging)
+  - go_live_update_checklist.txt (privacy / store gates)
+
+Related code today (stubs — replace/extend):
+  - marvira_dashboard_api/apps/api/src/notifications/*
+  - Call sites: progress (event_completed), places (wrong_answer_report),
+    questions (answer_updated), events/scheduled-publish (scheduled_publish_failed)
+  - marvira_mobile: Analytics + Crashlytics only (@react-native-firebase/*)
+  - Firebase project already in use for Analytics (google-services.json present)
+
+================================================================================
+0. PRODUCT PRINCIPLES (do not violate)
+================================================================================
+
+1. Inbox is source of truth. Every user-visible push MUST also create a
+   Notification row. FCM is delivery only; missing tray still leaves inbox item.
+2. Persist before send. Write DB row → enqueue BullMQ job → FCM. FCM failure
+   must not lose the inbox message.
+3. No secrets in push. Never put gift codes, passwords, tokens, or PII in
+   notification title/body/data beyond opaque IDs. Gift winners deep-link to
+   EventCompletion / GET /events/:id/completion after auth (§22).
+4. Transactional first. v1 = gameplay + creator ops only. Marketing / “near
+   you” / weekly challenge = v1.1+ behind preferences (growth_plan G2.3).
+5. Multi-device. One user may have many tokens; send to all active; prune dead.
+6. Idempotent. Retries must not spam; use dedupeKey where a trigger can fire twice.
+7. Permission respectful. Ask for OS permission with clear copy; never loop
+   nag; offer Settings deep-link when denied.
+8. i18n. Titles/bodies must support vi | en | zh | ja (match app UI language
+   preference stored on user or passed at register; default en).
+
+================================================================================
+1. SCOPE
+================================================================================
+
+1.1 IN SCOPE (v1)
+  - FCM via Firebase Admin (API) + @react-native-firebase/messaging (mobile)
+  - Device token register / unregister / prune
+  - Notification persistence + paginated inbox API
+  - Mobile: list screen, detail screen, unread badge, mark read / read-all
+  - Deep link from tap (cold / background / foreground) → detail or entity screen
+  - Wire existing stub types to real send path
+  - New v1 types: event_went_live (creator), optional event_ended (creator)
+  - Simple preferences: gameplay + creator categories (both default ON)
+  - Privacy Policy + store privacy label updates for device tokens
+  - Staging vs production Firebase messaging (same project split preference as §24)
+
+1.2 OUT OF SCOPE (v1 — defer)
+  - Push containing gift codes
+  - Geo “new hunt near you”
+  - Social “friend finished”
+  - Weekly challenge / marketing broadcasts
+  - Admin dashboard “compose push to all users”
+  - Rich media / image attachments in FCM
+  - Quiet hours / digest bundling
+  - Web Push for dashboard staff
+  - Email fallback for the same events (separate later)
+
+1.3 SUCCESS CRITERIA
+  - Offline user receives push when online; opens app → inbox shows same item
+  - Tap notification opens correct screen after login if needed
+  - Logout removes/disables that device token for the user
+  - Uninstall / invalid token cleaned without crashing worker
+  - Unread badge matches server unread count after refresh
+  - REDIS_DISABLED / no-queue mode: still persist inbox; skip FCM with log
+    (same soft pattern as today’s NotificationsService)
+
+================================================================================
+2. DATA MODEL (Prisma)
+================================================================================
+
+Add enums + models (names may be adjusted to project conventions; keep maps).
+
+enum NotificationType {
+  EVENT_COMPLETED
+  WRONG_ANSWER_REPORT
+  ANSWER_UPDATED
+  SCHEDULED_PUBLISH_FAILED
+  EVENT_WENT_LIVE
+  EVENT_ENDED
+  // reserved for later — do not send in v1:
+  // HUNT_NEARBY | WEEKLY_CHALLENGE | FRIEND_FINISHED | SYSTEM_ANNOUNCEMENT
+}
+
+enum NotificationCategory {
+  GAMEPLAY   // player-facing game loop
+  CREATOR    // organizer ops
+  PRODUCT    // tips / marketing — v1 stored OFF, unused
+}
+
+enum DevicePlatform {
+  ANDROID
+  IOS
+}
+
+model UserDevice {
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")
+  fcmToken    String         @unique @map("fcm_token")
+  platform    DevicePlatform
+  appVersion  String?        @map("app_version")
+  locale      String?        // vi|en|zh|ja — for server-side copy
+  lastSeenAt  DateTime       @default(now()) @map("last_seen_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  user User @relation(...)
+
+  @@index([userId])
+  @@map("user_devices")
+}
+
+model Notification {
+  id               String               @id @default(uuid())
+  userId           String               @map("user_id")
+  type             NotificationType
+  category         NotificationCategory
+  title            String
+  body             String
+  /// Opaque deep-link + analytics payload (no secrets)
+  data             Json                 @default("{}")
+  /// Prevent duplicate sends for same logical event
+  dedupeKey        String?              @map("dedupe_key")
+  relatedEntityType String?             @map("related_entity_type") // event|place|question
+  relatedEntityId  String?              @map("related_entity_id")
+  readAt           DateTime?            @map("read_at")
+  createdAt        DateTime             @default(now()) @map("created_at")
+
+  user User @relation(...)
+
+  @@unique([userId, dedupeKey])  // dedupeKey null = no unique constraint hit in PG;
+                                 // use partial unique index in migration if needed
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  userId           String  @id @map("user_id")
+  gameplayEnabled  Boolean @default(true)  @map("gameplay_enabled")
+  creatorEnabled   Boolean @default(true)  @map("creator_enabled")
+  productEnabled   Boolean @default(false) @map("product_enabled")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  user User @relation(...)
+
+  @@map("notification_preferences")
+}
+
+User model: add relations devices, notifications, notificationPreference.
+
+Migration notes:
+  - Create migration under apps/api/prisma/migrations
+  - Partial unique index recommended:
+      CREATE UNIQUE INDEX notifications_user_dedupe_unique
+      ON notifications (user_id, dedupe_key)
+      WHERE dedupe_key IS NOT NULL;
+
+================================================================================
+3. API CONTRACT
+================================================================================
+
+Auth: JWT required on all routes below. Role: any authenticated active user
+(own resources only).
+
+------------------------------------------------------------------------------
+3.1 DEVICES
+------------------------------------------------------------------------------
+
+POST /devices
+  Body: {
+    fcmToken: string (required, max ~4096),
+    platform: "ANDROID" | "IOS",
+    appVersion?: string,
+    locale?: "vi" | "en" | "zh" | "ja"
+  }
+  Behavior:
+    - Upsert by fcmToken: if token existed for another user, reassign to current
+      (device switched accounts).
+    - Update lastSeenAt, platform, appVersion, locale.
+  Response: { id, fcmToken, platform, lastSeenAt }
+
+DELETE /devices
+  Body: { fcmToken: string }
+  Behavior: delete token for current user only (ignore if missing).
+  Response: 204
+
+POST /devices/heartbeat (optional v1)
+  Body: { fcmToken: string }
+  Updates lastSeenAt — call on app foreground if cheap.
+
+------------------------------------------------------------------------------
+3.2 NOTIFICATIONS (INBOX)
+------------------------------------------------------------------------------
+
+GET /notifications
+  Query: cursor? | page? + limit (default 20, max 50), unreadOnly?: boolean
+  Response: {
+    items: NotificationDto[],
+    nextCursor?: string,
+    unreadCount: number
+  }
+
+GET /notifications/unread-count
+  Response: { unreadCount: number }
+
+GET /notifications/:id
+  404 if not owner.
+  Response: NotificationDto
+
+PATCH /notifications/:id/read
+  Sets readAt = now() if null; idempotent.
+  Response: NotificationDto
+
+POST /notifications/read-all
+  Sets readAt on all unread for user.
+  Response: { updated: number }
+
+NotificationDto:
+  {
+    id, type, category, title, body, data,
+    relatedEntityType, relatedEntityId,
+    readAt, createdAt
+  }
+
+------------------------------------------------------------------------------
+3.3 PREFERENCES
+------------------------------------------------------------------------------
+
+GET /notifications/preferences
+POST /notifications/preferences
+  Body: { gameplayEnabled?, creatorEnabled?, productEnabled? }
+  Response: full preference object
+  Create row with defaults on first GET if missing.
+
+------------------------------------------------------------------------------
+3.4 INTERNAL SEND API (service, not public HTTP)
+------------------------------------------------------------------------------
+
+NotificationsService.createAndEnqueue({
+  userId,
+  type,
+  category,
+  title,           // already localized OR template key + params
+  body,
+  data,
+  relatedEntityType?,
+  relatedEntityId?,
+  dedupeKey?,      // e.g. `answer_updated:${questionId}:${userId}`
+})
+
+Flow:
+  1. If preference for category disabled → skip entirely (no row) OR still
+     write row but skip FCM — CHOICE LOCKED FOR V1: still write inbox row,
+     skip FCM only. User can read later in app; push is the opt-out surface.
+  2. Insert Notification; on unique dedupe conflict → return existing, no FCM.
+  3. If notifications queue unavailable → log + return (inbox still saved).
+  4. Else queue job { notificationId } (not full payload — worker loads row).
+
+Processor:
+  1. Load notification + user devices.
+  2. If no devices → done.
+  3. Send multicast / per-token via Firebase Admin.
+  4. On messaging/registration-token-not-registered or invalid-argument
+     for token → delete UserDevice row.
+  5. Log success/failure counts; do not throw forever — allow limited retries
+     then mark job failed.
+
+================================================================================
+4. NOTIFICATION CATALOG (v1)
+================================================================================
+
+Type                     | Category | Recipients              | Dedupe example
+-------------------------|----------|-------------------------|---------------------------
+EVENT_COMPLETED          | GAMEPLAY | Completing player       | event_completed:{progressId}
+WRONG_ANSWER_REPORT      | CREATOR  | Event creator + ADMINS | wrong_answer_report:{reportId}:{userId}
+ANSWER_UPDATED           | GAMEPLAY | Distinct reporters      | answer_updated:{questionId}:{userId}
+SCHEDULED_PUBLISH_FAILED | CREATOR  | Creator                 | sched_fail:{eventId}:{reasonHash}
+EVENT_WENT_LIVE          | CREATOR  | Creator                 | event_live:{eventId}
+EVENT_ENDED              | CREATOR  | Creator                 | event_ended:{eventId}
+
+data JSON (examples — keep stable keys):
+  {
+    "notificationId": "<uuid>",
+    "type": "ANSWER_UPDATED",
+    "eventId": "<uuid>",
+    "placeId": "<uuid?>",
+    "questionId": "<uuid?>"
+  }
+
+Copy guidelines:
+  - Short title (≤ 50 chars preferred), body ≤ 120 for tray; full text OK in DB.
+  - Localize server-side using UserDevice.locale of primary device OR user
+    profile locale field if you add one; fallback en.
+  - EVENT_COMPLETED: celebrate score/rank teaser; NEVER include giftCode.
+  - WRONG_ANSWER_REPORT: place + event title only; no reporter PII in body.
+
+Deep-link targets (mobile):
+  EVENT_COMPLETED       → EventCompletion / completed event detail
+  WRONG_ANSWER_REPORT   → My Events → event / place edit if available
+  ANSWER_UPDATED        → Event / place gameplay resume
+  SCHEDULED_PUBLISH_*   → My Events detail
+  EVENT_WENT_LIVE       → My Events detail
+  EVENT_ENDED           → My Events detail
+  Fallback              → NotificationDetailScreen
+
+================================================================================
+5. FIREBASE / OPS SETUP
+================================================================================
+
+5.1 Console
+  - Same Firebase project(s) as Analytics (§24): enable Cloud Messaging.
+  - Prefer separate staging vs production projects.
+  - Android: package com.marvira already registered.
+  - iOS: APNs auth key (recommended) or certificates uploaded to Firebase.
+  - Download/refresh google-services.json + GoogleService-Info.plist if needed.
+
+5.2 API credentials
+  - Service account JSON with Firebase Admin / Cloud Messaging permission.
+  - Store as secret: FIREBASE_ADMIN_CREDENTIALS_JSON (raw JSON) or
+    FIREBASE_ADMIN_CREDENTIALS_BASE64 + path option.
+  - Add to .env.example + deployment.md; never commit real key.
+  - Codemagic / prod host: inject secret like other Firebase configs.
+
+5.3 Mobile native
+  Android:
+    - POST_NOTIFICATIONS permission (API 33+)
+    - Default notification channel (e.g. marvira_default)
+    - Ensure google-services plugin already applied (Analytics)
+  iOS:
+    - Push Notifications capability
+    - Background Modes → Remote notifications
+    - Request permission via messaging().requestPermission()
+    - Register for remote messages; APNs token → FCM token bridge per RNFirebase docs
+
+5.4 Packages
+  Mobile: @react-native-firebase/messaging (match existing app / analytics versions)
+  API: firebase-admin
+
+================================================================================
+6. IMPLEMENTATION STEPS (ordered)
+================================================================================
+
+Execute in this order. Each phase should leave main green / app runnable.
+
+------------------------------------------------------------------------------
+PHASE A — DATABASE + API FOUNDATION
+------------------------------------------------------------------------------
+A1. Add Prisma enums/models + User relations (§2).
+A2. Create and apply migration; document in backup-restore if needed.
+A3. Extend NotificationsModule:
+      - UserDevicesService (upsert/delete/list)
+      - NotificationsInboxService (list/get/read/read-all/unread)
+      - NotificationPreferencesService
+      - Keep NotificationsService as the single createAndEnqueue entry
+A4. Controllers: DevicesController, NotificationsController (routes §3).
+A5. DTOs + validation (class-validator); swagger if project uses it.
+A6. Unit tests: dedupe, preference skip-FCM, ownership 404, pagination.
+A7. Replace processor stub: load by notificationId, call FcmSender (can be
+    no-op logger until Phase B credentials exist).
+
+Acceptance: curl/JWT can register fake token, create notification via
+internal service call in a test, list + mark read.
+
+------------------------------------------------------------------------------
+PHASE B — FCM SENDER (API)
+------------------------------------------------------------------------------
+B1. Add firebase-admin; init once from env (lazy if missing — log warn).
+B2. Implement FcmSender.sendToTokens(tokens, { title, body, data }).
+B3. Processor: multicast; prune invalid tokens; structured logs.
+B4. Wire createAndEnqueue from existing call sites with typed catalog +
+    dedupeKeys + localized strings (start with en + vi if timebox).
+B5. Add EVENT_WENT_LIVE on successful scheduled publish; EVENT_ENDED on end.
+B6. Integration test with Admin SDK mocked.
+
+Acceptance: with real staging credentials + one device token, tray shows
+message and row appears in GET /notifications.
+
+------------------------------------------------------------------------------
+PHASE C — MOBILE MESSAGING + TOKEN LIFECYCLE
+------------------------------------------------------------------------------
+C1. Add @react-native-firebase/messaging; rebuild native (pods / gradle).
+C2. Create services/pushNotifications.ts:
+      - requestPermission()
+      - getToken() / onTokenRefresh
+      - registerWithApi() after auth
+      - unregisterOnLogout()
+C3. Hook into authSession / login success / app resume:
+      - register token when authenticated
+      - DELETE /devices on logout
+C4. Android channel + POST_NOTIFICATIONS runtime request (Android 13+).
+C5. iOS permission + capability in Xcode / entitlements.
+C6. Update FIREBASE_SETUP.md with Messaging section (permission, APNs, channel).
+
+Acceptance: login → token in user_devices; logout → row gone; token refresh updates.
+
+------------------------------------------------------------------------------
+PHASE D — MOBILE INBOX UI
+------------------------------------------------------------------------------
+D1. API client methods (react-query hooks): list, detail, read, read-all,
+    unread-count, preferences.
+D2. Screens:
+      - NotificationListScreen (flat list, pull-to-refresh, empty state)
+      - NotificationDetailScreen (body + primary CTA from type/data)
+D3. Navigation: Profile stack (or Events header) → Notifications;
+    register routes in ProfileNavigator / Root for deep links.
+D4. Bell icon + unread badge (poll on focus + after push received).
+D5. Mark read when opening detail; optional swipe/mark on list.
+D6. Settings: toggles for gameplay / creator preferences.
+D7. i18n keys for empty states, permission copy, settings labels (vi/en/zh/ja).
+
+Acceptance: user can open list, open detail, badge clears, CTA navigates.
+
+------------------------------------------------------------------------------
+PHASE E — TAP HANDLING + DEEP LINKS
+------------------------------------------------------------------------------
+E1. Handlers:
+      - messaging().onMessage (foreground → in-app banner/toast + invalidate queries)
+      - onNotificationOpenedApp
+      - getInitialNotification (cold start)
+E2. Resolve payload → navigate:
+      Prefer notificationId → fetch detail → then entity route if known.
+E3. If unauthenticated: stash pending deep link → after login navigate.
+E4. Analytics: notification_received / notification_opened / inbox_opened
+    via existing AnalyticsEvents helpers (§24) — no ad-hoc Firebase imports.
+
+Acceptance: kill app, tap tray → correct screen; foreground receive updates UI.
+
+------------------------------------------------------------------------------
+PHASE F — LEGAL / STORE / DOCS
+------------------------------------------------------------------------------
+F1. Marketing /privacy: disclose FCM + device tokens + purpose.
+F2. store_privacy_labels.txt: check device tokens / push rows.
+F3. go_live_update_checklist.txt: add push verification items.
+F4. docs/ARCHITECTURE.md: FCM + inbox in system map.
+F5. docs/PRODUCT_OVERVIEW.md: short “Notifications” bullet.
+F6. Cross-link this file from requirement_all.txt companion list + docs/README.
+
+Acceptance: privacy text and store forms match actual data collection.
+
+------------------------------------------------------------------------------
+PHASE G — QA / HARDENING
+------------------------------------------------------------------------------
+G1. Manual matrix: Android + iOS; foreground / background / killed;
+    login / logout / account switch; denied permission; no network then online.
+G2. Dedupe: trigger same answer_updated twice → one inbox row.
+G3. Invalid token pruning under Firebase error codes.
+G4. REDIS_DISABLED: inbox writes work; no crash.
+G5. Load: multicast to N devices; pagination performance on 100+ rows.
+G6. Add MANUAL_TEST_CASES.md section for notifications.
+
+================================================================================
+7. MOBILE UX DETAILS
+================================================================================
+
+Entry:
+  - Bell on Profile header (preferred) or Events header — not a 5th tab.
+  - Badge = unreadCount (cap display at 9+).
+
+List row:
+  - Unread dot, title, 1-line body, relative time.
+  - Type icon optional (keep simple; no card farm).
+
+Detail:
+  - Title, full body, timestamp, primary button by type.
+  - Secondary: “Back to notifications”.
+
+Empty:
+  - “No notifications yet” + short explanation.
+
+Permission denied:
+  - Soft banner in list/settings once; button → OS Settings.
+  - Do not block app use.
+
+Foreground:
+  - Lightweight toast/banner; do not steal focus from GPS gameplay mid-answer
+    if PlaceGameScreen focused — queue toast after leave OR show non-blocking.
+
+================================================================================
+8. SECURITY & ABUSE
+================================================================================
+
+- All inbox routes scoped to JWT userId; no IDOR.
+- Rate-limit POST /devices (e.g. 10/min) to reduce token thrash.
+- Truncate title/body lengths server-side.
+- data JSON: allowlist keys only when sending to FCM (notificationId, type,
+  eventId, placeId, questionId).
+- Admins receiving WRONG_ANSWER_REPORT: same inbox; do not leak reporter email.
+- Service account key: rotate procedure in deployment.md.
+
+================================================================================
+9. ENVIRONMENT VARIABLES
+================================================================================
+
+API:
+  FIREBASE_ADMIN_CREDENTIALS_JSON=   # or BASE64 variant
+  # Optional override:
+  # FIREBASE_ADMIN_PROJECT_ID=
+
+Mobile:
+  (uses google-services.json / GoogleService-Info.plist — no extra FCM key
+   for client send; client only receives)
+
+Existing:
+  REDIS_URL / REDIS_DISABLED — queue behavior unchanged in spirit
+
+================================================================================
+10. ROLLOUT PLAN
+================================================================================
+
+1. Ship Phase A–B behind staging Firebase; dogfood with team devices.
+2. Ship Phase C–E to internal TestFlight / Play internal track.
+3. Complete Phase F before public store build that enables push.
+4. Monitor: FCM send failure rate, dead token prune rate, inbox open rate.
+5. Only then consider growth_plan G2.3 product pushes (new types + PRODUCT
+   preference default OFF until user opts in).
+
+================================================================================
+11. IMPLEMENTATION CHECKLIST (copy into PR / issue)
+================================================================================
+
+[x] A Prisma models + migration
+[x] A Devices + Notifications + Preferences API
+[x] A createAndEnqueue + dedupe + preference FCM skip
+[x] B firebase-admin FcmSender + processor prune
+[x] B Wire stub call sites + EVENT_WENT_LIVE / EVENT_ENDED
+[x] C RNFirebase messaging + token register/logout
+[x] C Android channel + POST_NOTIFICATIONS; iOS APNs
+[x] D List + Detail screens + badge + settings toggles
+[x] E Foreground/background/cold-start deep links
+[x] E Analytics events for push/inbox
+[x] F Privacy + store labels + ARCHITECTURE / PRODUCT_OVERVIEW
+[x] G Manual QA matrix + MANUAL_TEST_CASES
+[x] Update FIREBASE_SETUP.md (Messaging)
+[ ] Secrets in prod + Codemagic if needed  (ops — Admin JSON + APNs after code ship)
+
+================================================================================
+12. NON-GOALS REMINDER
+================================================================================
+
+Do not:
+  - Store gift codes in Notification.body or FCM data
+  - Use local-only notification storage as the only inbox
+  - Send product/marketing pushes in v1 without opt-in
+  - Block gameplay on notification permission denial
+  - Commit Firebase Admin service account JSON to git
+
+================================================================================
+END
+================================================================================

@@ -4,7 +4,7 @@ MARVIRA — STORE PRIVACY LABELS (APPLE + GOOGLE)
 Updated: 2026-07-27
 Purpose: Copy-paste answers for App Store Connect + Google Play Data safety.
 Companion: requirement_all.txt §24 | marketing /privacy
-Scope: v1.0 mobile (Firebase Analytics + Crashlytics; NO ads / IAP yet)
+Scope: v1.0 mobile (Firebase Analytics + Crashlytics + FCM push; NO ads / IAP yet)
 
 IMPORTANT
   - These are console form answers, not code.
@@ -308,6 +308,8 @@ Legend for each row:
   Device or other IDs
     Collected: Yes | Shared: Yes (Firebase) | Ephemeral: No | Required: Yes
     Purposes: Analytics, App functionality
+    Notes: includes Firebase Analytics/Crashlytics app identifiers and FCM
+      device push tokens registered with our API for notifications.
 
   ---------------------------------------------------------------------------
   FINANCIAL / HEALTH / MESSAGES / FILES / CONTACTS / CALENDAR / WEB BROWSING
@@ -323,7 +325,9 @@ B3) Data sharing — third parties (short text you can reuse)
   We share limited data with service providers that help us operate the app:
   - Google Firebase Analytics — product usage events and identifiers
   - Google Firebase Crashlytics — crash and diagnostic data
-  - Our hosting / API infrastructure — account, gameplay, and location checks
+  - Google Firebase Cloud Messaging — device push tokens for notifications
+  - Our hosting / API infrastructure — account, gameplay, location checks,
+    and in-app notification inbox
 
   We do not sell user data.
   We do not use data for third-party advertising in v1.0.
@@ -363,10 +367,10 @@ Privacy Policy:
 D) WHEN TO UPDATE THIS FILE
 ================================================================================
 
-  [ ] Real Firebase project live (no change to labels; still Analytics + Crashlytics)
+  [ ] Real Firebase project live (no change to labels; still Analytics + Crashlytics + FCM)
   [ ] Add ads / ATT / advertising ID  → Tracking = Yes; declare Advertising data
   [ ] Add IAP / subscriptions       → Purchase history / Financial info
-  [ ] Add push notifications        → Device tokens under Device or other IDs
+  [x] Add push notifications        → Device tokens under Device or other IDs (declared above)
   [ ] Ship account self-delete UI   → keep Data safety deletion answer Yes
   [ ] Remove camera/photo upload    → remove Photos declarations
 
