@@ -173,8 +173,29 @@ CORS_ORIGIN=http://localhost:3000
 Dashboard: `apps/dashboard/.env.local`
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_API_ENV=local
+# NEXT_PUBLIC_API_ENV=uat
+NEXT_PUBLIC_API_URL_LOCAL=http://localhost:3001
+NEXT_PUBLIC_API_URL_UAT=https://your-uat-api.up.railway.app
+NEXT_PUBLIC_API_URL=https://marvira-production.up.railway.app
 ```
+
+Marketing: `apps/marketing/.env.local` — same `NEXT_PUBLIC_API_*` pattern, plus `NEXT_PUBLIC_SITE_URL`.
+
+Or flip the code flag in `packages/shared-utils/src/public-api-url.ts`:
+
+```typescript
+const MANUAL_PUBLIC_API_ENV: PublicApiEnvironment | null = 'uat'; // null = use NEXT_PUBLIC_API_ENV / defaults
+```
+
+| Mode | API |
+|------|-----|
+| `next dev` (default) | **local** |
+| `next dev` + `NEXT_PUBLIC_API_ENV=uat` or `MANUAL_PUBLIC_API_ENV = 'uat'` | **UAT** |
+| Railway production build | **production** (`NEXT_PUBLIC_API_URL`) |
+| Future UAT web deploy | set `NEXT_PUBLIC_API_ENV=uat` + `_UAT` URL |
+
+No Settings UI — end users never see a switcher. Restart the Next dev server after changing `.env.local`.
 
 ## API Endpoints
 

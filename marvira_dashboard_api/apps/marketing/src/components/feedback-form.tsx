@@ -2,7 +2,9 @@
 
 import { FormEvent, useState } from 'react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { getPublicApiUrl } from '@marvira/shared-utils';
+
+const API_URL = getPublicApiUrl();
 
 type FeedbackCategory = 'FEEDBACK' | 'SUGGESTION' | 'BUG' | 'OTHER';
 

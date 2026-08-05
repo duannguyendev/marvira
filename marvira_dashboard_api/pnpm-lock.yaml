@@ -277,6 +277,9 @@ importers:
 
   apps/marketing:
     dependencies:
+      '@marvira/shared-utils':
+        specifier: workspace:*
+        version: link:../../packages/shared-utils
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -335,6 +338,9 @@ importers:
       '@marvira/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.21
       typescript:
         specifier: ^5.7.2
         version: 5.9.3

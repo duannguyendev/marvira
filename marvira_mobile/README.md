@@ -68,10 +68,32 @@ A production-ready React Native application for location-based gaming with event
 
 5. **Configure API Base URL**
 
-   Update `src/utils/constants.ts`:
-   ```typescript
-   export const API_BASE_URL = 'https://your-api-url.com';
+   **Debug (local / UAT):** set in `.env.local` (no quotes):
+
+   ```env
+   API_ENV=local
+   # API_ENV=uat
+   # API_ENV=production
+
+   API_BASE_URL_LOCAL=http://10.0.2.2:3001
+   # Real device: http://YOUR_LAN_IP:3001
+   API_BASE_URL_UAT=https://your-uat-api.up.railway.app
+   API_BASE_URL=https://marvira-production.up.railway.app
    ```
+
+   Or flip the code flag in `src/config/apiEnvironment.ts`:
+
+   ```typescript
+   const MANUAL_API_ENV: ApiEnvironment | null = 'uat'; // null = use API_ENV / defaults
+   ```
+
+   | Mode | Which API |
+   |------|-----------|
+   | Debug (`__DEV__`), default | **local** |
+   | Debug + `API_ENV=uat` or `MANUAL_API_ENV = 'uat'` | **UAT** |
+   | Release / store | **production** (`API_BASE_URL`) |
+
+   Restart Metro after changing `.env.local` (`yarn start:reset` if needed).
 
 ## 🏃 Running the App
 

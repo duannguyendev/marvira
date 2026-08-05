@@ -10,7 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { PlaceQuestion } from '../types';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
-import { API_BASE_URL } from '../utils/constants';
+import { getApiBaseUrl } from '../config/apiEnvironment';
 
 interface VerifyQuestionRendererProps {
   question: PlaceQuestion;
@@ -25,7 +25,7 @@ function resolveImageUrl(imageUrl?: string): string | undefined {
   if (imageUrl.startsWith('http')) {
     return imageUrl;
   }
-  return `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+  return `${getApiBaseUrl()}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
 }
 
 export const VerifyQuestionRenderer: React.FC<VerifyQuestionRendererProps> = ({

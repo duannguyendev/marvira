@@ -1,11 +1,9 @@
-import { Platform } from 'react-native';
+import { getApiBaseUrl } from '../config/apiEnvironment';
 
 // Set USE_MOCK_API=true in dev only when running without backend
 export const USE_MOCK_DATA = false;
 
-// Android emulator: 10.0.2.2 → host machine localhost.
-// Real device: set API_BASE_URL=http://<your-pc-lan-ip>:3001 in .env.local
-const DEV_API_HOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+export { getApiBaseUrl } from '../config/apiEnvironment';
 
 function requireReleaseUrl(name: string, value: string | undefined): string {
   const trimmed = value?.trim();
@@ -18,14 +16,20 @@ function requireReleaseUrl(name: string, value: string | undefined): string {
   return trimmed;
 }
 
-/** Debug: .env.local API_BASE_URL if set (real device), else emulator/simulator host. Release: required ENV. */
-export const API_BASE_URL = __DEV__
-  ? process.env.API_BASE_URL?.trim() || `http://${DEV_API_HOST}:3001`
-  : requireReleaseUrl('API_BASE_URL', process.env.API_BASE_URL);
+/**
+ * @deprecated Prefer getApiBaseUrl() (respects API_ENV / local|uat|production).
+ */
+export const API_BASE_URL = (() => {
+  try {
+    return getApiBaseUrl();
+  } catch {
+    return '';
+  }
+})();
 
 /** Marketing site used for share / invite HTTPS links (`/e/{eventId}`). */
 export const MARKETING_SITE_URL = __DEV__
-  ? 'http://localhost:3002'
+  ? process.env.MARKETING_SITE_URL?.trim() || 'http://localhost:3002'
   : requireReleaseUrl('MARKETING_SITE_URL', process.env.MARKETING_SITE_URL);
 
 // Location Configuration

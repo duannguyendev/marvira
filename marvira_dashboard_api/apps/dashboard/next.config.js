@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const {
+  resolvePublicApiUrl,
+} = require('../../packages/shared-utils/resolve-public-api-url.cjs');
+
+const apiUrl = resolvePublicApiUrl();
 
 const nextConfig = {
   transpilePackages: ['@marvira/shared-types', '@marvira/shared-utils'],

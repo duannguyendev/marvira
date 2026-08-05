@@ -26,6 +26,7 @@ RUN test -n "$NEXT_PUBLIC_API_URL" || (echo "NEXT_PUBLIC_API_URL must be set (no
 RUN test -n "$NEXT_PUBLIC_SITE_URL" || (echo "NEXT_PUBLIC_SITE_URL must be set (no quotes)" && exit 1)
 RUN echo "Building marketing SITE=$NEXT_PUBLIC_SITE_URL API=$NEXT_PUBLIC_API_URL"
 RUN pnpm install --frozen-lockfile --filter @marvira/marketing...
+RUN pnpm --filter @marvira/shared-utils build
 RUN pnpm --filter @marvira/marketing build
 RUN mkdir -p apps/marketing/public
 

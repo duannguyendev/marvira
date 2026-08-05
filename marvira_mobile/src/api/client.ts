@@ -1,5 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { API_BASE_URL } from '../utils/constants';
+import { getApiBaseUrl } from '../config/apiEnvironment';
 import { storage } from '../utils/storage';
 import { ApiError } from '../types';
 import { authSession } from '../services/authSession';
@@ -18,7 +18,7 @@ async function refreshAccessToken(): Promise<string> {
   }
 
   const response = await axios.post<{ success: boolean; data: ApiLoginData }>(
-    `${API_BASE_URL}/auth/refresh`,
+    `${getApiBaseUrl()}/auth/refresh`,
     { refreshToken },
     { headers: { 'Content-Type': 'application/json' } },
   );
@@ -43,7 +43,13 @@ function processQueue(error: unknown, token: string | null) {
 
 class ApiClient {
   private client = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: (() => {
+      try {
+        return getApiBaseUrl();
+      } catch {
+        return '';
+      }
+    })(),
     timeout: 30000,
     headers: { 'Content-Type': 'application/json' },
   });
@@ -51,6 +57,7 @@ class ApiClient {
   constructor() {
     this.client.interceptors.request.use(
       async config => {
+        config.baseURL = getApiBaseUrl();
         const token = await storage.getToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;

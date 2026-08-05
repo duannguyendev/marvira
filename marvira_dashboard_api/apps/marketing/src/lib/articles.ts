@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { getPublicApiUrl } from '@marvira/shared-utils';
+
+const API_URL = getPublicApiUrl();
 
 /** Brand placeholder shown when an article has no cover image. */
 export const ARTICLE_PLACEHOLDER_IMAGE = '/images/article-placeholder.png';

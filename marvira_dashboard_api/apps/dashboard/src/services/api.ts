@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { getPublicApiUrl } from '@marvira/shared-utils';
+
+const API_URL = getPublicApiUrl();
 const AUTH_COOKIE = 'marvira-auth';
 
 function setAuthCookie() {

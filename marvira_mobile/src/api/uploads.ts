@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import { API_BASE_URL } from '../utils/constants';
+import { getApiBaseUrl } from '../config/apiEnvironment';
 
 export interface UploadResult {
   url: string;
@@ -33,7 +33,7 @@ export function resolveUploadUrl(url: string): string {
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
-  return `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  return `${getApiBaseUrl()}${url.startsWith('/') ? '' : '/'}${url}`;
 }
 
 export const uploadsApi = {

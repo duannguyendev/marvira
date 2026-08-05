@@ -17,7 +17,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { getPublicApiUrl } from '@marvira/shared-utils';
+
+const API_URL = getPublicApiUrl();
 
 const forgotSchema = z.object({
   email: z.string().email('Invalid email'),
