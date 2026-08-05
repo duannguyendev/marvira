@@ -7,6 +7,15 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "docker/dashboard.Dockerfile"
+watchPatterns = [
+  "/marvira_dashboard_api/apps/dashboard/**",
+  "/marvira_dashboard_api/packages/**",
+  "/marvira_dashboard_api/docker/dashboard.Dockerfile",
+  "/marvira_dashboard_api/package.json",
+  "/marvira_dashboard_api/pnpm-lock.yaml",
+  "/marvira_dashboard_api/pnpm-workspace.yaml",
+  "/marvira_dashboard_api/railway.dashboard.toml",
+]
 
 [deploy]
 restartPolicyType = "ON_FAILURE"

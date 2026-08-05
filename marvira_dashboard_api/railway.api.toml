@@ -6,6 +6,16 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "docker/api.Dockerfile"
+# Repo-root paths — skip deploy when only dashboard/marketing change
+watchPatterns = [
+  "/marvira_dashboard_api/apps/api/**",
+  "/marvira_dashboard_api/packages/**",
+  "/marvira_dashboard_api/docker/api.Dockerfile",
+  "/marvira_dashboard_api/package.json",
+  "/marvira_dashboard_api/pnpm-lock.yaml",
+  "/marvira_dashboard_api/pnpm-workspace.yaml",
+  "/marvira_dashboard_api/railway.api.toml",
+]
 
 [deploy]
 healthcheckPath = "/health"

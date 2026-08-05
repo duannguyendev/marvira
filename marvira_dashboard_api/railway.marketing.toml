@@ -16,6 +16,15 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "docker/marketing.Dockerfile"
+watchPatterns = [
+  "/marvira_dashboard_api/apps/marketing/**",
+  "/marvira_dashboard_api/packages/**",
+  "/marvira_dashboard_api/docker/marketing.Dockerfile",
+  "/marvira_dashboard_api/package.json",
+  "/marvira_dashboard_api/pnpm-lock.yaml",
+  "/marvira_dashboard_api/pnpm-workspace.yaml",
+  "/marvira_dashboard_api/railway.marketing.toml",
+]
 
 [deploy]
 restartPolicyType = "ON_FAILURE"
