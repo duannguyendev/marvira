@@ -58,3 +58,8 @@ yarn-error.log
 # Android release signing (never commit)
 android/key.properties
 android/release.keystore
+
+# Android signed APK / AAB outputs
+*.apk
+*.aab
+android/app/release/
