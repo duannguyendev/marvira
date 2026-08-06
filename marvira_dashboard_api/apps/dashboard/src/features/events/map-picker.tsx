@@ -8,7 +8,9 @@ interface MapPickerProps {
 }
 
 export function MapPicker({ places, onPlaceMove }: MapPickerProps) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const apiKey =
+    process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY_WEB ??
+    process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {
     return (
@@ -16,7 +18,7 @@ export function MapPicker({ places, onPlaceMove }: MapPickerProps) {
         <p className="text-sm text-muted-foreground">
           Set{' '}
           <code className="rounded bg-muted px-1">
-            NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+            NEXT_PUBLIC_GOOGLE_MAPS_API_KEY_WEB
           </code>{' '}
           to enable the interactive map.
         </p>

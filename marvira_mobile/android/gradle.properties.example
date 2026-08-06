@@ -1,5 +1,5 @@
 # Optional reference only — not required for Google Maps.
-# Maps key: set GOOGLE_MAPS_API_KEY in ../.env.local (local) or Codemagic Secure ENV (CI).
+# Maps key: set GOOGLE_MAPS_API_KEY_ANDROID in ../.env.local (local) or Codemagic Secure ENV (CI).
 # See ../CODEMAGIC.md and ../.env.example.
 #
 # Release signing: copy key.properties.example → key.properties (gitignored).

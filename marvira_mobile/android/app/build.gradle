@@ -50,13 +50,15 @@ def PLACEHOLDER_MAPS_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'
  */
 def requireMapsApiKey = {
     def key =
-        System.getenv('GOOGLE_MAPS_API_KEY')
+        System.getenv('GOOGLE_MAPS_API_KEY_ANDROID')
+            ?: System.getenv('GOOGLE_MAPS_API_KEY')
+            ?: envLocal.getProperty('GOOGLE_MAPS_API_KEY_ANDROID')
             ?: envLocal.getProperty('GOOGLE_MAPS_API_KEY')
 
     if (!(key instanceof String) || !key.trim() || key.trim() == PLACEHOLDER_MAPS_KEY) {
         throw new GradleException(
-            "GOOGLE_MAPS_API_KEY is missing or invalid.\n" +
-            "  Codemagic: set Secure ENV GOOGLE_MAPS_API_KEY\n" +
+            "GOOGLE_MAPS_API_KEY_ANDROID is missing or invalid.\n" +
+            "  Codemagic: set Secure ENV GOOGLE_MAPS_API_KEY_ANDROID (fallback: GOOGLE_MAPS_API_KEY)\n" +
             "  Local: create marvira_mobile/.env.local (see .env.example)"
         )
     }
@@ -64,6 +66,31 @@ def requireMapsApiKey = {
 }
 
 def mapsApiKey = requireMapsApiKey()
+
+/**
+ * Codemagic: pass -PcmVersionCode=$PROJECT_BUILD_NUMBER (or BUILD_NUMBER).
+ * Also accepts NEW_BUILD_NUMBER / BUILD_NUMBER / PROJECT_BUILD_NUMBER env.
+ * Local / Android Studio builds default to 1.
+ * Invalid or empty env values are skipped (some IDEs set BUILD_NUMBER oddly).
+ */
+def resolveVersionCode = {
+    def candidates = []
+    if (project.hasProperty('cmVersionCode')) {
+        candidates << project.property('cmVersionCode')
+    }
+    candidates << System.getenv('NEW_BUILD_NUMBER')
+    candidates << System.getenv('BUILD_NUMBER')
+    candidates << System.getenv('PROJECT_BUILD_NUMBER')
+    candidates << '1'
+
+    for (def raw : candidates) {
+        def text = raw?.toString()?.trim()
+        if (text && (text ==~ /^\d+$/)) {
+            return text.toInteger()
+        }
+    }
+    return 1
+}
 
 react {
     autolinkLibrariesWithApp()
@@ -94,14 +121,9 @@ android {
         applicationId "com.marvira"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // Codemagic sets BUILD_NUMBER / PROJECT_BUILD_NUMBER / NEW_BUILD_NUMBER.
+        // Prefer -PversionCode from Codemagic, then env, then 1.
         // Play requires each upload to have a higher versionCode.
-        versionCode (
-            System.getenv("NEW_BUILD_NUMBER")
-                ?: System.getenv("BUILD_NUMBER")
-                ?: System.getenv("PROJECT_BUILD_NUMBER")
-                ?: "1"
-        ).toInteger()
+        versionCode resolveVersionCode()
         versionName "1.0"
         multiDexEnabled true
         manifestPlaceholders = [GOOGLE_MAPS_API_KEY: mapsApiKey]

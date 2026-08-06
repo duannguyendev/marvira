@@ -13,7 +13,8 @@ If required values are missing, the **build fails**.
 
 | Variable | Debug (local Metro) | Release (store / Codemagic) |
 |----------|---------------------|-----------------------------|
-| `GOOGLE_MAPS_API_KEY` | Required (native) | Required |
+| `GOOGLE_MAPS_API_KEY_ANDROID` | Required (native) | Required |
+| `GOOGLE_MAPS_API_KEY_IOS` | Required (native) | Required |
 | `API_BASE_URL` | Not used (`__DEV__` → localhost) | Required |
 | `MARKETING_SITE_URL` | Not used (`__DEV__` → localhost:3002) | Required |
 | `GOOGLE_WEB_CLIENT_ID` | Optional until social login | Required for Google Sign-In |
@@ -26,8 +27,8 @@ Also replace Android `strings.xml` Facebook placeholders before testing Facebook
 
 ## How each platform reads them
 
-- **Android (Gradle):** `System.getenv` first, then `.env.local` — fails if Maps key missing.
-- **iOS (Xcode build phase):** same order; injects into the built `Info.plist` via `ios/scripts/apply-maps-api-key.sh` (runs automatically on Build/Run).
+- **Android (Gradle):** `GOOGLE_MAPS_API_KEY_ANDROID` (fallback: legacy `GOOGLE_MAPS_API_KEY`), then `.env.local`.
+- **iOS (Xcode build phase):** `GOOGLE_MAPS_API_KEY_IOS` (fallback: legacy `GOOGLE_MAPS_API_KEY`), then `.env.local`, injected via `ios/scripts/apply-maps-api-key.sh`.
 - **JS release URLs:** Babel loads `.env.local` if ENV is empty, then inlines `API_BASE_URL` / `MARKETING_SITE_URL` into the bundle.
 
 ## Local setup
@@ -35,7 +36,8 @@ Also replace Android `strings.xml` Facebook placeholders before testing Facebook
 ```bash
 cd marvira_mobile
 cp .env.example .env.local
-# set GOOGLE_MAPS_API_KEY=...
+# set GOOGLE_MAPS_API_KEY_ANDROID=...
+# set GOOGLE_MAPS_API_KEY_IOS=...
 
 yarn android
 # or

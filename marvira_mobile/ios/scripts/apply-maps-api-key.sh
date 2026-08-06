@@ -1,10 +1,12 @@
 #!/bin/bash
 # Runs automatically from the Xcode "Apply Google Maps API Key" build phase.
-# Codemagic: uses GOOGLE_MAPS_API_KEY from environment.
+# iOS Maps key injection.
+# Codemagic / CI: uses GOOGLE_MAPS_API_KEY_IOS from environment.
+# Backward compatible fallback: GOOGLE_MAPS_API_KEY.
 # Local: falls back to marvira_mobile/.env.local
 set -euo pipefail
 
-KEY="${GOOGLE_MAPS_API_KEY:-}"
+KEY="${GOOGLE_MAPS_API_KEY_IOS:-${GOOGLE_MAPS_API_KEY:-}}"
 
 if [ -z "$KEY" ]; then
   ENV_FILE="${SRCROOT}/../.env.local"
@@ -16,7 +18,15 @@ if [ -z "$KEY" ]; then
     while IFS= read -r line || [ -n "$line" ]; do
       case "$line" in
         ''|\#*) continue ;;
+        GOOGLE_MAPS_API_KEY_IOS=*)
+          KEY="${line#GOOGLE_MAPS_API_KEY_IOS=}"
+          KEY="${KEY%\"}"
+          KEY="${KEY#\"}"
+          KEY="${KEY%\'}"
+          KEY="${KEY#\'}"
+          ;;
         GOOGLE_MAPS_API_KEY=*)
+          # Backward compatible local fallback
           KEY="${line#GOOGLE_MAPS_API_KEY=}"
           KEY="${KEY%\"}"
           KEY="${KEY#\"}"
@@ -29,8 +39,8 @@ if [ -z "$KEY" ]; then
 fi
 
 if [ -z "$KEY" ] || [ "$KEY" = "YOUR_GOOGLE_MAPS_API_KEY" ]; then
-  echo "error: GOOGLE_MAPS_API_KEY is missing or invalid." >&2
-  echo "  Codemagic: set Secure ENV GOOGLE_MAPS_API_KEY" >&2
+  echo "error: iOS Google Maps API key is missing or invalid." >&2
+  echo "  Codemagic: set Secure ENV GOOGLE_MAPS_API_KEY_IOS (fallback: GOOGLE_MAPS_API_KEY)" >&2
   echo "  Local: create marvira_mobile/.env.local (see .env.example)" >&2
   exit 1
 fi

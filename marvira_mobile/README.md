@@ -18,7 +18,7 @@ A production-ready React Native application for location-based gaming with event
 - React Native development environment set up
 - iOS: Xcode and CocoaPods
 - Android: Android Studio and Android SDK
-- Google Maps API key (for map functionality)
+- Google Maps API keys (for map functionality: Android + iOS)
 
 ## 🛠️ Installation
 
@@ -38,7 +38,8 @@ A production-ready React Native application for location-based gaming with event
 3. **Secrets (Maps / release URLs)**
    ```bash
    cp .env.example .env.local
-   # set GOOGLE_MAPS_API_KEY=...
+  # set GOOGLE_MAPS_API_KEY_ANDROID=...
+  # set GOOGLE_MAPS_API_KEY_IOS=...
    ```
    Then run the app as usual — no extra secrets script.
    Codemagic uses Secure ENV instead — see `CODEMAGIC.md`.
@@ -52,14 +53,14 @@ A production-ready React Native application for location-based gaming with event
 
 4. **Configure Google Maps**
 
-   **iOS** (`ios/AppDelegate.mm`):
-   Add your Google Maps API key:
+**iOS**: (key injected at build time)
+Make sure you set `GOOGLE_MAPS_API_KEY_IOS`.
    ```objc
    [GMSServices provideAPIKey:@"YOUR_GOOGLE_MAPS_API_KEY"];
    ```
 
-   **Android** (`android/app/src/main/AndroidManifest.xml`):
-   Add your Google Maps API key:
+**Android**: (key injected at build time)
+Make sure you set `GOOGLE_MAPS_API_KEY_ANDROID`.
    ```xml
    <meta-data
      android:name="com.google.android.geo.API_KEY"
