@@ -4,18 +4,23 @@
 # 1. Connect this repo → Applications → check for this yaml
 # 2. Env group `marvira_mobile_secrets` (Secure) with:
 #      GOOGLE_MAPS_API_KEY
-#      API_BASE_URL              (e.g. https://api.marvira.com)
+#      API_BASE_URL              (e.g. https://api.marvira.com or Railway URL)
 #      MARKETING_SITE_URL        (e.g. https://www.marvira.com)
 #      GOOGLE_WEB_CLIENT_ID      (Web OAuth client — Google Sign-In)
 #      FACEBOOK_APP_ID
 #      FACEBOOK_CLIENT_TOKEN
+#      GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS  (full Play API JSON key contents)
 # 3. Optional override (repo already has placeholder Firebase configs):
 #      GOOGLE_SERVICES_JSON_BASE64
 #      GOOGLE_SERVICE_INFO_PLIST_BASE64
 # 4. Code signing identities:
 #      Android keystore reference name: marvira_android
 #      iOS: App Store Connect integration name: marvira_asc
-# 5. Start Build → pick android-release or ios-release
+# 5. Play Console: create app com.marvira, invite the service account (Releases),
+#    then upload the FIRST AAB manually once. Later android-release builds auto-publish.
+# 6. Start Build → android-release (→ Play internal) or ios-release (→ TestFlight)
+#
+# Override Play track without editing yaml: set GOOGLE_PLAY_TRACK=production (etc.)
 #
 # Local: copy marvira_mobile/.env.example → .env.local, then yarn android / yarn ios.
 # See marvira_mobile/CODEMAGIC.md
@@ -45,7 +50,8 @@ workflows:
             MARKETING_SITE_URL \
             GOOGLE_WEB_CLIENT_ID \
             FACEBOOK_APP_ID \
-            FACEBOOK_CLIENT_TOKEN
+            FACEBOOK_CLIENT_TOKEN \
+            GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
           do
             eval "val=\${$v:-}"
             if [ -z "$val" ]; then
@@ -84,6 +90,11 @@ workflows:
         notify:
           success: true
           failure: true
+      google_play:
+        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
+        # Default: internal testing. Override at build time with GOOGLE_PLAY_TRACK.
+        track: internal
+        submit_as_draft: false
 
   ios-release:
     name: iOS Release
@@ -139,6 +150,10 @@ workflows:
         script: |
           cd ios
           pod install
+      - name: Set iOS build number
+        script: |
+          cd ios
+          agvtool new-version -all "$((BUILD_NUMBER))"
       - name: Build IPA
         script: |
           xcode-project build-ipa \

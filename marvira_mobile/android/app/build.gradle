@@ -94,7 +94,14 @@ android {
         applicationId "com.marvira"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        // Codemagic sets BUILD_NUMBER / PROJECT_BUILD_NUMBER / NEW_BUILD_NUMBER.
+        // Play requires each upload to have a higher versionCode.
+        versionCode (
+            System.getenv("NEW_BUILD_NUMBER")
+                ?: System.getenv("BUILD_NUMBER")
+                ?: System.getenv("PROJECT_BUILD_NUMBER")
+                ?: "1"
+        ).toInteger()
         versionName "1.0"
         multiDexEnabled true
         manifestPlaceholders = [GOOGLE_MAPS_API_KEY: mapsApiKey]

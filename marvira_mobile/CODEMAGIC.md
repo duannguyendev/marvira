@@ -45,12 +45,24 @@ yarn ios
 ## Codemagic setup
 
 1. Use root `codemagic.yaml` (committed at repo root).
-2. Env group **`marvira_mobile_secrets`** with all Required variables above.
+2. Env group **`marvira_mobile_secrets`** with all Required variables above, plus:
+   - `GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS` — full Play Console API JSON key
 3. Code signing identities:
    - Android keystore reference: **`marvira_android`**
    - App Store Connect integration: **`marvira_asc`**
 4. Start Build → `android-release` or `ios-release`.
-   Workflows verify ENV, install with **yarn**, then build (AAB / IPA).
+
+### Auto-publish targets
+
+| Workflow | After a green build |
+|----------|---------------------|
+| `android-release` | Uploads AAB to Google Play **internal** track |
+| `ios-release` | Uploads IPA to **TestFlight** |
+
+- Override Play track: set Secure/var `GOOGLE_PLAY_TRACK` to `alpha`, `beta`, or `production`.
+- **First Play upload must be manual** (Play Console requirement). After that, Codemagic publishes automatically.
+- Invite the Play service account under Play Console → Users and permissions (grant **Releases** on `com.marvira`).
+- Build numbers auto-increment from Codemagic `BUILD_NUMBER` (Android `versionCode` + iOS `CFBundleVersion`).
 
 ### Optional Firebase via base64
 
