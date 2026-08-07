@@ -6,7 +6,7 @@ import Map, {
   Marker,
   NavigationControl,
   Source,
-  type MapLayerMouseEvent,
+  type MapMouseEvent,
 } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -102,7 +102,7 @@ export function LocationMapField({
     );
   }
 
-  const handleMapClick = (event: MapLayerMouseEvent) => {
+  const handleMapClick = (event: MapMouseEvent) => {
     onChange(event.lngLat.lat, event.lngLat.lng);
   };
 
