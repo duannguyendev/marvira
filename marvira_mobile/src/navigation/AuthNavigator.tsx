@@ -9,7 +9,7 @@ import { AuthStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 const authEdges = ['top', 'bottom', 'left', 'right'] as const;
-const LoginScreenSafe = withScreenSafeArea(LoginScreen, [...authEdges]);
+// Login draws its own full-bleed gradient; safe area is applied to the card only.
 const RegisterScreenSafe = withScreenSafeArea(RegisterScreen, [...authEdges]);
 const ForgotPasswordScreenSafe = withScreenSafeArea(ForgotPasswordScreen, [
   ...authEdges,
@@ -23,9 +23,9 @@ export const AuthNavigator: React.FC = () => {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: '#FFFFFF' },
+        contentStyle: { backgroundColor: 'transparent' },
       }}>
-      <Stack.Screen name="Login" component={LoginScreenSafe} />
+      <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreenSafe} />
       <Stack.Screen
         name="ForgotPassword"
