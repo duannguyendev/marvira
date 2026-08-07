@@ -82,6 +82,7 @@ workflows:
           VERSION_CODE="${PROJECT_BUILD_NUMBER:-${BUILD_NUMBER:-1}}"
           echo "Using Android versionCode=${VERSION_CODE}"
           cd android
+          chmod +x gradlew
           ./gradlew bundleRelease -PcmVersionCode="$VERSION_CODE"
     artifacts:
       - android/app/build/outputs/**/*.aab
