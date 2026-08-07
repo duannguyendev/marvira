@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 interface AdvancedFieldsProps {
   children: ReactNode;
@@ -16,10 +16,15 @@ export function AdvancedFields({
   label = 'Advanced options',
   defaultOpen = false,
 }: AdvancedFieldsProps) {
+  const [open, setOpen] = useState(defaultOpen);
+
   return (
     <details
       className="rounded-md border border-border bg-muted/30"
-      defaultOpen={defaultOpen}>
+      open={open}
+      onToggle={event => {
+        setOpen(event.currentTarget.open);
+      }}>
       <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
         {label}
       </summary>
