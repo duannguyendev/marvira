@@ -179,4 +179,6 @@ workflows:
           failure: true
       app_store_connect:
         auth: integration
-        submit_to_testflight: true
+        # Upload IPA only — Internal Testing works without beta review.
+        # Set true later when TestFlight test-info is filled for external testers.
+        submit_to_testflight: false
