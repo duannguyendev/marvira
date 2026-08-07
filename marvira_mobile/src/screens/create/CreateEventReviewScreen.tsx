@@ -11,7 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Mapbox from '@rnmapbox/maps';
 import { StepIndicator } from '../../components/StepIndicator';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
@@ -21,6 +21,7 @@ import {
 } from '../../components/ScheduleDateTimeField';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorView } from '../../components/ErrorView';
+import { MapPin } from '../../components/MapPin';
 import { useEventDetails } from '../../hooks/useEvents';
 import { usePublishEvent, useSchedulePublish } from '../../hooks/useMyEvents';
 import { usePublishVerifyStatus } from '../../hooks/usePublishVerify';
@@ -34,6 +35,10 @@ import {
   fontWeight,
 } from '../../theme';
 import { DEFAULT_MAP_REGION } from '../../utils/constants';
+import {
+  MAPBOX_STYLE,
+  zoomFromLatitudeDelta,
+} from '../../utils/mapbox';
 
 type CreateEventReviewRouteProp = RouteProp<
   HomeStackParamList,
@@ -242,15 +247,19 @@ export const CreateEventReviewScreen: React.FC = () => {
   }
 
   const allPlacesHaveQuestions = event.places.length > 0;
-  const mapRegion =
+  const mapCenter =
     event.places.length > 0
       ? {
           latitude: event.places[0].location.latitude,
           longitude: event.places[0].location.longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
         }
-      : DEFAULT_MAP_REGION;
+      : {
+          latitude: DEFAULT_MAP_REGION.latitude,
+          longitude: DEFAULT_MAP_REGION.longitude,
+        };
+  const mapZoom = zoomFromLatitudeDelta(
+    event.places.length > 0 ? 0.05 : DEFAULT_MAP_REGION.latitudeDelta,
+  );
 
   return (
     <View style={styles.container}>
@@ -273,20 +282,32 @@ export const CreateEventReviewScreen: React.FC = () => {
           </Text>
         </View>
 
-        <MapView
-          provider={PROVIDER_GOOGLE}
+        <Mapbox.MapView
           style={styles.map}
-          initialRegion={mapRegion}
-          scrollEnabled={false}>
+          styleURL={MAPBOX_STYLE}
+          scrollEnabled={false}
+          zoomEnabled={false}
+          pitchEnabled={false}
+          rotateEnabled={false}
+          compassEnabled={false}
+          scaleBarEnabled={false}
+          logoEnabled={false}
+          attributionEnabled={false}>
+          <Mapbox.Camera
+            centerCoordinate={[mapCenter.longitude, mapCenter.latitude]}
+            zoomLevel={mapZoom}
+            animationMode="none"
+          />
           {event.places.map((place, index) => (
-            <Marker
+            <Mapbox.PointAnnotation
               key={place.id}
-              coordinate={place.location}
-              title={place.name}
-              description={`#${index + 1}`}
-            />
+              id={`review-place-${place.id}`}
+              coordinate={[place.location.longitude, place.location.latitude]}
+              title={`#${index + 1} ${place.name}`}>
+              <MapPin color={colors.mapMarker} />
+            </Mapbox.PointAnnotation>
           ))}
-        </MapView>
+        </Mapbox.MapView>
 
         <View style={styles.accessSection}>
           <Text style={styles.accessTitle}>

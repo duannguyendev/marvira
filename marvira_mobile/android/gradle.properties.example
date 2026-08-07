@@ -1,5 +1,5 @@
-# Optional reference only — not required for Google Maps.
-# Maps key: set GOOGLE_MAPS_API_KEY_ANDROID in ../.env.local (local) or Codemagic Secure ENV (CI).
+# Optional reference — Mapbox runtime token is set in ../.env.local (MAPBOX_ACCESS_TOKEN)
+# or Codemagic Secure ENV. Mapbox Maven downloads no longer require a secret token.
 # See ../CODEMAGIC.md and ../.env.example.
 #
 # Release signing: copy key.properties.example → key.properties (gitignored).

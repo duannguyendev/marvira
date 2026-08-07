@@ -105,11 +105,12 @@ mostly deploy, store, Firebase, invite web page, and launch-city content.
 
 [P0] Codemagic / release ENV (see marvira_mobile/CODEMAGIC.md)
   - Env group marvira_mobile_secrets:
-      GOOGLE_MAPS_API_KEY
+      MAPBOX_ACCESS_TOKEN
       API_BASE_URL=https://api.yourdomain.com
       MARKETING_SITE_URL=https://www.yourdomain.com
   - Local release: same names in marvira_mobile/.env.local (from .env.example)
   - Do NOT hardcode URLs in constants.ts — release builds fail if ENV missing
+  - Dashboard: set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
 [P0] Replace Firebase placeholder configs
   - android/app/google-services.json  (project_id still marvira-replace-me)
@@ -135,9 +136,9 @@ mostly deploy, store, Firebase, invite web page, and launch-city content.
   - App Store Connect: marvira_asc
   - First green android-release + ios-release builds
 
-[P1] Restrict Google Maps API key
-  - Android: package name + release SHA-1
-  - iOS: bundle ID
+[P1] Restrict Mapbox access token
+  - Mobile: bundle ID / package restrictions in Mapbox console
+  - Dashboard: URL restrictions for NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
 ================================================================================
 3. LAUNCH CONTENT + SOFT TEST (growth_plan G0)

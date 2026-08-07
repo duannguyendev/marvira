@@ -13,60 +13,6 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-def loadDotEnvLocal = {
-    def props = new Properties()
-    def envFile = rootProject.file('../.env.local')
-    if (!envFile.exists()) {
-        envFile = rootProject.file('../.env')
-    }
-    if (envFile.exists()) {
-        envFile.eachLine { raw ->
-            def line = raw.trim()
-            if (!line || line.startsWith('#')) {
-                return
-            }
-            def idx = line.indexOf('=')
-            if (idx > 0) {
-                def key = line.substring(0, idx).trim()
-                def value = line.substring(idx + 1).trim()
-                if ((value.startsWith('"') && value.endsWith('"')) ||
-                    (value.startsWith("'") && value.endsWith("'"))) {
-                    value = value.substring(1, value.length() - 1)
-                }
-                props.setProperty(key, value)
-            }
-        }
-    }
-    return props
-}
-
-def envLocal = loadDotEnvLocal()
-def PLACEHOLDER_MAPS_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'
-
-/**
- * Codemagic / shell ENV wins, then local `.env.local`.
- * Build fails if the key is missing (debug and release).
- * Use a closure (not a method) so script locals are visible to Gradle Groovy.
- */
-def requireMapsApiKey = {
-    def key =
-        System.getenv('GOOGLE_MAPS_API_KEY_ANDROID')
-            ?: System.getenv('GOOGLE_MAPS_API_KEY')
-            ?: envLocal.getProperty('GOOGLE_MAPS_API_KEY_ANDROID')
-            ?: envLocal.getProperty('GOOGLE_MAPS_API_KEY')
-
-    if (!(key instanceof String) || !key.trim() || key.trim() == PLACEHOLDER_MAPS_KEY) {
-        throw new GradleException(
-            "GOOGLE_MAPS_API_KEY_ANDROID is missing or invalid.\n" +
-            "  Codemagic: set Secure ENV GOOGLE_MAPS_API_KEY_ANDROID (fallback: GOOGLE_MAPS_API_KEY)\n" +
-            "  Local: create marvira_mobile/.env.local (see .env.example)"
-        )
-    }
-    return key.trim()
-}
-
-def mapsApiKey = requireMapsApiKey()
-
 /**
  * Codemagic: pass -PcmVersionCode=$PROJECT_BUILD_NUMBER (or BUILD_NUMBER).
  * Also accepts NEW_BUILD_NUMBER / BUILD_NUMBER / PROJECT_BUILD_NUMBER env.
@@ -126,7 +72,6 @@ android {
         versionCode resolveVersionCode()
         versionName "1.0"
         multiDexEnabled true
-        manifestPlaceholders = [GOOGLE_MAPS_API_KEY: mapsApiKey]
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"

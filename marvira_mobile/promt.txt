@@ -14,7 +14,7 @@ TECH STACK REQUIREMENTS
 - React Native (latest)
 - TypeScript
 - React Navigation (stack + bottom tabs)
-- Google Maps (react-native-maps with Google provider)
+- Mapbox (@rnmapbox/maps)
 - Location services (background + foreground)
 - Axios for API calls
 - React Query or similar for server state
@@ -46,7 +46,7 @@ CORE FEATURES
 - Beautiful modern UI (inspired by top Dribbble / Behance mobile designs)
 
 3️⃣ EVENT DETAILS SCREEN
-- Map at the top (Google Maps)
+- Map at the top (Mapbox)
 - Show:
   - User current location
   - All places for the event

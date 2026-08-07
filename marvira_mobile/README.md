@@ -1,6 +1,6 @@
 # Marvira - Location-Based Game App
 
-A production-ready React Native application for location-based gaming with events and places. Built with TypeScript, React Navigation, Google Maps, and modern best practices.
+A production-ready React Native application for location-based gaming with events and places. Built with TypeScript, React Navigation, Mapbox, and modern best practices.
 
 ## 🚀 Features
 
@@ -18,7 +18,7 @@ A production-ready React Native application for location-based gaming with event
 - React Native development environment set up
 - iOS: Xcode and CocoaPods
 - Android: Android Studio and Android SDK
-- Google Maps API keys (for map functionality: Android + iOS)
+- Mapbox access token (https://account.mapbox.com/access-tokens/)
 
 ## 🛠️ Installation
 
@@ -38,8 +38,7 @@ A production-ready React Native application for location-based gaming with event
 3. **Secrets (Maps / release URLs)**
    ```bash
    cp .env.example .env.local
-  # set GOOGLE_MAPS_API_KEY_ANDROID=...
-  # set GOOGLE_MAPS_API_KEY_IOS=...
+   # set MAPBOX_ACCESS_TOKEN=pk....
    ```
    Then run the app as usual — no extra secrets script.
    Codemagic uses Secure ENV instead — see `CODEMAGIC.md`.
@@ -51,23 +50,11 @@ A production-ready React Native application for location-based gaming with event
    cd ..
    ```
 
-4. **Configure Google Maps**
+5. **Configure Mapbox**
 
-**iOS**: (key injected at build time)
-Make sure you set `GOOGLE_MAPS_API_KEY_IOS`.
-   ```objc
-   [GMSServices provideAPIKey:@"YOUR_GOOGLE_MAPS_API_KEY"];
-   ```
+   Set `MAPBOX_ACCESS_TOKEN` in `.env.local` (or Codemagic Secure ENV). The app calls `Mapbox.setAccessToken` at startup (Babel-inlined). After adding `@rnmapbox/maps`, run `pod install` on iOS.
 
-**Android**: (key injected at build time)
-Make sure you set `GOOGLE_MAPS_API_KEY_ANDROID`.
-   ```xml
-   <meta-data
-     android:name="com.google.android.geo.API_KEY"
-     android:value="YOUR_GOOGLE_MAPS_API_KEY"/>
-   ```
-
-5. **Configure API Base URL**
+6. **Configure API Base URL**
 
    **Debug (local / UAT):** set in `.env.local` (no quotes):
 
@@ -362,7 +349,7 @@ Edit `src/utils/constants.ts` to adjust:
 ## 🐛 Troubleshooting
 
 ### Maps not showing
-- Ensure Google Maps API key is correctly configured
+- Ensure Mapbox access token is correctly configured
 - Check that billing is enabled for your Google Cloud project
 - Verify API key has Maps SDK enabled
 

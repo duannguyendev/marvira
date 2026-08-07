@@ -11,7 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Mapbox from '@rnmapbox/maps';
 import { useEventDetails, useJoinEvent } from '../../hooks/useEvents';
 import { useLocation } from '../../hooks/useLocation';
 import { useIsEventFavorite } from '../../hooks/useFavorites';
@@ -23,6 +23,11 @@ import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorView } from '../../components/ErrorView';
 import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
 import { JoinEventPasswordSheet } from '../../components/JoinEventPasswordSheet';
+import { MapPin } from '../../components/MapPin';
+import {
+  MAPBOX_STYLE,
+  zoomFromLatitudeDelta,
+} from '../../utils/mapbox';
 import {
   colors,
   spacing,
@@ -177,15 +182,19 @@ export const EventDetailsScreen: React.FC = () => {
     );
   }
 
-  const mapRegion =
+  const mapCenter =
     event.places.length > 0
       ? {
           latitude: event.places[0].location.latitude,
           longitude: event.places[0].location.longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
         }
-      : DEFAULT_MAP_REGION;
+      : {
+          latitude: DEFAULT_MAP_REGION.latitude,
+          longitude: DEFAULT_MAP_REGION.longitude,
+        };
+  const mapZoom = zoomFromLatitudeDelta(
+    event.places.length > 0 ? 0.05 : DEFAULT_MAP_REGION.latitudeDelta,
+  );
 
   const placesWithDistance = location
     ? event.places.map(place => ({
@@ -199,27 +208,40 @@ export const EventDetailsScreen: React.FC = () => {
       <ScrollView style={styles.container}>
         {!isLocked ? (
           <View style={styles.mapContainer}>
-            <MapView
-              provider={PROVIDER_GOOGLE}
+            <Mapbox.MapView
               style={styles.map}
-              initialRegion={mapRegion}
-              showsUserLocation
-              showsMyLocationButton>
+              styleURL={MAPBOX_STYLE}
+              compassEnabled={false}
+              scaleBarEnabled={false}
+              logoEnabled={false}
+              attributionEnabled={false}>
+              <Mapbox.Camera
+                centerCoordinate={[mapCenter.longitude, mapCenter.latitude]}
+                zoomLevel={mapZoom}
+                animationMode="none"
+              />
+              <Mapbox.UserLocation visible />
               {event.places.map(place => (
-                <Marker
+                <Mapbox.PointAnnotation
                   key={place.id}
-                  coordinate={place.location}
-                  title={place.name}
-                  pinColor={
-                    place.isCompleted
-                      ? colors.completed
-                      : place.isUnlocked
-                        ? colors.primary
-                        : colors.notStarted
-                  }
-                />
+                  id={`place-${place.id}`}
+                  coordinate={[
+                    place.location.longitude,
+                    place.location.latitude,
+                  ]}
+                  title={place.name}>
+                  <MapPin
+                    color={
+                      place.isCompleted
+                        ? colors.completed
+                        : place.isUnlocked
+                          ? colors.primary
+                          : colors.notStarted
+                    }
+                  />
+                </Mapbox.PointAnnotation>
               ))}
-            </MapView>
+            </Mapbox.MapView>
           </View>
         ) : null}
 

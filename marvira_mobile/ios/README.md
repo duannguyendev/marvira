@@ -25,8 +25,8 @@ cd ios && pod install
 ## Required Info.plist keys
 
 - `NSLocationWhenInUseUsageDescription` — location for gameplay unlock
-- `GMSApiKey` — set automatically at build time from Codemagic ENV or `../.env.local`
-  (Xcode phase `Apply Google Maps API Key`)
+
+Mapbox access token is set in JS via `MAPBOX_ACCESS_TOKEN` (`.env.local` / Codemagic), not Info.plist.
 
 ## Bundle identifier
 
@@ -38,3 +38,4 @@ cd ios && pod install
 - New Architecture is enabled (`newArchEnabled=true` / `RCT_NEW_ARCH_ENABLED=1`)
 - Build and TestFlight upload require Apple Developer account
 - Physical device recommended for GPS gameplay testing
+- After installing `@rnmapbox/maps`, run `pod install` before building

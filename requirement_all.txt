@@ -136,7 +136,7 @@ Mandatory dependencies:
 - react-dom
 - typescript
 - styled-components
-- react-native-maps
+- @rnmapbox/maps
 - react-navigation
 - axios
 - @tanstack/react-query
@@ -161,7 +161,7 @@ Generate:
 - AndroidManifest permissions:
   - ACCESS_FINE_LOCATION
   - ACCESS_COARSE_LOCATION
-- Google Maps setup
+- Mapbox setup
 - placeholder API key
 - build configs
 
@@ -172,7 +172,7 @@ Generate:
 - Info.plist permissions:
   - NSLocationWhenInUseUsageDescription
   - NSLocationAlwaysAndWhenInUseUsageDescription
-- Google Maps setup
+- Mapbox setup
 - placeholder key
 - iOS 14+
 
@@ -1447,7 +1447,8 @@ AWS_SECRET_ACCESS_KEY=
 S3_BUCKET=
 NEXT_PUBLIC_API_URL=
 USE_MOCK_API=
-GOOGLE_MAPS_API_KEY=
+MAPBOX_ACCESS_TOKEN=
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
 
 ====================================================
 README REQUIREMENTS

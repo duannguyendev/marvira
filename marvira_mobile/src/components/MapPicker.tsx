@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,15 +6,18 @@ import {
   Text,
   Dimensions,
 } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
+import Mapbox from '@rnmapbox/maps';
 import { useTranslation } from 'react-i18next';
 import { Location } from '../types';
+import { MapPin } from './MapPin';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 import { DEFAULT_MAP_REGION } from '../utils/constants';
+import { MAPBOX_STYLE, zoomFromLatitudeDelta } from '../utils/mapbox';
 
 const { height } = Dimensions.get('window');
 const MAP_HEIGHT = height * 0.32;
 const DEFAULT_DELTA = 0.01;
+const DEFAULT_ZOOM = zoomFromLatitudeDelta(DEFAULT_DELTA);
 
 interface MapPickerProps {
   coordinate: Location;
@@ -30,66 +33,80 @@ export const MapPicker: React.FC<MapPickerProps> = ({
   markers = [],
 }) => {
   const { t } = useTranslation();
-  const mapRef = useRef<MapView>(null);
-  const [region, setRegion] = useState<Region>({
-    ...coordinate,
-    latitudeDelta: DEFAULT_DELTA,
-    longitudeDelta: DEFAULT_DELTA,
-  });
+  const cameraRef = useRef<React.ElementRef<typeof Mapbox.Camera>>(null);
+  const zoomRef = useRef(DEFAULT_ZOOM);
 
   useEffect(() => {
-    const nextRegion: Region = {
-      latitude: coordinate.latitude,
-      longitude: coordinate.longitude,
-      latitudeDelta: region.latitudeDelta || DEFAULT_DELTA,
-      longitudeDelta: region.longitudeDelta || DEFAULT_DELTA,
-    };
-    setRegion(nextRegion);
-    mapRef.current?.animateToRegion(nextRegion, 400);
-    // Only recenter when the selected pin moves, not when the user pans/zooms.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    cameraRef.current?.setCamera({
+      centerCoordinate: [coordinate.longitude, coordinate.latitude],
+      zoomLevel: zoomRef.current,
+      animationDuration: 400,
+    });
   }, [coordinate.latitude, coordinate.longitude]);
 
   const handleMapPress = (event: {
-    nativeEvent: { coordinate: { latitude: number; longitude: number } };
+    geometry: { type: string; coordinates: number[] };
   }) => {
-    const { latitude, longitude } = event.nativeEvent.coordinate;
+    if (event.geometry.type !== 'Point') {
+      return;
+    }
+    const [longitude, latitude] = event.geometry.coordinates;
     onCoordinateChange({ latitude, longitude });
   };
 
   const handleMarkerDrag = (event: {
-    nativeEvent: { coordinate: { latitude: number; longitude: number } };
+    geometry: { type: string; coordinates: number[] };
   }) => {
-    const { latitude, longitude } = event.nativeEvent.coordinate;
+    if (event.geometry.type !== 'Point') {
+      return;
+    }
+    const [longitude, latitude] = event.geometry.coordinates;
     onCoordinateChange({ latitude, longitude });
   };
 
   return (
     <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        provider={PROVIDER_GOOGLE}
+      <Mapbox.MapView
         style={styles.map}
-        initialRegion={region}
-        onRegionChangeComplete={setRegion}
-        onPress={handleMapPress}
-        showsUserLocation
-        showsMyLocationButton={false}>
-        {markers.map(marker => (
-          <Marker
-            key={marker.id}
-            coordinate={marker.coordinate}
-            title={marker.label}
-            pinColor={colors.textLight}
-          />
-        ))}
-        <Marker
-          coordinate={coordinate}
-          draggable
-          onDragEnd={handleMarkerDrag}
-          pinColor={colors.mapMarker}
+        styleURL={MAPBOX_STYLE}
+        compassEnabled={false}
+        scaleBarEnabled={false}
+        logoEnabled={false}
+        attributionEnabled={false}
+        onPress={handleMapPress}>
+        <Mapbox.Camera
+          ref={cameraRef}
+          defaultSettings={{
+            centerCoordinate: [coordinate.longitude, coordinate.latitude],
+            zoomLevel: DEFAULT_ZOOM,
+          }}
+          onCameraChanged={(state: { properties: { zoom?: number } }) => {
+            if (typeof state.properties.zoom === 'number') {
+              zoomRef.current = state.properties.zoom;
+            }
+          }}
         />
-      </MapView>
+        <Mapbox.UserLocation visible />
+        {markers.map(marker => (
+          <Mapbox.PointAnnotation
+            key={marker.id}
+            id={`extra-${marker.id}`}
+            coordinate={[
+              marker.coordinate.longitude,
+              marker.coordinate.latitude,
+            ]}
+            title={marker.label}>
+            <MapPin color={colors.textLight} />
+          </Mapbox.PointAnnotation>
+        ))}
+        <Mapbox.PointAnnotation
+          id="selected-coordinate"
+          coordinate={[coordinate.longitude, coordinate.latitude]}
+          draggable
+          onDragEnd={handleMarkerDrag}>
+          <MapPin color={colors.mapMarker} />
+        </Mapbox.PointAnnotation>
+      </Mapbox.MapView>
       {onUseMyLocation ? (
         <TouchableOpacity
           style={styles.locationButton}

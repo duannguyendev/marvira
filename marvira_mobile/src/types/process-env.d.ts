@@ -11,5 +11,6 @@ declare const process: {
     GOOGLE_WEB_CLIENT_ID?: string;
     FACEBOOK_APP_ID?: string;
     FACEBOOK_CLIENT_TOKEN?: string;
+    MAPBOX_ACCESS_TOKEN?: string;
   };
 };

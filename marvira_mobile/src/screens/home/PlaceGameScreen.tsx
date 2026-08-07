@@ -12,7 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import MapView, { Marker, Circle, PROVIDER_GOOGLE } from 'react-native-maps';
+import Mapbox from '@rnmapbox/maps';
 import {
   usePlaceQuestion,
   useSubmitAnswer,
@@ -25,6 +25,12 @@ import { Button } from '../../components/Button';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorView } from '../../components/ErrorView';
 import { QuestionRenderer } from '../../components/QuestionRenderer';
+import { MapPin } from '../../components/MapPin';
+import {
+  circlePolygon,
+  MAPBOX_STYLE,
+  zoomFromLatitudeDelta,
+} from '../../utils/mapbox';
 import {
   colors,
   spacing,
@@ -334,11 +340,15 @@ export const PlaceGameScreen: React.FC = () => {
     );
   }
 
-  const mapRegion = {
-    latitude: place.location.latitude,
-    longitude: place.location.longitude,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
+  const mapZoom = zoomFromLatitudeDelta(0.01);
+  const radiusGeoJson = {
+    type: 'Feature' as const,
+    properties: {},
+    geometry: circlePolygon(
+      place.location.latitude,
+      place.location.longitude,
+      unlockRadius,
+    ),
   };
 
   const question = questionData?.data;
@@ -351,25 +361,47 @@ export const PlaceGameScreen: React.FC = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.mapContainer}>
-          <MapView
-            provider={PROVIDER_GOOGLE}
+          <Mapbox.MapView
             style={styles.map}
-            initialRegion={mapRegion}
-            showsUserLocation
-            showsMyLocationButton>
-            <Marker
-              coordinate={place.location}
-              title={place.name}
-              pinColor={isUnlocked ? colors.primary : colors.notStarted}
+            styleURL={MAPBOX_STYLE}
+            compassEnabled={false}
+            scaleBarEnabled={false}
+            logoEnabled={false}
+            attributionEnabled={false}>
+            <Mapbox.Camera
+              centerCoordinate={[
+                place.location.longitude,
+                place.location.latitude,
+              ]}
+              zoomLevel={mapZoom}
+              animationMode="none"
             />
-            <Circle
-              center={place.location}
-              radius={unlockRadius}
-              fillColor={colors.primary + '20'}
-              strokeColor={colors.primary}
-              strokeWidth={2}
-            />
-          </MapView>
+            <Mapbox.UserLocation visible />
+            <Mapbox.ShapeSource id="unlock-radius" shape={radiusGeoJson}>
+              <Mapbox.FillLayer
+                id="unlock-radius-fill"
+                style={{
+                  fillColor: colors.primary,
+                  fillOpacity: 0.12,
+                }}
+              />
+              <Mapbox.LineLayer
+                id="unlock-radius-stroke"
+                style={{
+                  lineColor: colors.primary,
+                  lineWidth: 2,
+                }}
+              />
+            </Mapbox.ShapeSource>
+            <Mapbox.PointAnnotation
+              id={`place-${place.id}`}
+              coordinate={[place.location.longitude, place.location.latitude]}
+              title={place.name}>
+              <MapPin
+                color={isUnlocked ? colors.primary : colors.notStarted}
+              />
+            </Mapbox.PointAnnotation>
+          </Mapbox.MapView>
         </View>
 
         <View style={styles.content}>

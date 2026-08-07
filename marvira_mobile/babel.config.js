@@ -71,20 +71,12 @@ module.exports = {
           'GOOGLE_WEB_CLIENT_ID',
           'FACEBOOK_APP_ID',
           'FACEBOOK_CLIENT_TOKEN',
+          'MAPBOX_ACCESS_TOKEN',
         ],
       },
     ],
+    ['@babel/plugin-transform-private-methods', { loose: true }],
     // Reanimated 4's plugin is an alias of worklets; include only one (must be last).
     'react-native-worklets/plugin',
-  ],
-  // Avoid applying class/private transforms to react-native-maps: they turn
-  // declaration-only fields into instance props that shadow decorateMapComponent methods.
-  overrides: [
-    {
-      test: filename =>
-        !!filename &&
-        !filename.includes(`${path.sep}node_modules${path.sep}react-native-maps${path.sep}`),
-      plugins: [['@babel/plugin-transform-private-methods', { loose: true }]],
-    },
   ],
 };

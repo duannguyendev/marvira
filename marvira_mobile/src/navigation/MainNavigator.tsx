@@ -29,17 +29,25 @@ export const MainNavigator: React.FC = () => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   /**
-   * Android (edgeToEdgeEnabled=false + opaque status bar): the window already
-   * sits above the system nav bar — applying insets.bottom again creates a
-   * blank strip above the tab bar. iOS still needs the home-indicator inset.
+   * Bottom padding for the tab bar:
+   * - iOS: always reserve home-indicator space (min 8).
+   * - Android when insets.bottom === 0: window window is already above the
+   *   system nav (classic / non-overlapping) → keep a small 6px gap only
+   *   (same as before; avoids a blank double-inset strip).
+   * - Android when insets.bottom > 0: edge-to-edge / 3-button or gesture bar
+   *   overlaps the app → pad by the reported inset so tabs sit above it.
    */
-  const bottomInset = Platform.OS === 'ios' ? Math.max(insets.bottom, 8) : 6;
+  const bottomInset =
+    Platform.OS === 'ios'
+      ? Math.max(insets.bottom, 8)
+      : insets.bottom > 0
+        ? insets.bottom
+        : 6;
 
   return (
     <Tab.Navigator
-      safeAreaInsets={
-        Platform.OS === 'android' ? { bottom: 0 } : undefined
-      }
+      // Handle inset ourselves via tabBarStyle so we can branch Android cases.
+      safeAreaInsets={{ bottom: 0 }}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,

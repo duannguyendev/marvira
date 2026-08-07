@@ -57,4 +57,4 @@ Write-Host "Cleaning up temporary template..."
 Remove-Item -Recurse -Force $TemplateDir
 
 Write-Host 'Done. On macOS run: cd ios; pod install'
-Write-Host 'Set GOOGLE_MAPS_API_KEY_IOS (or legacy GOOGLE_MAPS_API_KEY) and add location usage strings in Info.plist if needed'
+Write-Host 'Set MAPBOX_ACCESS_TOKEN in ../.env.local (or Codemagic) and add location usage strings in Info.plist if needed'

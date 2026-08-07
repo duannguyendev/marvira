@@ -2,7 +2,6 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
-import GoogleMaps
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,8 +14,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    GMSServices.provideAPIKey(Self.googleMapsAPIKey())
-
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -33,16 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
 
     return true
-  }
-
-  private static func googleMapsAPIKey() -> String {
-    if let key = Bundle.main.object(forInfoDictionaryKey: "GMSApiKey") as? String,
-       !key.isEmpty,
-       key != "YOUR_GOOGLE_MAPS_API_KEY" {
-      return key
-    }
-    // Local fallback if Info.plist was not updated yet
-    return "YOUR_GOOGLE_MAPS_API_KEY"
   }
 }
 

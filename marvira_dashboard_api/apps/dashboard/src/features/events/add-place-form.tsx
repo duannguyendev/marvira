@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LocationMapField } from '@/features/events/location-map-field';
 import { placeSchema, type PlaceFormValues } from '@/lib/validation/schemas';
 
 interface AddPlaceFormProps {
@@ -34,6 +35,8 @@ export function AddPlaceForm({
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PlaceFormValues>({
     resolver: zodResolver(placeSchema),
@@ -47,6 +50,10 @@ export function AddPlaceForm({
       hint: '',
     },
   });
+
+  const latitude = watch('latitude');
+  const longitude = watch('longitude');
+  const radiusMeters = watch('radiusMeters');
 
   const createMutation = useMutation({
     mutationFn: (data: PlaceFormValues) =>
@@ -119,6 +126,26 @@ export function AddPlaceForm({
               </p>
             )}
           </div>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label>Location on map *</Label>
+            <LocationMapField
+              latitude={Number(latitude)}
+              longitude={Number(longitude)}
+              radiusMeters={Number(radiusMeters)}
+              onChange={(lat, lng) => {
+                setValue('latitude', lat, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                setValue('longitude', lng, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+              }}
+            />
+          </div>
+
           <div className="space-y-2">
             <Label>Latitude *</Label>
             <Input type="number" step="any" {...register('latitude')} />

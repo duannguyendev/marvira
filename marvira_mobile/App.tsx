@@ -10,6 +10,9 @@ import { OfflineBanner } from './src/components/OfflineBanner';
 import { I18nProvider } from './src/components/I18nProvider';
 import { analytics } from './src/services/analytics';
 import { colors } from './src/theme';
+import { initMapbox } from './src/utils/mapbox';
+
+initMapbox();
 
 const queryClient = new QueryClient({
   defaultOptions: {
