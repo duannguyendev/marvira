@@ -158,6 +158,10 @@ workflows:
         script: |
           cd ios
           agvtool new-version -all "$((BUILD_NUMBER))"
+      - name: Set up code signing settings on Xcode project
+        script: |
+          # Generates ~/export_options.plist and applies profiles from ios_signing
+          xcode-project use-profiles --project ios/Marvira.xcodeproj
       - name: Build IPA
         script: |
           xcode-project build-ipa \
