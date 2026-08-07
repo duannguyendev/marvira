@@ -5,17 +5,6 @@ export const USE_MOCK_DATA = false;
 
 export { getApiBaseUrl } from '../config/apiEnvironment';
 
-function requireReleaseUrl(name: string, value: string | undefined): string {
-  const trimmed = value?.trim();
-  if (!trimmed) {
-    throw new Error(
-      `${name} is missing in this release build. ` +
-        'Codemagic: set Secure ENV. Local release: set it in .env.local.',
-    );
-  }
-  return trimmed;
-}
-
 /**
  * @deprecated Prefer getApiBaseUrl() (respects API_ENV / local|uat|production).
  */
@@ -27,10 +16,24 @@ export const API_BASE_URL = (() => {
   }
 })();
 
-/** Marketing site used for share / invite HTTPS links (`/e/{eventId}`). */
-export const MARKETING_SITE_URL = __DEV__
-  ? process.env.MARKETING_SITE_URL?.trim() || 'http://localhost:3002'
-  : requireReleaseUrl('MARKETING_SITE_URL', process.env.MARKETING_SITE_URL);
+/**
+ * Marketing site used for share / invite HTTPS links (`/e/{eventId}`).
+ * Do not throw at module load — that crashes release before ErrorBoundary mounts.
+ */
+export const MARKETING_SITE_URL = (() => {
+  const fromEnv = process.env.MARKETING_SITE_URL?.trim();
+  if (fromEnv) {
+    return fromEnv;
+  }
+  if (__DEV__) {
+    return 'http://localhost:3002';
+  }
+  console.warn(
+    'MARKETING_SITE_URL is missing in this release build. ' +
+      'Codemagic: set Secure ENV. Invite links will be incomplete.',
+  );
+  return '';
+})();
 
 // Location Configuration
 export const DEFAULT_UNLOCK_RADIUS_METERS = 100;
