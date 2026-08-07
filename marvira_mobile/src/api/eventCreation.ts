@@ -117,10 +117,10 @@ export const eventCreationApi = {
       {
         eventId,
         title: input.title,
-        description: input.description,
+        description: input.description?.trim() || '',
         latitude: input.latitude,
         longitude: input.longitude,
-        radiusMeters: input.radiusMeters,
+        radiusMeters: input.radiusMeters ?? 100,
         orderIndex,
         hint: input.hint,
         questionId,

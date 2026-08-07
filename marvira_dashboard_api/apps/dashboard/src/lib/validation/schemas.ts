@@ -123,7 +123,7 @@ export function createEditEventSchema(meta?: {
 
 export const placeSchema = z.object({
   title: trimmed(2, 'Title'),
-  description: trimmed(5, 'Description'),
+  description: z.string().trim().max(2000, 'Description must be at most 2000 characters'),
   latitude: z.coerce
     .number({ invalid_type_error: 'Latitude is required' })
     .min(-90, 'Latitude must be between -90 and 90')
@@ -141,7 +141,7 @@ export const placeSchema = z.object({
     .number({ invalid_type_error: 'Order is required' })
     .int('Order must be a whole number')
     .min(0, 'Order cannot be negative'),
-  hint: z.string().trim().optional(),
+  hint: z.string().trim().optional().or(z.literal('')),
 });
 
 export type PlaceFormValues = z.infer<typeof placeSchema>;

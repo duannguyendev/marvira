@@ -225,10 +225,10 @@ export interface EventCompletionInfo {
 
 export interface CreatePlaceInput {
   title: string;
-  description: string;
+  description?: string;
   latitude: number;
   longitude: number;
-  radiusMeters: number;
+  radiusMeters?: number;
   hint?: string;
 }
 

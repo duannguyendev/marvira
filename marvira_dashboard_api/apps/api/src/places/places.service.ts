@@ -9,7 +9,7 @@ import { EventAccessService } from '../events/event-access.service';
 export interface CreatePlaceInput {
   eventId: string;
   title: string;
-  description: string;
+  description?: string;
   latitude: number;
   longitude: number;
   radiusMeters?: number;
@@ -112,6 +112,7 @@ export class PlacesService {
     return this.prisma.client.place.create({
       data: {
         ...data,
+        description: data.description?.trim() ?? '',
         radiusMeters: data.radiusMeters ?? 100,
       },
       include: { question: true },
@@ -123,9 +124,15 @@ export class PlacesService {
     if (data.questionId !== undefined) {
       await this.validateQuestionForEvent(place.eventId, data.questionId);
     }
+    const { description, ...rest } = data;
     return this.prisma.client.place.update({
       where: { id },
-      data,
+      data: {
+        ...rest,
+        ...(description !== undefined
+          ? { description: description.trim() }
+          : {}),
+      },
       include: { question: true },
     });
   }

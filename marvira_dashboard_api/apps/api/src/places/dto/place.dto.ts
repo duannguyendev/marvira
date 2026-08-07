@@ -25,12 +25,13 @@ export class CreatePlaceDto {
   @MaxLength(200)
   title!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description: 'Optional; defaults to empty. Player UI hides blank descriptions.',
+  })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  @MinLength(5)
   @MaxLength(2000)
-  description!: string;
+  description?: string;
 
   @ApiProperty()
   @Type(() => Number)
@@ -84,8 +85,6 @@ export class UpdatePlaceDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  @MinLength(5)
   @MaxLength(2000)
   description?: string;
 

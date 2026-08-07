@@ -48,9 +48,11 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({
           <Text style={styles.name} numberOfLines={1}>
             {place.name}
           </Text>
-          <Text style={styles.description} numberOfLines={2}>
-            {place.description}
-          </Text>
+          {place.description?.trim() ? (
+            <Text style={styles.description} numberOfLines={2}>
+              {place.description}
+            </Text>
+          ) : null}
         </View>
         <View style={styles.statusContainer}>
           <Text style={styles.statusIcon}>{getStatusIcon()}</Text>

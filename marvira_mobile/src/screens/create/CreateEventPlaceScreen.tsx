@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Text } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -56,6 +63,7 @@ export const CreateEventPlaceScreen: React.FC = () => {
   });
   const [question, setQuestion] =
     useState<CreateQuestionInput>(DEFAULT_QUESTION);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleCoordinateChange = (next: Location) => {
@@ -89,9 +97,6 @@ export const CreateEventPlaceScreen: React.FC = () => {
     const nextErrors: Record<string, string> = {};
     if (place.title.trim().length < 2) {
       nextErrors.title = t('createEvent.validation.placeTitleMin');
-    }
-    if (place.description.trim().length < 5) {
-      nextErrors.description = t('createEvent.validation.placeDescriptionMin');
     }
     if (question.question.trim().length < 3) {
       nextErrors.question = t('createEvent.validation.questionMin');
@@ -128,9 +133,10 @@ export const CreateEventPlaceScreen: React.FC = () => {
     const placePayload: CreatePlaceInput = {
       ...place,
       title: place.title.trim(),
-      description: place.description.trim(),
+      description: (place.description ?? '').trim(),
       latitude: coordinate.latitude,
       longitude: coordinate.longitude,
+      radiusMeters: place.radiusMeters || 100,
     };
 
     try {
@@ -210,49 +216,64 @@ export const CreateEventPlaceScreen: React.FC = () => {
           placeholder={t('createEvent.placeTitlePlaceholder')}
           error={errors.title}
         />
-        <Input
-          label={t('createEvent.placeDescription')}
-          value={place.description}
-          onChangeText={description =>
-            setPlace(prev => ({ ...prev, description }))
-          }
-          placeholder={t('createEvent.placeDescriptionPlaceholder')}
-          multiline
-          error={errors.description}
-        />
-        <Input
-          label={t('createEvent.radiusMeters')}
-          value={String(place.radiusMeters)}
-          onChangeText={value =>
-            setPlace(prev => ({
-              ...prev,
-              radiusMeters: Math.min(
-                5000,
-                Math.max(10, parseInt(value || '100', 10) || 100),
-              ),
-            }))
-          }
-          keyboardType="number-pad"
-        />
-        <Input
-          label={t('createEvent.hintOptional')}
-          value={place.hint ?? ''}
-          onChangeText={hint =>
-            setPlace(prev => ({ ...prev, hint: hint || undefined }))
-          }
-          placeholder={t('createEvent.hintPlaceholder')}
-        />
 
-<QuestionForm
-  value={question}
-  onChange={setQuestion}
-  errors={{
-    question: errors.question,
-    answer: errors.answer,
-    options: errors.options,
-    imageUrl: errors.imageUrl,
-  }}
-/>
+        <TouchableOpacity
+          style={styles.advancedToggle}
+          onPress={() => setShowAdvanced(prev => !prev)}
+          accessibilityRole="button">
+          <Text style={styles.advancedToggleText}>
+            {showAdvanced
+              ? t('createEvent.hideAdvanced')
+              : t('createEvent.showAdvanced')}
+          </Text>
+        </TouchableOpacity>
+
+        {showAdvanced ? (
+          <View style={styles.advancedSection}>
+            <Input
+              label={t('createEvent.placeDescriptionOptional')}
+              value={place.description ?? ''}
+              onChangeText={description =>
+                setPlace(prev => ({ ...prev, description }))
+              }
+              placeholder={t('createEvent.placeDescriptionPlaceholder')}
+              multiline
+            />
+            <Input
+              label={t('createEvent.radiusMeters')}
+              value={String(place.radiusMeters)}
+              onChangeText={value =>
+                setPlace(prev => ({
+                  ...prev,
+                  radiusMeters: Math.min(
+                    5000,
+                    Math.max(10, parseInt(value || '100', 10) || 100),
+                  ),
+                }))
+              }
+              keyboardType="number-pad"
+            />
+            <Input
+              label={t('createEvent.hintOptional')}
+              value={place.hint ?? ''}
+              onChangeText={hint =>
+                setPlace(prev => ({ ...prev, hint: hint || undefined }))
+              }
+              placeholder={t('createEvent.hintPlaceholder')}
+            />
+          </View>
+        ) : null}
+
+        <QuestionForm
+          value={question}
+          onChange={setQuestion}
+          errors={{
+            question: errors.question,
+            answer: errors.answer,
+            options: errors.options,
+            imageUrl: errors.imageUrl,
+          }}
+        />
 
         <View style={styles.actions}>
           <Button
@@ -298,6 +319,19 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     color: colors.textSecondary,
     marginBottom: spacing.md,
+  },
+  advancedToggle: {
+    alignSelf: 'flex-start',
+    marginBottom: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  advancedToggleText: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.primary,
+  },
+  advancedSection: {
+    marginBottom: spacing.sm,
   },
   actions: {
     marginTop: spacing.lg,

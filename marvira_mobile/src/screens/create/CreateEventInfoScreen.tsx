@@ -48,6 +48,7 @@ export const CreateEventInfoScreen: React.FC = () => {
     rewardPoints: 100,
     language: getAppContentLanguage(),
   });
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [errors, setErrors] = useState<
     Partial<Record<keyof CreateEventInput, string>>
   >({});
@@ -141,40 +142,57 @@ export const CreateEventInfoScreen: React.FC = () => {
           error={errors.city}
         />
 
-        <Text style={styles.label}>{t('createEvent.difficulty')}</Text>
-        <View style={styles.difficultyRow}>
-          {DIFFICULTIES.map(difficulty => (
-            <TouchableOpacity
-              key={difficulty}
-              style={[
-                styles.difficultyButton,
-                form.difficulty === difficulty && styles.difficultyButtonActive,
-              ]}
-              onPress={() => setForm(prev => ({ ...prev, difficulty }))}>
-              <Text
-                style={[
-                  styles.difficultyText,
-                  form.difficulty === difficulty && styles.difficultyTextActive,
-                ]}>
-                {t(`createEvent.difficulties.${difficulty}`)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <TouchableOpacity
+          style={styles.advancedToggle}
+          onPress={() => setShowAdvanced(prev => !prev)}
+          accessibilityRole="button">
+          <Text style={styles.advancedToggleText}>
+            {showAdvanced
+              ? t('createEvent.hideAdvanced')
+              : t('createEvent.showAdvanced')}
+          </Text>
+        </TouchableOpacity>
 
-        <Input
-          label={t('createEvent.rewardPoints')}
-          value={String(form.rewardPoints)}
-          onChangeText={value =>
-            setForm(prev => ({
-              ...prev,
-              rewardPoints: parseInt(value || '0', 10) || 0,
-            }))
-          }
-          keyboardType="number-pad"
-          error={errors.rewardPoints}
-        />
-        <Text style={styles.hint}>{t('createEvent.rewardPointsHint')}</Text>
+        {showAdvanced ? (
+          <View style={styles.advancedSection}>
+            <Text style={styles.label}>{t('createEvent.difficulty')}</Text>
+            <View style={styles.difficultyRow}>
+              {DIFFICULTIES.map(difficulty => (
+                <TouchableOpacity
+                  key={difficulty}
+                  style={[
+                    styles.difficultyButton,
+                    form.difficulty === difficulty &&
+                      styles.difficultyButtonActive,
+                  ]}
+                  onPress={() => setForm(prev => ({ ...prev, difficulty }))}>
+                  <Text
+                    style={[
+                      styles.difficultyText,
+                      form.difficulty === difficulty &&
+                        styles.difficultyTextActive,
+                    ]}>
+                    {t(`createEvent.difficulties.${difficulty}`)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Input
+              label={t('createEvent.rewardPoints')}
+              value={String(form.rewardPoints)}
+              onChangeText={value =>
+                setForm(prev => ({
+                  ...prev,
+                  rewardPoints: parseInt(value || '0', 10) || 0,
+                }))
+              }
+              keyboardType="number-pad"
+              error={errors.rewardPoints}
+            />
+            <Text style={styles.hint}>{t('createEvent.rewardPointsHint')}</Text>
+          </View>
+        ) : null}
 
         <Button
           title={t('createEvent.continueToPlaces')}
@@ -215,6 +233,19 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     fontWeight: fontWeight.medium,
     color: colors.textDark,
+    marginBottom: spacing.sm,
+  },
+  advancedToggle: {
+    alignSelf: 'flex-start',
+    marginBottom: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  advancedToggleText: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.primary,
+  },
+  advancedSection: {
     marginBottom: spacing.sm,
   },
   difficultyRow: {

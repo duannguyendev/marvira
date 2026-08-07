@@ -314,6 +314,8 @@
     "descriptionPlaceholder": "プレイヤーが探索する内容を説明...",
     "city": "都市",
     "cityPlaceholder": "東京",
+    "showAdvanced": "詳細オプションを表示",
+    "hideAdvanced": "詳細オプションを隠す",
     "difficulty": "難易度",
     "difficulties": {
       "EASY": "かんたん",
@@ -330,6 +332,7 @@
     "placeTitle": "場所名",
     "placeTitlePlaceholder": "日比谷公園",
     "placeDescription": "場所の説明",
+    "placeDescriptionOptional": "場所の説明（任意）",
     "placeDescriptionPlaceholder": "このストップを説明...",
     "radiusMeters": "解除半径（メートル）",
     "hintOptional": "ヒント（任意）",

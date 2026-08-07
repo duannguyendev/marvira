@@ -10,6 +10,7 @@ import { api } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AdvancedFields } from '@/components/ui/advanced-fields';
 import { QuestionType, type AdminQuestion } from '@marvira/shared-types';
 import {
   questionSchema,
@@ -205,38 +206,17 @@ export function QuestionForm({
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="space-y-2">
-          <Label>Type</Label>
-          <select
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            {...register('type')}>
-            {Object.values(QuestionType).map(t => (
-              <option key={t} value={t}>
-                {t.replace(/_/g, ' ')}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="space-y-2">
-          <Label>Points</Label>
-          <Input type="number" min={1} {...register('points')} />
-          {errors.points && (
-            <p className="text-sm text-destructive">{errors.points.message}</p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label>Content language</Label>
-          <select
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            {...register('language')}>
-            {LANGUAGE_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="space-y-2">
+        <Label>Type</Label>
+        <select
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          {...register('type')}>
+          {Object.values(QuestionType).map(t => (
+            <option key={t} value={t}>
+              {t.replace(/_/g, ' ')}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="space-y-2">
@@ -383,13 +363,40 @@ export function QuestionForm({
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label>Explanation (shown after correct answer)</Label>
-        <Input
-          placeholder="Optional explanation"
-          {...register('explanation')}
-        />
-      </div>
+      <AdvancedFields
+        defaultOpen={
+          Boolean(question?.explanation?.trim()) ||
+          (question != null && question.points !== 10)
+        }>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Points</Label>
+            <Input type="number" min={1} {...register('points')} />
+            {errors.points && (
+              <p className="text-sm text-destructive">{errors.points.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label>Content language</Label>
+            <select
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              {...register('language')}>
+              {LANGUAGE_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Explanation (shown after correct answer)</Label>
+          <Input
+            placeholder="Optional explanation"
+            {...register('explanation')}
+          />
+        </div>
+      </AdvancedFields>
 
       <div className="flex flex-wrap gap-2">
         <Button type="submit" disabled={saveMutation.isPending}>

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AdvancedFields } from '@/components/ui/advanced-fields';
 import { EventDifficulty } from '@marvira/shared-types';
 import type { Event } from '@marvira/shared-types';
 import { newEventSchema, type EventFormValues } from '@/lib/validation/schemas';
@@ -49,7 +50,10 @@ export default function NewEventPage() {
 
   const mutation = useMutation({
     mutationFn: (data: EventFormValues) =>
-      api.post<Event>('/events', normalizeGiftFields(data)),
+      api.post<Event>('/events', {
+        ...normalizeGiftFields(data),
+        isActive: false,
+      }),
     onSuccess: event => {
       toast.success('Event created');
       router.push(`/dashboard/events/${event.id}`);
@@ -117,45 +121,6 @@ export default function NewEventPage() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="difficulty">Difficulty *</Label>
-                <select
-                  id="difficulty"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  {...register('difficulty')}>
-                  {Object.values(EventDifficulty).map(d => (
-                    <option key={d} value={d}>
-                      {d}
-                    </option>
-                  ))}
-                </select>
-                {errors.difficulty && (
-                  <p className="text-sm text-destructive">
-                    {errors.difficulty.message}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="rewardPoints">Reward Points *</Label>
-                <Input
-                  id="rewardPoints"
-                  type="number"
-                  min={0}
-                  max={10000}
-                  {...register('rewardPoints')}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Event leaderboard only (max 10,000 for staff). Does not raise
-                  the global leaderboard.
-                </p>
-                {errors.rewardPoints && (
-                  <p className="text-sm text-destructive">
-                    {errors.rewardPoints.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="language">Content language *</Label>
                 <select
                   id="language"
@@ -174,14 +139,48 @@ export default function NewEventPage() {
               </div>
             </div>
 
-            <div className="space-y-4 border-t pt-4">
-              <div>
-                <h3 className="text-sm font-medium">Completion gifts</h3>
-                <p className="text-xs text-muted-foreground">
-                  Optional. Soonest finishers receive codes in order (1st →
-                  first code). Max 10.
-                </p>
+            <AdvancedFields>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="difficulty">Difficulty</Label>
+                  <select
+                    id="difficulty"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    {...register('difficulty')}>
+                    {Object.values(EventDifficulty).map(d => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="rewardPoints">Reward Points</Label>
+                  <Input
+                    id="rewardPoints"
+                    type="number"
+                    min={0}
+                    max={10000}
+                    {...register('rewardPoints')}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Event leaderboard only (default 100). Does not raise the
+                    global leaderboard.
+                  </p>
+                  {errors.rewardPoints && (
+                    <p className="text-sm text-destructive">
+                      {errors.rewardPoints.message}
+                    </p>
+                  )}
+                </div>
               </div>
+            </AdvancedFields>
+
+            <AdvancedFields label="Completion gifts (optional)">
+              <p className="text-xs text-muted-foreground">
+                Soonest finishers receive codes in order (1st → first code). Max
+                10.
+              </p>
               <div className="space-y-2">
                 <Label htmlFor="giftTeaser">Gift teaser</Label>
                 <Input
@@ -190,10 +189,6 @@ export default function NewEventPage() {
                   maxLength={80}
                   {...register('giftTeaser')}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Public description of the gift (not the code). Required when
-                  codes are set.
-                </p>
                 {errors.giftTeaser && (
                   <p className="text-sm text-destructive">
                     {errors.giftTeaser.message}
@@ -209,14 +204,6 @@ export default function NewEventPage() {
                   maxLength={2000}
                   {...register('completionMessage')}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Shown after finish — thanks, story, and how to redeem.
-                </p>
-                {errors.completionMessage && (
-                  <p className="text-sm text-destructive">
-                    {errors.completionMessage.message}
-                  </p>
-                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="giftCodes">Gift codes</Label>
@@ -231,9 +218,6 @@ export default function NewEventPage() {
                     })
                   }
                 />
-                <p className="text-xs text-muted-foreground">
-                  One code per line, up to 10. Leave empty for no gifts.
-                </p>
                 {errors.giftCodes && (
                   <p className="text-sm text-destructive">
                     {typeof errors.giftCodes.message === 'string'
@@ -242,28 +226,12 @@ export default function NewEventPage() {
                   </p>
                 )}
               </div>
-            </div>
+            </AdvancedFields>
 
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  {...register('isActive')}
-                  className="h-4 w-4"
-                />
-                <Label htmlFor="isActive">Publish immediately</Label>
-              </div>
-              {errors.isActive && (
-                <p className="text-sm text-destructive">
-                  {errors.isActive.message}
-                </p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Recommended: save as draft, add places and questions, then
-                publish from the edit page.
-              </p>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              Saved as draft. Add places and questions, then publish from the
+              edit page.
+            </p>
             <div className="flex gap-2">
               <Button type="submit" disabled={mutation.isPending}>
                 {mutation.isPending ? 'Creating...' : 'Create Event'}

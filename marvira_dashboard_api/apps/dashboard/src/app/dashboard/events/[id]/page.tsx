@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AdvancedFields } from '@/components/ui/advanced-fields';
 import { MapPicker } from '@/features/events/map-picker';
 import { PlaceEditor } from '@/features/events/place-editor';
 import { AddPlaceForm } from '@/features/events/add-place-form';
@@ -257,36 +258,7 @@ export default function EditEventPage() {
                 </p>
               )}
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-2">
-                <Label>Difficulty *</Label>
-                <select
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  {...register('difficulty')}>
-                  {Object.values(EventDifficulty).map(d => (
-                    <option key={d} value={d}>
-                      {d}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label>Reward Points *</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  max={10000}
-                  {...register('rewardPoints')}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Event leaderboard only. Does not raise the global leaderboard.
-                </p>
-                {errors.rewardPoints && (
-                  <p className="text-sm text-destructive">
-                    {errors.rewardPoints.message}
-                  </p>
-                )}
-              </div>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Content language *</Label>
                 <select
@@ -298,85 +270,127 @@ export default function EditEventPage() {
                   <option value="ja">日本語</option>
                 </select>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <div className="flex h-10 items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  {...register('isActive')}
-                  className="h-4 w-4"
-                />
-                <Label htmlFor="isActive">Published</Label>
-              </div>
-              {event.scheduledPublishAt && !event.isActive ? (
-                <div className="space-y-2 rounded-md border border-border p-3">
-                  <p className="text-sm text-muted-foreground">
-                    Scheduled · goes live{' '}
-                    {new Date(event.scheduledPublishAt).toLocaleString()}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setPendingPublish({
-                          title: event.title,
-                          description: event.description,
-                          city: event.city,
-                          difficulty: event.difficulty as EventFormValues['difficulty'],
-                          rewardPoints: event.rewardPoints,
-                          isActive: false,
-                          language:
-                            (event.language as EventFormValues['language']) ??
-                            'vi',
-                          completionMessage: event.completionMessage ?? '',
-                          giftTeaser: event.giftTeaser ?? '',
-                          giftCodes: event.giftCodes ?? [],
-                        });
-                        setPublishReviewOpen(true);
-                      }}>
-                      Reschedule
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          await api.delete(`/events/${id}/schedule`);
-                          invalidateEvent();
-                          toast.success('Schedule cancelled');
-                        } catch (err) {
-                          toast.error(
-                            err instanceof Error
-                              ? err.message
-                              : 'Failed to cancel schedule',
-                          );
-                        }
-                      }}>
-                      Cancel schedule
-                    </Button>
-                  </div>
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <div className="flex h-10 items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    {...register('isActive')}
+                    className="h-4 w-4"
+                  />
+                  <Label htmlFor="isActive">Published</Label>
                 </div>
-              ) : null}
-              {errors.isActive && (
-                <p className="text-sm text-destructive">
-                  {errors.isActive.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-4 border-t pt-4">
-              <div>
-                <h3 className="text-sm font-medium">Completion gifts</h3>
-                <p className="text-xs text-muted-foreground">
-                  Optional. Soonest finishers receive codes in order (1st →
-                  first code). Max 10.
-                </p>
               </div>
+            </div>
+            {event.scheduledPublishAt && !event.isActive ? (
+              <div className="space-y-2 rounded-md border border-border p-3">
+                <p className="text-sm text-muted-foreground">
+                  Scheduled · goes live{' '}
+                  {new Date(event.scheduledPublishAt).toLocaleString()}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setPendingPublish({
+                        title: event.title,
+                        description: event.description,
+                        city: event.city,
+                        difficulty: event.difficulty as EventFormValues['difficulty'],
+                        rewardPoints: event.rewardPoints,
+                        isActive: false,
+                        language:
+                          (event.language as EventFormValues['language']) ??
+                          'vi',
+                        completionMessage: event.completionMessage ?? '',
+                        giftTeaser: event.giftTeaser ?? '',
+                        giftCodes: event.giftCodes ?? [],
+                      });
+                      setPublishReviewOpen(true);
+                    }}>
+                    Reschedule
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        await api.delete(`/events/${id}/schedule`);
+                        invalidateEvent();
+                        toast.success('Schedule cancelled');
+                      } catch (err) {
+                        toast.error(
+                          err instanceof Error
+                            ? err.message
+                            : 'Failed to cancel schedule',
+                        );
+                      }
+                    }}>
+                    Cancel schedule
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+            {errors.isActive && (
+              <p className="text-sm text-destructive">
+                {errors.isActive.message}
+              </p>
+            )}
+
+            <AdvancedFields
+              defaultOpen={
+                event.difficulty !== EventDifficulty.MEDIUM ||
+                event.rewardPoints !== 100
+              }>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Difficulty</Label>
+                  <select
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    {...register('difficulty')}>
+                    {Object.values(EventDifficulty).map(d => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Reward Points</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={10000}
+                    {...register('rewardPoints')}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Event leaderboard only. Does not raise the global
+                    leaderboard.
+                  </p>
+                  {errors.rewardPoints && (
+                    <p className="text-sm text-destructive">
+                      {errors.rewardPoints.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </AdvancedFields>
+
+            <AdvancedFields
+              label="Completion gifts (optional)"
+              defaultOpen={
+                Boolean(event.giftTeaser?.trim()) ||
+                Boolean(event.completionMessage?.trim()) ||
+                (event.giftCodes?.length ?? 0) > 0
+              }>
+              <p className="text-xs text-muted-foreground">
+                Soonest finishers receive codes in order (1st → first code). Max
+                10.
+              </p>
               <div className="space-y-2">
                 <Label htmlFor="giftTeaser">Gift teaser</Label>
                 <Input
@@ -439,7 +453,7 @@ export default function EditEventPage() {
                   </p>
                 )}
               </div>
-            </div>
+            </AdvancedFields>
 
             <Button type="submit" disabled={updateMutation.isPending}>
               Save Event

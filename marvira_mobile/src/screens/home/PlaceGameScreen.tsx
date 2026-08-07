@@ -407,7 +407,9 @@ export const PlaceGameScreen: React.FC = () => {
         <View style={styles.content}>
           <View style={styles.header}>
             <Text style={styles.placeName}>{place.name}</Text>
-            <Text style={styles.placeDescription}>{place.description}</Text>
+            {place.description?.trim() ? (
+              <Text style={styles.placeDescription}>{place.description}</Text>
+            ) : null}
           </View>
 
           {locationError ? (

@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AdvancedFields } from '@/components/ui/advanced-fields';
 import { LocationMapField } from '@/features/events/location-map-field';
 import { placeSchema, type PlaceFormValues } from '@/lib/validation/schemas';
 
@@ -59,7 +60,12 @@ export function AddPlaceForm({
     mutationFn: (data: PlaceFormValues) =>
       api.post('/places', {
         eventId,
-        ...data,
+        title: data.title,
+        description: data.description?.trim() || '',
+        latitude: data.latitude,
+        longitude: data.longitude,
+        radiusMeters: data.radiusMeters ?? 100,
+        orderIndex: nextOrderIndex,
         hint: data.hint?.trim() || undefined,
       }),
     onSuccess: () => {
@@ -97,33 +103,11 @@ export function AddPlaceForm({
         <form
           onSubmit={handleSubmit(data => createMutation.mutate(data))}
           className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
+          <div className="space-y-2 sm:col-span-2">
             <Label>Title *</Label>
             <Input placeholder="e.g. Union Square" {...register('title')} />
             {errors.title && (
               <p className="text-sm text-destructive">{errors.title.message}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label>Order *</Label>
-            <Input type="number" min={0} {...register('orderIndex')} />
-            {errors.orderIndex && (
-              <p className="text-sm text-destructive">
-                {errors.orderIndex.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label>Description *</Label>
-            <textarea
-              className="flex min-h-[72px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              placeholder="What players will see at this stop"
-              {...register('description')}
-            />
-            {errors.description && (
-              <p className="text-sm text-destructive">
-                {errors.description.message}
-              </p>
             )}
           </div>
 
@@ -132,7 +116,7 @@ export function AddPlaceForm({
             <LocationMapField
               latitude={Number(latitude)}
               longitude={Number(longitude)}
-              radiusMeters={Number(radiusMeters)}
+              radiusMeters={Number(radiusMeters) || 100}
               onChange={(lat, lng) => {
                 setValue('latitude', lat, {
                   shouldDirty: true,
@@ -144,44 +128,64 @@ export function AddPlaceForm({
                 });
               }}
             />
+            {(errors.latitude || errors.longitude) && (
+              <p className="text-sm text-destructive">
+                {errors.latitude?.message || errors.longitude?.message}
+              </p>
+            )}
           </div>
 
-          <div className="space-y-2">
-            <Label>Latitude *</Label>
-            <Input type="number" step="any" {...register('latitude')} />
-            {errors.latitude && (
-              <p className="text-sm text-destructive">
-                {errors.latitude.message}
-              </p>
-            )}
+          <div className="sm:col-span-2">
+            <AdvancedFields>
+              <div className="space-y-2">
+                <Label>Description</Label>
+                <textarea
+                  className="flex min-h-[72px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  placeholder="Optional — what players see at this stop"
+                  {...register('description')}
+                />
+                {errors.description && (
+                  <p className="text-sm text-destructive">
+                    {errors.description.message}
+                  </p>
+                )}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Radius (meters)</Label>
+                  <Input
+                    type="number"
+                    min={10}
+                    max={5000}
+                    {...register('radiusMeters')}
+                  />
+                  {errors.radiusMeters && (
+                    <p className="text-sm text-destructive">
+                      {errors.radiusMeters.message}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label>Hint</Label>
+                  <Input
+                    placeholder="Shown after a wrong answer"
+                    {...register('hint')}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Latitude</Label>
+                  <Input type="number" step="any" {...register('latitude')} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Longitude</Label>
+                  <Input type="number" step="any" {...register('longitude')} />
+                </div>
+              </div>
+            </AdvancedFields>
           </div>
-          <div className="space-y-2">
-            <Label>Longitude *</Label>
-            <Input type="number" step="any" {...register('longitude')} />
-            {errors.longitude && (
-              <p className="text-sm text-destructive">
-                {errors.longitude.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label>Radius (meters) *</Label>
-            <Input
-              type="number"
-              min={10}
-              max={5000}
-              {...register('radiusMeters')}
-            />
-            {errors.radiusMeters && (
-              <p className="text-sm text-destructive">
-                {errors.radiusMeters.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label>Hint</Label>
-            <Input placeholder="Optional" {...register('hint')} />
-          </div>
+
           <div className="flex gap-2 sm:col-span-2">
             <Button type="submit" disabled={createMutation.isPending}>
               {createMutation.isPending ? 'Adding...' : 'Create Place'}

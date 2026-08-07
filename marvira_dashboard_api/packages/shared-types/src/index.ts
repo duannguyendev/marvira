@@ -392,7 +392,8 @@ export interface UpdateEventDto extends Partial<CreateEventDto> {}
 export interface CreatePlaceDto {
   eventId: string;
   title: string;
-  description: string;
+  /** Optional; empty string is fine — player UI hides blank descriptions */
+  description?: string;
   latitude: number;
   longitude: number;
   radiusMeters?: number;

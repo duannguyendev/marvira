@@ -314,6 +314,8 @@
     "descriptionPlaceholder": "Describe what players will explore...",
     "city": "City",
     "cityPlaceholder": "San Francisco",
+    "showAdvanced": "Show advanced options",
+    "hideAdvanced": "Hide advanced options",
     "difficulty": "Difficulty",
     "difficulties": {
       "EASY": "Easy",
@@ -330,6 +332,7 @@
     "placeTitle": "Place name",
     "placeTitlePlaceholder": "Union Square",
     "placeDescription": "Place description",
+    "placeDescriptionOptional": "Place description (optional)",
     "placeDescriptionPlaceholder": "Describe this stop...",
     "radiusMeters": "Unlock radius (meters)",
     "hintOptional": "Hint (optional)",

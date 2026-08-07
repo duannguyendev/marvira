@@ -314,6 +314,8 @@
     "descriptionPlaceholder": "Mô tả những gì người chơi sẽ khám phá...",
     "city": "Thành phố",
     "cityPlaceholder": "Hà Nội",
+    "showAdvanced": "Hiện tùy chọn nâng cao",
+    "hideAdvanced": "Ẩn tùy chọn nâng cao",
     "difficulty": "Độ khó",
     "difficulties": {
       "EASY": "Dễ",
@@ -330,6 +332,7 @@
     "placeTitle": "Tên địa điểm",
     "placeTitlePlaceholder": "Quảng trường Ba Đình",
     "placeDescription": "Mô tả địa điểm",
+    "placeDescriptionOptional": "Mô tả địa điểm (tùy chọn)",
     "placeDescriptionPlaceholder": "Mô tả điểm dừng này...",
     "radiusMeters": "Bán kính mở khóa (mét)",
     "hintOptional": "Gợi ý (tùy chọn)",

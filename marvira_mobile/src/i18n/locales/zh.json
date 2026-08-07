@@ -314,6 +314,8 @@
     "descriptionPlaceholder": "描述玩家将探索的内容...",
     "city": "城市",
     "cityPlaceholder": "上海",
+    "showAdvanced": "显示高级选项",
+    "hideAdvanced": "隐藏高级选项",
     "difficulty": "难度",
     "difficulties": {
       "EASY": "简单",
@@ -330,6 +332,7 @@
     "placeTitle": "地点名称",
     "placeTitlePlaceholder": "人民广场",
     "placeDescription": "地点描述",
+    "placeDescriptionOptional": "地点描述（可选）",
     "placeDescriptionPlaceholder": "描述此站点...",
     "radiusMeters": "解锁半径（米）",
     "hintOptional": "提示（可选）",

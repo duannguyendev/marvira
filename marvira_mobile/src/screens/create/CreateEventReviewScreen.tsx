@@ -442,9 +442,11 @@ export const CreateEventReviewScreen: React.FC = () => {
             <Text style={styles.placeTitle}>
               {index + 1}. {place.name}
             </Text>
-            <Text style={styles.placeDescription} numberOfLines={2}>
-              {place.description}
-            </Text>
+            {place.description?.trim() ? (
+              <Text style={styles.placeDescription} numberOfLines={2}>
+                {place.description}
+              </Text>
+            ) : null}
           </View>
         ))}
 
