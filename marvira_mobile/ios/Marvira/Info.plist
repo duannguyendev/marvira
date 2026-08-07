@@ -78,6 +78,8 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Marvira needs access to your location to play location-based events.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Marvira needs access to your location to play location-based events and unlock nearby places while you use the app.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Marvira needs camera access so you can take photos for image questions.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

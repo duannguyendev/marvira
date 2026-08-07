@@ -34,29 +34,37 @@ export const Button: React.FC<ButtonProps> = ({
   const isDisabled = disabled || loading;
 
   if (variant === 'primary') {
+    // Gradient as absolute background (not parent of Text). Nested
+    // LinearGradient + Text inside another LinearGradient (auth screens)
+    // can leave the label blank on iOS / Fabric.
     return (
       <TouchableOpacity
         onPress={onPress}
         disabled={isDisabled}
         activeOpacity={0.8}
-        style={[fullWidth && styles.fullWidth, style]}>
+        style={[
+          styles.button,
+          styles.primaryButton,
+          fullWidth && styles.fullWidth,
+          style,
+        ]}>
         <LinearGradient
           colors={
             isDisabled
               ? [colors.textLight, colors.textLight]
               : [colors.primary, colors.primaryDark]
           }
-          style={[styles.button, styles.primaryButton]}
+          style={StyleSheet.absoluteFillObject}
           start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}>
-          {loading ? (
-            <ActivityIndicator color={colors.background} />
-          ) : (
-            <Text style={[styles.buttonText, styles.primaryText, textStyle]}>
-              {title}
-            </Text>
-          )}
-        </LinearGradient>
+          end={{ x: 1, y: 0 }}
+        />
+        {loading ? (
+          <ActivityIndicator color="#FFFFFF" />
+        ) : (
+          <Text style={[styles.buttonText, styles.primaryText, textStyle]}>
+            {title}
+          </Text>
+        )}
       </TouchableOpacity>
     );
   }
@@ -75,7 +83,7 @@ export const Button: React.FC<ButtonProps> = ({
           style,
         ]}>
         {loading ? (
-          <ActivityIndicator color={colors.secondary} />
+          <ActivityIndicator color="#FFFFFF" />
         ) : (
           <Text style={[styles.buttonText, styles.secondaryText, textStyle]}>
             {title}
@@ -116,9 +124,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 48,
+    overflow: 'hidden',
   },
   primaryButton: {
-    // Gradient handles background
+    backgroundColor: colors.primary,
   },
   secondaryButton: {
     backgroundColor: colors.secondary,
@@ -133,10 +142,10 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.semibold,
   },
   primaryText: {
-    color: colors.background,
+    color: '#FFFFFF',
   },
   secondaryText: {
-    color: colors.background,
+    color: '#FFFFFF',
   },
   outlineText: {
     color: colors.primary,

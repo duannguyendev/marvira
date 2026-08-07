@@ -9,7 +9,6 @@ import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { OfflineBanner } from './src/components/OfflineBanner';
 import { I18nProvider } from './src/components/I18nProvider';
 import { analytics } from './src/services/analytics';
-import { colors } from './src/theme';
 import { initMapbox } from './src/utils/mapbox';
 
 initMapbox();
@@ -42,8 +41,8 @@ const App: React.FC = () => {
                 <OfflineBanner />
                 <StatusBar
                   barStyle="light-content"
-                  backgroundColor={colors.primary}
-                  translucent={false}
+                  backgroundColor="transparent"
+                  translucent
                 />
                 <RootNavigator />
               </View>
