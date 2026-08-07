@@ -24,7 +24,7 @@ export const eventSchema = z
       .number({ invalid_type_error: 'Reward points must be a number' })
       .int('Reward points must be a whole number')
       .min(0, 'Reward points cannot be negative')
-      .max(100000, 'Reward points cannot exceed 100,000'),
+      .max(10000, 'Reward points cannot exceed 10,000'),
     isActive: z.boolean(),
     language: contentLanguageSchema.default(DEFAULT_CONTENT_LANGUAGE),
     completionMessage: z

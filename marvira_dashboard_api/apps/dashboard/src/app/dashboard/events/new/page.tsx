@@ -142,8 +142,13 @@ export default function NewEventPage() {
                   id="rewardPoints"
                   type="number"
                   min={0}
+                  max={10000}
                   {...register('rewardPoints')}
                 />
+                <p className="text-xs text-muted-foreground">
+                  Event leaderboard only (max 10,000 for staff). Does not raise
+                  the global leaderboard.
+                </p>
                 {errors.rewardPoints && (
                   <p className="text-sm text-destructive">
                     {errors.rewardPoints.message}

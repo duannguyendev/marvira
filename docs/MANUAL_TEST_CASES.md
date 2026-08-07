@@ -380,11 +380,14 @@ $headers = @{ Authorization = "Bearer $token" }
 **Steps:**
 
 1. `GET /leaderboard/global`
+2. (Anti-abuse) Complete an event you created with high `rewardPoints` → your global total must **not** increase from that completion
+3. (Fair play) Complete someone else’s event → global total increases by the platform formula (capped), not by `rewardPoints`
 
 **Expected:**
 
 - Status `200`
-- Array of leaderboard entries (may be empty on fresh DB)
+- Entries ranked by `SUM(globalScore)`, then events completed, then avg duration
+- Creator self-completions contribute `0` global points; see `docs/SCORING_AND_LEADERBOARD.md`
 
 ---
 

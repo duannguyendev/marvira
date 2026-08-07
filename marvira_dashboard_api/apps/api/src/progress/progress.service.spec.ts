@@ -28,6 +28,7 @@ function createProgressService(
               id: 'event-1',
               title: 'Test Event',
               rewardPoints: 50,
+              createdBy: 'creator-1',
               places: [{ id: 'place-1' }],
             },
           },
@@ -136,6 +137,7 @@ describe('ProgressService', () => {
             id: 'event-1',
             title: 'Test Event',
             rewardPoints: 50,
+            createdBy: 'creator-1',
             places: [{ id: 'place-1' }, { id: 'place-2' }],
           },
         },
@@ -178,6 +180,9 @@ describe('ProgressService', () => {
               startedAt: new Date(),
             },
           ]),
+          aggregate: jest.fn().mockResolvedValue({
+            _sum: { globalScore: 0 },
+          }),
         },
         event: {
           findUnique: jest.fn().mockResolvedValue({

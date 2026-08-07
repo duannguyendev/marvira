@@ -205,7 +205,7 @@ const en = {
   legal: {
     privacyTitle: 'Privacy Policy',
     termsTitle: 'Terms of Service',
-    updated: 'Last updated: July 30, 2026',
+    updated: 'Last updated: August 7, 2026',
     counselNote:
       'Draft for product and store readiness. Final legal review by counsel is required before go-live.',
   },

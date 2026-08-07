@@ -54,7 +54,7 @@ export class CreateEventDto {
   @Type(() => Number)
   @IsInt()
   @Min(0)
-  @Max(100000)
+  @Max(10000)
   rewardPoints!: number;
 
   @ApiPropertyOptional()
@@ -151,7 +151,7 @@ export class UpdateEventDto {
   @Type(() => Number)
   @IsInt()
   @Min(0)
-  @Max(100000)
+  @Max(10000)
   rewardPoints?: number;
 
   @ApiPropertyOptional()

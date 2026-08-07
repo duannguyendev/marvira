@@ -83,6 +83,7 @@ Admin configures the full hunt; **mobile enforces linear unlock** (you cannot sk
 - **Gifts**: first N finishers by completion time get codes; public UI shows teaser/count, never unused codes.
 - **Content language**: Practice and discovery default to the user’s content language; My Events / deep links are not filtered out.
 - **Kids**: not directed at children under 13 (see Privacy Policy).
+- **Scores**: event `rewardPoints` affect **event** leaderboards only. Global rank uses a platform formula (`globalScore`) with creator exclusion and daily caps — see [SCORING_AND_LEADERBOARD.md](./SCORING_AND_LEADERBOARD.md).
 
 ---
 
@@ -109,5 +110,6 @@ Typical local seeds (see API README / manual tests):
 ## Next reading
 
 - How systems connect → [ARCHITECTURE.md](./ARCHITECTURE.md)
+- Scoring rules → [SCORING_AND_LEADERBOARD.md](./SCORING_AND_LEADERBOARD.md)
 - Doc index → [README.md](./README.md)
 - Deep acceptance / regenerate → [`../requirement_all.txt`](../requirement_all.txt) §14–24

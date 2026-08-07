@@ -63,7 +63,11 @@ export const CreateEventInfoScreen: React.FC = () => {
     if (form.city.trim().length < 2) {
       nextErrors.city = t('createEvent.validation.cityMin');
     }
-    if (!Number.isFinite(form.rewardPoints) || form.rewardPoints < 0) {
+    if (
+      !Number.isFinite(form.rewardPoints) ||
+      form.rewardPoints < 0 ||
+      form.rewardPoints > 1000
+    ) {
       nextErrors.rewardPoints = t('createEvent.validation.rewardPoints');
     }
     setErrors(nextErrors);
@@ -170,6 +174,7 @@ export const CreateEventInfoScreen: React.FC = () => {
           keyboardType="number-pad"
           error={errors.rewardPoints}
         />
+        <Text style={styles.hint}>{t('createEvent.rewardPointsHint')}</Text>
 
         <Button
           title={t('createEvent.continueToPlaces')}
@@ -237,6 +242,13 @@ const styles = StyleSheet.create({
   },
   difficultyTextActive: {
     color: colors.background,
+  },
+  hint: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    marginTop: -spacing.sm,
+    marginBottom: spacing.sm,
+    lineHeight: 18,
   },
   submitButton: {
     marginTop: spacing.md,

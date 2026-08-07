@@ -16,6 +16,7 @@ Human reading map for the Marvira project. **Do not start with `requirement_all.
 
 ### Product / PM / stakeholders
 - [PRODUCT_OVERVIEW.md](./PRODUCT_OVERVIEW.md) — features & user flows
+- [SCORING_AND_LEADERBOARD.md](./SCORING_AND_LEADERBOARD.md) — event vs global points, anti-abuse
 - [`../growth_plan.txt`](../growth_plan.txt) — post-launch growth metrics
 - [`../monetization_todo.txt`](../monetization_todo.txt) — ads / IAP (later)
 

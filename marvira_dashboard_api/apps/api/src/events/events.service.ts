@@ -28,6 +28,11 @@ import {
   parseLanguageFilterQuery,
 } from '../common/content-language';
 import { NotificationsService } from '../notifications/notifications.service';
+import { isDashboardRole } from '../common/utils/roles';
+import {
+  STAFF_REWARD_POINTS_MAX,
+  USER_REWARD_POINTS_MAX,
+} from '../progress/global-score.constants';
 
 export interface CreateEventInput {
   title: string;
@@ -426,6 +431,7 @@ export class EventsService {
   }
 
   async create(data: CreateEventInput) {
+    await this.assertRewardPointsAllowed(data.rewardPoints, data.createdBy);
     if (data.isActive) {
       await this.validateEventForPublish(null, data);
     }
@@ -473,6 +479,16 @@ export class EventsService {
     options?: { allowChecklistBypass?: boolean },
   ) {
     const existing = await this.findOneInternal(id);
+    if (data.rewardPoints != null) {
+      if (actorRole) {
+        this.assertRewardPointsForRole(data.rewardPoints, actorRole);
+      } else {
+        await this.assertRewardPointsAllowed(
+          data.rewardPoints,
+          existing.createdBy,
+        );
+      }
+    }
     if (data.isActive) {
       await this.validateEventForPublish(id, {
         publishReviewConfirmed: data.publishReviewConfirmed,
@@ -726,5 +742,28 @@ export class EventsService {
 
   private async invalidateCache() {
     await this.redis.incr('events:list:version');
+  }
+
+  private async assertRewardPointsAllowed(
+    rewardPoints: number,
+    userId: string,
+  ) {
+    const user = await this.prisma.client.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    this.assertRewardPointsForRole(rewardPoints, user.role);
+  }
+
+  private assertRewardPointsForRole(rewardPoints: number, role: string) {
+    const max = isDashboardRole(role)
+      ? STAFF_REWARD_POINTS_MAX
+      : USER_REWARD_POINTS_MAX;
+    if (rewardPoints < 0 || rewardPoints > max) {
+      throw new BadRequestException(
+        `Reward points must be between 0 and ${max} for your role`,
+      );
+    }
   }
 }

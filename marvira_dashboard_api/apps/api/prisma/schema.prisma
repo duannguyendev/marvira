@@ -269,7 +269,10 @@ model UserEventProgress {
   eventId           String    @map("event_id")
   currentPlaceIndex Int       @default(0) @map("current_place_index")
   completed         Boolean   @default(false)
+  /// Event leaderboard score (question points + creator rewardPoints)
   score             Int       @default(0)
+  /// Platform global-leaderboard contribution (excludes creator rewardPoints)
+  globalScore       Int       @default(0) @map("global_score")
   startedAt         DateTime  @default(now()) @map("started_at")
   completedAt       DateTime? @map("completed_at")
   /// Wall-clock ms from first place unlock to event completion (for leaderboards)
@@ -287,6 +290,7 @@ model UserEventProgress {
   @@index([eventId])
   @@index([eventId, completed, score, totalDurationMs])
   @@index([eventId, completed, completedAt])
+  @@index([completed, globalScore])
   @@map("user_event_progress")
 }
 

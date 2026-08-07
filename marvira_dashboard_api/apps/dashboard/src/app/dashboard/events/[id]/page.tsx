@@ -272,7 +272,15 @@ export default function EditEventPage() {
               </div>
               <div className="space-y-2">
                 <Label>Reward Points *</Label>
-                <Input type="number" min={0} {...register('rewardPoints')} />
+                <Input
+                  type="number"
+                  min={0}
+                  max={10000}
+                  {...register('rewardPoints')}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Event leaderboard only. Does not raise the global leaderboard.
+                </p>
                 {errors.rewardPoints && (
                   <p className="text-sm text-destructive">
                     {errors.rewardPoints.message}

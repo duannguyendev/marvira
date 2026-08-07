@@ -43,7 +43,7 @@ Mobile is **separate** from the API Turborepo. Point the app at the API base URL
 | **Event** | A hunt (city, difficulty, places, optional password, gifts) |
 | **Place** | Ordered stop with lat/lng, radius, one **Question** |
 | **Question** | Bank item: TEXT / TRUE_FALSE / MULTIPLE_CHOICE / IMAGE |
-| **Progress** | Per-user event state: started, places done, score, duration |
+| **Progress** | Per-user event state: started, places done, event `score`, platform `globalScore`, duration |
 | **Access** | Password join grant for private events |
 | **Practice** | Standalone community questions (not tied to a hunt place) |
 

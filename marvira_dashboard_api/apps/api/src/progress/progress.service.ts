@@ -21,6 +21,10 @@ import { EventAccessService } from '../events/event-access.service';
 import { AnticheatService } from '../anticheat/anticheat.service';
 import { buildCompletionPayload } from '../events/gift-codes.util';
 import { isAnswerCorrect as matchAnswer } from '../common/utils/answer-match.util';
+import {
+  computeGlobalScoreContribution,
+  startOfUtcDay,
+} from './global-score.util';
 
 const COOLDOWN_SECONDS = 5;
 
@@ -197,6 +201,9 @@ export class ProgressService {
           newIndex: placeIndex,
           now,
           eventTotalDurationMs,
+          placeCount: place.event.places.length,
+          rewardPoints: place.event.rewardPoints,
+          eventCreatedBy: place.event.createdBy,
         });
         const giftFields = completed.giftFields;
         await this.enqueueEventCompletedNotification(
@@ -328,6 +335,9 @@ export class ProgressService {
           newIndex,
           now,
           eventTotalDurationMs,
+          placeCount: place.event.places.length,
+          rewardPoints: place.event.rewardPoints,
+          eventCreatedBy: place.event.createdBy,
         });
         eventCompleted = true;
         giftFields = completed.giftFields;
@@ -383,6 +393,9 @@ export class ProgressService {
     newIndex: number;
     now: Date;
     eventTotalDurationMs: number;
+    placeCount: number;
+    rewardPoints: number;
+    eventCreatedBy: string;
   }): Promise<{ giftFields: CompletionGiftFields }> {
     return this.prisma.client.$transaction(async tx => {
       await tx.$queryRaw`SELECT id FROM events WHERE id = ${params.eventId} FOR UPDATE`;
@@ -423,11 +436,31 @@ export class ProgressService {
       if (!event) throw new NotFoundException('Event not found');
 
       const giftCodes = event.giftCodes ?? [];
+      const dayStart = startOfUtcDay(params.now);
+      const todayAgg = await tx.userEventProgress.aggregate({
+        where: {
+          userId: params.userId,
+          completed: true,
+          completedAt: { gte: dayStart },
+        },
+        _sum: { globalScore: true },
+      });
+      const questionPointsEarned = Math.max(
+        0,
+        params.totalScore - params.rewardPoints,
+      );
+      const globalScore = computeGlobalScoreContribution({
+        isEventCreator: params.userId === params.eventCreatedBy,
+        placeCount: params.placeCount,
+        questionPointsEarned,
+        globalPointsEarnedToday: todayAgg._sum.globalScore ?? 0,
+      });
 
       await tx.userEventProgress.update({
         where: { id: params.progressId },
         data: {
           score: params.totalScore,
+          globalScore,
           currentPlaceIndex: params.newIndex,
           completed: true,
           completedAt: params.now,
@@ -688,14 +721,14 @@ export class ProgressService {
     const groups = await this.prisma.client.userEventProgress.groupBy({
       by: ['userId'],
       where: { completed: true },
-      _sum: { score: true },
+      _sum: { globalScore: true },
       _count: { _all: true },
       _avg: { totalDurationMs: true },
     });
 
     const sorted = groups
       .sort((a, b) => {
-        const scoreDiff = (b._sum.score ?? 0) - (a._sum.score ?? 0);
+        const scoreDiff = (b._sum.globalScore ?? 0) - (a._sum.globalScore ?? 0);
         if (scoreDiff !== 0) return scoreDiff;
         const countDiff = b._count._all - a._count._all;
         if (countDiff !== 0) return countDiff;
@@ -717,7 +750,7 @@ export class ProgressService {
         rank: index + 1,
         userId: group.userId,
         userName: userMap.get(group.userId) ?? 'Unknown',
-        totalScore: group._sum.score ?? 0,
+        totalScore: group._sum.globalScore ?? 0,
         eventsCompleted: group._count._all,
         avgDurationMs:
           group._avg.totalDurationMs != null

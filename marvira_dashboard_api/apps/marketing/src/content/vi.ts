@@ -206,7 +206,7 @@ const vi: MarketingContent = {
   legal: {
     privacyTitle: 'Chính sách quyền riêng tư',
     termsTitle: 'Điều khoản dịch vụ',
-    updated: 'Cập nhật lần cuối: 30 tháng 7, 2026',
+    updated: 'Cập nhật lần cuối: 7 tháng 8, 2026',
     counselNote:
       'Bản nháp phục vụ sản phẩm và cửa hàng ứng dụng. Cần luật sư rà soát cuối trước khi chính thức phát hành.',
   },
