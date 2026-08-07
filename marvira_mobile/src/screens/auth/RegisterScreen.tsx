@@ -7,11 +7,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  StatusBar,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
@@ -31,6 +33,7 @@ type RegisterScreenNavigationProp = NativeStackNavigationProp<
 
 export const RegisterScreen: React.FC = () => {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { register, isRegistering, registerError } = useAuth();
 
@@ -98,11 +101,24 @@ export const RegisterScreen: React.FC = () => {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <LinearGradient
         colors={[colors.secondary, colors.primary]}
         style={styles.gradient}>
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {
+              paddingTop: spacing.lg + insets.top,
+              paddingBottom: spacing.lg + insets.bottom,
+              paddingLeft: spacing.lg + insets.left,
+              paddingRight: spacing.lg + insets.right,
+            },
+          ]}
           keyboardShouldPersistTaps="handled">
           <View style={styles.content}>
             <View style={styles.header}>
@@ -190,7 +206,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: spacing.lg,
   },
   content: {
     backgroundColor: colors.background,

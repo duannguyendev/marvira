@@ -7,11 +7,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  StatusBar,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { authApi } from '../../api/auth';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
@@ -31,6 +33,7 @@ type NavigationProp = NativeStackNavigationProp<
 
 export const ForgotPasswordScreen: React.FC = () => {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp>();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,10 +64,25 @@ export const ForgotPasswordScreen: React.FC = () => {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <LinearGradient
         colors={[colors.primary, colors.secondary]}
         style={styles.gradient}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            {
+              paddingTop: spacing.lg + insets.top,
+              paddingBottom: spacing.lg + insets.bottom,
+              paddingLeft: spacing.lg + insets.left,
+              paddingRight: spacing.lg + insets.right,
+            },
+          ]}
+          keyboardShouldPersistTaps="handled">
           <View style={styles.content}>
             <Text style={styles.title}>{t('auth.forgotPasswordTitle')}</Text>
             <Text style={styles.subtitle}>
@@ -100,7 +118,7 @@ export const ForgotPasswordScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   gradient: { flex: 1 },
-  scrollContent: { flexGrow: 1, justifyContent: 'center', padding: spacing.lg },
+  scrollContent: { flexGrow: 1, justifyContent: 'center' },
   content: {
     backgroundColor: colors.background,
     borderRadius: borderRadius.xl,
