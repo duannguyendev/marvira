@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
@@ -14,28 +14,91 @@ const BRAND = {
   white: '#FFFFFF',
 } as const;
 
+type MailPayload = {
+  from: string;
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+};
+
 @Injectable()
-export class EmailService {
+export class EmailService implements OnModuleInit {
   private readonly logger = new Logger(EmailService.name);
   private transporter: Transporter | null = null;
+  private resendApiKey: string | null = null;
 
   constructor(private readonly config: ConfigService) {
-    const host = this.config.get<string>('SMTP_HOST');
+    this.resendApiKey =
+      this.config.get<string>('RESEND_API_KEY')?.trim() || null;
+
+    const host = this.config.get<string>('SMTP_HOST')?.trim();
     if (host) {
-      this.transporter = nodemailer.createTransport({
-        host,
-        port: parseInt(this.config.get('SMTP_PORT', '587'), 10),
-        secure: this.config.get('SMTP_SECURE') === 'true',
-        auth: {
-          user: this.config.get('SMTP_USER'),
-          pass: this.config.get('SMTP_PASS'),
-        },
-        // Prevent hung SMTP from blocking API requests (mobile shows "Network error").
-        connectionTimeout: 10_000,
-        greetingTimeout: 10_000,
-        socketTimeout: 15_000,
-      });
+      const user = this.config.get<string>('SMTP_USER')?.trim();
+      // Gmail App Passwords are often pasted with spaces — strip them.
+      const pass = this.config
+        .get<string>('SMTP_PASS')
+        ?.replace(/\s+/g, '');
+      const isGmail =
+        /^(smtp\.)?gmail\.com$/i.test(host) || host.toLowerCase() === 'gmail';
+      const port = parseInt(this.config.get('SMTP_PORT', '587'), 10);
+      const secure =
+        this.config.get('SMTP_SECURE') === 'true' || port === 465;
+
+      this.transporter = nodemailer.createTransport(
+        isGmail
+          ? {
+              service: 'gmail',
+              auth: { user, pass },
+              connectionTimeout: 10_000,
+              greetingTimeout: 10_000,
+              socketTimeout: 15_000,
+            }
+          : {
+              host,
+              port,
+              secure,
+              auth: { user, pass },
+              requireTLS: !secure && port === 587,
+              connectionTimeout: 10_000,
+              greetingTimeout: 10_000,
+              socketTimeout: 15_000,
+            },
+      );
     }
+  }
+
+  async onModuleInit() {
+    if (this.resendApiKey) {
+      this.logger.log('Email delivery: Resend (HTTPS)');
+      return;
+    }
+    if (this.transporter) {
+      const host = this.config.get<string>('SMTP_HOST')?.trim();
+      this.logger.log(`Email delivery: SMTP (${host})`);
+      try {
+        await this.transporter.verify();
+        this.logger.log('SMTP connection verified');
+      } catch (error) {
+        const detail =
+          error instanceof Error ? error.message : String(error);
+        this.logger.error(
+          `SMTP verify failed — password reset emails will not send: ${detail}`,
+        );
+        this.logger.error(
+          'Gmail: use an App Password (not account password). ' +
+            'Railway: outbound SMTP is often blocked — switch to RESEND_API_KEY.',
+        );
+      }
+      return;
+    }
+    this.logger.warn(
+      'Email delivery: DISABLED — set RESEND_API_KEY (recommended) or SMTP_* env vars',
+    );
+  }
+
+  isConfigured(): boolean {
+    return !!(this.resendApiKey || this.transporter);
   }
 
   async sendPasswordResetEmail(
@@ -44,7 +107,10 @@ export class EmailService {
     userName: string,
     options?: { isFirstPassword?: boolean },
   ): Promise<void> {
-    const from = this.config.get('SMTP_FROM', 'Marvira <noreply@marvira.com>');
+    const from =
+      this.config.get('SMTP_FROM')?.trim() ||
+      this.config.get('RESEND_FROM')?.trim() ||
+      'Marvira <noreply@marvira.com>';
     const supportEmail = this.config.get(
       'SUPPORT_EMAIL',
       'support@marvira.com',
@@ -112,20 +178,56 @@ export class EmailService {
         : `You received this because a password reset was requested for your Marvira account. Questions? ${safeSupport}`,
     });
 
-    if (!this.transporter) {
-      this.logger.warn(`SMTP not configured — password reset email for ${to}`);
+    const mail: MailPayload = { from, to, subject, text, html };
+
+    if (!this.isConfigured()) {
+      this.logger.warn(
+        `Email not configured — password reset for ${to} (link logged only)`,
+      );
       this.logger.log(`Reset URL: ${resetUrl}`);
       return;
     }
 
     try {
-      await this.transporter.sendMail({ from, to, subject, text, html });
+      if (this.resendApiKey) {
+        await this.sendViaResend(mail);
+        this.logger.log(`Password reset email sent via Resend to ${to}`);
+        return;
+      }
+      await this.transporter!.sendMail(mail);
+      this.logger.log(`Password reset email sent via SMTP to ${to}`);
     } catch (error) {
+      const detail =
+        error instanceof Error ? error.message : String(error);
       this.logger.error(
-        `Failed to send password reset email to ${to}`,
+        `Failed to send password reset email to ${to}: ${detail}`,
         error instanceof Error ? error.stack : undefined,
       );
       // Do not rethrow — caller must still return the generic success response.
+    }
+  }
+
+  private async sendViaResend(mail: MailPayload): Promise<void> {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: mail.from,
+        to: [mail.to],
+        subject: mail.subject,
+        text: mail.text,
+        html: mail.html,
+      }),
+    });
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => '');
+      throw new Error(
+        `Resend HTTP ${response.status}: ${body || response.statusText}`,
+      );
     }
   }
 

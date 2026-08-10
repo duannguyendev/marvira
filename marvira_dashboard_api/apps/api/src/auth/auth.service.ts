@@ -120,8 +120,10 @@ export class AuthService {
       { isFirstPassword: !user.passwordHash },
     );
 
-    const smtpConfigured = !!this.config.get<string>('SMTP_HOST');
-    if (!smtpConfigured && this.config.get('NODE_ENV') !== 'production') {
+    const emailConfigured =
+      !!this.config.get<string>('RESEND_API_KEY')?.trim() ||
+      !!this.config.get<string>('SMTP_HOST')?.trim();
+    if (!emailConfigured && this.config.get('NODE_ENV') !== 'production') {
       return { devResetToken: rawToken };
     }
 

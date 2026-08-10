@@ -21,6 +21,8 @@ Set via platform env vars or secrets manager:
 | `SENTRY_DSN`                        | Optional error tracking                                 |
 | `FIREBASE_ADMIN_CREDENTIALS_JSON`   | Or `_BASE64` — FCM push (optional until push enabled)   |
 | `FIREBASE_ADMIN_PROJECT_ID`         | Optional override                                       |
+| `RESEND_API_KEY`                    | **Recommended** for password-reset email (HTTPS)        |
+| `SMTP_FROM` / `PASSWORD_RESET_URL`  | From address on verified domain; marketing reset URL    |
 
 Rotate seed demo passwords (`demo123`, `admin123`) before public launch.
 
