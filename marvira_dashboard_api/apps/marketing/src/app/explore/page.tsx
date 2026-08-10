@@ -10,11 +10,24 @@ import {
   type PublicArticle,
 } from '@/lib/articles';
 
-export const metadata: Metadata = {
-  title: 'Explore city hunts',
-  description:
-    'Discover scavenger hunts published by Marvira organizers near you.',
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string; search?: string; page?: string }>;
+}): Promise<Metadata> {
+  const { search, page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
+  const isFiltered = Boolean(search?.trim()) || page > 1;
+
+  return {
+    title: 'Khám phá cuộc săn thành phố',
+    description:
+      'Khám phá các cuộc giải mật thư do nhà tổ chức Marvira đăng gần bạn.',
+    ...(isFiltered
+      ? { robots: { index: false, follow: true } }
+      : {}),
+  };
+}
 
 export const dynamic = 'force-dynamic';
 

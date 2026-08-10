@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const article = await fetchArticleBySlug(slug).catch(() => null);
   if (!article) {
-    return { title: 'Hunt' };
+    return { title: 'Hunt', robots: { index: false, follow: false } };
   }
   const image =
     resolveArticleImage(article.coverImage) ||
@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: article.title,
     description,
+    robots: { index: true, follow: true },
     openGraph: {
       type: 'article',
       title: article.title,

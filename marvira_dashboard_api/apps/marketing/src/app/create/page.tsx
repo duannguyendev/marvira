@@ -2,11 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PageShell } from '@/components/page-shell';
 import { loadMarketingContent, withLang } from '@/lib/content-loader';
+import { STORE_READY } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Create a scavenger hunt',
+  title: 'Tạo cuộc giải mật thư',
   description:
-    'Design GPS hunts for events, tourism, venues, and schools. Download Marvira to create.',
+    'Thiết kế cuộc giải mật thư GPS cho sự kiện, đoàn đội, du lịch và trường học.',
 };
 
 export default async function CreatePage({
@@ -42,13 +43,19 @@ export default async function CreatePage({
 
         <div className="mt-16 max-w-xl rounded-3xl bg-forest px-6 py-8 text-mist">
           <p className="font-display text-xl font-bold">
-            {content.create.ctaDownload}
+            {STORE_READY
+              ? content.create.ctaDownload
+              : content.download.titleSoon}
           </p>
-          <p className="mt-3 text-sm text-mist/80">{content.create.intro}</p>
+          <p className="mt-3 text-sm text-mist/80">
+            {STORE_READY ? content.create.intro : content.download.introSoon}
+          </p>
           <Link
             href={withLang('/download', locale)}
             className="mt-6 inline-flex rounded-full bg-sun px-5 py-3 text-sm font-semibold text-ink">
-            {content.home.ctaDownload}
+            {STORE_READY
+              ? content.home.ctaDownload
+              : content.home.ctaComingSoon}
           </Link>
         </div>
       </section>

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
-import { SITE } from '@/lib/site';
+import { SITE, STORE_READY } from '@/lib/site';
 import { cn } from '@/lib/cn';
 import type { ContentPack } from '@/lib/i18n';
 
@@ -22,6 +22,9 @@ export function SiteHeader({ content }: { content: ContentPack }) {
   const locale = searchParams.get('lang') === 'vi' ? 'vi' : 'en';
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
+  const downloadLabel = STORE_READY
+    ? content.nav.download
+    : content.home.ctaComingSoon;
 
   function setLocale(next: 'en' | 'vi') {
     const params = new URLSearchParams(searchParams.toString());
@@ -77,7 +80,9 @@ export function SiteHeader({ content }: { content: ContentPack }) {
                 pathname === item.href &&
                   'text-forest underline decoration-sun decoration-2 underline-offset-8',
               )}>
-              {content.nav[item.key]}
+              {item.key === 'download'
+                ? downloadLabel
+                : content.nav[item.key]}
             </Link>
           ))}
         </nav>
@@ -112,7 +117,7 @@ export function SiteHeader({ content }: { content: ContentPack }) {
           <Link
             href={localeHref('/download')}
             className="hidden rounded-full bg-sun px-4 py-2 text-sm font-semibold text-ink shadow-sm transition hover:brightness-105 sm:inline-flex">
-            {content.nav.download}
+            {downloadLabel}
           </Link>
           <button
             type="button"
@@ -161,7 +166,9 @@ export function SiteHeader({ content }: { content: ContentPack }) {
                 'rounded-xl px-3 py-3 text-base font-medium text-ink/80 transition hover:bg-forest/5 hover:text-forest',
                 pathname === item.href && 'bg-forest/5 text-forest',
               )}>
-              {content.nav[item.key]}
+              {item.key === 'download'
+                ? downloadLabel
+                : content.nav[item.key]}
             </Link>
           ))}
         </nav>

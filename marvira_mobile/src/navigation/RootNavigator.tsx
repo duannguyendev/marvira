@@ -95,7 +95,11 @@ export const RootNavigator: React.FC = () => {
 
   useEffect(() => {
     return authSession.subscribe(() => {
-      queryClient.clear();
+      // Flip auth off immediately so Root never remounts into the boot spinner
+      queryClient.setQueryData(['user'], null);
+      queryClient.removeQueries({
+        predicate: query => query.queryKey[0] !== 'user',
+      });
       setSessionKey(k => k + 1);
     });
   }, [queryClient]);
@@ -173,6 +177,7 @@ export const RootNavigator: React.FC = () => {
     }
   }, [isAuthenticated, isLoading]);
 
+  // Only gate cold start — never flash spinner when session expires mid-use
   if (isLoading) {
     return (
       <Screen edges={['top', 'bottom', 'left', 'right']}>

@@ -6,9 +6,12 @@ import { loadMarketingContent } from '@/lib/content-loader';
 import { IMAGES, SITE } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Marvira — City scavenger hunts on foot' },
+  title: {
+    absolute:
+      'Marvira — Giải mật thư ngoài trời | Trò chơi lớn khám phá thành phố',
+  },
   description:
-    'Walk real places, answer challenges, and climb leaderboards. Marvira is a GPS scavenger-hunt app for players and organizers.',
+    'Marvira là ứng dụng giải mật thư GPS ngoài trời: đi tới địa điểm thật, giải thử thách và chơi trò chơi lớn cùng đội nhóm — phù hợp hoạt động đoàn đội, đội viên, đoàn viên và người thích đi bộ, chạy bộ, khám phá.',
 };
 
 export default async function HomePage({

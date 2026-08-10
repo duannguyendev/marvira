@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Platform,
   Alert,
   StatusBar,
+  Pressable,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
@@ -17,6 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { storage } from '../../utils/storage';
 import {
   colors,
   spacing,
@@ -49,10 +51,27 @@ export const LoginScreen: React.FC = () => {
 
   const [email, setEmail] = useState(__DEV__ ? 'demo@marvira.com' : '');
   const [password, setPassword] = useState(__DEV__ ? 'demo123' : '');
+  const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {},
   );
   const busy = isLoggingIn || isSocialPending;
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const saved = await storage.getRememberedCredentials();
+      if (cancelled || !saved) {
+        return;
+      }
+      setEmail(saved.email);
+      setPassword(saved.password);
+      setRememberMe(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -80,6 +99,11 @@ export const LoginScreen: React.FC = () => {
 
     try {
       await login({ email, password });
+      if (rememberMe) {
+        await storage.setRememberedCredentials(email, password);
+      } else {
+        await storage.clearRememberedCredentials();
+      }
     } catch (error: any) {
       Alert.alert(
         t('auth.loginFailed'),
@@ -168,14 +192,35 @@ export const LoginScreen: React.FC = () => {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
+                autoComplete="password"
                 error={errors.password}
               />
 
-              <Text
-                style={styles.forgotLink}
-                onPress={() => navigation.navigate('ForgotPassword')}>
-                {t('auth.forgotPassword')}
-              </Text>
+              <View style={styles.optionsRow}>
+                <Pressable
+                  style={styles.rememberRow}
+                  onPress={() => setRememberMe(prev => !prev)}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: rememberMe }}
+                  hitSlop={8}>
+                  <View
+                    style={[
+                      styles.checkbox,
+                      rememberMe && styles.checkboxChecked,
+                    ]}>
+                    {rememberMe ? (
+                      <Text style={styles.checkmark}>✓</Text>
+                    ) : null}
+                  </View>
+                  <Text style={styles.rememberLabel}>{t('auth.rememberMe')}</Text>
+                </Pressable>
+
+                <Text
+                  style={styles.forgotLink}
+                  onPress={() => navigation.navigate('ForgotPassword')}>
+                  {t('auth.forgotPassword')}
+                </Text>
+              </View>
 
               {loginError && (
                 <Text style={styles.errorText}>
@@ -285,6 +330,44 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
+  optionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
+  },
+  rememberRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+    gap: spacing.sm,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primary,
+  },
+  checkmark: {
+    color: colors.background,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    lineHeight: fontSize.sm,
+  },
+  rememberLabel: {
+    fontSize: fontSize.sm,
+    color: colors.textDark,
+  },
   button: {
     marginTop: spacing.md,
   },
@@ -312,8 +395,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: fontWeight.semibold,
     textAlign: 'right',
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
+    flexShrink: 0,
   },
   footer: {
     flexDirection: 'row',

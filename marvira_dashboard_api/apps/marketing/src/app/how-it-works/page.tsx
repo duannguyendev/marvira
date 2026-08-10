@@ -3,9 +3,9 @@ import { PageShell } from '@/components/page-shell';
 import { loadMarketingContent } from '@/lib/content-loader';
 
 export const metadata: Metadata = {
-  title: 'How it works',
+  title: 'Cách Marvira hoạt động',
   description:
-    'Find a hunt, walk to places, answer challenges, climb the leaderboard.',
+    'Tìm cuộc săn, đi tới địa điểm, giải mật thư tại chỗ và leo bảng xếp hạng.',
 };
 
 export default async function HowItWorksPage({

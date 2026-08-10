@@ -28,11 +28,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const event = await getInviteEvent(id);
   if (!event) {
-    return { title: 'Hunt invite' };
+    return { title: 'Hunt invite', robots: { index: false, follow: false } };
   }
   return {
     title: event.shareTitle,
     description: event.shareDescription,
+    /** Shareable invites: allow social OG fetch, keep out of Google index. */
+    robots: { index: false, follow: true },
     openGraph: {
       title: event.shareTitle,
       description: event.shareDescription,
@@ -116,7 +118,9 @@ export default async function EventInvitePage({ params, searchParams }: Props) {
                 {content.event.how}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-ink/70">
-                {content.event.howBody}
+                {STORE_READY
+                  ? content.event.howBody
+                  : content.event.howBodySoon}
               </p>
             </div>
             <p className="mt-8 text-sm text-ink/55">
@@ -129,18 +133,24 @@ export default async function EventInvitePage({ params, searchParams }: Props) {
               {content.event.joinCta}
             </p>
             <p className="mt-3 text-sm text-mist/75">
-              {content.event.joinHint}
+              {STORE_READY
+                ? content.event.joinHint
+                : content.event.joinHintSoon}
             </p>
             <div className="mt-6 flex flex-col gap-3">
-              <a
-                href={appDeepLink}
-                className="inline-flex justify-center rounded-full bg-sun px-5 py-3 text-sm font-semibold text-ink">
-                {content.event.joinCta}
-              </a>
+              {STORE_READY ? (
+                <a
+                  href={appDeepLink}
+                  className="inline-flex justify-center rounded-full bg-sun px-5 py-3 text-sm font-semibold text-ink">
+                  {content.event.joinCta}
+                </a>
+              ) : null}
               <Link
                 href={storeHref || withLang('/download', locale)}
                 className="inline-flex justify-center rounded-full border border-white/30 px-5 py-3 text-sm font-semibold text-white">
-                {content.event.downloadCta}
+                {STORE_READY
+                  ? content.event.downloadCta
+                  : content.event.downloadCtaSoon}
               </Link>
             </div>
           </aside>

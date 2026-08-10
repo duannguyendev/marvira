@@ -2,7 +2,7 @@ import { IMAGES } from '@/lib/site';
 import type { MarketingContent } from '@/content/en';
 
 const vi: MarketingContent = {
-  brandLine: 'Khám phá thành phố bằng đôi chân.',
+  brandLine: 'Giải mật thư — khám phá thành phố bằng đôi chân.',
   nav: {
     how: 'Cách chơi',
     explore: 'Khám phá',
@@ -12,12 +12,13 @@ const vi: MarketingContent = {
     press: 'Báo chí',
   },
   home: {
-    headline: 'Biến thành phố thành cuộc săn tìm kho báu.',
+    headline: 'Biến thành phố thành cuộc giải mật thư ngoài trời.',
     support:
-      'Đi bộ tới địa điểm thật, trả lời thử thách và leo bảng xếp hạng cùng bạn bè.',
+      'Đi bộ tới địa điểm thật, giải mật thư và thử thách, chơi trò chơi lớn cùng bạn bè trên bảng xếp hạng.',
     ctaAppStore: 'App Store',
     ctaPlayStore: 'Google Play',
     ctaDownload: 'Tải ứng dụng',
+    ctaComingSoon: 'Sắp ra mắt',
     ctaHow: 'Xem cách chơi',
     heroAlt: 'Mọi người khám phá phố vào giờ hoàng hôn',
     heroImageBrief:
@@ -25,7 +26,8 @@ const vi: MarketingContent = {
   },
   how: {
     title: 'Marvira hoạt động thế nào',
-    intro: 'Bốn bước đơn giản từ tìm cuộc săn đến đứng đầu bảng xếp hạng.',
+    intro:
+      'Bốn bước đơn giản từ tìm một cuộc giải mật thư đến đứng đầu bảng xếp hạng.',
     steps: [
       {
         title: 'Tìm một cuộc săn',
@@ -36,8 +38,8 @@ const vi: MarketingContent = {
         body: 'Theo bản đồ tới địa danh thật. GPS sẽ xác nhận khi bạn đến nơi.',
       },
       {
-        title: 'Trả lời thử thách',
-        body: 'Giải câu hỏi và gợi ý tại mỗi điểm dừng. Không tiết lộ trước — khám phá mới thú vị.',
+        title: 'Giải mật thư',
+        body: 'Trả lời câu hỏi và gợi ý tại mỗi điểm dừng. Không tiết lộ trước — khám phá mới thú vị.',
       },
       {
         title: 'Leo bảng xếp hạng',
@@ -47,12 +49,19 @@ const vi: MarketingContent = {
   },
   download: {
     title: 'Tải Marvira',
+    titleSoon: 'Marvira sắp ra mắt',
     intro: 'Cài trên iOS hoặc Android và bắt đầu cuộc săn đầu tiên.',
+    introSoon:
+      'Marvira sẽ có trên App Store và Google Play. Liên kết tải sẽ xuất hiện tại đây ngay khi phát hành công khai — hiện chưa có bản cài đặt trên cửa hàng.',
     qrLabel: 'Quét để cài',
+    qrLabelSoon: 'Link cửa hàng sắp có',
+    storesSoonTitle: 'Chưa có trên App Store và Google Play',
     storesSoon:
-      'Liên kết cửa hàng sẽ mở khi phát hành công khai. Hãy quay lại sau.',
+      'Cảm ơn bạn đã quan tâm. Chúng tôi đang chuẩn bị phát hành công khai. Vui lòng quay lại sau để lấy liên kết tải chính thức.',
     deepLinkNote:
       'Đã có ứng dụng? Mở liên kết cuộc săn được chia sẻ — Marvira sẽ tự khởi chạy.',
+    deepLinkNoteSoon:
+      'Sau khi phát hành, liên kết cuộc săn được chia sẻ sẽ mở Marvira nếu bạn đã cài ứng dụng.',
   },
   create: {
     title: 'Tạo cuộc săn cho thành phố của bạn',
@@ -120,7 +129,7 @@ const vi: MarketingContent = {
   press: {
     title: 'Marvira là gì?',
     onePager:
-      'Marvira là ứng dụng săn tìm kho báu bằng GPS để khám phá thành phố. Người chơi đi tới địa điểm thật, trả lời thử thách tại chỗ và cạnh tranh trên bảng xếp hạng. Người tổ chức tạo cuộc săn cho sự kiện, du lịch, địa điểm và trường học — rồi chia sẻ một liên kết mời.',
+      'Marvira là ứng dụng giải mật thư bằng GPS để khám phá thành phố. Người chơi đi tới địa điểm thật, giải thử thách tại chỗ và cạnh tranh trên bảng xếp hạng. Phù hợp hoạt động đoàn đội, đội viên, đoàn viên và nhóm thích đi bộ ngoài trời. Người tổ chức tạo cuộc săn cho sự kiện, du lịch, địa điểm và trường học — rồi chia sẻ một liên kết mời.',
     audiences: [
       {
         title: 'Thành phố & du lịch',
@@ -131,8 +140,8 @@ const vi: MarketingContent = {
         body: 'Mang trải nghiệm tự hướng dẫn mà không cần xây ứng dụng riêng.',
       },
       {
-        title: 'Trường học',
-        body: 'Biến lịch sử địa phương và STEM thành thử thách đội nhóm ngoài trời.',
+        title: 'Trường học & đoàn đội',
+        body: 'Biến lịch sử địa phương và STEM thành thử thách đội nhóm ngoài trời cho đội viên và đoàn viên.',
       },
       {
         title: 'Người tổ chức',
@@ -140,7 +149,7 @@ const vi: MarketingContent = {
       },
     ],
     boilerplate:
-      'Marvira biến thành phố thành cuộc săn tìm kho báu có thể chơi. Đi bộ tới địa điểm thật, giải thử thách, leo bảng xếp hạng — hoặc tạo cuộc săn cho cộng đồng của bạn.',
+      'Marvira biến thành phố thành cuộc giải mật thư có thể chơi. Đi bộ tới địa điểm thật, giải thử thách, leo bảng xếp hạng — hoặc tạo cuộc săn cho cộng đồng của bạn.',
     downloadPdf: 'Tải PDF một trang',
   },
   support: {
@@ -191,12 +200,17 @@ const vi: MarketingContent = {
   event: {
     joinCta: 'Tham gia cuộc săn này',
     downloadCta: 'Tải Marvira',
+    downloadCtaSoon: 'Ứng dụng sắp ra mắt',
     when: 'Khi nào',
     where: 'Ở đâu',
     how: 'Cách tham gia',
     howBody:
       'Cài Marvira, mở lại liên kết mời này, rồi bắt đầu đi. Đáp án và tọa độ chính xác chỉ có trong ứng dụng — không tiết lộ tại đây.',
+    howBodySoon:
+      'Khi Marvira có trên App Store và Google Play, cài ứng dụng, mở lại liên kết mời này, rồi bắt đầu đi. Đáp án và tọa độ chính xác chỉ có trong ứng dụng — không tiết lộ tại đây.',
     joinHint: 'Mở trong ứng dụng nếu đã cài, hoặc tải Marvira trước.',
+    joinHintSoon:
+      'Ứng dụng chưa lên cửa hàng. Xem trang tải để theo dõi thông tin phát hành.',
     leaderboardEmpty: 'Bảng xếp hạng mở khi cuộc săn bắt đầu.',
     leaderboardLive: 'Điểm cập nhật khi người chơi hoàn thành địa điểm.',
     leaderboardEnded: 'Kết quả cuối — cảm ơn đã chơi.',
@@ -211,30 +225,30 @@ const vi: MarketingContent = {
   },
   footer: {
     brand: 'Marvira',
-    line: 'Cuộc săn GPS dành cho người thích đi bộ khám phá.',
+    line: 'Giải mật thư GPS cho đội nhóm và người thích đi bộ khám phá.',
     privacy: 'Quyền riêng tư',
     terms: 'Điều khoản',
     support: 'Hỗ trợ',
   },
   seo: {
-    homeTitle: 'Marvira — Cuộc săn thành phố bằng đôi chân',
+    homeTitle: 'Marvira — Giải mật thư ngoài trời | Trò chơi lớn khám phá thành phố',
     homeDesc:
-      'Đi bộ tới địa điểm thật, trả lời thử thách, leo bảng xếp hạng. Marvira là ứng dụng săn tìm kho báu bằng GPS cho người chơi và người tổ chức.',
+      'Marvira là ứng dụng giải mật thư GPS ngoài trời: đi tới địa điểm thật, giải thử thách và chơi trò chơi lớn cùng đội nhóm — phù hợp hoạt động đoàn đội, đội viên, đoàn viên và người thích đi bộ, chạy bộ, khám phá.',
     howTitle: 'Cách Marvira hoạt động',
     howDesc:
-      'Tìm cuộc săn, đi tới địa điểm, trả lời thử thách, leo bảng xếp hạng.',
+      'Tìm cuộc săn, đi tới địa điểm, giải mật thư tại chỗ và leo bảng xếp hạng.',
     downloadTitle: 'Tải Marvira',
     downloadDesc:
-      'Tải Marvira trên App Store hoặc Google Play và bắt đầu khám phá.',
-    createTitle: 'Tạo cuộc săn tìm kho báu — Marvira',
+      'Marvira sắp có trên App Store và Google Play — ứng dụng giải mật thư GPS để khám phá thành phố.',
+    createTitle: 'Tạo cuộc giải mật thư — Marvira',
     createDesc:
-      'Thiết kế cuộc săn GPS cho sự kiện, du lịch, địa điểm và trường học. Tải Marvira để tạo.',
-    huntsTitle: 'Cuộc săn thành phố nổi bật — Marvira',
+      'Thiết kế cuộc giải mật thư GPS cho sự kiện, đoàn đội, du lịch và trường học.',
+    huntsTitle: 'Cuộc giải mật thư thành phố — Marvira',
     huntsDesc:
-      'Xem mẫu cuộc săn như Downtown Discovery và Golden Gate Adventure.',
+      'Khám phá các cuộc giải mật thư do nhà tổ chức Marvira đăng gần bạn.',
     pressTitle: 'Báo chí & đối tác — Marvira',
     pressDesc:
-      'Marvira dành cho thành phố, địa điểm, trường học và người tổ chức.',
+      'Marvira — giải mật thư ngoài trời cho thành phố, địa điểm, trường học và người tổ chức.',
     supportTitle: 'Hỗ trợ & FAQ — Marvira',
     supportDesc: 'Trợ giúp cho người chơi và người tổ chức dùng Marvira.',
     privacyTitle: 'Chính sách quyền riêng tư — Marvira',
@@ -242,13 +256,15 @@ const vi: MarketingContent = {
     termsTitle: 'Điều khoản dịch vụ — Marvira',
     termsDesc: 'Điều khoản sử dụng ứng dụng và website Marvira.',
     keywords: [
-      'ứng dụng săn tìm kho báu',
-      'scavenger hunt GPS',
-      'game khám phá thành phố',
-      'câu hỏi đi bộ',
-      'gắn kết đội nhóm ngoài trời',
-      'scavenger hunt San Francisco',
-      'tạo scavenger hunt',
+      'mật thư',
+      'giải mật thư',
+      'trò chơi lớn',
+      'game cho hoạt động đoàn đội',
+      'trò chơi cho đội viên',
+      'trò chơi cho đoàn viên',
+      'game đoàn đội',
+      'trò chơi chạy bộ',
+      'trò chơi khám phá ngoài trời',
     ],
   },
 };

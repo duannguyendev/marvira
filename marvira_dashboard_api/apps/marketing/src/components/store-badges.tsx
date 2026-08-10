@@ -27,6 +27,9 @@ function QrPlaceholder({ label, target }: { label: string; target: string }) {
 export function StoreBadges({ content }: { content: ContentPack }) {
   const appTarget = SITE.appStoreUrl || `${SITE.url}/download`;
   const playTarget = SITE.playStoreUrl || `${SITE.url}/download`;
+  const qrLabel = STORE_READY
+    ? content.download.qrLabel
+    : content.download.qrLabelSoon;
 
   return (
     <div className="grid gap-8 sm:grid-cols-2">
@@ -40,14 +43,18 @@ export function StoreBadges({ content }: { content: ContentPack }) {
             {content.home.ctaAppStore}
           </a>
         ) : (
-          <span className="inline-flex rounded-xl bg-ink/80 px-5 py-3 text-sm font-semibold text-mist">
-            {content.home.ctaAppStore}
+          <span className="inline-flex rounded-xl bg-ink/50 px-5 py-3 text-sm font-semibold text-mist">
+            {content.home.ctaAppStore} · {content.home.ctaComingSoon}
           </span>
         )}
-        <QrPlaceholder
-          label={`${content.download.qrLabel} · iOS`}
-          target={appTarget}
-        />
+        {STORE_READY ? (
+          <QrPlaceholder
+            label={`${qrLabel} · iOS`}
+            target={appTarget}
+          />
+        ) : (
+          <p className="text-xs font-medium text-ink/55">{qrLabel} · iOS</p>
+        )}
       </div>
       <div className="flex flex-col items-start gap-4">
         {STORE_READY ? (
@@ -59,14 +66,20 @@ export function StoreBadges({ content }: { content: ContentPack }) {
             {content.home.ctaPlayStore}
           </a>
         ) : (
-          <span className="inline-flex rounded-xl border border-ink/15 bg-white px-5 py-3 text-sm font-semibold text-ink">
-            {content.home.ctaPlayStore}
+          <span className="inline-flex rounded-xl border border-ink/15 bg-white/70 px-5 py-3 text-sm font-semibold text-ink/70">
+            {content.home.ctaPlayStore} · {content.home.ctaComingSoon}
           </span>
         )}
-        <QrPlaceholder
-          label={`${content.download.qrLabel} · Android`}
-          target={playTarget}
-        />
+        {STORE_READY ? (
+          <QrPlaceholder
+            label={`${qrLabel} · Android`}
+            target={playTarget}
+          />
+        ) : (
+          <p className="text-xs font-medium text-ink/55">
+            {qrLabel} · Android
+          </p>
+        )}
       </div>
     </div>
   );

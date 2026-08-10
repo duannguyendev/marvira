@@ -82,7 +82,9 @@ const getStorageImpl = () => {
 };
 
 const USER_KEY = '@user_data';
+const REMEMBER_ME_KEY = '@remember_me';
 const KEYCHAIN_SERVICE = 'com.marvira.auth';
+const REMEMBERED_LOGIN_SERVICE = 'com.marvira.remembered_login';
 
 const getStorage = () => getStorageImpl();
 
@@ -185,6 +187,61 @@ export const storage = {
       this.removeRefreshToken(),
       this.removeUser(),
     ]);
+  },
+
+  /**
+   * Save email/password for the login form "Remember me" option.
+   * Kept separate from session tokens so logout / expiry still leaves them.
+   */
+  async setRememberedCredentials(
+    email: string,
+    password: string,
+  ): Promise<void> {
+    try {
+      await Keychain.setGenericPassword(email.trim(), password, {
+        service: REMEMBERED_LOGIN_SERVICE,
+        accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+      });
+      await getStorage().setItem(REMEMBER_ME_KEY, 'true');
+    } catch (error) {
+      console.error('Error saving remembered credentials:', error);
+    }
+  },
+
+  async getRememberedCredentials(): Promise<{
+    email: string;
+    password: string;
+  } | null> {
+    try {
+      const enabled = await getStorage().getItem(REMEMBER_ME_KEY);
+      if (enabled !== 'true') {
+        return null;
+      }
+      const credentials = await Keychain.getGenericPassword({
+        service: REMEMBERED_LOGIN_SERVICE,
+      });
+      if (credentials && typeof credentials !== 'boolean') {
+        return {
+          email: credentials.username,
+          password: credentials.password,
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Error reading remembered credentials:', error);
+      return null;
+    }
+  },
+
+  async clearRememberedCredentials(): Promise<void> {
+    try {
+      await Keychain.resetGenericPassword({
+        service: REMEMBERED_LOGIN_SERVICE,
+      });
+    } catch {
+      // ignore
+    }
+    await getStorage().removeItem(REMEMBER_ME_KEY);
   },
 
   async setItem(key: string, value: string): Promise<void> {

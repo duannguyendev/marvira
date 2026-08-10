@@ -85,6 +85,13 @@ class AuthService {
   }
 
   /**
+   * Clear in-memory session only (forced logout already cleared storage)
+   */
+  clearLocalSession(): void {
+    this.currentUser = null;
+  }
+
+  /**
    * Logout user
    */
   async logout(): Promise<void> {
@@ -132,6 +139,12 @@ class AuthService {
         return response.data;
       }
     } catch {
+      // Session may have been cleared by the 401 interceptor during this call
+      const stillAuthed = await storage.getToken();
+      if (!stillAuthed) {
+        this.currentUser = null;
+        return null;
+      }
       // Offline / transient — fall back to cached user
     }
 

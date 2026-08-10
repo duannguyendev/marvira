@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  StatusBar,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
@@ -13,6 +14,7 @@ import { CompositeNavigationProp } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
 import { useCompletedEvents } from '../../hooks/useProfile';
 import { useUnreadNotificationCount } from '../../hooks/useNotifications';
@@ -43,6 +45,7 @@ type ProfileScreenNavigationProp = CompositeNavigationProp<
 export const ProfileScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
+  const insets = useSafeAreaInsets();
   const { user, logout, isLoggingOut } = useAuth();
   const { data: completedData, isLoading: eventsLoading } =
     useCompletedEvents();
@@ -81,9 +84,21 @@ export const ProfileScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <LinearGradient
         colors={[colors.primary, colors.secondary]}
-        style={styles.header}>
+        style={[
+          styles.header,
+          {
+            paddingTop: insets.top + spacing.xl,
+            paddingLeft: spacing.lg + insets.left,
+            paddingRight: spacing.lg + insets.right,
+          },
+        ]}>
         <View style={styles.profileContainer}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
@@ -95,7 +110,14 @@ export const ProfileScreen: React.FC = () => {
         </View>
       </LinearGradient>
 
-      <View style={styles.content}>
+      <View
+        style={[
+          styles.content,
+          {
+            paddingLeft: spacing.md + insets.left,
+            paddingRight: spacing.md + insets.right,
+          },
+        ]}>
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => navigation.navigate('Notifications')}>
@@ -212,12 +234,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundLight,
   },
   header: {
-    paddingTop: spacing.xxl,
+    alignSelf: 'stretch',
+    width: '100%',
     paddingBottom: spacing.xl,
-    paddingHorizontal: spacing.lg,
   },
   profileContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
   avatar: {
     width: 100,
@@ -243,14 +267,17 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.bold,
     color: colors.background,
     marginBottom: spacing.xs,
+    textAlign: 'center',
   },
   email: {
     fontSize: fontSize.md,
     color: colors.background,
     opacity: 0.9,
+    textAlign: 'center',
   },
   content: {
-    padding: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
   settingsButton: {
     flexDirection: 'row',

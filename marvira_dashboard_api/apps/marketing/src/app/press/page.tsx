@@ -4,8 +4,9 @@ import { loadMarketingContent } from '@/lib/content-loader';
 import { SITE } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Press & partners',
-  description: 'What is Marvira for cities, venues, schools, and organizers.',
+  title: 'Báo chí & đối tác',
+  description:
+    'Marvira — giải mật thư ngoài trời cho thành phố, địa điểm, trường học và người tổ chức.',
 };
 
 export default async function PressPage({

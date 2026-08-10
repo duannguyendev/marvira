@@ -13,36 +13,46 @@ const brand = Be_Vietnam_Pro({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: 'Marvira — City scavenger hunts on foot',
+    default:
+      'Marvira — Giải mật thư ngoài trời | Trò chơi lớn khám phá thành phố',
     template: '%s · Marvira',
   },
   description:
-    'Walk real places, answer challenges, and climb leaderboards. Marvira is a GPS scavenger-hunt app for players and organizers.',
+    'Marvira là ứng dụng giải mật thư GPS ngoài trời: đi tới địa điểm thật, giải thử thách và chơi trò chơi lớn cùng đội nhóm — phù hợp hoạt động đoàn đội, đội viên, đoàn viên và người thích đi bộ, chạy bộ, khám phá.',
   keywords: [
-    'scavenger hunt app',
+    'mật thư',
+    'giải mật thư',
+    'trò chơi lớn',
+    'game cho hoạt động đoàn đội',
+    'trò chơi cho đội viên',
+    'trò chơi cho đoàn viên',
+    'game đoàn đội',
+    'trò chơi chạy bộ',
+    'trò chơi khám phá ngoài trời',
     'GPS scavenger hunt',
-    'city exploration game',
-    'walking quiz',
-    'outdoor team building',
   ],
   openGraph: {
     type: 'website',
     siteName: SITE.name,
-    title: 'Marvira — City scavenger hunts on foot',
-    description: 'Walk real places, answer challenges, and climb leaderboards.',
+    title:
+      'Marvira — Giải mật thư ngoài trời | Trò chơi lớn khám phá thành phố',
+    description:
+      'Ứng dụng giải mật thư GPS ngoài trời cho đội nhóm, đoàn đội và người thích đi bộ khám phá thành phố.',
     images: [
       {
         url: IMAGES.ogDefault,
         width: 1200,
         height: 630,
-        alt: 'Marvira city adventure',
+        alt: 'Marvira — giải mật thư ngoài trời',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Marvira — City scavenger hunts on foot',
-    description: 'Walk real places, answer challenges, and climb leaderboards.',
+    title:
+      'Marvira — Giải mật thư ngoài trời | Trò chơi lớn khám phá thành phố',
+    description:
+      'Ứng dụng giải mật thư GPS ngoài trời cho đội nhóm, đoàn đội và người thích đi bộ khám phá thành phố.',
     images: [IMAGES.ogDefault],
   },
 };

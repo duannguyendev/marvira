@@ -20,24 +20,34 @@ export function StoreCtas({
     : 'border border-ink/15 bg-white text-ink hover:border-forest/40';
 
   if (!STORE_READY) {
+    const noteTone = light ? 'text-white/80' : 'text-ink/70';
+    const noteTitle = light ? 'text-white' : 'text-ink';
     return (
-      <div className={cn('flex flex-wrap gap-3', className)}>
-        <Link
-          href="/download"
-          className={cn(
-            'inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition',
-            primary,
-          )}>
-          {content.home.ctaDownload}
-        </Link>
-        <Link
-          href="/how-it-works"
-          className={cn(
-            'inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition',
-            secondary,
-          )}>
-          {content.home.ctaHow}
-        </Link>
+      <div className={cn('flex flex-col gap-4', className)}>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/download"
+            className={cn(
+              'inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition',
+              primary,
+            )}>
+            {content.home.ctaComingSoon}
+          </Link>
+          <Link
+            href="/how-it-works"
+            className={cn(
+              'inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition',
+              secondary,
+            )}>
+            {content.home.ctaHow}
+          </Link>
+        </div>
+        <p className={cn('max-w-xl text-sm leading-relaxed', noteTone)}>
+          <span className={cn('font-semibold', noteTitle)}>
+            {content.download.storesSoonTitle}.{' '}
+          </span>
+          {content.download.storesSoon}
+        </p>
       </div>
     );
   }

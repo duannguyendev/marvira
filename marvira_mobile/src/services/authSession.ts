@@ -8,6 +8,13 @@ export const authSession = {
     return () => listeners.delete(listener);
   },
   notifyLogout(): void {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { authService } = require('./auth.service') as typeof import('./auth.service');
+      authService.clearLocalSession();
+    } catch {
+      // ignore
+    }
     // Clear analytics user id without awaiting (forced logout path)
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires

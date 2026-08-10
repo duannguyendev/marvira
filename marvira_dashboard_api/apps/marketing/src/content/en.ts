@@ -17,6 +17,7 @@ const en = {
     ctaAppStore: 'App Store',
     ctaPlayStore: 'Google Play',
     ctaDownload: 'Get the app',
+    ctaComingSoon: 'Coming soon',
     ctaHow: 'See how it works',
     heroAlt: 'People exploring a city street at golden hour',
     heroImageBrief:
@@ -46,11 +47,19 @@ const en = {
   },
   download: {
     title: 'Download Marvira',
+    titleSoon: 'Marvira is coming soon',
     intro: 'Install on iOS or Android and start your first hunt.',
+    introSoon:
+      'Marvira will be available on the App Store and Google Play. Links will appear here as soon as the public release is live — nothing to install yet.',
     qrLabel: 'Scan to install',
-    storesSoon: 'Store links go live with the public release. Check back soon.',
+    qrLabelSoon: 'Store link coming soon',
+    storesSoonTitle: 'Not on the App Store or Google Play yet',
+    storesSoon:
+      'Thank you for your interest. We’re preparing the public release. Please check back later for official download links.',
     deepLinkNote:
       'Already have the app? Open a shared hunt link and Marvira will launch automatically.',
+    deepLinkNoteSoon:
+      'After release, shared hunt links will open Marvira if the app is installed.',
   },
   create: {
     title: 'Create hunts for your city',
@@ -190,12 +199,17 @@ const en = {
   event: {
     joinCta: 'Join this hunt',
     downloadCta: 'Download Marvira',
+    downloadCtaSoon: 'App coming soon',
     when: 'When',
     where: 'Where',
     how: 'How to join',
     howBody:
       'Install Marvira, open this invite link again, and start walking. Exact answers and GPS pins stay in the app — no spoilers here.',
+    howBodySoon:
+      'When Marvira is available on the App Store and Google Play, install the app, open this invite link again, and start walking. Exact answers and GPS pins stay in the app — no spoilers here.',
     joinHint: 'Open in the app if installed, or download Marvira first.',
+    joinHintSoon:
+      'The app is not on the stores yet. Check the download page for release updates.',
     leaderboardEmpty: 'Leaderboard opens when the hunt starts.',
     leaderboardLive: 'Scores update as players finish places.',
     leaderboardEnded: 'Final results — thanks for playing.',
@@ -218,7 +232,7 @@ const en = {
   seo: {
     homeTitle: 'Marvira — City scavenger hunts on foot',
     homeDesc:
-      'Walk real places, answer challenges, and climb leaderboards. Marvira is a GPS scavenger-hunt app for players and organizers.',
+      'Marvira is a GPS scavenger-hunt app: walk real places, solve challenges, and play with friends or teams outdoors.',
     howTitle: 'How Marvira works',
     howDesc:
       'Find a hunt, walk to places, answer challenges, climb the leaderboard.',
@@ -240,13 +254,15 @@ const en = {
     termsTitle: 'Terms of Service — Marvira',
     termsDesc: 'Terms governing use of the Marvira app and website.',
     keywords: [
-      'scavenger hunt app',
+      'mật thư',
+      'giải mật thư',
+      'trò chơi lớn',
+      'game đoàn đội',
+      'trò chơi cho đội viên',
+      'trò chơi cho đoàn viên',
+      'outdoor scavenger hunt',
       'GPS scavenger hunt',
-      'city exploration game',
-      'walking quiz',
-      'outdoor team building',
-      'San Francisco scavenger hunt',
-      'create scavenger hunt',
+      'team building game',
     ],
   },
 };
