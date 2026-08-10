@@ -14,6 +14,7 @@ import { NotificationDetailScreen } from '../screens/notifications/NotificationD
 import { withScreenSafeArea } from '../components/Screen';
 import { ProfileStackParamList } from './types';
 import { primaryStackScreenOptions } from './stackOptions';
+import { colors } from '../theme';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 /** Headered screens: only horizontal safe area (header owns the top inset). */
@@ -52,6 +53,7 @@ export const ProfileNavigator: React.FC = () => {
           statusBarStyle: 'light',
           statusBarTranslucent: true,
           statusBarColor: 'transparent',
+          contentStyle: { backgroundColor: colors.primary },
         }}
       />
       <Stack.Screen

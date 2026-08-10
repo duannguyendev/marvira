@@ -89,30 +89,39 @@ export const ProfileScreen: React.FC = () => {
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
       contentInsetAdjustmentBehavior="never"
+      automaticallyAdjustContentInsets={false}
+      automaticallyAdjustsScrollIndicatorInsets={false}
       showsVerticalScrollIndicator={false}>
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
         translucent
       />
-      <LinearGradient
-        colors={[colors.primary, colors.secondary]}
-        style={[
-          styles.header,
-          {
-            width: windowWidth,
-            paddingTop: insets.top + spacing.xl,
-            paddingHorizontal: spacing.lg,
-          },
-        ]}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {user?.name?.charAt(0).toUpperCase() || 'U'}
-          </Text>
+      {/* Absolute gradient: layout from children, no clip on avatar/name */}
+      <View style={[styles.header, { width: windowWidth }]}>
+        <LinearGradient
+          colors={[colors.primary, colors.secondary]}
+          style={StyleSheet.absoluteFill}
+        />
+        <View
+          style={[
+            styles.headerContent,
+            {
+              paddingTop: insets.top + spacing.xl,
+              paddingHorizontal: spacing.lg,
+            },
+          ]}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {user?.name?.charAt(0).toUpperCase() || 'U'}
+            </Text>
+          </View>
+          <Text style={styles.name}>{user?.name || t('common.user')}</Text>
+          {user?.email ? (
+            <Text style={styles.email}>{user.email}</Text>
+          ) : null}
         </View>
-        <Text style={styles.name}>{user?.name || t('common.user')}</Text>
-        <Text style={styles.email}>{user?.email || ''}</Text>
-      </LinearGradient>
+      </View>
 
       <View
         style={[
@@ -236,14 +245,17 @@ export const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundLight,
+    backgroundColor: colors.primary,
   },
   scrollContent: {
     alignItems: 'stretch',
+    backgroundColor: colors.backgroundLight,
   },
   header: {
+    overflow: 'visible',
+  },
+  headerContent: {
     alignItems: 'center',
-    justifyContent: 'center',
     paddingBottom: spacing.xl,
   },
   avatar: {
@@ -281,6 +293,7 @@ const styles = StyleSheet.create({
   content: {
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
+    backgroundColor: colors.backgroundLight,
   },
   settingsButton: {
     flexDirection: 'row',
