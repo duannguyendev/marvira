@@ -83,7 +83,7 @@ export class EmailService implements OnModuleInit {
         const detail =
           error instanceof Error ? error.message : String(error);
         this.logger.error(
-          `SMTP verify failed — password reset emails will not send: ${detail}`,
+          `SMTP verify failed — transactional emails will not send: ${detail}`,
         );
         this.logger.error(
           'Gmail: use an App Password (not account password). ' +
@@ -107,14 +107,7 @@ export class EmailService implements OnModuleInit {
     userName: string,
     options?: { isFirstPassword?: boolean },
   ): Promise<void> {
-    const from =
-      this.config.get('SMTP_FROM')?.trim() ||
-      this.config.get('RESEND_FROM')?.trim() ||
-      'Marvira <noreply@marvira.com>';
-    const supportEmail = this.config.get(
-      'SUPPORT_EMAIL',
-      'support@marvira.com',
-    );
+    const supportEmail = this.supportEmail();
     const isFirst = !!options?.isFirstPassword;
     const subject = isFirst
       ? 'Create your Marvira password'
@@ -147,16 +140,7 @@ export class EmailService implements OnModuleInit {
       <p style="margin:0 0 24px;font-size:16px;line-height:1.5;color:${BRAND.ink};">
         ${this.escapeHtml(intro)}
       </p>
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
-        <tr>
-          <td align="center" bgcolor="${BRAND.primary}" style="border-radius:8px;">
-            <a href="${safeUrl}"
-               style="display:inline-block;padding:14px 28px;font-size:16px;font-weight:600;color:${BRAND.white};text-decoration:none;border-radius:8px;">
-              ${ctaLabel}
-            </a>
-          </td>
-        </tr>
-      </table>
+      ${this.ctaButton(safeUrl, ctaLabel)}
       <p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:${BRAND.muted};">
         Or copy this link into your browser:
       </p>
@@ -168,42 +152,200 @@ export class EmailService implements OnModuleInit {
       </p>
     `;
 
-    const html = this.wrapSystemMail({
-      preheader: isFirst
-        ? 'Create your Marvira password — link expires in 1 hour.'
-        : 'Reset your Marvira password — link expires in 1 hour.',
-      bodyHtml,
-      footerNote: isFirst
-        ? `You received this because a Marvira password was requested for your account. Questions? ${safeSupport}`
-        : `You received this because a password reset was requested for your Marvira account. Questions? ${safeSupport}`,
-    });
+    await this.dispatch(
+      {
+        to,
+        subject,
+        text,
+        html: this.wrapSystemMail({
+          preheader: isFirst
+            ? 'Create your Marvira password — link expires in 1 hour.'
+            : 'Reset your Marvira password — link expires in 1 hour.',
+          bodyHtml,
+          footerNote: isFirst
+            ? `You received this because a Marvira password was requested for your account. Questions? ${safeSupport}`
+            : `You received this because a password reset was requested for your Marvira account. Questions? ${safeSupport}`,
+        }),
+      },
+      {
+        kind: 'password-reset',
+        fallbackLog: `Reset URL: ${resetUrl}`,
+      },
+    );
+  }
 
-    const mail: MailPayload = { from, to, subject, text, html };
+  async sendWelcomeEmail(to: string, userName: string): Promise<void> {
+    const supportEmail = this.supportEmail();
+    const siteUrl =
+      this.config.get<string>('MARKETING_SITE_URL')?.trim() ||
+      this.config.get<string>('PUBLIC_SITE_URL')?.trim() ||
+      'https://www.marvira.com';
+    const downloadUrl = `${siteUrl.replace(/\/$/, '')}/download`;
+    const subject = 'Welcome to Marvira';
+    const intro =
+      'Thanks for creating your Marvira account. Open the app to find nearby hunts, walk to places, and unlock challenges.';
+
+    const text = [
+      `Hi ${userName},`,
+      '',
+      intro,
+      '',
+      `Get the app: ${downloadUrl}`,
+      '',
+      `Need help? Contact ${supportEmail}`,
+      '— The Marvira team',
+    ].join('\n');
+
+    const bodyHtml = `
+      <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:${BRAND.ink};">
+        Hi ${this.escapeHtml(userName)},
+      </p>
+      <p style="margin:0 0 24px;font-size:16px;line-height:1.5;color:${BRAND.ink};">
+        ${this.escapeHtml(intro)}
+      </p>
+      ${this.ctaButton(this.escapeHtml(downloadUrl), 'Get the app')}
+      <p style="margin:0;font-size:14px;line-height:1.5;color:${BRAND.muted};">
+        Happy exploring.
+      </p>
+    `;
+
+    await this.dispatch(
+      {
+        to,
+        subject,
+        text,
+        html: this.wrapSystemMail({
+          preheader: 'Welcome to Marvira — find hunts near you.',
+          bodyHtml,
+          footerNote: `You received this because you created a Marvira account. Questions? ${this.escapeHtml(supportEmail)}`,
+        }),
+      },
+      { kind: 'welcome' },
+    );
+  }
+
+  /**
+   * Security notice after password is created or changed.
+   * reason: changed (settings), reset (email link), set (SSO first password).
+   */
+  async sendPasswordChangedEmail(
+    to: string,
+    userName: string,
+    reason: 'changed' | 'reset' | 'set' = 'changed',
+  ): Promise<void> {
+    const supportEmail = this.supportEmail();
+    const subject =
+      reason === 'set'
+        ? 'Your Marvira password was created'
+        : 'Your Marvira password was changed';
+    const intro =
+      reason === 'set'
+        ? 'A Marvira password was just added to your account. You can now sign in with email and password as well as social login.'
+        : reason === 'reset'
+          ? 'Your Marvira password was just reset using an email link. If this was you, no further action is needed.'
+          : 'Your Marvira password was just changed. If this was you, no further action is needed.';
+    const warning =
+      'If you did not make this change, reset your password immediately and contact support.';
+
+    const text = [
+      `Hi ${userName},`,
+      '',
+      intro,
+      '',
+      warning,
+      '',
+      `Need help? Contact ${supportEmail}`,
+      '— The Marvira team',
+    ].join('\n');
+
+    const bodyHtml = `
+      <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:${BRAND.ink};">
+        Hi ${this.escapeHtml(userName)},
+      </p>
+      <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:${BRAND.ink};">
+        ${this.escapeHtml(intro)}
+      </p>
+      <p style="margin:0;font-size:14px;line-height:1.5;color:${BRAND.muted};">
+        ${this.escapeHtml(warning)}
+      </p>
+    `;
+
+    await this.dispatch(
+      {
+        to,
+        subject,
+        text,
+        html: this.wrapSystemMail({
+          preheader: subject,
+          bodyHtml,
+          footerNote: `Security notice for your Marvira account. Questions? ${this.escapeHtml(supportEmail)}`,
+        }),
+      },
+      { kind: 'password-changed' },
+    );
+  }
+
+  private supportEmail(): string {
+    return (
+      this.config.get<string>('SUPPORT_EMAIL')?.trim() || 'support@marvira.com'
+    );
+  }
+
+  private fromAddress(): string {
+    return (
+      this.config.get('SMTP_FROM')?.trim() ||
+      this.config.get('RESEND_FROM')?.trim() ||
+      'Marvira <noreply@marvira.com>'
+    );
+  }
+
+  private ctaButton(safeHref: string, label: string): string {
+    return `
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+        <tr>
+          <td align="center" bgcolor="${BRAND.primary}" style="border-radius:8px;">
+            <a href="${safeHref}"
+               style="display:inline-block;padding:14px 28px;font-size:16px;font-weight:600;color:${BRAND.white};text-decoration:none;border-radius:8px;">
+              ${label}
+            </a>
+          </td>
+        </tr>
+      </table>
+    `;
+  }
+
+  private async dispatch(
+    content: Omit<MailPayload, 'from'>,
+    meta: { kind: string; fallbackLog?: string },
+  ): Promise<void> {
+    const mail: MailPayload = { ...content, from: this.fromAddress() };
 
     if (!this.isConfigured()) {
       this.logger.warn(
-        `Email not configured — password reset for ${to} (link logged only)`,
+        `Email not configured — ${meta.kind} for ${mail.to} (skipped)`,
       );
-      this.logger.log(`Reset URL: ${resetUrl}`);
+      if (meta.fallbackLog) {
+        this.logger.log(meta.fallbackLog);
+      }
       return;
     }
 
     try {
       if (this.resendApiKey) {
         await this.sendViaResend(mail);
-        this.logger.log(`Password reset email sent via Resend to ${to}`);
+        this.logger.log(`${meta.kind} email sent via Resend to ${mail.to}`);
         return;
       }
       await this.transporter!.sendMail(mail);
-      this.logger.log(`Password reset email sent via SMTP to ${to}`);
+      this.logger.log(`${meta.kind} email sent via SMTP to ${mail.to}`);
     } catch (error) {
       const detail =
         error instanceof Error ? error.message : String(error);
       this.logger.error(
-        `Failed to send password reset email to ${to}: ${detail}`,
+        `Failed to send ${meta.kind} email to ${mail.to}: ${detail}`,
         error instanceof Error ? error.stack : undefined,
       );
-      // Do not rethrow — caller must still return the generic success response.
+      // Do not rethrow — auth flows must still succeed.
     }
   }
 
@@ -233,7 +375,6 @@ export class EmailService implements OnModuleInit {
 
   /**
    * Shared transactional layout (table-based for email clients).
-   * Reuse for welcome / invite / password-changed mail later.
    */
   private wrapSystemMail(params: {
     preheader: string;

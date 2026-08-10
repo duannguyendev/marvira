@@ -64,6 +64,7 @@ export class AuthService {
     });
 
     const tokens = await this.generateTokens(user);
+    void this.emailService.sendWelcomeEmail(user.email, user.name);
     return { user: this.toPublicUser(user), tokens };
   }
 
@@ -164,6 +165,12 @@ export class AuthService {
         where: { userId: resetRecord.userId },
       }),
     ]);
+
+    void this.emailService.sendPasswordChangedEmail(
+      resetRecord.user.email,
+      resetRecord.user.name,
+      'reset',
+    );
   }
 
   async setPassword(userId: string, password: string): Promise<PublicUser> {
@@ -186,6 +193,12 @@ export class AuthService {
       where: { id: userId },
       data: { passwordHash },
     });
+
+    void this.emailService.sendPasswordChangedEmail(
+      updated.email,
+      updated.name,
+      'set',
+    );
 
     return this.toPublicUser(updated);
   }
@@ -234,6 +247,12 @@ export class AuthService {
         where: { userId },
       }),
     ]);
+
+    void this.emailService.sendPasswordChangedEmail(
+      user.email,
+      user.name,
+      'changed',
+    );
   }
 
   async loginWithGoogle(input: {
