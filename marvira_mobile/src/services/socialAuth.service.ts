@@ -6,13 +6,23 @@ import {
   isFacebookSignInConfigured,
   isGoogleSignInConfigured,
 } from '../config/socialAuth';
+import { analytics } from './analytics';
+
+/** Kept on Error for Crashlytics / logs — never show raw to users. */
+function configIssueMessage(provider: string): string {
+  return (
+    `${provider} sign-in is not configured. ` +
+    'Set credentials in .env.local / Codemagic (see release_credentials.txt).'
+  );
+}
 
 export class SocialAuthNotConfiguredError extends Error {
+  readonly provider: string;
+
   constructor(provider: string) {
-    super(
-      `${provider} sign-in is not configured. Set credentials in .env.local / Codemagic (see release_credentials.txt).`,
-    );
+    super(configIssueMessage(provider));
     this.name = 'SocialAuthNotConfiguredError';
+    this.provider = provider;
   }
 }
 
@@ -23,12 +33,25 @@ export class SocialAuthCancelledError extends Error {
   }
 }
 
+export function isSocialAuthNotConfiguredError(error: unknown): boolean {
+  if (error instanceof SocialAuthNotConfiguredError) {
+    return true;
+  }
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  return /sign-?in is not configured/i.test(error.message);
+}
+
 let googleConfigured = false;
 let facebookConfigured = false;
 
 async function ensureGoogleConfigured(): Promise<void> {
   if (!isGoogleSignInConfigured()) {
-    throw new SocialAuthNotConfiguredError('Google');
+    const err = new SocialAuthNotConfiguredError('Google');
+    analytics.logBreadcrumb(err.message);
+    analytics.recordError(err);
+    throw err;
   }
   if (googleConfigured) {
     return;
@@ -45,7 +68,10 @@ async function ensureGoogleConfigured(): Promise<void> {
 
 async function ensureFacebookConfigured(): Promise<void> {
   if (!isFacebookSignInConfigured()) {
-    throw new SocialAuthNotConfiguredError('Facebook');
+    const err = new SocialAuthNotConfiguredError('Facebook');
+    analytics.logBreadcrumb(err.message);
+    analytics.recordError(err);
+    throw err;
   }
   if (facebookConfigured) {
     return;
@@ -111,10 +137,7 @@ export const socialAuthService = {
 
     const response = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
-      requestedScopes: [
-        appleAuth.Scope.EMAIL,
-        appleAuth.Scope.FULL_NAME,
-      ],
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
     });
 
     if (!response.identityToken) {

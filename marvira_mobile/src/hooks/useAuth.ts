@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import { authService } from '../services/auth.service';
 import {
   SocialAuthCancelledError,
+  isSocialAuthNotConfiguredError,
   socialAuthService,
 } from '../services/socialAuth.service';
 import { LoginCredentials, RegisterCredentials } from '../types';
@@ -93,5 +94,6 @@ export const useAuth = () => {
     appleAvailable: Platform.OS === 'ios',
     isSocialCancelled: (error: unknown) =>
       error instanceof SocialAuthCancelledError,
+    isSocialNotConfigured: isSocialAuthNotConfiguredError,
   };
 };

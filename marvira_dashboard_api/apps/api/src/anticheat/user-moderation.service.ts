@@ -98,13 +98,13 @@ export class UserModerationService {
     page = 1,
     pageSize = 20,
     search?: string,
-    minWarningPoints?: number,
+    minWarningPoints = 1,
     suspendedOnly?: boolean,
   ) {
     const { skip, take } = parsePagination({ page, pageSize });
     const now = new Date();
 
-    const where = {
+    const where: Prisma.UserWhereInput = {
       ...(search
         ? {
             OR: [
@@ -113,10 +113,16 @@ export class UserModerationService {
             ],
           }
         : {}),
-      ...(minWarningPoints != null
-        ? { warningPoints: { gte: minWarningPoints } }
-        : {}),
-      ...(suspendedOnly ? { playSuspendedUntil: { gt: now } } : {}),
+      ...(suspendedOnly
+        ? { playSuspendedUntil: { gt: now } }
+        : minWarningPoints > 0
+          ? {
+              OR: [
+                { warningPoints: { gte: minWarningPoints } },
+                { playSuspendedUntil: { gt: now } },
+              ],
+            }
+          : {}),
     };
 
     const [items, total] = await Promise.all([
@@ -136,7 +142,7 @@ export class UserModerationService {
           locationWarnings: {
             orderBy: { createdAt: 'desc' },
             take: 1,
-            select: { createdAt: true, code: true },
+            select: { createdAt: true, code: true, payload: true },
           },
           _count: { select: { locationWarnings: true } },
         },
@@ -144,18 +150,56 @@ export class UserModerationService {
       this.prisma.client.user.count({ where }),
     ]);
 
-    const mapped = items.map(user => ({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      warningPoints: user.warningPoints,
-      playSuspendedUntil: user.playSuspendedUntil?.toISOString() ?? null,
-      isActive: user.isActive,
-      createdAt: user.createdAt.toISOString(),
-      lastWarningAt: user.locationWarnings[0]?.createdAt.toISOString() ?? null,
-      lastWarningCode: user.locationWarnings[0]?.code ?? null,
-      totalWarnings: user._count.locationWarnings,
-    }));
+    const userIds = items.map(user => user.id);
+    const reasonRows =
+      userIds.length > 0
+        ? await this.prisma.client.userLocationWarning.groupBy({
+            by: ['userId', 'code'],
+            where: { userId: { in: userIds } },
+            _count: { _all: true },
+          })
+        : [];
+
+    const reasonsByUser = new Map<
+      string,
+      Array<{ code: string; count: number }>
+    >();
+    for (const row of reasonRows) {
+      const list = reasonsByUser.get(row.userId) ?? [];
+      list.push({ code: row.code, count: row._count._all });
+      reasonsByUser.set(row.userId, list);
+    }
+    for (const list of reasonsByUser.values()) {
+      list.sort((a, b) => b.count - a.count);
+    }
+
+    const mapped = items.map(user => {
+      const last = user.locationWarnings[0];
+      const payload =
+        last?.payload && typeof last.payload === 'object'
+          ? (last.payload as Record<string, unknown>)
+          : null;
+      const triggered = Array.isArray(payload?.triggeredCodes)
+        ? (payload.triggeredCodes as string[])
+        : last?.code
+          ? [last.code]
+          : [];
+
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        warningPoints: user.warningPoints,
+        playSuspendedUntil: user.playSuspendedUntil?.toISOString() ?? null,
+        isActive: user.isActive,
+        createdAt: user.createdAt.toISOString(),
+        lastWarningAt: last?.createdAt.toISOString() ?? null,
+        lastWarningCode: last?.code ?? null,
+        lastTriggeredCodes: triggered,
+        warningReasons: reasonsByUser.get(user.id) ?? [],
+        totalWarnings: user._count.locationWarnings,
+      };
+    });
 
     return buildPaginatedResponse(mapped, total, page, pageSize);
   }

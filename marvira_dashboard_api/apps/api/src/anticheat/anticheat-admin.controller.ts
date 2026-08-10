@@ -23,7 +23,10 @@ export class AnticheatAdminController {
   constructor(private readonly moderation: UserModerationService) {}
 
   @Get('users')
-  @ApiOperation({ summary: 'List users by warning points (highest first)' })
+  @ApiOperation({
+    summary:
+      'List flagged users (warning points >= 1 by default, highest first)',
+  })
   async listUsers(
     @Query('page') page?: string,
     @Query('pageSize') pageSize?: string,
@@ -31,11 +34,15 @@ export class AnticheatAdminController {
     @Query('minWarningPoints') minWarningPoints?: string,
     @Query('suspendedOnly') suspendedOnly?: string,
   ) {
+    const parsedMin =
+      minWarningPoints != null && minWarningPoints !== ''
+        ? parseInt(minWarningPoints, 10)
+        : 1;
     const data = await this.moderation.listFlaggedUsers(
       parseInt(page || '1', 10),
       parseInt(pageSize || '20', 10),
       search,
-      minWarningPoints != null ? parseInt(minWarningPoints, 10) : undefined,
+      Number.isFinite(parsedMin) ? parsedMin : 1,
       suspendedOnly === 'true',
     );
     return { success: true, data };

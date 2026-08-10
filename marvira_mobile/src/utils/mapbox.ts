@@ -1,4 +1,5 @@
 import Mapbox from '@rnmapbox/maps';
+import { analytics } from '../services/analytics';
 
 const PLACEHOLDER = 'your-mapbox-access-token';
 
@@ -20,9 +21,15 @@ export function getMapboxAccessToken(): string {
 export function initMapbox(): void {
   const token = getMapboxAccessToken();
   if (!token || token === PLACEHOLDER) {
-    console.warn(
+    const err = new Error(
       'MAPBOX_ACCESS_TOKEN is missing. Set it in .env.local or Codemagic Secure ENV.',
     );
+    err.name = 'MapboxConfigError';
+    analytics.logBreadcrumb(err.message);
+    analytics.recordError(err);
+    if (__DEV__) {
+      console.warn(err.message);
+    }
   }
   Mapbox.setAccessToken(token || null);
 }

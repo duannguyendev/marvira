@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from '../config/apiEnvironment';
+import { analytics } from '../services/analytics';
 
 // Set USE_MOCK_API=true in dev only when running without backend
 export const USE_MOCK_DATA = false;
@@ -28,10 +29,13 @@ export const MARKETING_SITE_URL = (() => {
   if (__DEV__) {
     return 'http://localhost:3002';
   }
-  console.warn(
+  const err = new Error(
     'MARKETING_SITE_URL is missing in this release build. ' +
       'Codemagic: set Secure ENV. Invite links will be incomplete.',
   );
+  err.name = 'MarketingSiteUrlConfigError';
+  analytics.logBreadcrumb(err.message);
+  analytics.recordError(err);
   return '';
 })();
 

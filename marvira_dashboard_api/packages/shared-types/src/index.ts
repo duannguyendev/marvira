@@ -354,6 +354,11 @@ export interface EventParticipantsResponse {
   participants: PaginatedResponse<EventParticipant>;
 }
 
+export interface AnticheatWarningReasonSummary {
+  code: string;
+  count: number;
+}
+
 export interface AnticheatUserListItem {
   id: string;
   email: string;
@@ -364,7 +369,40 @@ export interface AnticheatUserListItem {
   createdAt: string;
   lastWarningAt: string | null;
   lastWarningCode: string | null;
+  lastTriggeredCodes: string[];
+  warningReasons: AnticheatWarningReasonSummary[];
   totalWarnings: number;
+}
+
+export interface AnticheatWarningDetail {
+  id: string;
+  code: string;
+  placeId: string | null;
+  eventId: string | null;
+  payload: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+export interface AnticheatUserDetail {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    warningPoints: number;
+    playSuspendedUntil: string | null;
+    isActive: boolean;
+    createdAt: string;
+    totalWarnings: number;
+  };
+  recentWarnings: AnticheatWarningDetail[];
+  moderationHistory: Array<{
+    id: string;
+    action: string;
+    reason: string | null;
+    metadata: Record<string, unknown> | null;
+    createdAt: string;
+    admin: { id: string; name: string; email: string };
+  }>;
 }
 
 export type SuspendDuration = '1d' | '2d' | '1w' | '1m';

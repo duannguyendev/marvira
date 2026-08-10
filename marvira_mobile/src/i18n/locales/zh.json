@@ -66,7 +66,7 @@
     "continueWithGoogle": "使用 Google 登录",
     "continueWithApple": "使用 Apple 登录",
     "continueWithFacebook": "使用 Facebook 登录",
-    "socialNotConfigured": "社交登录暂未开通。",
+    "socialNotConfigured": "社交登录暂不可用。请使用邮箱和密码登录，或稍后再试。",
     "createAccount": "创建账号",
     "registerSubtitle": "加入冒险，开始探索",
     "namePlaceholder": "输入姓名",

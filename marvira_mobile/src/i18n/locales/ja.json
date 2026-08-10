@@ -66,7 +66,7 @@
     "continueWithGoogle": "Googleでログイン",
     "continueWithApple": "Appleでログイン",
     "continueWithFacebook": "Facebookでログイン",
-    "socialNotConfigured": "ソーシャルログインはまだ利用できません。",
+    "socialNotConfigured": "ソーシャルログインは現在ご利用いただけません。メールとパスワードでサインインするか、後でもう一度お試しください。",
     "createAccount": "アカウント作成",
     "registerSubtitle": "冒険に参加して、探索を始めよう",
     "namePlaceholder": "名前を入力",

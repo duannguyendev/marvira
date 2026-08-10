@@ -93,11 +93,8 @@ export function LocationMapField({
   if (!token) {
     return (
       <div className="rounded-lg border bg-muted/50 p-4 text-sm text-muted-foreground">
-        Set{' '}
-        <code className="rounded bg-muted px-1">
-          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-        </code>{' '}
-        to pick a location on the map. You can still enter coordinates below.
+        Map picker is unavailable. Enter latitude and longitude below, or ask an
+        admin to enable map location picking.
       </div>
     );
   }

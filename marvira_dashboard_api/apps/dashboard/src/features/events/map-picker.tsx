@@ -73,11 +73,8 @@ export function MapPicker({ places, onPlaceMove }: MapPickerProps) {
     return (
       <div className="rounded-lg border bg-muted/50 p-8 text-center">
         <p className="text-sm text-muted-foreground">
-          Set{' '}
-          <code className="rounded bg-muted px-1">
-            NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-          </code>{' '}
-          to enable the interactive map.
+          Interactive map is unavailable. Place coordinates are listed below —
+          you can still edit them in each place card.
         </p>
         {places.length > 0 && (
           <div className="mt-4 space-y-2 text-left text-sm">

@@ -2,7 +2,15 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { Plus, Pencil, Trash2, Search, ExternalLink } from 'lucide-react';
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Search,
+  ExternalLink,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { api } from '@/services/api';
@@ -48,6 +56,30 @@ export default function ArticlesPage() {
     queryFn: () =>
       api.get<PaginatedResponse<Article>>(
         `/admin/articles${buildQuery({ page, pageSize, search: debouncedSearch, status })}`,
+      ),
+  });
+
+  const statusMutation = useMutation({
+    mutationFn: ({
+      id,
+      status: nextStatus,
+    }: {
+      id: string;
+      status: ArticleStatus;
+    }) => api.patch(`/admin/articles/${id}`, { status: nextStatus }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-articles'] });
+      toast.success(
+        variables.status === ArticleStatus.PUBLISHED
+          ? 'Article published'
+          : 'Article unpublished',
+      );
+    },
+    onError: (_err, variables) =>
+      toast.error(
+        variables.status === ArticleStatus.PUBLISHED
+          ? 'Failed to publish article'
+          : 'Failed to unpublish article',
       ),
   });
 
@@ -190,16 +222,51 @@ export default function ArticlesPage() {
                         {new Date(article.updatedAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          {article.status === ArticleStatus.PUBLISHED && (
-                            <Button variant="outline" size="sm" asChild>
-                              <a
-                                href={`${MARKETING_URL}/explore/${article.slug}`}
-                                target="_blank"
-                                rel="noreferrer">
-                                <ExternalLink className="h-3 w-3" />
-                                View
-                              </a>
+                        <div className="flex flex-wrap justify-end gap-2">
+                          {article.status === ArticleStatus.PUBLISHED ? (
+                            <>
+                              <Button variant="outline" size="sm" asChild>
+                                <a
+                                  href={`${MARKETING_URL}/explore/${article.slug}`}
+                                  target="_blank"
+                                  rel="noreferrer">
+                                  <ExternalLink className="h-3 w-3" />
+                                  View
+                                </a>
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={statusMutation.isPending}
+                                onClick={() => {
+                                  if (
+                                    confirm(
+                                      'Unpublish this article? It will disappear from Explore.',
+                                    )
+                                  ) {
+                                    statusMutation.mutate({
+                                      id: article.id,
+                                      status: ArticleStatus.DRAFT,
+                                    });
+                                  }
+                                }}>
+                                <EyeOff className="h-3 w-3" />
+                                Unpublish
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={statusMutation.isPending}
+                              onClick={() =>
+                                statusMutation.mutate({
+                                  id: article.id,
+                                  status: ArticleStatus.PUBLISHED,
+                                })
+                              }>
+                              <Eye className="h-3 w-3" />
+                              Publish
                             </Button>
                           )}
                           <Button variant="outline" size="sm" asChild>

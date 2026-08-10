@@ -27,6 +27,8 @@ import {
   fontWeight,
 } from '../../theme';
 import { AuthStackParamList } from '../../navigation/types';
+import { analytics } from '../../services/analytics';
+import { SocialAuthNotConfiguredError } from '../../services/socialAuth.service';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -47,6 +49,7 @@ export const LoginScreen: React.FC = () => {
     loginError,
     appleAvailable,
     isSocialCancelled,
+    isSocialNotConfigured,
   } = useAuth();
 
   const [email, setEmail] = useState(__DEV__ ? 'demo@marvira.com' : '');
@@ -116,9 +119,23 @@ export const LoginScreen: React.FC = () => {
     if (isSocialCancelled(error)) {
       return;
     }
-    const message =
-      error instanceof Error ? error.message : t('auth.pleaseTryAgain');
-    Alert.alert(t('auth.loginFailed'), message);
+
+    const detail =
+      error instanceof Error ? error.message : String(error ?? 'unknown');
+    analytics.logBreadcrumb(`social_login_error: ${detail}`);
+    // Client-side missing credentials already recorded in socialAuth.service
+    if (!(error instanceof SocialAuthNotConfiguredError)) {
+      analytics.recordError(error);
+    }
+
+    Alert.alert(
+      t('auth.loginFailed'),
+      isSocialNotConfigured(error)
+        ? t('auth.socialNotConfigured')
+        : error instanceof Error
+          ? error.message
+          : t('auth.pleaseTryAgain'),
+    );
   };
 
   const handleGoogle = async () => {

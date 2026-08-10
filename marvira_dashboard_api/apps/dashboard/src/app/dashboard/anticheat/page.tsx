@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { UserRole } from '@marvira/shared-types';
 import type {
+  AnticheatUserDetail,
   AnticheatUserListItem,
   PaginatedResponse,
   SuspendDuration,
@@ -25,9 +26,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { DataTablePagination } from '@/components/data-table/pagination';
 import { useDebouncedValue } from '@/lib/use-debounced-value';
 import { buildQuery } from '@/lib/build-query';
+import {
+  anticheatCodeLabel,
+  formatWarningPayloadDetail,
+} from '@/lib/anticheat-labels';
 
 function formatDate(iso: string | null) {
   if (!iso) return '—';
@@ -46,6 +58,43 @@ function isSuspended(user: AnticheatUserListItem) {
   );
 }
 
+function ReasonList({
+  reasons,
+  fallbackCodes,
+}: {
+  reasons: AnticheatUserListItem['warningReasons'];
+  fallbackCodes: string[];
+}) {
+  if (reasons.length > 0) {
+    return (
+      <ul className="space-y-1.5">
+        {reasons.map(reason => (
+          <li key={reason.code} className="text-sm leading-snug">
+            <span className="font-medium text-foreground">
+              {anticheatCodeLabel(reason.code)}
+            </span>
+            <span className="text-muted-foreground"> ×{reason.count}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (fallbackCodes.length > 0) {
+    return (
+      <ul className="space-y-1.5">
+        {fallbackCodes.map(code => (
+          <li key={code} className="text-sm leading-snug font-medium">
+            {anticheatCodeLabel(code)}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  return <span className="text-muted-foreground text-sm">—</span>;
+}
+
 export default function AnticheatPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -55,6 +104,7 @@ export default function AnticheatPage() {
   const [pageSize, setPageSize] = useState(20);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentUser && !isAdmin) {
@@ -70,13 +120,32 @@ export default function AnticheatPage() {
     queryKey: ['admin-anticheat', page, pageSize, debouncedSearch],
     queryFn: () =>
       api.get<PaginatedResponse<AnticheatUserListItem>>(
-        `/admin/anticheat/users${buildQuery({ page, pageSize, search: debouncedSearch })}`,
+        `/admin/anticheat/users${buildQuery({
+          page,
+          pageSize,
+          search: debouncedSearch,
+          minWarningPoints: 1,
+        })}`,
       ),
     enabled: isAdmin,
   });
 
+  const { data: detail, isLoading: detailLoading } = useQuery({
+    queryKey: ['admin-anticheat-detail', selectedUserId],
+    queryFn: () =>
+      api.get<AnticheatUserDetail>(
+        `/admin/anticheat/users/${selectedUserId}`,
+      ),
+    enabled: isAdmin && !!selectedUserId,
+  });
+
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['admin-anticheat'] });
+    if (selectedUserId) {
+      queryClient.invalidateQueries({
+        queryKey: ['admin-anticheat-detail', selectedUserId],
+      });
+    }
   };
 
   const suspendMutation = useMutation({
@@ -159,7 +228,8 @@ export default function AnticheatPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Anti-Cheat</h1>
         <p className="text-muted-foreground">
-          Review users with location warnings and apply moderation actions
+          Only users with location warning points or an active suspension —
+          review suspicion reasons and apply moderation
         </p>
       </div>
 
@@ -187,7 +257,9 @@ export default function AnticheatPage() {
             </div>
           ) : users.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-muted-foreground">No users found.</p>
+              <p className="text-muted-foreground">
+                No flagged users right now.
+              </p>
             </div>
           ) : (
             <>
@@ -197,6 +269,7 @@ export default function AnticheatPage() {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead className="text-right">Warning pts</TableHead>
+                    <TableHead>Suspicion reasons</TableHead>
                     <TableHead>Last warning</TableHead>
                     <TableHead>Suspended until</TableHead>
                     <TableHead>Status</TableHead>
@@ -209,18 +282,26 @@ export default function AnticheatPage() {
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell className="text-right font-semibold">
-                        {user.warningPoints}
+                        <div>{user.warningPoints}</div>
+                        <div className="text-muted-foreground text-xs font-normal">
+                          {user.totalWarnings} event
+                          {user.totalWarnings === 1 ? '' : 's'}
+                        </div>
+                      </TableCell>
+                      <TableCell className="max-w-xs">
+                        <ReasonList
+                          reasons={user.warningReasons ?? []}
+                          fallbackCodes={
+                            user.lastTriggeredCodes?.length
+                              ? user.lastTriggeredCodes
+                              : user.lastWarningCode
+                                ? [user.lastWarningCode]
+                                : []
+                          }
+                        />
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
-                        {user.lastWarningCode ? (
-                          <span>
-                            {user.lastWarningCode}
-                            <br />
-                            {formatDate(user.lastWarningAt)}
-                          </span>
-                        ) : (
-                          '—'
-                        )}
+                        {user.lastWarningAt ? formatDate(user.lastWarningAt) : '—'}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {formatDate(user.playSuspendedUntil)}
@@ -235,7 +316,13 @@ export default function AnticheatPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                        <div className="flex flex-wrap justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedUserId(user.id)}>
+                            Details
+                          </Button>
                           {user.warningPoints > 0 && (
                             <Button
                               variant="outline"
@@ -309,6 +396,108 @@ export default function AnticheatPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog
+        open={!!selectedUserId}
+        onOpenChange={open => {
+          if (!open) setSelectedUserId(null);
+        }}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              {detail?.user.name ?? 'User anti-cheat detail'}
+            </DialogTitle>
+            <DialogDescription>
+              {detail?.user.email
+                ? `${detail.user.email} · ${detail.user.warningPoints} warning pts · ${detail.user.totalWarnings} warning events`
+                : 'Loading warning history and suspicion details'}
+            </DialogDescription>
+          </DialogHeader>
+
+          {detailLoading || !detail ? (
+            <div className="space-y-2 py-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <section className="space-y-2">
+                <h3 className="text-sm font-semibold">Recent warnings</h3>
+                {detail.recentWarnings.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No warning history.
+                  </p>
+                ) : (
+                  <ul className="divide-y rounded-md border">
+                    {detail.recentWarnings.map(warning => {
+                      const payload =
+                        warning.payload &&
+                        typeof warning.payload === 'object' &&
+                        !Array.isArray(warning.payload)
+                          ? (warning.payload as Record<string, unknown>)
+                          : null;
+                      const extra = formatWarningPayloadDetail(payload);
+                      return (
+                        <li key={warning.id} className="space-y-1 px-4 py-3">
+                          <div className="flex flex-wrap items-baseline justify-between gap-2">
+                            <p className="font-medium leading-snug">
+                              {anticheatCodeLabel(warning.code)}
+                            </p>
+                            <time className="text-xs text-muted-foreground">
+                              {formatDate(warning.createdAt)}
+                            </time>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Code: {warning.code}
+                            {warning.placeId ? ` · Place ${warning.placeId}` : ''}
+                            {warning.eventId ? ` · Event ${warning.eventId}` : ''}
+                          </p>
+                          {extra.length > 0 && (
+                            <ul className="text-sm text-muted-foreground">
+                              {extra.map(line => (
+                                <li key={line}>{line}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </section>
+
+              <section className="space-y-2">
+                <h3 className="text-sm font-semibold">Moderation history</h3>
+                {detail.moderationHistory.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No moderation actions yet.
+                  </p>
+                ) : (
+                  <ul className="divide-y rounded-md border">
+                    {detail.moderationHistory.map(action => (
+                      <li
+                        key={action.id}
+                        className="flex flex-wrap items-baseline justify-between gap-2 px-4 py-3 text-sm">
+                        <div>
+                          <p className="font-medium">{action.action}</p>
+                          <p className="text-muted-foreground">
+                            by {action.admin.name}
+                            {action.reason ? ` · ${action.reason}` : ''}
+                          </p>
+                        </div>
+                        <time className="text-xs text-muted-foreground">
+                          {formatDate(action.createdAt)}
+                        </time>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
