@@ -490,13 +490,18 @@ export class EventsService {
       }
     }
     if (data.isActive) {
+      // Answer verify is only for draft → go-live / schedule. Live edits
+      // (add place/question, fix answer) must not re-require verify (§3).
+      const goingLive = !existing.isActive;
       await this.validateEventForPublish(id, {
         publishReviewConfirmed: data.publishReviewConfirmed,
         actorRole,
         allowChecklistBypass: options?.allowChecklistBypass === true,
+        requireAnswerVerify: goingLive,
       });
       // Persist checklist so any later schedule/self-heal path stays consistent
       if (
+        goingLive &&
         options?.allowChecklistBypass &&
         data.publishReviewConfirmed &&
         (actorRole === 'ADMIN' || actorRole === 'STAFF')
@@ -678,6 +683,8 @@ export class EventsService {
       publishReviewConfirmed?: boolean;
       actorRole?: string;
       allowChecklistBypass?: boolean;
+      /** When false, only structural checks (places + questions). Default true. */
+      requireAnswerVerify?: boolean;
     },
   ) {
     if (!eventId) {
@@ -702,6 +709,10 @@ export class EventsService {
       throw new BadRequestException(
         `Each place must have a question before publishing (${missing.length} place(s) missing)`,
       );
+    }
+
+    if (options?.requireAnswerVerify === false) {
+      return;
     }
 
     const canUseChecklist =

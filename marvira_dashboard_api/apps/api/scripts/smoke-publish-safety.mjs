@@ -440,6 +440,34 @@ async function main() {
     );
   }
 
+  // ---------- Live edit: add place+question then save active event (no re-verify) ----------
+  {
+    const ev = await createDraftEvent(adminToken, `Smoke Live Add ${Date.now()}`);
+    await addPlaceWithQuestion(adminToken, ev.id, 'Hanoi');
+    const pub = await req('PATCH', `/events/${ev.id}`, {
+      token: adminToken,
+      headers: { 'X-Marvira-Client': 'dashboard' },
+      body: { isActive: true, publishReviewConfirmed: true },
+    });
+    assert(
+      pub.ok && pub.json?.data?.isActive === true,
+      'Dashboard publish live event for add-place test',
+      `status=${pub.status}`,
+    );
+
+    await addPlaceWithQuestion(adminToken, ev.id, 'Saigon');
+    const saveLive = await req('PATCH', `/events/${ev.id}`, {
+      token: adminToken,
+      headers: { 'X-Marvira-Client': 'dashboard' },
+      body: { isActive: true, title: `${ev.title} updated` },
+    });
+    assert(
+      saveLive.ok && saveLive.json?.data?.isActive === true,
+      'Live edit save after adding place+question does not require re-verify',
+      `status=${saveLive.status} msg=${saveLive.json?.message || ''}`,
+    );
+  }
+
   // Summary
   const failed = results.filter(r => !r.ok);
   console.log(`\n======== SUMMARY: ${results.length - failed.length}/${results.length} passed ========`);
