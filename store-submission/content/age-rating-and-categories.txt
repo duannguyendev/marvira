@@ -1,0 +1,76 @@
+================================================================================
+AGE RATING · CATEGORIES · CONTENT DECLARATIONS
+================================================================================
+Use these as guidance when filling Apple Age Rating + Google Play questionnaires.
+Not legal advice — answer truthfully for your live build.
+
+--------------------------------------------------------------------------------
+Categories
+--------------------------------------------------------------------------------
+Apple
+  Primary:   Games → Adventure
+  Secondary: Travel  (or Lifestyle)
+
+Google Play
+  Application type: Game  (or App if you prefer non-game listing)
+  Category: Adventure
+  Tags: scavenger hunt / outdoor / location
+
+--------------------------------------------------------------------------------
+Age / maturity (expected answers for Marvira v1.0)
+--------------------------------------------------------------------------------
+Apple Age Rating questionnaire (typical):
+  • Unrestricted Web Access: No (in-app content is curated / user hunts, not open browser)
+  • Gambling / Contests: No paid gambling. Competitive leaderboards / optional gift codes
+    for first finishers — declare “Contests” carefully if gift codes are real prizes.
+  • Mature / Suggestive: None intended
+  • Violence: None
+  • Horror / Fear: None
+  • Alcohol / Tobacco / Drugs: None intended
+  • Medical / Treatment: No
+  • Guns / Weapons: No
+  Expected rating: 12+  (location sharing often drives 12+)
+
+Google Play content rating (IARC):
+  Complete the questionnaire honestly.
+  Likely: PEGI 3 / ESRB Everyone — but LOCATION + USER INTERACTION may raise guidance.
+  Users can create content (hunts / questions) → declare User-Generated Content if asked.
+  Not “Designed for Families” / not Kids.
+
+Children
+  Not directed at children under 13.
+  Do not check “Made for Kids” / COPPA directed-to-children.
+
+--------------------------------------------------------------------------------
+Data safety / App Privacy
+--------------------------------------------------------------------------------
+Full copy-paste answers already live in repo:
+  → ../store_privacy_labels.txt   (Apple + Google Data safety)
+
+Quick reminders:
+  • Collects: name, email, precise location (gameplay), photos (optional creator),
+    crash/analytics via Firebase, push tokens
+  • Tracking (Apple definition): No in v1.0
+  • Ads / IAP: No in v1.0
+  • Privacy Policy URL: https://www.marvira.com/privacy
+
+--------------------------------------------------------------------------------
+Permissions justification (for review forms if asked)
+--------------------------------------------------------------------------------
+Location (precise): Unlock hunt places when player is within radius; anti-cheat.
+Camera / Photos: Creators attach images to questions; optional avatar / media.
+Notifications: Gameplay and creator alerts (optional).
+Internet: Account, hunts, maps tiles, sync.
+
+--------------------------------------------------------------------------------
+Export compliance (Apple)
+--------------------------------------------------------------------------------
+Uses only standard HTTPS / TLS encryption.
+Info.plist: ITSAppUsesNonExemptEncryption = false
+Answer: No (or “uses exempt encryption only”) as appropriate in the form.
+
+--------------------------------------------------------------------------------
+Government / ID / Sensitive
+--------------------------------------------------------------------------------
+No government ID collection.
+No health / financial account data in v1.0.

@@ -4,7 +4,7 @@
 # - Ink slate text (#1E293B), mist/trail surfaces (#F8FAFC)
 # - Forest / canopy indigo (#6366F1 / #4F46E5) for brand + primary CTAs
 # - Sun pink (#EC4899) for accents (Download, underlines, highlights)
-# - Display: Syne Â· Body: Figtree
+# - Display + body: Be Vietnam Pro (SIL OFL 1.1 — free for commercial use)
 # - Imagery: real streets, plazas, trails â€” never abstract UI chrome
 # - Motion: fade-up on copy, soft pan on hero photo, hover scale on hunt covers
 

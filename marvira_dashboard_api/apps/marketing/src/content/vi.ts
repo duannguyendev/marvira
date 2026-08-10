@@ -141,8 +141,7 @@ const vi: MarketingContent = {
     ],
     boilerplate:
       'Marvira biến thành phố thành cuộc săn tìm kho báu có thể chơi. Đi bộ tới địa điểm thật, giải thử thách, leo bảng xếp hạng — hoặc tạo cuộc săn cho cộng đồng của bạn.',
-    pdfBrief:
-      'PDF một trang tùy chọn: ảnh bìa đi bộ thành phố, đoạn Marvira là gì, bốn điểm đối tượng, nút tải/QR, email liên hệ.',
+    downloadPdf: 'Tải PDF một trang',
   },
   support: {
     title: 'Hỗ trợ & FAQ',

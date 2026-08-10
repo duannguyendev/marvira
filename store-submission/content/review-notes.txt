@@ -1,0 +1,104 @@
+================================================================================
+APP REVIEW NOTES — APPLE + GOOGLE (DEMO / TEST ACCOUNT)
+================================================================================
+Updated: 2026-08-07
+Dán vào:
+  • App Store Connect → App Review Information → Notes
+  • Google Play → App content / App access (if restricted)
+
+IMPORTANT
+  Replace DEMO_* placeholders with a REAL production account before submit.
+  Seed accounts (demo@marvira.com) are for local/dev only — do not use unless
+  they exist on production with a published hunt near the reviewer's region
+  (or a practice / password-free hunt they can open without walking).
+
+--------------------------------------------------------------------------------
+A) Suggested App Review Notes (English — paste as-is after filling DEMO_*)
+--------------------------------------------------------------------------------
+
+Thank you for reviewing Marvira.
+
+WHAT THE APP IS
+Marvira is a location-based scavenger hunt app. Players walk to real places,
+unlock stops with GPS, answer challenges, and compete on leaderboards.
+Creators can publish hunts from the mobile app.
+
+DEMO ACCOUNT
+Email:    DEMO_EMAIL@marvira.com
+Password: DEMO_PASSWORD
+
+HOW TO TEST WITHOUT WALKING ACROSS THE CITY
+1. Sign in with the demo account above.
+2. Open the published hunt: “DEMO_HUNT_TITLE” (it should appear on Home / Events).
+3. If prompted for a hunt password, use: DEMO_HUNT_PASSWORD
+4. For GPS unlock during review:
+   - iOS Simulator / Android emulator: set a custom location near the first place
+     (coordinates are listed under the hunt’s Place #1 in admin / notes below).
+   - Or use the Practice tab to answer practice questions without GPS.
+5. You can also create a short hunt from My Events → Create to verify creator flow
+   (camera/photo permission is only needed for image questions / avatar).
+
+PLACE #1 TEST COORDINATES (fill before submit)
+Latitude:  DEMO_LAT
+Longitude: DEMO_LNG
+Suggested unlock radius: ~100 m
+
+PERMISSIONS YOU MAY SEE
+• Location (When In Use): required to unlock hunt places with GPS.
+• Camera / Photos: only when creating image questions or choosing media.
+• Notifications: optional gameplay / creator alerts (FCM).
+
+SIGN-IN OPTIONS
+Email/password, Google, Apple, Facebook. Demo path uses email/password.
+
+NO IAP / ADS IN v1.0
+There are no in-app purchases, subscriptions, or ads in this release.
+
+SUPPORT
+support@marvira.com
+Privacy: https://www.marvira.com/privacy
+Website: https://www.marvira.com
+
+--------------------------------------------------------------------------------
+B) Ghi chú review (Tiếng Việt — tuỳ chọn nếu reviewer nội địa)
+--------------------------------------------------------------------------------
+
+Cảm ơn bạn đã review Marvira.
+
+Marvira là ứng dụng săn tìm kho báu theo vị trí: đi bộ tới địa điểm thật,
+mở khóa bằng GPS, trả lời thử thách và leo bảng xếp hạng.
+
+Tài khoản demo:
+Email: DEMO_EMAIL@marvira.com
+Mật khẩu: DEMO_PASSWORD
+
+Cách test nhanh:
+1. Đăng nhập tài khoản demo.
+2. Mở cuộc săn “DEMO_HUNT_TITLE”.
+3. Nếu có mật khẩu cuộc săn: DEMO_HUNT_PASSWORD
+4. Giả lập GPS gần Place #1 (DEMO_LAT, DEMO_LNG) hoặc dùng tab Luyện tập.
+5. Có thể tạo cuộc săn ngắn trong “Sự kiện của tôi” để kiểm tra luồng creator.
+
+Không có IAP / quảng cáo trong v1.0.
+Hỗ trợ: support@marvira.com
+
+--------------------------------------------------------------------------------
+C) Owner checklist before submit
+--------------------------------------------------------------------------------
+[ ] Production API + marketing live (privacy / terms / support URLs open in browser)
+[ ] Create DEMO reviewer account on production (not a real user PII dump)
+[ ] Publish at least 1 public hunt OR password hunt with password in notes
+[ ] Fill DEMO_LAT / DEMO_LNG for Place #1
+[ ] Confirm Google / Apple / Facebook login work on release builds
+[ ] Confirm location permission strings match Info.plist / Play declarations
+[ ] Attach privacy labels (see repo root store_privacy_labels.txt)
+[ ] Replace promotional placeholder images with real screenshots
+[ ] Age rating questionnaire completed (see age-rating-and-categories.txt)
+[ ] Contact email in consoles: support@marvira.com
+
+--------------------------------------------------------------------------------
+D) Google Play — App access
+--------------------------------------------------------------------------------
+If all features are available without login → “All functionality available…”
+If login required for core play → provide demo credentials in “App access”
+same as section A.

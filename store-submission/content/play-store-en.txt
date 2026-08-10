@@ -1,0 +1,92 @@
+================================================================================
+GOOGLE PLAY CONSOLE — LISTING (ENGLISH)
+================================================================================
+App name / package: Marvira  ·  com.marvira
+Copy-paste into: Play Console → Grow → Store presence → Main store listing
+
+--------------------------------------------------------------------------------
+App name (max 30)
+--------------------------------------------------------------------------------
+Marvira
+
+--------------------------------------------------------------------------------
+Short description (max 80)
+--------------------------------------------------------------------------------
+City adventure on foot. Walk real places, solve challenges, climb leaderboards.
+
+--------------------------------------------------------------------------------
+Full description (max 4000)
+--------------------------------------------------------------------------------
+Turn your city into a scavenger hunt.
+
+Marvira is a location-based adventure app. Walk to real places, unlock stops with GPS, answer challenges, and compete on leaderboards — alone or with friends.
+
+HOW IT WORKS
+1. Find a hunt — browse events near you or open an invite link.
+2. Walk to places — follow the map to real landmarks. GPS checks you in when you arrive.
+3. Answer challenges — quizzes and clues at each stop. Discovery is the point.
+4. Climb the leaderboard — earn points for speed and accuracy, then share your finish.
+
+CREATE YOUR OWN HUNTS
+Design GPS scavenger hunts for teams, birthdays, tourism, campuses, and schools. Publish publicly or protect with a password, then invite players with one link.
+
+FEATURES
+• Nearby scavenger hunts and city challenges
+• GPS place unlock for fair, on-location play
+• Multiple question types (text, true/false, multiple choice, image)
+• Event and global leaderboards
+• Favorites, practice questions, and in-app feedback
+• Create and manage your own hunts (My Events)
+• Languages: English, Vietnamese, Chinese, Japanese
+• Sign in with email, Google, Apple, or Facebook
+
+WHO IT’S FOR
+Friends exploring a city, teams bonding outdoors, tourism routes, schools, and anyone who wants adventure on foot.
+
+PRIVACY & SAFETY
+Marvira is not directed at children under 13. Precise location is used for gameplay unlock. See our Privacy Policy for details.
+
+Website: https://www.marvira.com
+Support: support@marvira.com
+Privacy: https://www.marvira.com/privacy
+Terms: https://www.marvira.com/terms
+
+Tagline: City adventure, on foot.
+
+--------------------------------------------------------------------------------
+App category
+--------------------------------------------------------------------------------
+Primary: Adventure  (or Games → Adventure)
+Secondary (optional): Travel & Local / Lifestyle
+
+--------------------------------------------------------------------------------
+Tags / keywords (Play does not have a separate keyword field;
+use naturally in short + full description)
+--------------------------------------------------------------------------------
+scavenger hunt, city walk, GPS game, outdoor adventure, leaderboard,
+location based, treasure hunt, team building, tourism quiz
+
+--------------------------------------------------------------------------------
+Contact details
+--------------------------------------------------------------------------------
+Email: support@marvira.com
+Website: https://www.marvira.com
+Privacy Policy: https://www.marvira.com/privacy
+
+--------------------------------------------------------------------------------
+Graphics to upload (see ../images/)
+--------------------------------------------------------------------------------
+• App icon: images/icon/play-icon-512.png  (512×512)
+• Feature graphic: images/feature-graphic/play-feature-graphic-1024x500.png
+• Phone screenshots: images/screenshots/android/  (min 2; prefer 1080×1920)
+  Temporary promo frames: images/promotional/*-android-phone.png
+  → Replace with real device screenshots before final submit.
+
+--------------------------------------------------------------------------------
+What’s new (v1.0)
+--------------------------------------------------------------------------------
+Welcome to Marvira — city adventure, on foot.
+• Discover nearby scavenger hunts
+• Walk to real places and unlock with GPS
+• Answer challenges and climb leaderboards
+• Create and share your own hunts

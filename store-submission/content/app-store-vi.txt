@@ -1,0 +1,93 @@
+================================================================================
+APP STORE CONNECT — LISTING (TIẾNG VIỆT)
+================================================================================
+Tên app / bundle: Marvira  ·  com.marvira
+Đường dẫn: App Store Connect → App → bản địa hóa Vietnamese
+
+--------------------------------------------------------------------------------
+Tên (tối đa 30)
+--------------------------------------------------------------------------------
+Marvira
+
+--------------------------------------------------------------------------------
+Phụ đề / Subtitle (tối đa 30)
+--------------------------------------------------------------------------------
+Khám phá thành phố bằng chân
+
+(Nếu dài: "Cuộc săn GPS ngoài trời" — 24 ký tự)
+
+--------------------------------------------------------------------------------
+Văn bản quảng bá / Promotional text (tối đa 170)
+--------------------------------------------------------------------------------
+Đi bộ tới địa điểm thật, mở khóa bằng GPS, trả lời thử thách và leo bảng xếp hạng cùng bạn bè.
+
+--------------------------------------------------------------------------------
+Mô tả (tối đa 4000)
+--------------------------------------------------------------------------------
+Biến thành phố thành cuộc săn tìm kho báu.
+
+Marvira là ứng dụng phiêu lưu theo vị trí. Đi bộ tới địa điểm thật, mở khóa bằng GPS, trả lời thử thách và cạnh tranh trên bảng xếp hạng — một mình hoặc cùng bạn bè.
+
+CÁCH CHƠI
+1. Tìm cuộc săn — duyệt sự kiện gần bạn hoặc mở liên kết mời.
+2. Đi tới địa điểm — theo bản đồ đến địa danh thật. GPS xác nhận khi bạn đến nơi.
+3. Trả lời thử thách — câu hỏi và gợi ý tại mỗi điểm dừng. Khám phá mới thú vị.
+4. Leo bảng xếp hạng — kiếm điểm nhờ tốc độ và độ chính xác, rồi chia sẻ thành tích.
+
+TẠO CUỘC SĂN CỦA RIÊNG BẠN
+Thiết kế cuộc săn GPS cho đội nhóm, sinh nhật, du lịch, khuôn viên và trường học. Công khai hoặc bảo vệ bằng mật khẩu, rồi mời người chơi chỉ với một liên kết.
+
+TÍNH NĂNG
+• Cuộc săn gần bạn và thử thách thành phố
+• Mở khóa địa điểm bằng GPS để chơi công bằng tại chỗ
+• Nhiều loại câu hỏi (văn bản, đúng/sai, trắc nghiệm, hình ảnh)
+• Bảng xếp hạng sự kiện và toàn hệ thống
+• Yêu thích, luyện tập và gửi phản hồi trong app
+• Tạo và quản lý cuộc săn của bạn (Sự kiện của tôi)
+• Ngôn ngữ: Tiếng Việt, English, 中文, 日本語
+• Đăng nhập bằng email, Google, Apple hoặc Facebook
+
+DÀNH CHO AI
+Bạn bè khám phá thành phố, đội nhóm gắn kết ngoài trời, lộ trình du lịch, trường học, và bất kỳ ai muốn phiêu lưu bằng đôi chân.
+
+QUYỀN RIÊNG TƯ & AN TOÀN
+Marvira không hướng tới trẻ em dưới 13 tuổi. Vị trí chính xác dùng để mở khóa gameplay. Xem Chính sách quyền riêng tư để biết chi tiết.
+
+Website: https://www.marvira.com
+Hỗ trợ: support@marvira.com
+Quyền riêng tư: https://www.marvira.com/privacy
+Điều khoản: https://www.marvira.com/terms
+
+--------------------------------------------------------------------------------
+Từ khóa (tối đa 100 ký tự, phân tách bằng dấu phẩy)
+--------------------------------------------------------------------------------
+săn kho báu,game GPS,khám phá phố,ngoài trời,phiêu lưu,bảng xếp hạng,quiz
+
+Gợi ý giữ dưới 100 ký tự; không lặp tên "Marvira".
+
+--------------------------------------------------------------------------------
+URL hỗ trợ
+--------------------------------------------------------------------------------
+https://www.marvira.com/support
+
+--------------------------------------------------------------------------------
+URL marketing
+--------------------------------------------------------------------------------
+https://www.marvira.com
+
+--------------------------------------------------------------------------------
+URL Privacy Policy
+--------------------------------------------------------------------------------
+https://www.marvira.com/privacy
+
+--------------------------------------------------------------------------------
+Danh mục
+--------------------------------------------------------------------------------
+Chính: Games → Adventure
+Phụ: Travel (hoặc Lifestyle)
+
+--------------------------------------------------------------------------------
+What’s New (v1.0)
+--------------------------------------------------------------------------------
+Chào mừng đến Marvira — khám phá thành phố bằng đôi chân.
+Tìm cuộc săn gần bạn, đi bộ tới địa điểm thật, mở khóa bằng GPS, trả lời thử thách, leo bảng xếp hạng và tạo cuộc săn của riêng bạn.

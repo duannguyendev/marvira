@@ -139,8 +139,7 @@ const en = {
     ],
     boilerplate:
       'Marvira turns cities into playable scavenger hunts. Walk real places, solve challenges, and climb the leaderboard — or create hunts for your community.',
-    pdfBrief:
-      'Optional one-pager PDF: cover photo of a city walk, What is Marvira paragraph, four audience bullets, store/QR CTA, contact email.',
+    downloadPdf: 'Download one-pager PDF',
   },
   support: {
     title: 'Support & FAQ',

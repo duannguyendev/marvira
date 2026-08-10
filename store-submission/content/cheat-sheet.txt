@@ -1,0 +1,32 @@
+================================================================================
+QUICK FIELDS CHEAT SHEET (both stores)
+================================================================================
+
+App name:           Marvira
+Bundle / package:   com.marvira
+Tagline EN:         City adventure, on foot.
+Tagline VI:         Khám phá thành phố bằng đôi chân.
+Subtitle EN:        City adventure, on foot
+Subtitle VI:        Khám phá thành phố bằng chân
+
+Support email:      support@marvira.com
+Website:            https://www.marvira.com
+Support page:       https://www.marvira.com/support
+Privacy:            https://www.marvira.com/privacy
+Terms:              https://www.marvira.com/terms
+
+Primary category:   Games → Adventure
+Copyright:          © 2026 Marvira
+
+Apple keywords:     scavenger hunt,GPS game,city walk,outdoor,adventure,leaderboard,treasure hunt,quiz
+
+Play short EN:      City adventure on foot. Walk real places, solve challenges, climb leaderboards.
+Play short VI:      Khám phá thành phố bằng đôi chân. Đi bộ, giải thử thách, leo bảng xếp hạng.
+
+Version What’s New EN:
+Welcome to Marvira — city adventure, on foot.
+Discover nearby scavenger hunts, walk to real places, unlock with GPS, answer challenges, climb leaderboards, and create hunts of your own.
+
+Version What’s New VI:
+Chào mừng đến Marvira — khám phá thành phố bằng đôi chân.
+Tìm cuộc săn gần bạn, đi bộ tới địa điểm thật, mở khóa bằng GPS, trả lời thử thách, leo bảng xếp hạng và tạo cuộc săn của riêng bạn.

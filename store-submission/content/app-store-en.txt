@@ -1,0 +1,130 @@
+================================================================================
+APP STORE CONNECT — LISTING (ENGLISH)
+================================================================================
+App name / bundle: Marvira  ·  com.marvira
+Path: App Store Connect → Your App → App Information + App Store → iOS version
+
+--------------------------------------------------------------------------------
+Name (max 30)
+--------------------------------------------------------------------------------
+Marvira
+
+--------------------------------------------------------------------------------
+Subtitle (max 30) — appears under the name
+--------------------------------------------------------------------------------
+City adventure, on foot
+
+--------------------------------------------------------------------------------
+Promotional text (max 170) — editable anytime without a new version
+--------------------------------------------------------------------------------
+Walk real places, unlock stops with GPS, answer challenges, and climb the leaderboard with friends.
+
+--------------------------------------------------------------------------------
+Description (max 4000)
+--------------------------------------------------------------------------------
+Turn your city into a scavenger hunt.
+
+Marvira is a location-based adventure app. Walk to real places, unlock stops with GPS, answer challenges, and compete on leaderboards — alone or with friends.
+
+HOW IT WORKS
+1. Find a hunt — browse events near you or open an invite link.
+2. Walk to places — follow the map to real landmarks. GPS checks you in when you arrive.
+3. Answer challenges — quizzes and clues at each stop. Discovery is the point.
+4. Climb the leaderboard — earn points for speed and accuracy, then share your finish.
+
+CREATE YOUR OWN HUNTS
+Design GPS scavenger hunts for teams, birthdays, tourism, campuses, and schools. Publish publicly or protect with a password, then invite players with one link.
+
+FEATURES
+• Nearby scavenger hunts and city challenges
+• GPS place unlock for fair, on-location play
+• Multiple question types (text, true/false, multiple choice, image)
+• Event and global leaderboards
+• Favorites, practice questions, and in-app feedback
+• Create and manage your own hunts (My Events)
+• Languages: English, Vietnamese, Chinese, Japanese
+• Sign in with email, Google, Apple, or Facebook
+
+WHO IT’S FOR
+Friends exploring a city, teams bonding outdoors, tourism routes, schools, and anyone who wants adventure on foot.
+
+PRIVACY & SAFETY
+Marvira is not directed at children under 13. Precise location is used for gameplay unlock. See our Privacy Policy for details.
+
+Website: https://www.marvira.com
+Support: support@marvira.com
+Privacy: https://www.marvira.com/privacy
+Terms: https://www.marvira.com/terms
+
+--------------------------------------------------------------------------------
+Keywords (max 100 characters, comma-separated, NO spaces after commas preferred)
+--------------------------------------------------------------------------------
+scavenger hunt,GPS game,city walk,outdoor,adventure,leaderboard,treasure hunt,quiz
+
+Character count check (spaces removed between commas):
+scavenger hunt,GPS game,city walk,outdoor,adventure,leaderboard,treasure hunt,quiz
+≈ 84 characters — under the 100 limit. Adjust if needed.
+
+Do NOT repeat the app name "Marvira" in keywords (Apple already indexes the name).
+
+--------------------------------------------------------------------------------
+Support URL (required)
+--------------------------------------------------------------------------------
+https://www.marvira.com/support
+
+--------------------------------------------------------------------------------
+Marketing URL (optional)
+--------------------------------------------------------------------------------
+https://www.marvira.com
+
+--------------------------------------------------------------------------------
+Privacy Policy URL (required)
+--------------------------------------------------------------------------------
+https://www.marvira.com/privacy
+
+--------------------------------------------------------------------------------
+Category
+--------------------------------------------------------------------------------
+Primary: Games → Adventure
+Secondary: Travel  (or Lifestyle)
+
+--------------------------------------------------------------------------------
+Age rating / content
+--------------------------------------------------------------------------------
+See content/age-rating-and-categories.txt
+Expected: 12+ (location sharing / infrequent mild competitive elements)
+Not Kids Category. Not directed under 13.
+
+--------------------------------------------------------------------------------
+Copyright
+--------------------------------------------------------------------------------
+© 2026 Marvira
+
+--------------------------------------------------------------------------------
+App icon
+--------------------------------------------------------------------------------
+images/icon/app-icon-1024-opaque.png
+(Apple prefers no transparency / no alpha on the 1024 marketing icon)
+
+--------------------------------------------------------------------------------
+Screenshots (required sizes — put real captures in images/screenshots/ios/)
+--------------------------------------------------------------------------------
+iPhone 6.7" (required): 1290×2796  — promo frames: images/promotional/*-ios-6.7.png
+iPhone 6.5" (if needed): 1284×2778
+iPad 12.9" (if iPad supported): 2048×2732 — promo: images/promotional/*-ipad-12.9.png
+
+Min 3 screenshots recommended; max 10 per device size.
+Replace promotional placeholder frames with real UI before final review.
+
+--------------------------------------------------------------------------------
+What’s New (v1.0)
+--------------------------------------------------------------------------------
+Welcome to Marvira — city adventure, on foot.
+Discover nearby scavenger hunts, walk to real places, unlock with GPS, answer challenges, climb leaderboards, and create hunts of your own.
+
+--------------------------------------------------------------------------------
+App Review Information — see content/review-notes.txt
+--------------------------------------------------------------------------------
+Export compliance: ITSAppUsesNonExemptEncryption = false (standard HTTPS only)
+Content rights: you own / have rights to listing assets and in-app media
+Advertising Identifier: No (v1.0 — no ads / ATT)

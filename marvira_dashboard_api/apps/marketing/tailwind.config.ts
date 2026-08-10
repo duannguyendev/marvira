@@ -14,8 +14,8 @@ const config: Config = {
         trail: 'var(--trail)',
       },
       fontFamily: {
-        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
-        body: ['var(--font-body)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-brand)', 'system-ui', 'sans-serif'],
+        body: ['var(--font-brand)', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         'fade-up': {

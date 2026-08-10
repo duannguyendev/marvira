@@ -46,8 +46,14 @@ export default async function PressPage({
         <p className="mt-10 text-sm text-ink/55">
           Media & partnerships: {SITE.supportEmail}
         </p>
-        <p className="mt-3 max-w-2xl text-xs text-ink/45">
-          {content.press.pdfBrief}
+        <p className="mt-6">
+          <a
+            href="/press/marvira-one-pager.pdf"
+            download
+            className="inline-flex items-center font-medium text-forest underline decoration-sun/60 underline-offset-4 transition hover:text-canopy"
+          >
+            {content.press.downloadPdf}
+          </a>
         </p>
       </section>
     </PageShell>
