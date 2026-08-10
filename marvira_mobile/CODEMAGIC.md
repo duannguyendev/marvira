@@ -14,11 +14,13 @@ If required values are missing, the **build fails**.
 | Variable | Debug (local Metro) | Release (store / Codemagic) |
 |----------|---------------------|-----------------------------|
 | `MAPBOX_ACCESS_TOKEN` | Required (JS → Mapbox SDK) | Required |
-| `API_BASE_URL` | Not used (`__DEV__` → localhost) | Required |
-| `MARKETING_SITE_URL` | Not used (`__DEV__` → localhost:3002) | Required |
+| `API_BASE_URL` | Not used (`__DEV__` → localhost) | **Required:** `https://api.marvira.com` |
+| `MARKETING_SITE_URL` | Not used (`__DEV__` → localhost:3002) | **Required:** `https://www.marvira.com` |
 | `GOOGLE_WEB_CLIENT_ID` | Optional until social login | Required for Google Sign-In |
 | `FACEBOOK_APP_ID` | Optional until social login | Required for Facebook Login |
 | `FACEBOOK_CLIENT_TOKEN` | Optional until social login | Required for Facebook Login |
+
+Do **not** use Railway `*.up.railway.app` URLs in release builds once custom domains are live.
 
 Apple Sign-In: enable capability on App ID `com.marvira`; set API `APPLE_CLIENT_ID`. Replace iOS Info.plist placeholders `GOOGLE_REVERSED_CLIENT_ID` / `fbFACEBOOK_APP_ID` / Facebook keys when credentials arrive (see `release_credentials.txt`).
 
@@ -36,6 +38,7 @@ Also replace Android `strings.xml` Facebook placeholders before testing Facebook
 cd marvira_mobile
 cp .env.example .env.local
 # set MAPBOX_ACCESS_TOKEN=pk....
+# release/local-prod smoke: API_BASE_URL + MARKETING_SITE_URL already point at marvira.com in .env.example
 
 yarn android
 # or
@@ -45,8 +48,17 @@ yarn ios
 ## Codemagic setup
 
 1. Use root `codemagic.yaml` (committed at repo root).
-2. Env group **`marvira_mobile_secrets`** with all Required variables above, plus:
-   - `GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS` — full Play Console API JSON key
+2. Env group **`marvira_mobile_secrets`** — set (or update) at least:
+
+   | Name | Value |
+   |------|--------|
+   | `API_BASE_URL` | `https://api.marvira.com` |
+   | `MARKETING_SITE_URL` | `https://www.marvira.com` |
+   | `MAPBOX_ACCESS_TOKEN` | (your token) |
+   | `GOOGLE_WEB_CLIENT_ID` | (Web OAuth client) |
+   | `FACEBOOK_APP_ID` / `FACEBOOK_CLIENT_TOKEN` | (Meta) |
+   | `GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS` | full Play Console API JSON key |
+
 3. Code signing identities:
    - Android keystore reference: **`marvira_android`**
    - App Store Connect integration: **`marvira_asc`**

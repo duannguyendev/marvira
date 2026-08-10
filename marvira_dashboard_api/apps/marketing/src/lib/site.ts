@@ -1,9 +1,9 @@
 export const SITE = {
   name: 'Marvira',
   tagline: 'City adventure, on foot.',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.marvira.example.com',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.marvira.com',
   supportEmail:
-    process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'hello@marvira.example.com',
+    process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@marvira.com',
   appStoreUrl: process.env.NEXT_PUBLIC_APP_STORE_URL || '',
   playStoreUrl: process.env.NEXT_PUBLIC_PLAY_STORE_URL || '',
   deepLinkScheme: 'marvira',

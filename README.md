@@ -38,8 +38,8 @@ NEXT_PUBLIC_API_ENV=local
 # NEXT_PUBLIC_API_ENV=uat
 
 NEXT_PUBLIC_API_URL_LOCAL=http://localhost:3001
-NEXT_PUBLIC_API_URL_UAT=https://your-uat-api.up.railway.app
-NEXT_PUBLIC_API_URL=https://marvira-production.up.railway.app
+NEXT_PUBLIC_API_URL_UAT=https://api-uat.marvira.com
+NEXT_PUBLIC_API_URL=https://api.marvira.com
 ```
 
 Or code flag: `packages/shared-utils/src/public-api-url.ts` → `MANUAL_PUBLIC_API_ENV = 'uat'`

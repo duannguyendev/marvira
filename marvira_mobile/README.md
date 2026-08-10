@@ -65,8 +65,9 @@ A production-ready React Native application for location-based gaming with event
 
    API_BASE_URL_LOCAL=http://10.0.2.2:3001
    # Real device: http://YOUR_LAN_IP:3001
-   API_BASE_URL_UAT=https://your-uat-api.up.railway.app
-   API_BASE_URL=https://marvira-production.up.railway.app
+   API_BASE_URL_UAT=https://api-uat.marvira.com
+   API_BASE_URL=https://api.marvira.com
+   MARKETING_SITE_URL=https://www.marvira.com
    ```
 
    Or flip the code flag in `src/config/apiEnvironment.ts`:

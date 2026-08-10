@@ -4,8 +4,8 @@
 # 1. Connect this repo → Applications → check for this yaml
 # 2. Env group `marvira_mobile_secrets` (Secure) with:
 #      MAPBOX_ACCESS_TOKEN       (Mapbox public token — Maps on Android + iOS)
-#      API_BASE_URL              (e.g. https://api.marvira.com or Railway URL)
-#      MARKETING_SITE_URL        (e.g. https://www.marvira.com)
+#      API_BASE_URL=https://api.marvira.com
+#      MARKETING_SITE_URL=https://www.marvira.com
 #      GOOGLE_WEB_CLIENT_ID      (Web OAuth client — Google Sign-In)
 #      FACEBOOK_APP_ID
 #      FACEBOOK_CLIENT_TOKEN

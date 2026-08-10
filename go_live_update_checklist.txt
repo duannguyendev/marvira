@@ -118,13 +118,17 @@ mostly deploy, store, Firebase, invite web page, and launch-city content.
 ================================================================================
 
 [P0] Codemagic / release ENV (see marvira_mobile/CODEMAGIC.md)
-  - Env group marvira_mobile_secrets:
+  - Env group marvira_mobile_secrets — set/update:
       MAPBOX_ACCESS_TOKEN
-      API_BASE_URL=https://api.yourdomain.com
-      MARKETING_SITE_URL=https://www.yourdomain.com
+      API_BASE_URL=https://api.marvira.com
+      MARKETING_SITE_URL=https://www.marvira.com
+  - Do not leave Railway *.up.railway.app URLs in release ENV
   - Local release: same names in marvira_mobile/.env.local (from .env.example)
   - Do NOT hardcode URLs in constants.ts — release builds fail if ENV missing
   - Dashboard: set NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+  - Dashboard web: NEXT_PUBLIC_API_URL=https://api.marvira.com
+  - Marketing web: NEXT_PUBLIC_SITE_URL=https://www.marvira.com
+                 NEXT_PUBLIC_API_URL=https://api.marvira.com
 
 [P0] Replace Firebase placeholder configs
   - android/app/google-services.json  (project_id still marvira-replace-me)
