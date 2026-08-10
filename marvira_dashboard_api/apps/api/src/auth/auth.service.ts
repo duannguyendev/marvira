@@ -112,7 +112,8 @@ export class AuthService {
       'http://localhost:3002/reset-password',
     );
     const resetUrl = `${resetBaseUrl}?token=${rawToken}`;
-    await this.emailService.sendPasswordResetEmail(
+    // Send in the background so a slow/unreachable SMTP never times out mobile clients.
+    void this.emailService.sendPasswordResetEmail(
       user.email,
       resetUrl,
       user.name,

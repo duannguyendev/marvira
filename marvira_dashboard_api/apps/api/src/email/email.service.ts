@@ -30,6 +30,10 @@ export class EmailService {
           user: this.config.get('SMTP_USER'),
           pass: this.config.get('SMTP_PASS'),
         },
+        // Prevent hung SMTP from blocking API requests (mobile shows "Network error").
+        connectionTimeout: 10_000,
+        greetingTimeout: 10_000,
+        socketTimeout: 15_000,
       });
     }
   }
@@ -114,7 +118,15 @@ export class EmailService {
       return;
     }
 
-    await this.transporter.sendMail({ from, to, subject, text, html });
+    try {
+      await this.transporter.sendMail({ from, to, subject, text, html });
+    } catch (error) {
+      this.logger.error(
+        `Failed to send password reset email to ${to}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+      // Do not rethrow — caller must still return the generic success response.
+    }
   }
 
   /**

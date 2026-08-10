@@ -314,31 +314,6 @@ export const EventDetailsScreen: React.FC = () => {
             <>
               <Text style={styles.hint}>{t('events.visitHint')}</Text>
 
-              <View style={styles.leaderboardSection}>
-                {event.status === 'completed' ? (
-                  <Button
-                    title={
-                      event.hasGift
-                        ? t('events.viewYourGift')
-                        : t('events.viewCompletion')
-                    }
-                    onPress={() =>
-                      navigation.navigate('EventCompletion', { eventId })
-                    }
-                    fullWidth
-                    style={styles.detailButton}
-                  />
-                ) : null}
-                <Button
-                  title={t('events.viewLeaderboard')}
-                  onPress={() =>
-                    navigation.navigate('EventLeaderboard', { eventId })
-                  }
-                  variant="outline"
-                  fullWidth
-                />
-              </View>
-
               <View style={styles.placesSection}>
                 <Text style={styles.sectionTitle}>
                   {t('events.placesCount', { count: event.places.length })}
@@ -351,6 +326,35 @@ export const EventDetailsScreen: React.FC = () => {
                     onPress={() => handlePlacePress(place.id)}
                   />
                 ))}
+              </View>
+
+              <View style={styles.footerActions}>
+                {event.status === 'completed' ? (
+                  <Button
+                    title={
+                      event.hasGift
+                        ? t('events.viewYourGift')
+                        : t('events.viewCompletion')
+                    }
+                    onPress={() =>
+                      navigation.navigate('EventCompletion', { eventId })
+                    }
+                    fullWidth
+                    style={styles.completionButton}
+                  />
+                ) : null}
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('EventLeaderboard', { eventId })
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={t('events.viewLeaderboard')}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  style={styles.leaderboardLink}>
+                  <Text style={styles.leaderboardLinkText}>
+                    {t('events.viewLeaderboard')}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </>
           )}
@@ -514,15 +518,26 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     lineHeight: 20,
   },
-  leaderboardSection: {
-    marginBottom: spacing.lg,
-    gap: spacing.sm,
-  },
-  detailButton: {
-    marginBottom: spacing.sm,
-  },
   placesSection: {
-    marginTop: spacing.md,
+    marginTop: spacing.xs,
+  },
+  footerActions: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.md,
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  completionButton: {
+    alignSelf: 'stretch',
+  },
+  leaderboardLink: {
+    paddingVertical: spacing.xs,
+  },
+  leaderboardLinkText: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.medium,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
   },
   sectionTitle: {
     fontSize: fontSize.lg,

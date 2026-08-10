@@ -16,11 +16,6 @@ import { ProfileStackParamList } from './types';
 import { primaryStackScreenOptions } from './stackOptions';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
-/**
- * Profile home draws its own edge-to-edge gradient under the status bar,
- * so it must not inherit a top (or horizontal) SafeArea inset that clips it.
- */
-const ProfileScreenSafe = withScreenSafeArea(ProfileScreen, []);
 /** Headered screens: only horizontal safe area (header owns the top inset). */
 const headeredEdges = ['left', 'right'] as const;
 const SettingsScreenSafe = withScreenSafeArea(SettingsScreen, [...headeredEdges]);
@@ -50,7 +45,7 @@ export const ProfileNavigator: React.FC = () => {
       }}>
       <Stack.Screen
         name="ProfileMain"
-        component={ProfileScreenSafe}
+        component={ProfileScreen}
         options={{
           headerShown: false,
           title: t('nav.profile'),

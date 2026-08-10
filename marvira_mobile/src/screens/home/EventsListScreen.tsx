@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -35,7 +35,7 @@ type EventsListScreenNavigationProp = NativeStackNavigationProp<
 export const EventsListScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<EventsListScreenNavigationProp>();
-  const { location, hasPermission, requestPermission } = useLocation();
+  const { location } = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [radius, setRadius] = useState(5000);
@@ -52,12 +52,6 @@ export const EventsListScreen: React.FC = () => {
     filters,
     location || undefined,
   );
-
-  useEffect(() => {
-    if (!hasPermission) {
-      requestPermission();
-    }
-  }, [hasPermission, requestPermission]);
 
   const handleRefresh = async () => {
     setRefreshing(true);

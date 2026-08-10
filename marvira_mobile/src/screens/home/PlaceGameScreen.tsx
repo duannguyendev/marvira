@@ -75,7 +75,11 @@ export const PlaceGameScreen: React.FC = () => {
     isLoading: eventLoading,
     refetch: refetchEvent,
   } = useEventDetails(eventId);
-  const { location, error: locationError } = useLocation();
+  const {
+    location,
+    error: locationError,
+    requestPermission,
+  } = useLocation();
   const submitAnswerMutation = useSubmitAnswer();
   const unlockPlaceMutation = useUnlockPlace();
 
@@ -415,9 +419,20 @@ export const PlaceGameScreen: React.FC = () => {
           {locationError ? (
             <View style={styles.warningBox}>
               <Text style={styles.warningText}>
-                {(locationError as Error)?.message ||
-                  t('game.locationUnavailable')}
+                {(locationError as Error)?.message ===
+                'Location permission denied'
+                  ? t('game.locationPermissionDenied')
+                  : (locationError as Error)?.message ||
+                    t('game.locationUnavailable')}
               </Text>
+              <Button
+                title={t('game.enableGps')}
+                onPress={() => {
+                  void requestPermission();
+                }}
+                variant="outline"
+                style={styles.unlockButton}
+              />
             </View>
           ) : null}
 

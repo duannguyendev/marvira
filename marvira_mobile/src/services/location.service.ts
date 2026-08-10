@@ -1,44 +1,41 @@
 import Geolocation from 'react-native-geolocation-service';
 import { Platform, PermissionsAndroid } from 'react-native';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { Location } from '../types';
 import { LOCATION_UPDATE_INTERVAL } from '../utils/constants';
 
 type LocationCallback = (location: Location) => void;
 type ErrorCallback = (error: any) => void;
 
+const ANDROID_FINE = PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION;
+const ANDROID_COARSE = PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION;
+
 class LocationService {
   private watchId: number | null = null;
+  private watchRefCount = 0;
   private listeners: Set<LocationCallback> = new Set();
   private errorListeners: Set<ErrorCallback> = new Set();
   private currentLocation: Location | null = null;
 
   /**
-   * Request location permissions
+   * Request location permissions.
+   * iOS: use Geolocation.requestAuthorization (same native path as getCurrentPosition).
+   * Android: request fine + coarse; either grant is enough to read location.
    */
   async requestPermission(): Promise<boolean> {
     try {
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: 'Location Permission',
-            message: 'Marvira needs access to your location to play events.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      } else {
-        const permission =
-          Platform.OS === 'ios'
-            ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-            : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
-
-        const result = await request(permission);
-        return result === RESULTS.GRANTED;
+      if (Platform.OS === 'ios') {
+        const status = await Geolocation.requestAuthorization('whenInUse');
+        return status === 'granted';
       }
+
+      const results = await PermissionsAndroid.requestMultiple([
+        ANDROID_FINE,
+        ANDROID_COARSE,
+      ]);
+      return (
+        results[ANDROID_FINE] === PermissionsAndroid.RESULTS.GRANTED ||
+        results[ANDROID_COARSE] === PermissionsAndroid.RESULTS.GRANTED
+      );
     } catch (error) {
       console.error('Error requesting location permission:', error);
       return false;
@@ -50,20 +47,15 @@ class LocationService {
    */
   async checkPermission(): Promise<boolean> {
     try {
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        );
-        return granted;
-      } else {
-        const permission =
-          Platform.OS === 'ios'
-            ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-            : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
-
-        const result = await check(permission);
-        return result === RESULTS.GRANTED;
+      if (Platform.OS === 'ios') {
+        // requestAuthorization returns current status without re-prompting when already decided
+        const status = await Geolocation.requestAuthorization('whenInUse');
+        return status === 'granted';
       }
+
+      const fine = await PermissionsAndroid.check(ANDROID_FINE);
+      const coarse = await PermissionsAndroid.check(ANDROID_COARSE);
+      return fine || coarse;
     } catch (error) {
       console.error('Error checking location permission:', error);
       return false;
@@ -93,17 +85,19 @@ class LocationService {
           enableHighAccuracy: true,
           timeout: 15000,
           maximumAge: 10000,
+          forceRequestLocation: true,
+          showLocationDialog: true,
         },
       );
     });
   }
 
   /**
-   * Start watching location updates
+   * Start watching location updates (internal; prefer acquireWatch)
    */
-  startWatching(): void {
+  private startWatching(): void {
     if (this.watchId !== null) {
-      return; // Already watching
+      return;
     }
 
     this.watchId = Geolocation.watchPosition(
@@ -122,20 +116,36 @@ class LocationService {
       },
       {
         enableHighAccuracy: true,
-        distanceFilter: 10, // Update every 10 meters
+        distanceFilter: 10,
         interval: LOCATION_UPDATE_INTERVAL,
         fastestInterval: LOCATION_UPDATE_INTERVAL,
+        forceRequestLocation: true,
+        showLocationDialog: true,
       },
     );
   }
 
-  /**
-   * Stop watching location updates
-   */
-  stopWatching(): void {
+  private stopWatching(): void {
     if (this.watchId !== null) {
       Geolocation.clearWatch(this.watchId);
       this.watchId = null;
+    }
+  }
+
+  /**
+   * Ref-counted watch so one screen unmount does not stop GPS for others.
+   */
+  acquireWatch(): void {
+    this.watchRefCount += 1;
+    if (this.watchRefCount === 1) {
+      this.startWatching();
+    }
+  }
+
+  releaseWatch(): void {
+    this.watchRefCount = Math.max(0, this.watchRefCount - 1);
+    if (this.watchRefCount === 0) {
+      this.stopWatching();
     }
   }
 
@@ -144,11 +154,9 @@ class LocationService {
    */
   subscribe(callback: LocationCallback): () => void {
     this.listeners.add(callback);
-    // Immediately notify with current location if available
     if (this.currentLocation) {
       callback(this.currentLocation);
     }
-    // Return unsubscribe function
     return () => {
       this.listeners.delete(callback);
     };

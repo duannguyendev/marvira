@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   StatusBar,
+  useWindowDimensions,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
@@ -46,6 +47,7 @@ export const ProfileScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
   const { user, logout, isLoggingOut } = useAuth();
   const { data: completedData, isLoading: eventsLoading } =
     useCompletedEvents();
@@ -83,7 +85,11 @@ export const ProfileScreen: React.FC = () => {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      contentInsetAdjustmentBehavior="never"
+      showsVerticalScrollIndicator={false}>
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
@@ -94,26 +100,25 @@ export const ProfileScreen: React.FC = () => {
         style={[
           styles.header,
           {
+            width: windowWidth,
             paddingTop: insets.top + spacing.xl,
-            paddingLeft: spacing.lg + insets.left,
-            paddingRight: spacing.lg + insets.right,
+            paddingHorizontal: spacing.lg,
           },
         ]}>
-        <View style={styles.profileContainer}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {user?.name?.charAt(0).toUpperCase() || 'U'}
-            </Text>
-          </View>
-          <Text style={styles.name}>{user?.name || t('common.user')}</Text>
-          <Text style={styles.email}>{user?.email || ''}</Text>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>
+            {user?.name?.charAt(0).toUpperCase() || 'U'}
+          </Text>
         </View>
+        <Text style={styles.name}>{user?.name || t('common.user')}</Text>
+        <Text style={styles.email}>{user?.email || ''}</Text>
       </LinearGradient>
 
       <View
         style={[
           styles.content,
           {
+            width: windowWidth,
             paddingLeft: spacing.md + insets.left,
             paddingRight: spacing.md + insets.right,
           },
@@ -233,15 +238,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.backgroundLight,
   },
-  header: {
-    alignSelf: 'stretch',
-    width: '100%',
-    paddingBottom: spacing.xl,
+  scrollContent: {
+    alignItems: 'stretch',
   },
-  profileContainer: {
+  header: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
+    paddingBottom: spacing.xl,
   },
   avatar: {
     width: 100,
