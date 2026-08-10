@@ -36,8 +36,9 @@ import {
   type PaginatedResponse,
 } from '@marvira/shared-types';
 
-const MARKETING_URL =
-  process.env.NEXT_PUBLIC_MARKETING_URL || 'http://localhost:3002';
+const MARKETING_URL = (
+  process.env.NEXT_PUBLIC_MARKETING_URL || 'http://localhost:3002'
+).replace(/\/$/, '');
 
 export default function ArticlesPage() {
   const queryClient = useQueryClient();

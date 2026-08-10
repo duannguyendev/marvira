@@ -10,8 +10,13 @@ COPY packages ./packages
 # Railway passes service vars into Docker only when declared as ARG (same name)
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_MARKETING_URL
+ENV NEXT_PUBLIC_MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL
+ARG NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+ENV NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=$NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 RUN test -n "$NEXT_PUBLIC_API_URL" || (echo "NEXT_PUBLIC_API_URL must be set on the Railway dashboard service (no quotes)" && exit 1)
-RUN echo "Building dashboard with NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL"
+RUN test -n "$NEXT_PUBLIC_MARKETING_URL" || (echo "NEXT_PUBLIC_MARKETING_URL must be set on the Railway dashboard service (e.g. https://www.marvira.com)" && exit 1)
+RUN echo "Building dashboard with NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL MARKETING_URL=$NEXT_PUBLIC_MARKETING_URL"
 RUN pnpm install --frozen-lockfile --filter @marvira/dashboard...
 RUN pnpm --filter @marvira/shared-types build
 RUN pnpm --filter @marvira/shared-utils build
