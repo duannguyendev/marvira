@@ -269,7 +269,9 @@ Website (Track A) already live.
 
 [ ] Inject Google / Apple / Facebook secrets into API + Codemagic / mobile
 [ ] Deploy/restart API with OAuth env; smoke social token verify on staging
-[ ] SMTP + PASSWORD_RESET_URL for email users
+[ ] SMTP + PASSWORD_RESET_URL=https://www.marvira.com/reset-password (Railway ENV)
+[x] CODE: branded HTML email templates in EmailService
+[x] CODE: change-password API + mobile Settings LOCAL vs SSO
 [ ] Lock down /metrics + Swagger; restrict Maps API key
 [ ] DB backups + PITR
 [ ] Rotate seed passwords if used on prod

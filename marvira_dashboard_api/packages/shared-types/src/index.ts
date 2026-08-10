@@ -40,6 +40,8 @@ export interface User {
   name: string;
   avatar: string | null;
   provider: AuthProvider;
+  /** Present on auth API responses — true when email/password login is enabled. */
+  hasPassword?: boolean;
   role: UserRole;
   createdAt: string;
   updatedAt: string;

@@ -6,6 +6,8 @@ import { MyEventsScreen } from '../screens/profile/MyEventsScreen';
 import { MyQuestionsScreen } from '../screens/profile/MyQuestionsScreen';
 import { AddQuestionScreen } from '../screens/practice/AddQuestionScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
+import { ChangePasswordScreen } from '../screens/settings/ChangePasswordScreen';
+import { SetPasswordScreen } from '../screens/settings/SetPasswordScreen';
 import { FeedbackScreen } from '../screens/settings/FeedbackScreen';
 import { NotificationListScreen } from '../screens/notifications/NotificationListScreen';
 import { NotificationDetailScreen } from '../screens/notifications/NotificationDetailScreen';
@@ -23,6 +25,12 @@ const ProfileScreenSafe = withScreenSafeArea(ProfileScreen, [
 /** Headered screens: only horizontal safe area (header owns the top inset). */
 const headeredEdges = ['left', 'right'] as const;
 const SettingsScreenSafe = withScreenSafeArea(SettingsScreen, [...headeredEdges]);
+const ChangePasswordScreenSafe = withScreenSafeArea(ChangePasswordScreen, [
+  ...headeredEdges,
+]);
+const SetPasswordScreenSafe = withScreenSafeArea(SetPasswordScreen, [
+  ...headeredEdges,
+]);
 const FeedbackScreenSafe = withScreenSafeArea(FeedbackScreen, [...headeredEdges]);
 const NotificationListScreenSafe = withScreenSafeArea(NotificationListScreen, [
   ...headeredEdges,
@@ -46,6 +54,16 @@ export const ProfileNavigator: React.FC = () => {
         name="Settings"
         component={SettingsScreenSafe}
         options={{ title: t('nav.settings') }}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreenSafe}
+        options={{ title: t('settings.changePassword') }}
+      />
+      <Stack.Screen
+        name="SetPassword"
+        component={SetPasswordScreenSafe}
+        options={{ title: t('settings.setPassword') }}
       />
       <Stack.Screen
         name="Feedback"

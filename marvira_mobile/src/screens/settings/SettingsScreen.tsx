@@ -11,12 +11,14 @@ import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SUPPORTED_LANGUAGES, LanguageCode, setAppLanguage } from '../../i18n';
+import { useAuth } from '../../hooks/useAuth';
 import { useShowAllLanguages } from '../../hooks/useContentLanguage';
 import {
   useNotificationPreferences,
   useUpdateNotificationPreferences,
 } from '../../hooks/useNotifications';
 import { ProfileStackParamList } from '../../navigation/types';
+import { AuthProvider } from '../../types';
 import {
   colors,
   spacing,
@@ -30,13 +32,33 @@ type SettingsNavigationProp = NativeStackNavigationProp<
   'Settings'
 >;
 
+function providerLabelKey(provider: AuthProvider): string {
+  switch (provider) {
+    case 'GOOGLE':
+      return 'settings.signedInWithGoogle';
+    case 'APPLE':
+      return 'settings.signedInWithApple';
+    case 'FACEBOOK':
+      return 'settings.signedInWithFacebook';
+    default:
+      return 'settings.signedInWithEmail';
+  }
+}
+
 export const SettingsScreen: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigation = useNavigation<SettingsNavigationProp>();
+  const { user } = useAuth();
   const currentLanguage = i18n.language as LanguageCode;
   const { showAllLanguages, setShowAllLanguages } = useShowAllLanguages();
   const { data: prefs } = useNotificationPreferences();
   const updatePrefs = useUpdateNotificationPreferences();
+
+  const isSocialProvider =
+    !!user?.provider && user.provider !== 'LOCAL';
+  const hasPassword =
+    user?.hasPassword === true ||
+    (!isSocialProvider && user?.hasPassword !== false);
 
   const handleSelectLanguage = async (code: LanguageCode) => {
     if (code !== currentLanguage) {
@@ -46,6 +68,39 @@ export const SettingsScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
+        {isSocialProvider && user?.provider ? (
+          <View style={styles.infoCard}>
+            <Text style={styles.infoLabel}>
+              {t(providerLabelKey(user.provider))}
+            </Text>
+            <Text style={styles.infoHint}>
+              {hasPassword
+                ? t('settings.ssoWithPasswordHint')
+                : t('settings.ssoPasswordHint')}
+            </Text>
+          </View>
+        ) : null}
+        {hasPassword ? (
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('ChangePassword')}
+            activeOpacity={0.7}>
+            <Text style={styles.menuLabel}>{t('settings.changePassword')}</Text>
+            <Text style={styles.menuChevron}>›</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('SetPassword')}
+            activeOpacity={0.7}>
+            <Text style={styles.menuLabel}>{t('settings.setPassword')}</Text>
+            <Text style={styles.menuChevron}>›</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       <View style={styles.section}>
         <TouchableOpacity
           style={styles.menuItem}
@@ -210,6 +265,24 @@ const styles = StyleSheet.create({
   },
   menuChevron: {
     fontSize: fontSize.xl,
+    color: colors.textSecondary,
+  },
+  infoCard: {
+    backgroundColor: colors.background,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
+    borderColor: colors.border,
+    marginBottom: spacing.sm,
+  },
+  infoLabel: {
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.medium,
+    color: colors.textDark,
+    marginBottom: spacing.xs,
+  },
+  infoHint: {
+    fontSize: fontSize.sm,
     color: colors.textSecondary,
   },
   languageOption: {

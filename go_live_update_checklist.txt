@@ -1,7 +1,7 @@
 ================================================================================
 MARVIRA — GO-LIVE CHECKLIST (NEXT STEPS ONLY)
 ================================================================================
-Updated: 2026-07-24
+Updated: 2026-08-10
 Reference: growth_plan.txt | monetization_todo.txt | requirement_all.txt §24
            marvira_dashboard_api/docs/deployment.md
            marvira_dashboard_api/docs/backup-restore.md
@@ -97,7 +97,21 @@ mostly deploy, store, Firebase, invite web page, and launch-city content.
   - Shared Redis (required — memory fallback banned in prod)
   - S3 bucket + CDN_URL for image uploads
   - SMTP + real PASSWORD_RESET_URL if email reset is required at launch
+    PASSWORD_RESET_URL=https://www.marvira.com/reset-password
+    (marketing /reset-password + /forgot-password; not dashboard host)
   - Real support email (replace hello@marvira.example.com placeholders)
+
+================================================================================
+1b. CODE — AUTH / EMAIL (must implement in API; not ENV-only)
+================================================================================
+
+[x] Branded HTML email templates (EmailService)
+  - Shared system-mail layout + CTA for password-reset (reuse wrapSystemMail
+    for welcome / invite / password-changed later)
+
+[x] Change password (LOCAL accounts) + Settings UI LOCAL vs SSO
+  - API POST /auth/change-password; mobile Settings shows Change password
+    for LOCAL and SSO provider hint for Google/Apple/Facebook
 
 ================================================================================
 2. MOBILE RELEASE CONFIG

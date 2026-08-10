@@ -12,6 +12,8 @@ export const mockUser: User = {
   id: '1',
   email: 'user@example.com',
   name: 'John Doe',
+  provider: 'LOCAL',
+  hasPassword: true,
   createdAt: new Date().toISOString(),
 };
 

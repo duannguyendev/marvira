@@ -8,6 +8,8 @@ export interface ApiUser {
   name: string;
   avatar: string | null;
   role: string;
+  provider?: string;
+  hasPassword?: boolean;
   createdAt: string;
 }
 

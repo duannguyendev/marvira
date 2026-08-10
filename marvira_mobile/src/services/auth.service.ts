@@ -114,9 +114,27 @@ class AuthService {
   }
 
   /**
-   * Get current user
+   * Get current user — prefer /auth/me so fields like provider stay fresh
    */
   async getCurrentUser(): Promise<User | null> {
+    const token = await storage.getToken();
+    if (!token) {
+      this.currentUser = null;
+      return null;
+    }
+
+    try {
+      const response = await authApi.getCurrentUser();
+      if (response.success && response.data) {
+        await storage.setUser(response.data);
+        this.currentUser = response.data;
+        await analytics.setUserId(response.data.id);
+        return response.data;
+      }
+    } catch {
+      // Offline / transient — fall back to cached user
+    }
+
     if (this.currentUser) {
       return this.currentUser;
     }
@@ -126,6 +144,14 @@ class AuthService {
       await analytics.setUserId(user.id);
     }
     return user;
+  }
+
+  /**
+   * Update cached user after profile/password changes (stay signed in)
+   */
+  async applyUserUpdate(user: User): Promise<void> {
+    await storage.setUser(user);
+    this.currentUser = user;
   }
 
   /**

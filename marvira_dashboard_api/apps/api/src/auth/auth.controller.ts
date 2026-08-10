@@ -17,6 +17,8 @@ import {
   RegisterDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  ChangePasswordDto,
+  SetPasswordDto,
   RefreshTokenDto,
   GoogleAuthDto,
   FacebookAuthDto,
@@ -136,5 +138,52 @@ export class AuthController {
   async me(@Req() req: Request & { user: RequestUser }) {
     const user = await this.authService.getMe(req.user.id);
     return { success: true, data: user };
+  }
+
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Throttle({ short: { limit: 5, ttl: 60000 } })
+  @ApiOperation({
+    summary:
+      'Change password for accounts that already have a Marvira password',
+  })
+  async changePassword(
+    @Req() req: Request & { user: RequestUser },
+    @Body() dto: ChangePasswordDto,
+  ) {
+    await this.authService.changePassword(
+      req.user.id,
+      dto.currentPassword,
+      dto.newPassword,
+    );
+    return {
+      success: true,
+      data: null,
+      message: 'Password updated successfully. Please sign in again.',
+    };
+  }
+
+  @Post('set-password')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Throttle({ short: { limit: 5, ttl: 60000 } })
+  @ApiOperation({
+    summary:
+      'Set a Marvira password for SSO accounts (enables email/password login)',
+  })
+  async setPassword(
+    @Req() req: Request & { user: RequestUser },
+    @Body() dto: SetPasswordDto,
+  ) {
+    const user = await this.authService.setPassword(req.user.id, dto.password);
+    return {
+      success: true,
+      data: user,
+      message:
+        'Password set. You can now sign in with email/password or social login.',
+    };
   }
 }

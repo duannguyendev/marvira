@@ -1,9 +1,14 @@
 // User Types
+export type AuthProvider = 'LOCAL' | 'GOOGLE' | 'APPLE' | 'FACEBOOK';
+
 export interface User {
   id: string;
   email: string;
   name: string;
   avatar?: string | null;
+  provider?: AuthProvider;
+  /** True when the account has a Marvira password (email/password login enabled). */
+  hasPassword?: boolean;
   createdAt: string;
 }
 

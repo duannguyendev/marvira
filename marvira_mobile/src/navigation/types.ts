@@ -8,6 +8,8 @@ export type AuthStackParamList = {
 export type ProfileStackParamList = {
   ProfileMain: undefined;
   Settings: undefined;
+  ChangePassword: undefined;
+  SetPassword: undefined;
   Feedback: undefined;
   Notifications: undefined;
   NotificationDetail: { notificationId: string };

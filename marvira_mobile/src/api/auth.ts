@@ -1,5 +1,6 @@
 import {
   AuthResponse,
+  AuthProvider,
   LoginCredentials,
   RegisterCredentials,
   ApiResponse,
@@ -11,12 +12,26 @@ import { apiClient } from './client';
 import { ApiLoginData, ApiUser } from '../types/api';
 import { storage } from '../utils/storage';
 
+function mapProvider(value?: string): AuthProvider | undefined {
+  if (
+    value === 'LOCAL' ||
+    value === 'GOOGLE' ||
+    value === 'APPLE' ||
+    value === 'FACEBOOK'
+  ) {
+    return value;
+  }
+  return undefined;
+}
+
 function mapApiUser(user: ApiUser): User {
   return {
     id: user.id,
     email: user.email,
     name: user.name,
     avatar: user.avatar,
+    provider: mapProvider(user.provider),
+    hasPassword: user.hasPassword,
     createdAt: user.createdAt,
   };
 }
@@ -137,6 +152,32 @@ export const authApi = {
       return;
     }
     await apiClient.post('/auth/reset-password', { token, password });
+  },
+
+  changePassword: async (
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> => {
+    if (USE_MOCK_DATA) {
+      await delay(500);
+      return;
+    }
+    await apiClient.post('/auth/change-password', {
+      currentPassword,
+      newPassword,
+    });
+  },
+
+  setPassword: async (password: string): Promise<User> => {
+    if (USE_MOCK_DATA) {
+      await delay(500);
+      return { ...mockUser, hasPassword: true };
+    }
+    const response = await apiClient.post<{
+      success: boolean;
+      data: ApiUser;
+    }>('/auth/set-password', { password });
+    return mapApiUser(response.data.data);
   },
 
   loginWithGoogle: async (

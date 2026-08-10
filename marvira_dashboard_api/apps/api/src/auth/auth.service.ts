@@ -21,7 +21,9 @@ export interface TokenPair {
   refreshToken: string;
 }
 
-export type PublicUser = Omit<User, 'passwordHash'>;
+export type PublicUser = Omit<User, 'passwordHash'> & {
+  hasPassword: boolean;
+};
 
 @Injectable()
 export class AuthService {
@@ -62,7 +64,7 @@ export class AuthService {
     });
 
     const tokens = await this.generateTokens(user);
-    return { user: this.stripPassword(user), tokens };
+    return { user: this.toPublicUser(user), tokens };
   }
 
   async login(
@@ -80,12 +82,13 @@ export class AuthService {
     }
 
     const tokens = await this.generateTokens(user);
-    return { user: this.stripPassword(user), tokens };
+    return { user: this.toPublicUser(user), tokens };
   }
 
   async forgotPassword(email: string): Promise<{ devResetToken?: string }> {
     const user = await this.prisma.client.user.findUnique({ where: { email } });
-    if (!user || !user.isActive || user.provider !== AuthProvider.LOCAL) {
+    // Any active account can set/reset a Marvira password (SSO-first included).
+    if (!user || !user.isActive) {
       return {};
     }
 
@@ -106,13 +109,14 @@ export class AuthService {
 
     const resetBaseUrl = this.config.get(
       'PASSWORD_RESET_URL',
-      'http://localhost:3000/reset-password',
+      'http://localhost:3002/reset-password',
     );
     const resetUrl = `${resetBaseUrl}?token=${rawToken}`;
     await this.emailService.sendPasswordResetEmail(
       user.email,
       resetUrl,
       user.name,
+      { isFirstPassword: !user.passwordHash },
     );
 
     const smtpConfigured = !!this.config.get<string>('SMTP_HOST');
@@ -138,10 +142,7 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired reset token');
     }
 
-    if (
-      !resetRecord.user.isActive ||
-      resetRecord.user.provider !== AuthProvider.LOCAL
-    ) {
+    if (!resetRecord.user.isActive) {
       throw new BadRequestException('Invalid or expired reset token');
     }
 
@@ -158,6 +159,76 @@ export class AuthService {
       }),
       this.prisma.client.session.deleteMany({
         where: { userId: resetRecord.userId },
+      }),
+    ]);
+  }
+
+  async setPassword(userId: string, password: string): Promise<PublicUser> {
+    const user = await this.prisma.client.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    if (user.passwordHash) {
+      throw new BadRequestException(
+        'Password already set. Use change password instead.',
+      );
+    }
+
+    const passwordHash = await this.hashPassword(password);
+    const updated = await this.prisma.client.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    return this.toPublicUser(updated);
+  }
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.prisma.client.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    if (!user.passwordHash) {
+      throw new BadRequestException(
+        'No password set yet. Use set password or the email reset link first.',
+      );
+    }
+
+    const valid = await this.comparePassword(
+      currentPassword,
+      user.passwordHash,
+    );
+    if (!valid) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    if (currentPassword === newPassword) {
+      throw new BadRequestException(
+        'New password must be different from the current password',
+      );
+    }
+
+    const passwordHash = await this.hashPassword(newPassword);
+
+    await this.prisma.client.$transaction([
+      this.prisma.client.user.update({
+        where: { id: userId },
+        data: { passwordHash },
+      }),
+      this.prisma.client.session.deleteMany({
+        where: { userId },
       }),
     ]);
   }
@@ -233,7 +304,7 @@ export class AuthService {
       where: { id: userId },
     });
     if (!user) throw new UnauthorizedException('User not found');
-    return this.stripPassword(user);
+    return this.toPublicUser(user);
   }
 
   async validateUser(payload: { sub: string }): Promise<RequestUser | null> {
@@ -324,7 +395,7 @@ export class AuthService {
     }
 
     const tokens = await this.generateTokens(user);
-    return { user: this.stripPassword(user), tokens };
+    return { user: this.toPublicUser(user), tokens };
   }
 
   private resolveDevProfile(
@@ -360,9 +431,9 @@ export class AuthService {
     return createHash('sha256').update(token).digest('hex');
   }
 
-  private stripPassword(user: User): PublicUser {
-    const { passwordHash: _, ...publicUser } = user;
-    return publicUser;
+  private toPublicUser(user: User): PublicUser {
+    const { passwordHash, ...publicUser } = user;
+    return { ...publicUser, hasPassword: !!passwordHash };
   }
 
   private async generateTokens(user: User): Promise<TokenPair> {
