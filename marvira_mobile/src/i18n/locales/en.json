@@ -4,6 +4,8 @@
     "ok": "OK",
     "error": "Error",
     "retry": "Retry",
+    "noLongerAvailable": "This content is no longer available",
+    "noLongerAvailableHint": "It may have been removed or is no longer public.",
     "user": "User",
     "all": "All",
     "places": "places",

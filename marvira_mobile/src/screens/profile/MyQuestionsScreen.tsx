@@ -6,8 +6,8 @@ import {
   FlatList,
   RefreshControl,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { CompositeNavigationProp } from '@react-navigation/native';
@@ -66,7 +66,7 @@ export const MyQuestionsScreen: React.FC = () => {
   };
 
   const handleDelete = (questionId: string, questionText: string) => {
-    Alert.alert(
+    appAlert.alert(
       t('myQuestions.deleteTitle'),
       t('myQuestions.deleteMessage', { question: questionText }),
       [
@@ -78,7 +78,7 @@ export const MyQuestionsScreen: React.FC = () => {
             try {
               await deleteMutation.mutateAsync(questionId);
             } catch (err: unknown) {
-              Alert.alert(
+              appAlert.alert(
                 t('common.error'),
                 (err as Error)?.message || t('myQuestions.deleteFailed'),
               );

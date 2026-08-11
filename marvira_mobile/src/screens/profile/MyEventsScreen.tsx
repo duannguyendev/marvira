@@ -5,8 +5,8 @@ import {
   StyleSheet,
   FlatList,
   RefreshControl,
-  Alert,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { CompositeNavigationProp } from '@react-navigation/native';
@@ -96,7 +96,7 @@ export const MyEventsScreen: React.FC = () => {
   };
 
   const handleDelete = (eventId: string, title: string) => {
-    Alert.alert(
+    appAlert.alert(
       t('myEvents.deleteTitle'),
       t('myEvents.deleteMessage', { title }),
       [
@@ -108,7 +108,7 @@ export const MyEventsScreen: React.FC = () => {
             try {
               await deleteEvent.mutateAsync(eventId);
             } catch (err: unknown) {
-              Alert.alert(
+              appAlert.alert(
                 t('common.error'),
                 (err as Error)?.message || t('myEvents.deleteFailed'),
               );
@@ -120,7 +120,7 @@ export const MyEventsScreen: React.FC = () => {
   };
 
   const handleEnd = (eventId: string, title: string) => {
-    Alert.alert(
+    appAlert.alert(
       t('myEvents.endTitle'),
       t('myEvents.endMessage', { title }),
       [
@@ -133,7 +133,7 @@ export const MyEventsScreen: React.FC = () => {
               await endEvent.mutateAsync(eventId);
               setStatusTab('done');
             } catch (err: unknown) {
-              Alert.alert(
+              appAlert.alert(
                 t('common.error'),
                 (err as Error)?.message || t('myEvents.endFailed'),
               );

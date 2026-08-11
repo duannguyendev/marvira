@@ -5,10 +5,10 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   StatusBar,
   useWindowDimensions,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import {
   useNavigation,
@@ -62,7 +62,7 @@ export const ProfileScreen: React.FC = () => {
   const unreadCount = unreadData?.unreadCount ?? 0;
 
   const handleLogout = () => {
-    Alert.alert(
+    appAlert.alert(
       t('profile.logoutConfirmTitle'),
       t('profile.logoutConfirmMessage'),
       [
@@ -74,7 +74,7 @@ export const ProfileScreen: React.FC = () => {
             try {
               await logout();
             } catch (error: any) {
-              Alert.alert(
+              appAlert.alert(
                 t('common.error'),
                 error.message || t('profile.logoutFailed'),
               );

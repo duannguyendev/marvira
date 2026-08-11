@@ -6,10 +6,10 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   StatusBar,
   Pressable,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -109,7 +109,7 @@ export const LoginScreen: React.FC = () => {
         await storage.clearRememberedCredentials();
       }
     } catch (error: any) {
-      Alert.alert(
+      appAlert.alert(
         t('auth.loginFailed'),
         error.message || t('auth.pleaseTryAgain'),
       );
@@ -129,7 +129,7 @@ export const LoginScreen: React.FC = () => {
       analytics.recordError(error);
     }
 
-    Alert.alert(
+    appAlert.alert(
       t('auth.loginFailed'),
       isSocialNotConfigured(error)
         ? t('auth.socialNotConfigured')

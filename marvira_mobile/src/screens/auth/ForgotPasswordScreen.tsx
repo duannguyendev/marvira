@@ -6,9 +6,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   StatusBar,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -40,18 +40,20 @@ export const ForgotPasswordScreen: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!email.trim()) {
-      Alert.alert(t('common.error'), t('auth.enterEmail'));
+      appAlert.alert(t('common.error'), t('auth.enterEmail'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
 
     setLoading(true);
     try {
       await authApi.forgotPassword(email.trim());
-      Alert.alert(t('auth.checkEmailTitle'), t('auth.checkEmailMessage'), [
+      appAlert.alert(t('auth.checkEmailTitle'), t('auth.checkEmailMessage'), [
         { text: t('common.ok'), onPress: () => navigation.navigate('Login') },
       ]);
     } catch (error: any) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         error.message || t('auth.resetEmailFailed'),
       );

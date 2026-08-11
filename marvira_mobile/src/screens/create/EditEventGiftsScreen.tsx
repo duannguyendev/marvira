@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -105,11 +105,11 @@ export const EditEventGiftsScreen: React.FC = () => {
         completionMessage: completionMessage.trim() || null,
         giftCodes: trimmed,
       });
-      Alert.alert(t('common.ok'), t('createEvent.gifts.saved'), [
+      appAlert.alert(t('common.ok'), t('createEvent.gifts.saved'), [
         { text: t('common.ok'), onPress: () => navigation.goBack() },
       ]);
     } catch (err: any) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         err?.response?.data?.message ||
           err.message ||

@@ -1,6 +1,38 @@
-import { Alert } from 'react-native';
+import { appAlert } from './appAlert';
 import i18n from '../i18n';
-import { LocationWarning } from '../types';
+import { Location, LocationWarning } from '../types';
+import { locationService } from '../services/location.service';
+import { isWithinRange } from './distance';
+import { LOCATION_ACCURACY_THRESHOLD } from './constants';
+
+export type FreshLocationError = 'unavailable' | 'poor_accuracy' | 'out_of_range';
+
+export async function getFreshLocationForPlace(
+  placeLocation: { latitude: number; longitude: number },
+  radiusMeters: number,
+): Promise<
+  { ok: true; location: Location } | { ok: false; error: FreshLocationError }
+> {
+  let location: Location;
+  try {
+    location = await locationService.getCurrentLocation({ maximumAge: 0 });
+  } catch {
+    return { ok: false, error: 'unavailable' };
+  }
+
+  if (
+    location.accuracy != null &&
+    location.accuracy > LOCATION_ACCURACY_THRESHOLD
+  ) {
+    return { ok: false, error: 'poor_accuracy' };
+  }
+
+  if (!isWithinRange(location, placeLocation, radiusMeters)) {
+    return { ok: false, error: 'out_of_range' };
+  }
+
+  return { ok: true, location };
+}
 
 export function showLocationWarnings(warnings?: LocationWarning[]) {
   if (!warnings?.length) {
@@ -9,7 +41,7 @@ export function showLocationWarnings(warnings?: LocationWarning[]) {
 
   const message = warnings[0]?.message || i18n.t('anticheat.message');
 
-  Alert.alert(i18n.t('anticheat.title'), message, [
+  appAlert.alert(i18n.t('anticheat.title'), message, [
     { text: i18n.t('anticheat.ok'), style: 'default' },
   ]);
 }

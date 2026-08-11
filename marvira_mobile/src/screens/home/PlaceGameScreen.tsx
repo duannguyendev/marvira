@@ -5,10 +5,10 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -49,6 +49,8 @@ import {
 import { LOCATION_ACCURACY_THRESHOLD, MAP_CAMERA_ANIMATION_MS } from '../../utils/constants';
 import {
   buildLocationPayload,
+  getFreshLocationForPlace,
+  FreshLocationError,
   showLocationWarnings,
 } from '../../utils/anticheat';
 import { AnalyticsEvents, analytics } from '../../services/analytics';
@@ -92,6 +94,7 @@ export const PlaceGameScreen: React.FC = () => {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [distance, setDistance] = useState<number | null>(null);
   const [hadIncorrectAttempt, setHadIncorrectAttempt] = useState(false);
+  const [isVerifyingLocation, setIsVerifyingLocation] = useState(false);
   const unlockAttemptedRef = useRef(false);
   const completingRef = useRef(false);
 
@@ -141,49 +144,100 @@ export const PlaceGameScreen: React.FC = () => {
     return unsubscribe;
   }, [navigation, eventId, event?.places]);
 
-  const attemptUnlock = useCallback(async () => {
-    if (!location || !place || isUnlocked || place.isCompleted) {
-      return;
-    }
-    if (location.accuracy && location.accuracy > LOCATION_ACCURACY_THRESHOLD) {
-      return;
-    }
-    if (!isWithinRange(location, place.location, unlockRadius)) {
-      return;
-    }
-    if (unlockPlaceMutation.isPending || unlockAttemptedRef.current) {
-      return;
-    }
+  const showFreshLocationError = useCallback(
+    (error: FreshLocationError) => {
+      switch (error) {
+        case 'unavailable':
+          appAlert.alert(t('game.locationRequired'), t('game.enableGps'), undefined, {
+            dismissOnOverlayPress: true,
+          });
+          break;
+        case 'poor_accuracy':
+          appAlert.alert(t('game.locationRequired'), t('game.waitingGps'), undefined, {
+            dismissOnOverlayPress: true,
+          });
+          break;
+        case 'out_of_range':
+          appAlert.alert(
+            t('game.locationRequired'),
+            t('game.mustBeWithin', { radius: unlockRadius }),
+          );
+          break;
+      }
+    },
+    [t, unlockRadius],
+  );
 
-    unlockAttemptedRef.current = true;
-    try {
-      const result = await unlockPlaceMutation.mutateAsync({
-        placeId,
-        ...buildLocationPayload(location),
-      });
-      showLocationWarnings(result.warnings);
-      setIsUnlocked(true);
-      void AnalyticsEvents.placeUnlocked(eventId, placeId);
-      await refetchEvent();
-    } catch (error: any) {
-      unlockAttemptedRef.current = false;
-      analytics.recordError(error);
-      Alert.alert(
-        t('game.unlockFailed'),
-        error.message || t('game.couldNotUnlock'),
-      );
-    }
-  }, [
-    location,
-    place,
-    isUnlocked,
-    unlockRadius,
-    placeId,
-    eventId,
-    unlockPlaceMutation,
-    refetchEvent,
-    t,
-  ]);
+  const attemptUnlock = useCallback(
+    async (options?: { showErrors?: boolean }) => {
+      if (!location || !place || isUnlocked || place.isCompleted) {
+        return;
+      }
+      if (
+        location.accuracy &&
+        location.accuracy > LOCATION_ACCURACY_THRESHOLD
+      ) {
+        return;
+      }
+      if (!isWithinRange(location, place.location, unlockRadius)) {
+        return;
+      }
+      if (
+        unlockPlaceMutation.isPending ||
+        unlockAttemptedRef.current ||
+        isVerifyingLocation
+      ) {
+        return;
+      }
+
+      unlockAttemptedRef.current = true;
+      setIsVerifyingLocation(true);
+      try {
+        const fresh = await getFreshLocationForPlace(
+          place.location,
+          unlockRadius,
+        );
+        if (!fresh.ok) {
+          unlockAttemptedRef.current = false;
+          if (options?.showErrors) {
+            showFreshLocationError(fresh.error);
+          }
+          return;
+        }
+
+        const result = await unlockPlaceMutation.mutateAsync({
+          placeId,
+          ...buildLocationPayload(fresh.location),
+        });
+        showLocationWarnings(result.warnings);
+        setIsUnlocked(true);
+        void AnalyticsEvents.placeUnlocked(eventId, placeId);
+        await refetchEvent();
+      } catch (error: any) {
+        unlockAttemptedRef.current = false;
+        analytics.recordError(error);
+        appAlert.alert(
+          t('game.unlockFailed'),
+          error.message || t('game.couldNotUnlock'),
+        );
+      } finally {
+        setIsVerifyingLocation(false);
+      }
+    },
+    [
+      location,
+      place,
+      isUnlocked,
+      unlockRadius,
+      placeId,
+      eventId,
+      unlockPlaceMutation,
+      refetchEvent,
+      isVerifyingLocation,
+      showFreshLocationError,
+      t,
+    ],
+  );
 
   useEffect(() => {
     if (location && place) {
@@ -196,10 +250,10 @@ export const PlaceGameScreen: React.FC = () => {
   const handleReportWrongAnswer = async () => {
     try {
       const result = await placesApi.reportWrongAnswer(placeId);
-      Alert.alert(t('game.reportSentTitle'), result.message);
+      appAlert.alert(t('game.reportSentTitle'), result.message);
     } catch (error: any) {
       analytics.recordError(error);
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         error?.response?.data?.message || error.message || t('common.error'),
       );
@@ -207,7 +261,7 @@ export const PlaceGameScreen: React.FC = () => {
   };
 
   const showIncorrectAlert = (message: string) => {
-    Alert.alert(t('game.incorrect'), message || t('game.tryAgain'), [
+    appAlert.alert(t('game.incorrect'), message || t('game.tryAgain'), [
       {
         text: t('game.reportProblem'),
         style: 'cancel',
@@ -221,25 +275,17 @@ export const PlaceGameScreen: React.FC = () => {
 
   const handleSubmitAnswer = async () => {
     if (!answer.trim()) {
-      Alert.alert(t('common.error'), t('game.enterAnswer'));
+      appAlert.alert(t('common.error'), t('game.enterAnswer'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
 
     if (!isUnlocked) {
-      Alert.alert(
+      appAlert.alert(
         t('game.notUnlocked'),
         t('game.mustBeWithin', { radius: unlockRadius }),
       );
-      return;
-    }
-
-    if (!location) {
-      Alert.alert(t('game.locationRequired'), t('game.enableGps'));
-      return;
-    }
-
-    if (location.accuracy && location.accuracy > LOCATION_ACCURACY_THRESHOLD) {
-      Alert.alert(t('game.locationRequired'), t('game.waitingGps'));
       return;
     }
 
@@ -247,19 +293,21 @@ export const PlaceGameScreen: React.FC = () => {
       return;
     }
 
-    if (!isWithinRange(location, place.location, unlockRadius)) {
-      Alert.alert(
-        t('game.locationRequired'),
-        t('game.mustBeWithin', { radius: unlockRadius }),
-      );
-      return;
-    }
-
+    setIsVerifyingLocation(true);
     try {
+      const fresh = await getFreshLocationForPlace(
+        place.location,
+        unlockRadius,
+      );
+      if (!fresh.ok) {
+        showFreshLocationError(fresh.error);
+        return;
+      }
+
       const response = await submitAnswerMutation.mutateAsync({
         placeId,
         answer: answer.trim(),
-        ...buildLocationPayload(location),
+        ...buildLocationPayload(fresh.location),
       });
 
       showLocationWarnings(response.data.warnings);
@@ -283,7 +331,7 @@ export const PlaceGameScreen: React.FC = () => {
           completingRef.current = true;
         }
 
-        Alert.alert(
+        appAlert.alert(
           t('game.correct'),
           response.data.explanation ||
             response.data.message ||
@@ -322,7 +370,9 @@ export const PlaceGameScreen: React.FC = () => {
       }
     } catch (error: any) {
       analytics.recordError(error);
-      Alert.alert(t('common.error'), error.message || t('game.submitFailed'));
+      appAlert.alert(t('common.error'), error.message || t('game.submitFailed'));
+    } finally {
+      setIsVerifyingLocation(false);
     }
   };
 
@@ -535,8 +585,10 @@ export const PlaceGameScreen: React.FC = () => {
               </Text>
               <Button
                 title={t('game.tryUnlockNow')}
-                onPress={attemptUnlock}
-                loading={unlockPlaceMutation.isPending}
+                onPress={() => {
+                  void attemptUnlock({ showErrors: true });
+                }}
+                loading={unlockPlaceMutation.isPending || isVerifyingLocation}
                 style={styles.unlockButton}
               />
             </View>
@@ -553,9 +605,11 @@ export const PlaceGameScreen: React.FC = () => {
           <Button
             title={t('game.submitAnswer')}
             onPress={handleSubmitAnswer}
-            loading={submitAnswerMutation.isPending}
+            loading={submitAnswerMutation.isPending || isVerifyingLocation}
             fullWidth
-            disabled={!canSubmitAnswer || !answer.trim()}
+            disabled={
+              !canSubmitAnswer || !answer.trim() || isVerifyingLocation
+            }
           />
         </View>
       ) : null}

@@ -65,7 +65,7 @@ class LocationService {
   /**
    * Get current location once
    */
-  async getCurrentLocation(): Promise<Location> {
+  async getCurrentLocation(options?: { maximumAge?: number }): Promise<Location> {
     return new Promise((resolve, reject) => {
       Geolocation.getCurrentPosition(
         position => {
@@ -84,7 +84,7 @@ class LocationService {
         {
           enableHighAccuracy: true,
           timeout: 15000,
-          maximumAge: 10000,
+          maximumAge: options?.maximumAge ?? 10000,
           forceRequestLocation: true,
           showLocationDialog: true,
         },

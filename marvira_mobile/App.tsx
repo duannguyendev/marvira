@@ -8,6 +8,7 @@ import { RootNavigator } from './src/navigation/RootNavigator';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { OfflineBanner } from './src/components/OfflineBanner';
 import { I18nProvider } from './src/components/I18nProvider';
+import { AlertProvider } from './src/components/AlertBottomSheet';
 import { analytics } from './src/services/analytics';
 import { initMapbox } from './src/utils/mapbox';
 
@@ -35,19 +36,21 @@ const App: React.FC = () => {
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
         <I18nProvider>
-          <ErrorBoundary>
-            <QueryClientProvider client={queryClient}>
-              <View style={styles.container}>
-                <OfflineBanner />
-                <StatusBar
-                  barStyle="light-content"
-                  backgroundColor="transparent"
-                  translucent
-                />
-                <RootNavigator />
-              </View>
-            </QueryClientProvider>
-          </ErrorBoundary>
+          <AlertProvider>
+            <ErrorBoundary>
+              <QueryClientProvider client={queryClient}>
+                <View style={styles.container}>
+                  <OfflineBanner />
+                  <StatusBar
+                    barStyle="light-content"
+                    backgroundColor="transparent"
+                    translucent
+                  />
+                  <RootNavigator />
+                </View>
+              </QueryClientProvider>
+            </ErrorBoundary>
+          </AlertProvider>
         </I18nProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

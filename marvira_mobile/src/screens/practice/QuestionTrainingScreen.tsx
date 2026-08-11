@@ -4,12 +4,13 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { useQueryClient } from '@tanstack/react-query';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,6 +25,7 @@ import { FavoriteButton } from '../../components/FavoriteButton';
 import { Button } from '../../components/Button';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorView } from '../../components/ErrorView';
+import { isNotFoundError } from '../../utils/apiErrors';
 import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
 import {
   PracticeStackParamList,
@@ -50,6 +52,7 @@ export const QuestionTrainingScreen: React.FC = () => {
   const { t } = useTranslation();
   const route = useRoute<TrainingRoute>();
   const navigation = useNavigation<TrainingNavigation>();
+  const queryClient = useQueryClient();
   const headerHeight = useHeaderHeight();
   const insets = useSafeAreaInsets();
   const { questionId } = route.params;
@@ -72,9 +75,17 @@ export const QuestionTrainingScreen: React.FC = () => {
     void AnalyticsEvents.practiceOpened('training');
   }, [questionId]);
 
+  useEffect(() => {
+    if (!isLoading && isNotFoundError(error)) {
+      void queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    }
+  }, [isLoading, error, queryClient]);
+
   const handleSubmit = async () => {
     if (!answer.trim()) {
-      Alert.alert(t('game.enterAnswer'));
+      appAlert.alert(t('game.enterAnswer'), undefined, undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
 
@@ -90,7 +101,7 @@ export const QuestionTrainingScreen: React.FC = () => {
       );
 
       if (result.data.isCorrect) {
-        Alert.alert(
+        appAlert.alert(
           t('practice.correctTitle'),
           result.data.explanation || t('practice.correctMessage'),
           [
@@ -101,13 +112,13 @@ export const QuestionTrainingScreen: React.FC = () => {
           ],
         );
       } else {
-        Alert.alert(
+        appAlert.alert(
           t('practice.incorrectTitle'),
           t('practice.incorrectMessage'),
         );
       }
     } catch (err: unknown) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         (err as Error)?.message || t('practice.submitFailed'),
       );
@@ -119,10 +130,17 @@ export const QuestionTrainingScreen: React.FC = () => {
   }
 
   if (error || !question) {
+    const unavailable = isNotFoundError(error);
     return (
       <ErrorView
-        message={(error as Error)?.message || t('practice.questionLoadFailed')}
-        onRetry={() => refetch()}
+        message={
+          unavailable
+            ? t('common.noLongerAvailable')
+            : (error as Error)?.message || t('practice.questionLoadFailed')
+        }
+        subtitle={unavailable ? t('common.noLongerAvailableHint') : undefined}
+        onAction={unavailable ? () => navigation.goBack() : undefined}
+        onRetry={unavailable ? undefined : () => refetch()}
       />
     );
   }

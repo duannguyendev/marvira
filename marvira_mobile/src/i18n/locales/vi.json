@@ -4,6 +4,8 @@
     "ok": "OK",
     "error": "Lỗi",
     "retry": "Thử lại",
+    "noLongerAvailable": "Nội dung này không còn khả dụng",
+    "noLongerAvailableHint": "Có thể đã bị xóa hoặc không còn công khai.",
     "user": "Người dùng",
     "all": "Tất cả",
     "places": "địa điểm",

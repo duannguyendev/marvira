@@ -18,10 +18,12 @@ export class FavoritesService {
     });
 
     const events = await Promise.all(
-      favorites.map(async f => this.eventsService.findOne(f.eventId)),
+      favorites.map(async f =>
+        this.resolveFavoriteEvent(userId, f.eventId),
+      ),
     );
 
-    return events;
+    return events.filter(Boolean);
   }
 
   async listFavoriteQuestions(userId: string) {
@@ -32,16 +34,38 @@ export class FavoritesService {
     });
 
     const items = await Promise.all(
-      favorites.map(async f => {
-        try {
-          return await this.practiceService.getQuestion(userId, f.questionId);
-        } catch {
-          return null;
-        }
-      }),
+      favorites.map(async f =>
+        this.resolveFavoriteQuestion(userId, f.questionId),
+      ),
     );
 
     return items.filter(Boolean);
+  }
+
+  private async resolveFavoriteEvent(userId: string, eventId: string) {
+    try {
+      return await this.eventsService.findOne(eventId, userId);
+    } catch {
+      void this.prisma.client.userFavoriteEvent
+        .delete({
+          where: { userId_eventId: { userId, eventId } },
+        })
+        .catch(() => {});
+      return null;
+    }
+  }
+
+  private async resolveFavoriteQuestion(userId: string, questionId: string) {
+    try {
+      return await this.practiceService.getQuestion(userId, questionId);
+    } catch {
+      void this.prisma.client.userFavoriteQuestion
+        .delete({
+          where: { userId_questionId: { userId, questionId } },
+        })
+        .catch(() => {});
+      return null;
+    }
   }
 
   async addFavoriteEvent(userId: string, eventId: string) {

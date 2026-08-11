@@ -5,11 +5,11 @@ import {
   StyleSheet,
   Animated,
   Dimensions,
-  Alert,
   ScrollView,
   Share,
   StatusBar,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -125,7 +125,7 @@ export const EventCompletionScreen: React.FC = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      Alert.alert(t('common.error'), t('completion.copyFailed'));
+      appAlert.alert(t('common.error'), t('completion.copyFailed'));
     }
   };
 

@@ -4,6 +4,8 @@
     "ok": "确定",
     "error": "错误",
     "retry": "重试",
+    "noLongerAvailable": "此内容已不可用",
+    "noLongerAvailableHint": "可能已被删除或不再公开。",
     "user": "用户",
     "all": "全部",
     "places": "地点",

@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
-  Alert,
   Platform,
 } from 'react-native';
+import { appAlert } from '../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import {
   launchCamera,
@@ -127,7 +127,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
       return;
     }
     if (response.errorCode) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         response.errorMessage || t('createEvent.imagePickFailed'),
       );

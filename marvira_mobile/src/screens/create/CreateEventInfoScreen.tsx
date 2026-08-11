@@ -3,10 +3,10 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Alert,
   TouchableOpacity,
   Text,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -94,7 +94,7 @@ export const CreateEventInfoScreen: React.FC = () => {
       });
     } catch (error: any) {
       analytics.recordError(error);
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         error?.response?.data?.message ||
           error.message ||

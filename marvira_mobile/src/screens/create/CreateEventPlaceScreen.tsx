@@ -3,10 +3,10 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Alert,
   Text,
   TouchableOpacity,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -102,7 +102,7 @@ export const CreateEventPlaceScreen: React.FC = () => {
   const handleUseMyLocation = async () => {
     const granted = location ? true : await requestPermission();
     if (!granted && !location) {
-      Alert.alert(t('game.locationRequired'), t('game.enableGps'));
+      appAlert.alert(t('game.locationRequired'), t('game.enableGps'));
       return;
     }
     try {
@@ -112,7 +112,7 @@ export const CreateEventPlaceScreen: React.FC = () => {
       if (location) {
         handleCoordinateChange(location);
       } else {
-        Alert.alert(t('game.locationRequired'), t('game.enableGps'));
+        appAlert.alert(t('game.locationRequired'), t('game.enableGps'));
       }
     }
   };
@@ -200,7 +200,7 @@ export const CreateEventPlaceScreen: React.FC = () => {
         });
       }
     } catch (error: any) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         error?.response?.data?.message ||
           error.message ||

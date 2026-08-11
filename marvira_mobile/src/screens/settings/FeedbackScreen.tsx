@@ -5,9 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/Button';
 import { feedbackApi } from '../../api/feedback';
@@ -39,7 +39,9 @@ export const FeedbackScreen: React.FC = () => {
 
   const handleSubmit = async () => {
     if (message.trim().length < 10) {
-      Alert.alert(t('common.error'), t('feedback.validationMessageMin'));
+      appAlert.alert(t('common.error'), t('feedback.validationMessageMin'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
 
@@ -51,12 +53,12 @@ export const FeedbackScreen: React.FC = () => {
         message: message.trim(),
       });
       void AnalyticsEvents.feedbackSubmitted(category);
-      Alert.alert(t('feedback.successTitle'), t('feedback.successMessage'));
+      appAlert.alert(t('feedback.successTitle'), t('feedback.successMessage'));
       setCategory(FeedbackCategory.FEEDBACK);
       setSubject('');
       setMessage('');
     } catch (error: any) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         error.message || t('feedback.submitFailed'),
       );

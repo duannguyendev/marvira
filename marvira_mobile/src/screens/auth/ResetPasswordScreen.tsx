@@ -6,9 +6,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   StatusBar,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -44,26 +44,32 @@ export const ResetPasswordScreen: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!token.trim() || !password) {
-      Alert.alert(t('common.error'), t('auth.tokenPasswordRequired'));
+      appAlert.alert(t('common.error'), t('auth.tokenPasswordRequired'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
     if (password.length < 6) {
-      Alert.alert(t('common.error'), t('validation.passwordMinLength'));
+      appAlert.alert(t('common.error'), t('validation.passwordMinLength'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert(t('common.error'), t('validation.passwordsDoNotMatch'));
+      appAlert.alert(t('common.error'), t('validation.passwordsDoNotMatch'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
 
     setLoading(true);
     try {
       await authApi.resetPassword(token.trim(), password);
-      Alert.alert(t('auth.success'), t('auth.passwordUpdated'), [
+      appAlert.alert(t('auth.success'), t('auth.passwordUpdated'), [
         { text: t('common.ok'), onPress: () => navigation.navigate('Login') },
       ]);
     } catch (error: any) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         error.message || t('auth.resetPasswordFailed'),
       );

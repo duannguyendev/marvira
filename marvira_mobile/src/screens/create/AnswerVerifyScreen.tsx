@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -93,7 +93,9 @@ export const AnswerVerifyScreen: React.FC = () => {
       return;
     }
     if (!answer.trim()) {
-      Alert.alert(t('common.error'), t('createEvent.verify.answerRequired'));
+      appAlert.alert(t('common.error'), t('createEvent.verify.answerRequired'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
 
@@ -105,7 +107,7 @@ export const AnswerVerifyScreen: React.FC = () => {
       await refetchStatus();
 
       if (!result.correct) {
-        Alert.alert(
+        appAlert.alert(
           t('createEvent.verify.mismatchTitle'),
           t('createEvent.verify.mismatchMessage'),
           [
@@ -137,7 +139,7 @@ export const AnswerVerifyScreen: React.FC = () => {
       setCurrentIndex(0);
       await refetchQuestions();
     } catch (err: any) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         err?.response?.data?.message || err.message || t('common.error'),
       );

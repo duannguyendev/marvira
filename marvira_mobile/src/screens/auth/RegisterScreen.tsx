@@ -6,9 +6,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   StatusBar,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -90,7 +90,7 @@ export const RegisterScreen: React.FC = () => {
     try {
       await register({ name, email, password });
     } catch (error: any) {
-      Alert.alert(
+      appAlert.alert(
         t('auth.registrationFailed'),
         error.message || t('auth.pleaseTryAgain'),
       );

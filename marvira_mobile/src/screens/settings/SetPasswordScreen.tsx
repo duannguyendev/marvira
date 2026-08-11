@@ -6,8 +6,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -34,15 +34,21 @@ export const SetPasswordScreen: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!password) {
-      Alert.alert(t('common.error'), t('validation.passwordRequired'));
+      appAlert.alert(t('common.error'), t('validation.passwordRequired'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
     if (password.length < 6) {
-      Alert.alert(t('common.error'), t('validation.passwordMinLength'));
+      appAlert.alert(t('common.error'), t('validation.passwordMinLength'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert(t('common.error'), t('validation.passwordsDoNotMatch'));
+      appAlert.alert(t('common.error'), t('validation.passwordsDoNotMatch'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
 
@@ -51,11 +57,11 @@ export const SetPasswordScreen: React.FC = () => {
       const user = await authApi.setPassword(password);
       await authService.applyUserUpdate(user);
       await queryClient.invalidateQueries({ queryKey: ['user'] });
-      Alert.alert(t('auth.success'), t('settings.setPasswordSuccess'), [
+      appAlert.alert(t('auth.success'), t('settings.setPasswordSuccess'), [
         { text: t('common.ok'), onPress: () => navigation.goBack() },
       ]);
     } catch (error: any) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         error.message || t('settings.setPasswordFailed'),
       );

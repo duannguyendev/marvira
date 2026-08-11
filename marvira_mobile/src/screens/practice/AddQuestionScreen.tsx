@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Text } from 'react-native';
+import { View, StyleSheet, ScrollView, Text } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -126,21 +127,21 @@ export const AddQuestionScreen: React.FC = () => {
 
       if (isEditing && questionId) {
         await updateMutation.mutateAsync({ questionId, input: payload });
-        Alert.alert(
+        appAlert.alert(
           t('practice.updateSuccessTitle'),
           t('practice.updateSuccessMessage'),
           [{ text: t('common.ok'), onPress: () => navigation.goBack() }],
         );
       } else {
         await createMutation.mutateAsync(payload);
-        Alert.alert(
+        appAlert.alert(
           t('practice.createSuccessTitle'),
           t('practice.createSuccessMessage'),
           [{ text: t('common.ok'), onPress: () => navigation.goBack() }],
         );
       }
     } catch (err: unknown) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         (err as Error)?.message || t('practice.saveFailed'),
       );

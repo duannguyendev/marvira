@@ -4,6 +4,8 @@
     "ok": "OK",
     "error": "エラー",
     "retry": "再試行",
+    "noLongerAvailable": "このコンテンツは利用できなくなりました",
+    "noLongerAvailableHint": "削除されたか、公開が終了した可能性があります。",
     "user": "ユーザー",
     "all": "すべて",
     "places": "スポット",

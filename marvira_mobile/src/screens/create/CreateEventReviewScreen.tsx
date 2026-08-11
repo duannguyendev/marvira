@@ -4,10 +4,10 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -186,7 +186,7 @@ export const CreateEventReviewScreen: React.FC = () => {
       });
     } catch (err: any) {
       analytics.recordError(err);
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         err?.response?.data?.message ||
           err.message ||
@@ -224,7 +224,7 @@ export const CreateEventReviewScreen: React.FC = () => {
       });
     } catch (err: any) {
       analytics.recordError(err);
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         err?.response?.data?.message ||
           err.message ||

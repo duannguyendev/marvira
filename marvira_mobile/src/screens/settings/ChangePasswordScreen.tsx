@@ -6,8 +6,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -39,26 +39,34 @@ export const ChangePasswordScreen: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!currentPassword || !newPassword) {
-      Alert.alert(t('common.error'), t('settings.changePasswordFieldsRequired'));
+      appAlert.alert(t('common.error'), t('settings.changePasswordFieldsRequired'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
     if (newPassword.length < 6) {
-      Alert.alert(t('common.error'), t('validation.passwordMinLength'));
+      appAlert.alert(t('common.error'), t('validation.passwordMinLength'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
     if (newPassword !== confirmPassword) {
-      Alert.alert(t('common.error'), t('validation.passwordsDoNotMatch'));
+      appAlert.alert(t('common.error'), t('validation.passwordsDoNotMatch'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
     if (currentPassword === newPassword) {
-      Alert.alert(t('common.error'), t('settings.changePasswordSameAsCurrent'));
+      appAlert.alert(t('common.error'), t('settings.changePasswordSameAsCurrent'), undefined, {
+        dismissOnOverlayPress: true,
+      });
       return;
     }
 
     setLoading(true);
     try {
       await authApi.changePassword(currentPassword, newPassword);
-      Alert.alert(t('auth.success'), t('settings.changePasswordSuccess'), [
+      appAlert.alert(t('auth.success'), t('settings.changePasswordSuccess'), [
         {
           text: t('common.ok'),
           onPress: async () => {
@@ -71,7 +79,7 @@ export const ChangePasswordScreen: React.FC = () => {
         },
       ]);
     } catch (error: any) {
-      Alert.alert(
+      appAlert.alert(
         t('common.error'),
         error.message || t('settings.changePasswordFailed'),
       );

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { useQueryClient } from '@tanstack/react-query';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Mapbox from '@rnmapbox/maps';
 import { useEventDetails, useJoinEvent } from '../../hooks/useEvents';
@@ -21,6 +22,7 @@ import { Button } from '../../components/Button';
 import { FavoriteButton } from '../../components/FavoriteButton';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorView } from '../../components/ErrorView';
+import { isNotFoundError } from '../../utils/apiErrors';
 import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
 import { JoinEventPasswordSheet } from '../../components/JoinEventPasswordSheet';
 import { MapPin } from '../../components/MapPin';
@@ -65,6 +67,7 @@ export const EventDetailsScreen: React.FC = () => {
   const { t } = useTranslation();
   const route = useRoute<EventDetailsScreenRouteProp>();
   const navigation = useNavigation<EventDetailsScreenNavigationProp>();
+  const queryClient = useQueryClient();
   const { eventId } = route.params;
 
   const { data, isLoading, error, refetch } = useEventDetails(eventId);
@@ -148,6 +151,12 @@ export const EventDetailsScreen: React.FC = () => {
     }
   }, [event]);
 
+  useEffect(() => {
+    if (!isLoading && isNotFoundError(error)) {
+      void queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    }
+  }, [isLoading, error, queryClient]);
+
   const handlePlacePress = (placeId: string) => {
     if (isLocked) {
       setShowJoinSheet(true);
@@ -181,10 +190,17 @@ export const EventDetailsScreen: React.FC = () => {
   }
 
   if (error || !event) {
+    const unavailable = isNotFoundError(error);
     return (
       <ErrorView
-        message={(error as any)?.message || t('events.detailsLoadFailed')}
-        onRetry={() => refetch()}
+        message={
+          unavailable
+            ? t('common.noLongerAvailable')
+            : (error as Error)?.message || t('events.detailsLoadFailed')
+        }
+        subtitle={unavailable ? t('common.noLongerAvailableHint') : undefined}
+        onAction={unavailable ? () => navigation.goBack() : undefined}
+        onRetry={unavailable ? undefined : () => refetch()}
       />
     );
   }

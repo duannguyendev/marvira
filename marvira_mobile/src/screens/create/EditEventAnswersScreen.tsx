@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
+import { appAlert } from '../../utils/appAlert';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -81,7 +81,7 @@ export const EditEventAnswersScreen: React.FC = () => {
         queryKey: ['publishVerifyQuestions', eventId],
       });
       queryClient.invalidateQueries({ queryKey: ['answerReports', eventId] });
-      Alert.alert(
+      appAlert.alert(
         t('createEvent.editAnswers.savedTitle'),
         t('createEvent.editAnswers.savedMessage'),
       );
@@ -92,7 +92,7 @@ export const EditEventAnswersScreen: React.FC = () => {
       }
     },
     onError: (err: Error) => {
-      Alert.alert(t('common.error'), err.message);
+      appAlert.alert(t('common.error'), err.message);
     },
   });
 
