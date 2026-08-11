@@ -38,6 +38,23 @@ export function formatDistance(meters: number): string {
 }
 
 /**
+ * True when coordinates look like a real place (not the mapper's missing-places
+ * fallback of 0,0 which would show ~12,000km from Vietnam).
+ */
+export function hasUsableCoordinates(
+  location?: { latitude: number; longitude: number } | null,
+): boolean {
+  if (!location) {
+    return false;
+  }
+  const { latitude, longitude } = location;
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return false;
+  }
+  return !(latitude === 0 && longitude === 0);
+}
+
+/**
  * Check if user is within range of a location
  */
 export function isWithinRange(

@@ -46,6 +46,9 @@ export interface ApiEvent {
   createdAt: string;
   updatedAt: string;
   distanceMeters?: number;
+  /** Nearest place coords from /events/nearby (when places[] is omitted) */
+  nearestLatitude?: number;
+  nearestLongitude?: number;
   places?: ApiPlace[];
   _count?: { places: number; eventQuestions?: number };
 }

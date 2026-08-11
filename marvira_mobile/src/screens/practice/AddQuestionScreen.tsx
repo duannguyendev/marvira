@@ -59,7 +59,7 @@ export const AddQuestionScreen: React.FC = () => {
       setQuestion({
         question: q.text,
         type: q.type,
-        answer: q.answer,
+        answer: q.answer ?? '',
         options: q.options,
         points: q.points,
         imageUrl: q.imageUrl,

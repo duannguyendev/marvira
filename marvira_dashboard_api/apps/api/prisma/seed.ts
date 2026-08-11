@@ -8,6 +8,7 @@ import {
   ArticleStatus,
 } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { matThuPracticeQuestions } from './seeds/mat-thu-practice';
 
 const prisma = new PrismaClient();
 
@@ -380,6 +381,48 @@ async function main() {
     });
   }
 
+  // Mật thư Đội / hunt practice bank (vi)
+  console.log(
+    `Seeding ${matThuPracticeQuestions.length} mật thư practice questions...`,
+  );
+  const matThuIds = matThuPracticeQuestions.map((q) => q.id);
+  await prisma.question.deleteMany({
+    where: {
+      id: { startsWith: 'seed-practice-matthu-' },
+      NOT: { id: { in: matThuIds } },
+    },
+  });
+  for (const cq of matThuPracticeQuestions) {
+    await prisma.question.upsert({
+      where: { id: cq.id },
+      update: {
+        question: cq.question,
+        type: cq.type,
+        options: cq.options ?? undefined,
+        answer: cq.answer,
+        explanation: cq.explanation,
+        points: cq.points,
+        source: QuestionSource.COMMUNITY,
+        isPublished: true,
+        createdBy: admin.id,
+        language: 'vi',
+      },
+      create: {
+        id: cq.id,
+        question: cq.question,
+        type: cq.type,
+        options: cq.options ?? undefined,
+        answer: cq.answer,
+        explanation: cq.explanation,
+        points: cq.points,
+        source: QuestionSource.COMMUNITY,
+        isPublished: true,
+        createdBy: admin.id,
+        language: 'vi',
+      },
+    });
+  }
+
   if (demoUser) {
     await prisma.userFavoriteEvent.upsert({
       where: {
@@ -400,62 +443,108 @@ async function main() {
     });
   }
 
+  // Launch content — giới thiệu app (không gắn eventId)
   const articles = [
     {
-      id: 'seed-article-downtown',
-      title: 'Discover Downtown San Francisco on Foot',
-      slug: 'discover-downtown-san-francisco',
-      placeName: 'Union Square',
-      city: 'San Francisco',
+      id: 'seed-article-what-is-marvira',
+      title: 'Marvira là gì? Săn tìm kho báu ngoài trời trên điện thoại',
+      slug: 'what-is-marvira',
+      placeName: 'Marvira',
+      city: null,
       excerpt:
-        'Walk the historic core of San Francisco — from Union Square to the Ferry Building — in a self-guided scavenger hunt built for curious explorers.',
+        'Marvira biến buổi đi bộ thành cuộc phiêu lưu theo nhóm — đến từng điểm, giải mật thư, và đua điểm với bạn bè.',
       coverImage:
-        'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1600&q=80',
-      eventId: 'seed-event-downtown',
+        'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80',
       body: [
-        '## A city walk that plays like a game',
+        '## Chơi thành phố như một trò chơi',
         '',
-        'Downtown San Francisco is packed with landmarks, plazas, and stories hiding in plain sight. This hunt turns a normal afternoon walk into a friendly competition — solve challenges at each stop and climb the leaderboard with your team.',
+        'Marvira là ứng dụng **săn tìm kho báu ngoài trời**. Bạn đi bộ đến các địa điểm thật, mở thử thách trên điện thoại, rồi cùng đội đua trên bảng xếp hạng.',
         '',
-        '### What you will explore',
+        '### Phù hợp với ai?',
         '',
-        '- **Union Square** — the buzzing heart of downtown shopping and culture.',
-        '- **The Ferry Building** — a historic transit hub turned gourmet marketplace.',
-        '- **Coit Tower** — an Art Deco landmark with panoramic bay views.',
+        '- Team building, offsite công ty',
+        '- Sinh nhật, họp lớp, hẹn hò',
+        '- Người thích khám phá phố phường theo kiểu có câu chuyện',
         '',
-        '### Who it is for',
+        '### Bạn cần gì?',
         '',
-        'Perfect for team offsites, birthdays, first dates, or visitors who want to see the city like a local. No prior knowledge needed — just comfortable shoes and a charged phone.',
+        'Điện thoại đủ pin, giày thoải mái, và một chút tò mò. Không cần dụng cụ đặc biệt — Marvira dẫn đường từng điểm một.',
         '',
-        '> Install Marvira, open this page on your phone, and tap play to begin. Exact answers stay in the app — no spoilers here.',
+        '> Tải Marvira trên App Store hoặc Google Play, rồi mở phần Khám phá để tìm hunt đầu tiên.',
       ].join('\n'),
     },
     {
-      id: 'seed-article-golden-gate',
-      title: 'The Golden Gate Adventure',
-      slug: 'golden-gate-adventure',
-      placeName: 'Golden Gate Bridge',
-      city: 'San Francisco',
+      id: 'seed-article-how-to-play',
+      title: 'Cách chơi một hunt trên Marvira',
+      slug: 'how-to-play-marvira',
+      placeName: 'Marvira',
+      city: null,
       excerpt:
-        'A scenic, slightly harder hunt along the most photographed bridge in the world. Big views, fresh air, and a challenge for competitive walkers.',
+        'Từ lúc cài app đến đích: tham gia hunt, check-in từng điểm, và nộp đáp án như thế nào.',
       coverImage:
-        'https://images.unsplash.com/photo-1521747116042-5a810fda9664?auto=format&fit=crop&w=1600&q=80',
-      eventId: 'seed-event-golden-gate',
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80',
       body: [
-        '## Wind, views, and a world-famous bridge',
+        '## Bốn bước từ nhà đến điểm đích',
         '',
-        'The Golden Gate Adventure is our favorite outdoor route for players who want scenery **and** a challenge. Start near the welcome center, follow the coastal path, and answer clues as you go.',
+        '### 1. Cài app và đăng nhập',
         '',
-        '### Highlights',
+        'Tải Marvira, tạo tài khoản, và cho phép vị trí khi app hỏi — hunt dùng GPS để mở khóa điểm gần bạn.',
         '',
-        '1. Sweeping views of the bridge and the bay.',
-        '2. Coastal trails with fresh Pacific air.',
-        '3. Trickier challenges for experienced hunters.',
+        '### 2. Chọn hunt',
         '',
-        'Bring a light jacket — it gets breezy out by the water. When you are ready, open Marvira and start from the pinned welcome area.',
+        'Xem các sự kiện đang mở gần bạn (hoặc mở link được chia sẻ). Đọc độ khó và thời gian đi bộ ước tính trước khi bắt đầu.',
+        '',
+        '### 3. Đi bộ, đến nơi, giải đố',
+        '',
+        'Theo bản đồ đến từng điểm. Khi bạn đủ gần, điểm sẽ mở. Trả lời mật thư — chữ, ảnh, đúng/sai, hoặc trắc nghiệm.',
+        '',
+        '### 4. Về đích và so điểm',
+        '',
+        'Hoàn thành lộ trình, xem điểm số và thứ hạng đội. Sai đáp án thường được thử lại — đi thong thả và tận hưởng đường đi.',
+        '',
+        'Mới làm quen mật thư? Hãy vào **Luyện tập** trong app trước khi chơi hunt ngoài trời.',
+      ].join('\n'),
+    },
+    {
+      id: 'seed-article-practice-mat-thu',
+      title: 'Luyện trước với Practice: mật thư & kỹ năng giải đố',
+      slug: 'practice-mat-thu-on-marvira',
+      placeName: 'Marvira',
+      city: null,
+      excerpt:
+        'Luyện mật thư kiểu Đội và các dạng clue phổ biến ngay trong app — để hunt đầu tiên không còn bỡ ngỡ.',
+      coverImage:
+        'https://images.unsplash.com/photo-1456513080080-2f3ae2b3d1d8?auto=format&fit=crop&w=1600&q=80',
+      body: [
+        '## Luyện trước khi ra đường',
+        '',
+        'Marvira Practice là ngân hàng câu hỏi luyện tập — gồm mật thư kiểu Việt Nam và các dạng clue hunt — giúp bạn nhận dạng khóa nhanh mà không cần đi hết một lộ trình.',
+        '',
+        '### Vì sao nên luyện?',
+        '',
+        '- Làm quen OTT / NW thường gặp trong sinh hoạt Đội và trò chơi lớn',
+        '- Nhớ cách đọc Telex khi đáp án có dấu',
+        '- Tự tin hơn trước hunt có giới hạn thời gian',
+        '',
+        '### Cách dùng',
+        '',
+        '1. Mở **Luyện tập** trong Marvira.',
+        '2. Giải vài câu theo nhịp của bạn.',
+        '3. Đọc phần giải thích khi trả lời đúng — rồi thử dạng khóa khác.',
+        '',
+        'Khi có hunt thật gần bạn, bạn đã biết cách đọc mật thư, không chỉ biết theo bản đồ.',
       ].join('\n'),
     },
   ];
+
+  // Drop old SF event articles if they exist from previous seeds
+  await prisma.article.deleteMany({
+    where: {
+      id: {
+        in: ['seed-article-downtown', 'seed-article-golden-gate'],
+      },
+    },
+  });
 
   for (const article of articles) {
     const { id, ...rest } = article;
@@ -463,12 +552,14 @@ async function main() {
       where: { id },
       update: {
         ...rest,
+        eventId: null,
         status: ArticleStatus.PUBLISHED,
         createdBy: admin.id,
       },
       create: {
         id,
         ...rest,
+        eventId: null,
         status: ArticleStatus.PUBLISHED,
         publishedAt: new Date(),
         createdBy: admin.id,

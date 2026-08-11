@@ -39,8 +39,7 @@ export const PracticeListScreen: React.FC = () => {
   const [status, setStatus] = useState<PracticeQuestionStatus>('unfinished');
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data, isLoading, error, refetch, isRefetching } =
-    usePracticeQuestions(status);
+  const { data, isLoading, error, refetch } = usePracticeQuestions(status);
   const {
     pendingUnfavoriteId,
     onFavoritePress,
@@ -56,8 +55,11 @@ export const PracticeListScreen: React.FC = () => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await refetch();
-    setRefreshing(false);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   if (isLoading) {
@@ -81,7 +83,7 @@ export const PracticeListScreen: React.FC = () => {
         contentContainerStyle={styles.list}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing || isRefetching}
+            refreshing={refreshing}
             onRefresh={handleRefresh}
           />
         }

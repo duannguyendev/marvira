@@ -259,7 +259,8 @@ export interface PracticeQuestion {
   options?: string[];
   points: number;
   language?: string;
-  answer: string;
+  /** Present only for the author (edit). Omitted for other players during training. */
+  answer?: string;
   explanation?: string;
   authorId: string;
   authorName: string;

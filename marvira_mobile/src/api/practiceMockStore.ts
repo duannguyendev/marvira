@@ -77,7 +77,7 @@ function normalizeAnswer(value: string): string {
 }
 
 function isAnswerCorrect(question: PracticeQuestion, answer: string): boolean {
-  return normalizeAnswer(question.answer) === normalizeAnswer(answer);
+  return normalizeAnswer(question.answer ?? '') === normalizeAnswer(answer);
 }
 
 export const practiceMockStore = {

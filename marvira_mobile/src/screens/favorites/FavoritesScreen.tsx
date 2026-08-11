@@ -55,8 +55,11 @@ export const FavoritesScreen: React.FC = () => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await activeQuery.refetch();
-    setRefreshing(false);
+    try {
+      await activeQuery.refetch();
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   if (activeQuery.isLoading) {
@@ -99,7 +102,7 @@ export const FavoritesScreen: React.FC = () => {
           contentContainerStyle={styles.eventsList}
           refreshControl={
             <RefreshControl
-              refreshing={refreshing || eventsQuery.isRefetching}
+              refreshing={refreshing}
               onRefresh={handleRefresh}
             />
           }
@@ -137,7 +140,7 @@ export const FavoritesScreen: React.FC = () => {
           contentContainerStyle={styles.questionsList}
           refreshControl={
             <RefreshControl
-              refreshing={refreshing || questionsQuery.isRefetching}
+              refreshing={refreshing}
               onRefresh={handleRefresh}
             />
           }

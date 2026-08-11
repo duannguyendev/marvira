@@ -25,7 +25,7 @@ import {
 } from '../../theme';
 import { HomeStackParamList } from '../../navigation/types';
 import { EventFilters, EventStatus } from '../../types';
-import { calculateDistance } from '../../utils/distance';
+import { calculateDistance, hasUsableCoordinates } from '../../utils/distance';
 
 type EventsListScreenNavigationProp = NativeStackNavigationProp<
   HomeStackParamList,
@@ -64,11 +64,19 @@ export const EventsListScreen: React.FC = () => {
   };
 
   const events = data?.data || [];
+  // Nearby API already provides distanceMeters. Recalculating from
+  // event.location is wrong when the list payload omits places (mapper
+  // falls back to 0,0 → ~12,000km from Vietnam).
   const eventsWithDistance = location
-    ? events.map(event => ({
-        ...event,
-        distance: calculateDistance(location, event.location),
-      }))
+    ? events.map(event => {
+        if (!hasUsableCoordinates(event.location)) {
+          return event;
+        }
+        return {
+          ...event,
+          distance: calculateDistance(location, event.location),
+        };
+      })
     : events;
 
   const sortedEvents = [...eventsWithDistance].sort((a, b) => {

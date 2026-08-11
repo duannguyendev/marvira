@@ -190,16 +190,12 @@ export class PracticeService {
     });
   }
 
+  /**
+   * Training / edit fetch. Correct answer is included only for the author
+   * (edit form). Players must submit via POST .../answer — grading is server-side.
+   */
   async getQuestionForTraining(userId: string, questionId: string) {
-    const item = await this.getQuestion(userId, questionId, true);
-    const question = await this.prisma.client.question.findUnique({
-      where: { id: questionId },
-    });
-    if (!question) throw new NotFoundException('Question not found');
-    return {
-      ...item,
-      answer: question.answer,
-    };
+    return this.getQuestion(userId, questionId, true);
   }
 
   async submitAnswer(userId: string, questionId: string, answer: string) {

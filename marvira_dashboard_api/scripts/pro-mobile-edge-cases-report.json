@@ -1,0 +1,184 @@
+{
+  "baseUrl": "https://api.marvira.com",
+  "timestamp": "2026-08-10T10:51:58.535Z",
+  "reusedAccounts": [
+    "qa.pro.1786358978197.1@marvira-qa.test",
+    "qa.pro.1786358978197.2@marvira-qa.test",
+    "qa.pro.1786358978197.3@marvira-qa.test",
+    "qa.pro.1786358978197.4@marvira-qa.test",
+    "qa.pro.1786358978197.5@marvira-qa.test",
+    "qa.pro.1786358978197.6@marvira-qa.test",
+    "qa.pro.1786358978197.7@marvira-qa.test",
+    "qa.pro.1786358978197.8@marvira-qa.test",
+    "qa.pro.1786358978197.9@marvira-qa.test",
+    "qa.pro.1786358978197.10@marvira-qa.test"
+  ],
+  "eventsCreated": [
+    "df58010d-164d-46dc-b422-c1c0d495045e",
+    "6e3cb5dc-235f-4c7b-9921-75bc8ccc2ee7",
+    "f47c9521-4c17-4cab-beb7-7ab110ab3d4b",
+    "c059494f-dd62-4738-8e1e-bfb4e2032a71",
+    "b1bad0a5-db9c-45f0-b49a-fd517201f79b",
+    "a5c69ba9-1030-48d1-847e-5a6ea3c408b6",
+    "195e307b-f999-4b99-844f-ed4dd34fd205"
+  ],
+  "summary": {
+    "passed": 30,
+    "failed": 0,
+    "total": 30,
+    "bugs": 0
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "test": "Reuse 10 existing accounts",
+      "detail": "qa.pro.1786358978197.1@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Create event rejects short title",
+      "detail": "status=400"
+    },
+    {
+      "status": "PASS",
+      "test": "Register rejects short password",
+      "detail": "status=400"
+    },
+    {
+      "status": "PASS",
+      "test": "Unlock blocked when outside place radius",
+      "detail": "status=400 msg=You must be within the place radius to unlock"
+    },
+    {
+      "status": "PASS",
+      "test": "Answer rejected before unlock",
+      "detail": "status=403"
+    },
+    {
+      "status": "PASS",
+      "test": "Unlock succeeds inside radius",
+      "detail": "status=201"
+    },
+    {
+      "status": "PASS",
+      "test": "Cannot unlock password event without join",
+      "detail": "status=403 msg=Password required to play this event"
+    },
+    {
+      "status": "PASS",
+      "test": "MC event unlock",
+      "detail": "status=201"
+    },
+    {
+      "status": "PASS",
+      "test": "MC question type returned",
+      "detail": "MULTIPLE_CHOICE"
+    },
+    {
+      "status": "PASS",
+      "test": "MC question does not leak answer",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "test": "MC correct answer completes",
+      "detail": "eventCompleted=true"
+    },
+    {
+      "status": "PASS",
+      "test": "TRUE_FALSE correct answer",
+      "detail": "{\"correct\":true,\"points\":40,\"totalScore\":40,\"explanation\":null,\"nextPlaceId\":null,\"eventCompleted\":true,\"answerDurationMs\":236,\"eventTotalDurationMs\":245,\"finishRank\":1,\"completionMessage\":null,\"giftTeaser\":null,\"giftCode\":null,\"giftCount\":0,\"giftsAllClaimed\":false}"
+    },
+    {
+      "status": "PASS",
+      "test": "Create draft for no-verify publish",
+      "detail": "b1bad0a5-db9c-45f0-b49a-fd517201f79b"
+    },
+    {
+      "status": "PASS",
+      "test": "Publish blocked without verify",
+      "detail": "status=400 msg=Event must have at least one place before publishing"
+    },
+    {
+      "status": "PASS",
+      "test": "Owner can end event",
+      "detail": "2026-08-10T10:52:25.504Z"
+    },
+    {
+      "status": "PASS",
+      "test": "Cannot unlock ended event",
+      "detail": "status=404"
+    },
+    {
+      "status": "PASS",
+      "test": "List notifications for mark-read",
+      "detail": "items=5"
+    },
+    {
+      "status": "PASS",
+      "test": "Mark notification read",
+      "detail": "2026-08-10T10:52:26.119Z"
+    },
+    {
+      "status": "PASS",
+      "test": "Mark all notifications read",
+      "detail": "{\"updated\":11}"
+    },
+    {
+      "status": "PASS",
+      "test": "Practice wrong answer returns isCorrect:false",
+      "detail": "{\"isCorrect\":false,\"message\":\"Incorrect, try again!\",\"explanation\":null}"
+    },
+    {
+      "status": "PASS",
+      "test": "Favorite practice question",
+      "detail": "status=201"
+    },
+    {
+      "status": "PASS",
+      "test": "Anonymous places list hides answers",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "test": "Refresh token invalid after logout",
+      "detail": "status=401"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish df58010d-164d-46dc-b422-c1c0d495045e",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish 6e3cb5dc-235f-4c7b-9921-75bc8ccc2ee7",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish f47c9521-4c17-4cab-beb7-7ab110ab3d4b",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish c059494f-dd62-4738-8e1e-bfb4e2032a71",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish b1bad0a5-db9c-45f0-b49a-fd517201f79b",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish a5c69ba9-1030-48d1-847e-5a6ea3c408b6",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish 195e307b-f999-4b99-844f-ed4dd34fd205",
+      "detail": "status=200"
+    }
+  ],
+  "bugs": []
+}

@@ -17,6 +17,8 @@ interface NearbyEventRow {
   created_at: Date;
   updated_at: Date;
   distance_meters: number;
+  nearest_latitude: number;
+  nearest_longitude: number;
   join_password_hash: string | null;
   gift_teaser: string | null;
   gift_codes: string[];
@@ -90,7 +92,25 @@ export class GeoQueryService {
             ST_SetSRID(ST_MakePoint(p.longitude, p.latitude), 4326)::geography,
             ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography
           )
-        )::float AS distance_meters
+        )::float AS distance_meters,
+        (
+          ARRAY_AGG(
+            p.latitude
+            ORDER BY ST_Distance(
+              ST_SetSRID(ST_MakePoint(p.longitude, p.latitude), 4326)::geography,
+              ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography
+            )
+          )
+        )[1]::float AS nearest_latitude,
+        (
+          ARRAY_AGG(
+            p.longitude
+            ORDER BY ST_Distance(
+              ST_SetSRID(ST_MakePoint(p.longitude, p.latitude), 4326)::geography,
+              ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography
+            )
+          )
+        )[1]::float AS nearest_longitude
       FROM events e
       INNER JOIN places p ON p.event_id = e.id
       WHERE (

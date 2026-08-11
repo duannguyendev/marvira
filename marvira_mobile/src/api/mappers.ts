@@ -49,6 +49,17 @@ function eventLocation(apiEvent: ApiEvent) {
   if (first) {
     return { latitude: first.latitude, longitude: first.longitude };
   }
+  if (
+    apiEvent.nearestLatitude != null &&
+    apiEvent.nearestLongitude != null &&
+    Number.isFinite(apiEvent.nearestLatitude) &&
+    Number.isFinite(apiEvent.nearestLongitude)
+  ) {
+    return {
+      latitude: apiEvent.nearestLatitude,
+      longitude: apiEvent.nearestLongitude,
+    };
+  }
   return { latitude: 0, longitude: 0 };
 }
 

@@ -79,6 +79,9 @@ export interface Event {
   createdAt: string;
   updatedAt: string;
   distanceMeters?: number;
+  /** Populated by /events/nearby when full places[] is omitted */
+  nearestLatitude?: number;
+  nearestLongitude?: number;
 }
 
 export interface Place {

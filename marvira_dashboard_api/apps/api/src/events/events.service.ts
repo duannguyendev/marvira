@@ -192,6 +192,8 @@ export class EventsService {
             createdAt: row.created_at,
             updatedAt: row.updated_at,
             distanceMeters: row.distance_meters,
+            nearestLatitude: row.nearest_latitude,
+            nearestLongitude: row.nearest_longitude,
           }),
         );
       } catch {

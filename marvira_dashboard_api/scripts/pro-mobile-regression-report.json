@@ -1,0 +1,400 @@
+{
+  "baseUrl": "https://api.marvira.com",
+  "timestamp": "2026-08-10T10:50:10.256Z",
+  "accounts": [
+    {
+      "email": "qa.pro.1786358978197.1@marvira-qa.test",
+      "userId": "c557c937-1254-47b7-910a-40996f7eb6ce"
+    },
+    {
+      "email": "qa.pro.1786358978197.2@marvira-qa.test",
+      "userId": "29ce0bb3-1c17-4c55-bf87-39f0d9492caf"
+    },
+    {
+      "email": "qa.pro.1786358978197.3@marvira-qa.test",
+      "userId": "2aa95a73-d651-46d6-bbf0-cb9e4dee5d52"
+    },
+    {
+      "email": "qa.pro.1786358978197.4@marvira-qa.test",
+      "userId": "3446371a-44db-43c7-8ed0-8a1573bf3b3e"
+    },
+    {
+      "email": "qa.pro.1786358978197.5@marvira-qa.test",
+      "userId": "52eb73ae-2127-45ff-ab6c-c44981d7ebd3"
+    },
+    {
+      "email": "qa.pro.1786358978197.6@marvira-qa.test",
+      "userId": "9c4da3d7-1317-41c8-95e9-809db57412e0"
+    },
+    {
+      "email": "qa.pro.1786358978197.7@marvira-qa.test",
+      "userId": "f986bd8e-6a6b-4aa7-a513-a1348a719879"
+    },
+    {
+      "email": "qa.pro.1786358978197.8@marvira-qa.test",
+      "userId": "06790d9b-efd6-42be-ae77-74dee52d3d1c"
+    },
+    {
+      "email": "qa.pro.1786358978197.9@marvira-qa.test",
+      "userId": "7976660e-17f9-48e0-bb28-42c1b51d8696"
+    },
+    {
+      "email": "qa.pro.1786358978197.10@marvira-qa.test",
+      "userId": "ca7a49fb-e022-434f-9811-29a126087f9b"
+    }
+  ],
+  "eventsCreated": [
+    "c308294d-6d82-4bd6-80ee-b8c57c4fba15",
+    "3e67eff0-ae33-4130-a932-0eefbf6251bf",
+    "f942435e-6b01-4978-aa65-a0fa44991e44",
+    "4e17b2f8-fd6c-4adb-a8e3-ee85ce33abbf",
+    "91dd6a75-7f51-4ad5-8a58-5e2941d2019f"
+  ],
+  "summary": {
+    "passed": 65,
+    "failed": 1,
+    "total": 66,
+    "bugs": 1
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "test": "Health check",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 1",
+      "detail": "qa.pro.1786358978197.1@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 2",
+      "detail": "qa.pro.1786358978197.2@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 3",
+      "detail": "qa.pro.1786358978197.3@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 4",
+      "detail": "qa.pro.1786358978197.4@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 5",
+      "detail": "qa.pro.1786358978197.5@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 6",
+      "detail": "qa.pro.1786358978197.6@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 7",
+      "detail": "qa.pro.1786358978197.7@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 8",
+      "detail": "qa.pro.1786358978197.8@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 9",
+      "detail": "qa.pro.1786358978197.9@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Register account 10",
+      "detail": "qa.pro.1786358978197.10@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "All 10 accounts created",
+      "detail": "created=10"
+    },
+    {
+      "status": "PASS",
+      "test": "Duplicate register rejected (409)",
+      "detail": "status=409"
+    },
+    {
+      "status": "PASS",
+      "test": "Wrong password rejected (401)",
+      "detail": "status=401"
+    },
+    {
+      "status": "PASS",
+      "test": "Login with valid credentials",
+      "detail": "qa.pro.1786358978197.1@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "GET /auth/me",
+      "detail": "qa.pro.1786358978197.1@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Refresh token",
+      "detail": "new access token received"
+    },
+    {
+      "status": "PASS",
+      "test": "Logout",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "Change password",
+      "detail": "Password updated successfully. Please sign in again."
+    },
+    {
+      "status": "PASS",
+      "test": "Login after change password",
+      "detail": "qa.pro.1786358978197.4@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Forgot password request",
+      "detail": "If an account exists for that email, a reset link has been sent."
+    },
+    {
+      "status": "PASS",
+      "test": "Forgot password (no devResetToken on PRO)",
+      "detail": "expected for production"
+    },
+    {
+      "status": "PASS",
+      "test": "Create & publish open event",
+      "detail": "c308294d-6d82-4bd6-80ee-b8c57c4fba15"
+    },
+    {
+      "status": "PASS",
+      "test": "Create & publish password-protected event",
+      "detail": "3e67eff0-ae33-4130-a932-0eefbf6251bf"
+    },
+    {
+      "status": "PASS",
+      "test": "Create & publish gift event",
+      "detail": "f942435e-6b01-4978-aa65-a0fa44991e44"
+    },
+    {
+      "status": "PASS",
+      "test": "Schedule publish",
+      "detail": "2026-08-10T11:49:56.894Z"
+    },
+    {
+      "status": "PASS",
+      "test": "Cancel scheduled publish",
+      "detail": "scheduled=null"
+    },
+    {
+      "status": "PASS",
+      "test": "GET /events/nearby",
+      "detail": "count=3"
+    },
+    {
+      "status": "PASS",
+      "test": "Open event appears in nearby",
+      "detail": "c308294d-6d82-4bd6-80ee-b8c57c4fba15"
+    },
+    {
+      "status": "PASS",
+      "test": "GET /events list",
+      "detail": "items=4"
+    },
+    {
+      "status": "PASS",
+      "test": "GET /events/:id details",
+      "detail": "QA Open Hunt 1786358978197"
+    },
+    {
+      "status": "PASS",
+      "test": "GET /events/:id/places",
+      "detail": "places=1"
+    },
+    {
+      "status": "PASS",
+      "test": "Places response does not leak answers",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "test": "Wrong join password rejected",
+      "detail": "status=403"
+    },
+    {
+      "status": "PASS",
+      "test": "Correct join password grants access",
+      "detail": "{\"joined\":true,\"hasAccess\":true}"
+    },
+    {
+      "status": "PASS",
+      "test": "Player completes open event (correct answer)",
+      "detail": "eventCompleted=true"
+    },
+    {
+      "status": "PASS",
+      "test": "GET completion snapshot after finish",
+      "detail": "{\"eventCompleted\":true,\"finishRank\":1,\"completionMessage\":null,\"giftTeaser\":null,\"giftCode\":null,\"giftCount\":0,\"giftsAllClaimed\":false,\"score\":60,\"totalDurationMs\":314}"
+    },
+    {
+      "status": "PASS",
+      "test": "Completed event in profile",
+      "detail": "count=1"
+    },
+    {
+      "status": "PASS",
+      "test": "Player completes gift event",
+      "detail": "giftCode=GIFT-1786358978197"
+    },
+    {
+      "status": "PASS",
+      "test": "Player completes protected event after join",
+      "detail": "eventCompleted=true"
+    },
+    {
+      "status": "PASS",
+      "test": "Wrong answer returns correct:false",
+      "detail": ""
+    },
+    {
+      "status": "PASS",
+      "test": "Report wrong answer",
+      "detail": "{\"reported\":true,\"alreadyReported\":false,\"message\":\"Thanks — we notified the organizer. You can keep trying; they may update the answer.\"}"
+    },
+    {
+      "status": "PASS",
+      "test": "Owner views answer reports",
+      "detail": "rows=1"
+    },
+    {
+      "status": "PASS",
+      "test": "Add event to favorites",
+      "detail": "status=201"
+    },
+    {
+      "status": "PASS",
+      "test": "Event appears in favorites",
+      "detail": "c308294d-6d82-4bd6-80ee-b8c57c4fba15"
+    },
+    {
+      "status": "PASS",
+      "test": "Remove event from favorites",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "GET /practice/questions",
+      "detail": "count=0"
+    },
+    {
+      "status": "PASS",
+      "test": "Create practice question",
+      "detail": "ff094ee3-80a7-4266-8c34-a50cbde62aba"
+    },
+    {
+      "status": "FAIL",
+      "test": "Submit practice training answer",
+      "detail": "{\"isCorrect\":true,\"message\":\"Correct!\",\"explanation\":null}"
+    },
+    {
+      "status": "PASS",
+      "test": "GET /practice/questions/mine",
+      "detail": "count=1"
+    },
+    {
+      "status": "PASS",
+      "test": "GET event leaderboard",
+      "detail": "entries=1"
+    },
+    {
+      "status": "PASS",
+      "test": "GET global leaderboard",
+      "detail": "status=200"
+    },
+    {
+      "status": "PASS",
+      "test": "GET notifications unread count",
+      "detail": "6"
+    },
+    {
+      "status": "PASS",
+      "test": "GET notifications list",
+      "detail": "items=6"
+    },
+    {
+      "status": "PASS",
+      "test": "GET notification preferences",
+      "detail": "{\"gameplayEnabled\":true,\"creatorEnabled\":true,\"productEnabled\":false}"
+    },
+    {
+      "status": "PASS",
+      "test": "Update notification preferences",
+      "detail": "status=201"
+    },
+    {
+      "status": "PASS",
+      "test": "Submit feedback",
+      "detail": "866d6cd9-0642-462e-890b-0bd2c04a0cff"
+    },
+    {
+      "status": "PASS",
+      "test": "GET /events/mine",
+      "detail": "count=5"
+    },
+    {
+      "status": "PASS",
+      "test": "GET owner-places",
+      "detail": "places=1"
+    },
+    {
+      "status": "PASS",
+      "test": "GET finishers (owner)",
+      "detail": "finishers=1"
+    },
+    {
+      "status": "PASS",
+      "test": "GET /profile",
+      "detail": "qa.pro.1786358978197.1@marvira-qa.test"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish event c308294d-6d82-4bd6-80ee-b8c57c4fba15",
+      "detail": "isActive=false"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish event 3e67eff0-ae33-4130-a932-0eefbf6251bf",
+      "detail": "isActive=false"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish event f942435e-6b01-4978-aa65-a0fa44991e44",
+      "detail": "isActive=false"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish event 4e17b2f8-fd6c-4adb-a8e3-ee85ce33abbf",
+      "detail": "isActive=false"
+    },
+    {
+      "status": "PASS",
+      "test": "Unpublish event 91dd6a75-7f51-4ad5-8a58-5e2941d2019f",
+      "detail": "isActive=false"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "BUG-1",
+      "severity": "medium",
+      "flow": "Submit practice training answer",
+      "detail": "{\"isCorrect\":true,\"message\":\"Correct!\",\"explanation\":null}",
+      "timestamp": "2026-08-10T10:50:07.204Z"
+    }
+  ]
+}

@@ -45,7 +45,7 @@ export const MyQuestionsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data, isLoading, error, refetch, isRefetching } = useMyQuestions();
+  const { data, isLoading, error, refetch } = useMyQuestions();
   const deleteMutation = useDeletePracticeQuestion();
   const {
     pendingUnfavoriteId,
@@ -58,8 +58,11 @@ export const MyQuestionsScreen: React.FC = () => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await refetch();
-    setRefreshing(false);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const handleDelete = (questionId: string, questionText: string) => {
@@ -107,7 +110,7 @@ export const MyQuestionsScreen: React.FC = () => {
         contentContainerStyle={styles.list}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing || isRefetching}
+            refreshing={refreshing}
             onRefresh={handleRefresh}
           />
         }
