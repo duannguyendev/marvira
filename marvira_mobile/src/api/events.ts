@@ -91,8 +91,8 @@ export const eventsApi = {
 
     let apiEvents: ApiEvent[] = [];
 
-    if (userLocation) {
-      const radiusKm = (filters?.radius ?? 5000) / 1000;
+    if (userLocation && filters?.radius != null && filters.radius > 0) {
+      const radiusKm = filters.radius / 1000;
       const response = await apiClient.get<{
         success: boolean;
         data: ApiEvent[];

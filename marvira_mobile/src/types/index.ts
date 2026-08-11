@@ -170,7 +170,8 @@ export interface ApiError {
 
 // Filter Types
 export interface EventFilters {
-  radius: number;
+  /** Meters. Omit / undefined = no radius filter (show all). */
+  radius?: number;
   status?: EventStatus;
   searchQuery?: string;
 }

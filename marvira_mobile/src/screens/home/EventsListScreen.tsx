@@ -38,12 +38,13 @@ export const EventsListScreen: React.FC = () => {
   const { location } = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [radius, setRadius] = useState(5000);
+  /** meters; null = no radius filter */
+  const [radius, setRadius] = useState<number | null>(25000);
   const [statusFilter, setStatusFilter] = useState<EventStatus | undefined>();
   const [refreshing, setRefreshing] = useState(false);
 
   const filters: EventFilters = {
-    radius,
+    radius: radius ?? undefined,
     status: statusFilter,
     searchQuery: searchQuery.trim() || undefined,
   };
@@ -114,10 +115,26 @@ export const EventsListScreen: React.FC = () => {
       <View style={styles.filtersContainer}>
         <View style={styles.radiusContainer}>
           <Text style={styles.filterLabel}>
-            {t('common.radius')}: {radius / 1000}
-            {t('common.km')}
+            {t('common.radius')}:{' '}
+            {radius == null
+              ? t('common.all')
+              : `${radius / 1000}${t('common.km')}`}
           </Text>
           <View style={styles.radiusButtons}>
+            <TouchableOpacity
+              style={[
+                styles.radiusButton,
+                radius == null && styles.radiusButtonActive,
+              ]}
+              onPress={() => setRadius(null)}>
+              <Text
+                style={[
+                  styles.radiusButtonText,
+                  radius == null && styles.radiusButtonTextActive,
+                ]}>
+                {t('common.all')}
+              </Text>
+            </TouchableOpacity>
             {[1, 5, 10, 25].map(km => (
               <TouchableOpacity
                 key={km}
@@ -256,6 +273,7 @@ const styles = StyleSheet.create({
   },
   radiusButtons: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm,
   },
   radiusButton: {

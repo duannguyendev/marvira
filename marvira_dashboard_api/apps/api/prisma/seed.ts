@@ -2,13 +2,13 @@ import {
   PrismaClient,
   UserRole,
   AuthProvider,
-  EventDifficulty,
   QuestionType,
   QuestionSource,
   ArticleStatus,
 } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { matThuPracticeQuestions } from './seeds/mat-thu-practice';
+import { demoHunts } from './seeds/demo-hunts';
 
 const prisma = new PrismaClient();
 
@@ -134,196 +134,11 @@ async function main() {
     });
   }
 
-  const event = await prisma.event.upsert({
-    where: { id: 'seed-event-downtown' },
-    update: { language: 'en' },
-    create: {
-      id: 'seed-event-downtown',
-      title: 'Downtown Discovery Hunt',
-      description:
-        'Explore the historic downtown district and uncover hidden gems through interactive challenges.',
-      city: 'San Francisco',
-      difficulty: EventDifficulty.MEDIUM,
-      rewardPoints: 250,
-      isActive: true,
-      language: 'en',
-      createdBy: admin.id,
-      coverImage: null,
-    },
-  });
-
-  const questionDefs = [
-    {
-      id: 'seed-question-1',
-      question: 'What year was Union Square dedicated?',
-      type: QuestionType.TEXT,
-      answer: '1850',
-      explanation:
-        'Union Square was dedicated in 1850 and named for pro-Union rallies.',
-      points: 15,
-      placeId: 'seed-place-1',
-    },
-    {
-      id: 'seed-question-2',
-      question: 'The Ferry Building clock is modeled after which famous tower?',
-      type: QuestionType.MULTIPLE_CHOICE,
-      options: ['Big Ben', 'Eiffel Tower', 'Leaning Tower', 'CN Tower'],
-      answer: 'Big Ben',
-      explanation:
-        'The clock was inspired by the Giralda tower in Seville, but resembles Big Ben.',
-      points: 20,
-      placeId: 'seed-place-2',
-    },
-    {
-      id: 'seed-question-3',
-      question: 'Coit Tower was built with funds from Lillie Hitchcock Coit.',
-      type: QuestionType.TRUE_FALSE,
-      options: ['True', 'False'],
-      answer: 'True',
-      explanation:
-        'Lillie Hitchcock Coit left funds to beautify San Francisco.',
-      points: 25,
-      placeId: 'seed-place-3',
-    },
-  ];
-
-  const placesData = [
-    {
-      id: 'seed-place-1',
-      title: 'Union Square',
-      description: 'The heart of downtown shopping and culture.',
-      latitude: 37.7879,
-      longitude: -122.4075,
-      orderIndex: 0,
-      hint: 'Look for the large plaza with palm trees.',
-    },
-    {
-      id: 'seed-place-2',
-      title: 'Ferry Building',
-      description: 'Historic transit hub turned gourmet marketplace.',
-      latitude: 37.7956,
-      longitude: -122.3933,
-      orderIndex: 1,
-      hint: 'Find the clock tower by the bay.',
-    },
-    {
-      id: 'seed-place-3',
-      title: 'Coit Tower',
-      description: 'Art Deco tower with panoramic city views.',
-      latitude: 37.8024,
-      longitude: -122.4058,
-      orderIndex: 2,
-      hint: 'Climb Telegraph Hill to find this landmark.',
-    },
-  ];
-
-  for (const qDef of questionDefs) {
-    const { placeId: _p, ...qData } = qDef;
-    await prisma.question.upsert({
-      where: { id: qDef.id },
-      update: { language: 'en' },
-      create: { ...qData, language: 'en' },
-    });
-    await prisma.eventQuestion.upsert({
-      where: {
-        eventId_questionId: { eventId: event.id, questionId: qDef.id },
-      },
-      update: {},
-      create: {
-        eventId: event.id,
-        questionId: qDef.id,
-        orderIndex: questionDefs.indexOf(qDef),
-      },
-    });
-  }
-
-  for (const place of placesData) {
-    const qDef = questionDefs.find(q => q.placeId === place.id);
-    await prisma.place.upsert({
-      where: { id: place.id },
-      update: { questionId: qDef?.id ?? null },
-      create: {
-        ...place,
-        eventId: event.id,
-        radiusMeters: 100,
-        questionId: qDef?.id,
-      },
-    });
-  }
-
-  const bridgeQuestion = await prisma.question.upsert({
-    where: { id: 'seed-question-bridge' },
-    update: { language: 'en' },
-    create: {
-      id: 'seed-question-bridge',
-      question: 'What color is the Golden Gate Bridge officially painted?',
-      type: QuestionType.TEXT,
-      answer: 'International Orange',
-      explanation: 'The official color is International Orange.',
-      points: 30,
-      language: 'en',
-    },
-  });
-
-  const event2 = await prisma.event.upsert({
-    where: { id: 'seed-event-golden-gate' },
-    update: { language: 'en' },
-    create: {
-      id: 'seed-event-golden-gate',
-      title: 'Golden Gate Adventure',
-      description: 'A scenic hunt along the iconic Golden Gate Bridge area.',
-      city: 'San Francisco',
-      difficulty: EventDifficulty.HARD,
-      rewardPoints: 400,
-      isActive: true,
-      language: 'en',
-      createdBy: admin.id,
-    },
-  });
-
-  await prisma.eventQuestion.upsert({
-    where: {
-      eventId_questionId: { eventId: event2.id, questionId: bridgeQuestion.id },
-    },
-    update: {},
-    create: {
-      eventId: event2.id,
-      questionId: bridgeQuestion.id,
-      orderIndex: 0,
-    },
-  });
-
-  await prisma.place.upsert({
-    where: { id: 'seed-place-golden-gate' },
-    update: {},
-    create: {
-      id: 'seed-place-golden-gate',
-      eventId: event2.id,
-      title: 'Golden Gate Welcome Center',
-      description: 'Start your bridge adventure here.',
-      latitude: 37.8078,
-      longitude: -122.475,
-      orderIndex: 0,
-      radiusMeters: 150,
-      hint: 'Near the south vista point.',
-      questionId: bridgeQuestion.id,
-    },
-  });
-
-  await prisma.eventQuestion.upsert({
-    where: {
-      eventId_questionId: { eventId: event2.id, questionId: 'seed-question-1' },
-    },
-    update: {},
-    create: {
-      eventId: event2.id,
-      questionId: 'seed-question-1',
-      orderIndex: 1,
-    },
-  });
+  // Demo hunts (Hà Nội + TP.HCM) are created after practice questions exist
+  // so we can attach seed-practice-matthu-* as place questions.
 
   const demoUser = await prisma.user.findUnique({
-    where: { email: 'demo@marvira.com' },
+    where: { email: demoEmail },
   });
 
   const communityQuestions = [
@@ -423,23 +238,122 @@ async function main() {
     });
   }
 
+  // Remove legacy San Francisco demo hunt data (if present)
+  await prisma.event.deleteMany({
+    where: {
+      id: { in: ['seed-event-downtown', 'seed-event-golden-gate'] },
+    },
+  });
+  await prisma.question.deleteMany({
+    where: {
+      id: {
+        in: [
+          'seed-question-1',
+          'seed-question-2',
+          'seed-question-3',
+          'seed-question-bridge',
+        ],
+      },
+    },
+  });
+
+  console.log(`Seeding ${demoHunts.length} demo hunts across Vietnam...`);
+  for (const hunt of demoHunts) {
+    const event = await prisma.event.upsert({
+      where: { id: hunt.id },
+      update: {
+        title: hunt.title,
+        description: hunt.description,
+        city: hunt.city,
+        coverImage: hunt.coverImage,
+        difficulty: hunt.difficulty,
+        rewardPoints: hunt.rewardPoints,
+        isActive: true,
+        language: 'vi',
+        createdBy: admin.id,
+      },
+      create: {
+        id: hunt.id,
+        title: hunt.title,
+        description: hunt.description,
+        city: hunt.city,
+        difficulty: hunt.difficulty,
+        rewardPoints: hunt.rewardPoints,
+        isActive: true,
+        language: 'vi',
+        createdBy: admin.id,
+        coverImage: hunt.coverImage,
+      },
+    });
+
+    for (const place of hunt.places) {
+      await prisma.eventQuestion.upsert({
+        where: {
+          eventId_questionId: {
+            eventId: event.id,
+            questionId: place.questionId,
+          },
+        },
+        update: { orderIndex: place.orderIndex },
+        create: {
+          eventId: event.id,
+          questionId: place.questionId,
+          orderIndex: place.orderIndex,
+        },
+      });
+
+      await prisma.place.upsert({
+        where: { id: place.id },
+        update: {
+          title: place.title,
+          description: place.description,
+          latitude: place.latitude,
+          longitude: place.longitude,
+          orderIndex: place.orderIndex,
+          hint: place.hint,
+          radiusMeters: place.radiusMeters ?? 120,
+          questionId: place.questionId,
+          eventId: event.id,
+        },
+        create: {
+          id: place.id,
+          eventId: event.id,
+          title: place.title,
+          description: place.description,
+          latitude: place.latitude,
+          longitude: place.longitude,
+          orderIndex: place.orderIndex,
+          hint: place.hint,
+          radiusMeters: place.radiusMeters ?? 120,
+          questionId: place.questionId,
+        },
+      });
+    }
+  }
+
   if (demoUser) {
     await prisma.userFavoriteEvent.upsert({
       where: {
-        userId_eventId: { userId: demoUser.id, eventId: event.id },
+        userId_eventId: {
+          userId: demoUser.id,
+          eventId: 'seed-event-hanoi',
+        },
       },
       update: {},
-      create: { userId: demoUser.id, eventId: event.id },
+      create: { userId: demoUser.id, eventId: 'seed-event-hanoi' },
     });
     await prisma.userFavoriteQuestion.upsert({
       where: {
         userId_questionId: {
           userId: demoUser.id,
-          questionId: 'seed-practice-1',
+          questionId: 'seed-practice-matthu-001',
         },
       },
       update: {},
-      create: { userId: demoUser.id, questionId: 'seed-practice-1' },
+      create: {
+        userId: demoUser.id,
+        questionId: 'seed-practice-matthu-001',
+      },
     });
   }
 
