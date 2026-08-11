@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Event } from '../types';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
@@ -64,9 +59,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           {isIncoming ? (
             <View
               style={[styles.statusBadge, { backgroundColor: colors.info }]}>
-              <Text style={styles.statusText}>
-                {t('eventStatus.incoming')}
-              </Text>
+              <Text style={styles.statusText}>{t('eventStatus.incoming')}</Text>
             </View>
           ) : null}
         </View>
@@ -94,14 +87,16 @@ export const EventCard: React.FC<EventCardProps> = ({
           {isIncoming ? (
             <Text style={styles.incomingHint}>{t('events.incomingHint')}</Text>
           ) : (
-            <View style={styles.metaEnd}>
-              {event.totalPlaces > 0 ? (
-                <Text style={styles.placesText}>
-                  {event.totalPlaces} {t('common.places')}
-                </Text>
-              ) : null}
+            <View style={styles.metaRow}>
+              <View style={styles.metaLeft}>
+                {event.totalPlaces > 0 ? (
+                  <Text style={styles.placesText} numberOfLines={1}>
+                    {event.totalPlaces} {t('common.places')}
+                  </Text>
+                ) : null}
+              </View>
               {event.creatorName ? (
-                <Text style={styles.creatorText} numberOfLines={1}>
+                <Text style={styles.creatorText} numberOfLines={1} ellipsizeMode="tail">
                   {t('events.createdBy', { name: event.creatorName })}
                 </Text>
               ) : null}
@@ -252,17 +247,23 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     color: colors.textSecondary,
     fontWeight: fontWeight.medium,
-    textAlign: 'right',
-  },
-  metaEnd: {
-    flex: 1,
-    marginLeft: spacing.md,
-    alignItems: 'flex-end',
+    textAlign: 'left',
   },
   creatorText: {
-    marginTop: spacing.xs,
     fontSize: fontSize.xs,
     color: colors.textSecondary,
     textAlign: 'right',
+  },
+  metaRow: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginLeft: spacing.md,
+    marginTop: spacing.xs,
+  },
+  metaLeft: {
+    flex: 1,
+    paddingRight: spacing.sm,
   },
 });

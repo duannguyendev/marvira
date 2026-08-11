@@ -1,3 +1,90 @@
+diff --git a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomToolbar.kt b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomToolbar.kt
+index 0ecc2fc..c70a3ed 100644
+--- a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomToolbar.kt
++++ b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/CustomToolbar.kt
+@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
+ import com.facebook.react.modules.core.ReactChoreographer
+ import com.facebook.react.uimanager.ThemedReactContext
+ import com.swmansion.rnscreens.utils.InsetsCompat
++import com.swmansion.rnscreens.utils.getDecorViewTopInset
+ import com.swmansion.rnscreens.utils.resolveInsetsOrZero
+ import kotlin.math.max
+ 
+@@ -42,6 +43,8 @@ open class CustomToolbar(
+ 
+     private var isLayoutEnqueued = false
+ 
++    private var insetsAppliedFromListener = false
++
+     init {
+         // Ensure ActionMenuView is initialized as soon as the Toolbar is created.
+         //
+@@ -113,7 +116,36 @@ open class CustomToolbar(
+         }
+     }
+ 
++    // Patch (backport from 4.25): when insets never reach the toolbar via
++    // normal dispatch (e.g. RN's translucent StatusBar listener or another
++    // ancestor consumes them), apply the decor-view top inset on attach so
++    // the header never renders behind the status bar.
++    override fun onAttachedToWindow() {
++        super.onAttachedToWindow()
++        applyDecorViewTopInsetIfNeeded()
++    }
++
++    override fun onDetachedFromWindow() {
++        super.onDetachedFromWindow()
++        insetsAppliedFromListener = false
++        lastInsets = InsetsCompat.NONE
++    }
++
++    private fun applyDecorViewTopInsetIfNeeded() {
++        if (insetsAppliedFromListener) return
++
++        val activity = (context as? ThemedReactContext)?.currentActivity ?: return
++        val decorView = activity.window.decorView
++        val topInset = getDecorViewTopInset(decorView)
++
++        if (topInset > 0 && paddingTop != topInset) {
++            applyExactPadding(paddingLeft, topInset, paddingRight, paddingBottom)
++        }
++    }
++
+     override fun onApplyWindowInsets(insets: WindowInsets?): WindowInsets? {
++        insetsAppliedFromListener = true
++
+         val unhandledInsets = super.onApplyWindowInsets(insets)
+ 
+         // There are few UI modes we could be running in
+@@ -128,6 +160,19 @@ open class CustomToolbar(
+         val systemBarInsets =
+             resolveInsetsOrZero(WindowInsetsCompat.Type.systemBars(), unhandledInsets)
+ 
++        // Patch (react-native-screens#3499 / #3869, fixed upstream in 4.25):
++        // under enforced edge-to-edge, ancestors such as SafeAreaProvider consume
++        // the top system-bar inset before it reaches the toolbar, so
++        // `unhandledInsets` reports top=0 and the header renders behind the
++        // status bar. Root window insets cannot be consumed by ancestors, so
++        // fall back to them whenever the propagated top inset is zero.
++        val systemBarTopInset =
++            if (systemBarInsets.top > 0) {
++                systemBarInsets.top
++            } else {
++                resolveInsetsOrZero(WindowInsetsCompat.Type.systemBars()).top
++            }
++
+         // This seems to work fine in all tested configurations, because cutout & system bars overlap
+         // only in portrait mode & top inset is controlled separately, therefore we don't count
+         // any insets twice.
+@@ -145,7 +190,7 @@ open class CustomToolbar(
+         val verticalInsets =
+             InsetsCompat.of(
+                 0,
+-                max(cutoutInsets.top, if (shouldApplyTopInset) systemBarInsets.top else 0),
++                max(cutoutInsets.top, if (shouldApplyTopInset) systemBarTopInset else 0),
+                 0,
+                 max(cutoutInsets.bottom, 0),
+             )
 diff --git a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt b/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt
 index c99ca36..2ed9d9d 100644
 --- a/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt
