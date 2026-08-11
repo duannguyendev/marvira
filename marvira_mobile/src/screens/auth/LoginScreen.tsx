@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { SocialSignInButton } from '../../components/social/SocialSignInButton';
 import { storage } from '../../utils/storage';
 import {
   colors,
@@ -260,35 +261,32 @@ export const LoginScreen: React.FC = () => {
                 <View style={styles.dividerLine} />
               </View>
 
-              <Button
+              <SocialSignInButton
+                provider="google"
                 title={t('auth.continueWithGoogle')}
                 onPress={handleGoogle}
                 loading={isSocialPending}
                 disabled={busy}
-                variant="outline"
-                fullWidth
                 style={styles.socialButton}
               />
 
               {appleAvailable && (
-                <Button
+                <SocialSignInButton
+                  provider="apple"
                   title={t('auth.continueWithApple')}
                   onPress={handleApple}
                   loading={isSocialPending}
                   disabled={busy}
-                  variant="outline"
-                  fullWidth
                   style={styles.socialButton}
                 />
               )}
 
-              <Button
+              <SocialSignInButton
+                provider="facebook"
                 title={t('auth.continueWithFacebook')}
                 onPress={handleFacebook}
                 loading={isSocialPending}
                 disabled={busy}
-                variant="outline"
-                fullWidth
                 style={styles.socialButton}
               />
 
