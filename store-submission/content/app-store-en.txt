@@ -109,12 +109,11 @@ images/icon/app-icon-1024-opaque.png
 --------------------------------------------------------------------------------
 Screenshots (required sizes — put real captures in images/screenshots/ios/)
 --------------------------------------------------------------------------------
-iPhone 6.7" (required): 1290×2796  — promo frames: images/promotional/*-ios-6.7.png
+iPhone 6.7" (required): 1290×2796
 iPhone 6.5" (if needed): 1284×2778
-iPad 12.9" (if iPad supported): 2048×2732 — promo: images/promotional/*-ipad-12.9.png
+iPad 12.9" (if iPad supported): 2048×2732
 
 Min 3 screenshots recommended; max 10 per device size.
-Replace promotional placeholder frames with real UI before final review.
 
 --------------------------------------------------------------------------------
 What’s New (v1.0)

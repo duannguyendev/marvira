@@ -15,6 +15,7 @@ interface NearbyEventRow {
   language: string;
   created_by: string;
   creator_name: string;
+  creator_email: string;
   created_at: Date;
   updated_at: Date;
   distance_meters: number;
@@ -88,6 +89,7 @@ export class GeoQueryService {
         e.gift_codes,
         e.created_by,
         MAX(u.name) AS creator_name,
+        MAX(u.email) AS creator_email,
         e.created_at,
         e.updated_at,
         MIN(

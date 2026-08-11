@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import './src/i18n';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -11,6 +11,7 @@ import { I18nProvider } from './src/components/I18nProvider';
 import { AlertProvider } from './src/components/AlertBottomSheet';
 import { analytics } from './src/services/analytics';
 import { initMapbox } from './src/utils/mapbox';
+import { colors } from './src/theme';
 
 initMapbox();
 
@@ -43,8 +44,12 @@ const App: React.FC = () => {
                   <OfflineBanner />
                   <StatusBar
                     barStyle="light-content"
-                    backgroundColor="transparent"
-                    translucent
+                    // On Android, keep status bar opaque so stack headers
+                    // don't render under it (prevents title overlap).
+                    backgroundColor={
+                      Platform.OS === 'android' ? colors.primary : 'transparent'
+                    }
+                    translucent={Platform.OS === 'ios'}
                   />
                   <RootNavigator />
                 </View>

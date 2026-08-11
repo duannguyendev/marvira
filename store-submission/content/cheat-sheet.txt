@@ -9,6 +9,9 @@ Tagline VI:         Khám phá thành phố bằng đôi chân.
 Subtitle EN:        City adventure, on foot
 Subtitle VI:        Khám phá thành phố bằng chân
 
+Production API:     https://api.marvira.com
+Production health:  https://api.marvira.com/health
+
 Support email:      support@marvira.com
 Website:            https://www.marvira.com
 Support page:       https://www.marvira.com/support

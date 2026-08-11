@@ -79,8 +79,7 @@ Graphics to upload (see ../images/)
 • App icon: images/icon/play-icon-512.png  (512×512)
 • Feature graphic: images/feature-graphic/play-feature-graphic-1024x500.png
 • Phone screenshots: images/screenshots/android/  (min 2; prefer 1080×1920)
-  Temporary promo frames: images/promotional/*-android-phone.png
-  → Replace with real device screenshots before final submit.
+  Use real device screenshots (or Android emulator captures) before final submit.
 
 --------------------------------------------------------------------------------
 What’s new (v1.0)

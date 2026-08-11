@@ -29,9 +29,9 @@ import {
 } from '../common/content-language';
 import { NotificationsService } from '../notifications/notifications.service';
 
-/** Public attribution — name only, never email. */
+/** Public attribution — show "Marvira" for creators with marvira email domain. */
 const CREATOR_PUBLIC_INCLUDE = {
-  creator: { select: { name: true } },
+  creator: { select: { name: true, email: true } },
 } as const;
 import { isDashboardRole } from '../common/utils/roles';
 import {
@@ -203,7 +203,7 @@ export class EventsService {
             nearestLatitude: row.nearest_latitude,
             nearestLongitude: row.nearest_longitude,
             _count: { places: row.places_count },
-            creatorName: row.creator_name,
+            creator: { name: row.creator_name, email: row.creator_email },
           }),
         );
       } catch {

@@ -681,7 +681,7 @@ export class ProgressService {
       include: {
         event: {
           include: {
-            creator: { select: { name: true } },
+            creator: { select: { name: true, email: true } },
             _count: { select: { places: true } },
           },
         },
@@ -698,11 +698,17 @@ export class ProgressService {
         ...event
       } = row.event;
       const codes = giftCodes ?? [];
+      const creatorEmail = creator?.email?.toLowerCase() ?? '';
+      const creatorDomain = creatorEmail.includes('@')
+        ? creatorEmail.split('@')[1] ?? ''
+        : creatorEmail;
+      const creatorName =
+        creatorDomain.includes('marvira') ? 'Marvira' : creator?.name?.trim() || 'Marvira';
       return {
         ...row,
         event: {
           ...event,
-          creatorName: creator?.name?.trim() || 'Marvira',
+          creatorName,
           isPasswordProtected: joinPasswordHash != null,
           hasGift: codes.length > 0,
           giftCount: codes.length,

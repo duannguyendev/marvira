@@ -3,8 +3,9 @@ MARVIRA — STORE SUBMISSION PACK
 ================================================================================
 Folder này chứa sẵn text + ảnh để điền App Store Connect và Google Play Console.
 
-Cập nhật: 2026-08-07
+Cập nhật: 2026-08-11
 App: Marvira · Bundle/Package: com.marvira
+Production: https://www.marvira.com · API https://api.marvira.com
 Slogan: City adventure, on foot. / Khám phá thành phố bằng đôi chân.
 
 --------------------------------------------------------------------------------
@@ -27,8 +28,6 @@ store-submission/
 │   │   └── play-icon-512.png           ← Google Play icon
 │   ├── feature-graphic/
 │   │   └── play-feature-graphic-1024x500.png   ← bắt buộc trên Play
-│   ├── promotional/                    ← bộ promo premium (5 slides × sizes)
-│   │                                     regenerate: node scripts/generate-promotional.js
 │   └── screenshots/
 │       ├── README.txt                  ← hướng dẫn chụp screenshot thật
 │       ├── ios/                        ← bỏ screenshot iPhone/iPad vào đây
@@ -46,7 +45,6 @@ THỨ TỰ LÀM KHI SUBMIT
 2. Điền listing text từ content/* (EN primary; VI nếu publish locale Việt)
 3. Upload icon + feature graphic từ images/
 4. Chụp screenshot thật theo images/screenshots/README.txt
-   (hiện promotional/ chỉ là placeholder — nên thay trước review công khai)
 5. Điền App Privacy / Data safety theo store_privacy_labels.txt
 6. Điền age rating theo content/age-rating-and-categories.txt
 7. Điền demo account trong content/review-notes.txt (thay DEMO_*)
@@ -63,7 +61,7 @@ App Store Connect
   Icon 1024
       → images/icon/app-icon-1024-opaque.png
   Screenshots
-      → images/screenshots/ios/  (hoặc promotional/*-ios-6.7.png tạm thời)
+      → images/screenshots/ios/
 
 Google Play Console
   App name / Short / Full description / What’s new
@@ -73,16 +71,25 @@ Google Play Console
   Feature graphic 1024×500
       → images/feature-graphic/play-feature-graphic-1024x500.png
   Screenshots
-      → images/screenshots/android/  (hoặc promotional/*-android-phone.png)
+      → images/screenshots/android/
   App access / demo
       → content/review-notes.txt
 
 --------------------------------------------------------------------------------
-REGENERATE ẢNH
+REGENERATE ẢNH (sau khi đổi icon / promo layout)
 --------------------------------------------------------------------------------
-cd store-submission/scripts
-npm install
-node generate-assets.js
+1. Platform icons (scale 2 mark — source of truth):
+     cd repo root
+     npm install --no-save --prefix app-icon @resvg/resvg-js sharp
+     node app-icon/generate.js
+
+2. Store submission pack (icon 1024/512, feature graphic):
+     cd store-submission/scripts
+     npm install
+     node generate-assets.js
+
+   Icon store lấy từ app-icon/marvira-icon-master.png (1024).
+   Play 512 copy từ marketing/public/icons/icon-512.png nếu có.
 
 --------------------------------------------------------------------------------
 LIÊN HỆ / URL (điền sẵn trong text)

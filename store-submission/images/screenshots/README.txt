@@ -1,8 +1,7 @@
 ================================================================================
-SCREENSHOTS — HOW TO CAPTURE (replace promotional placeholders)
+SCREENSHOTS — HOW TO CAPTURE (use real screenshots only)
 ================================================================================
-Promotional frames in ../promotional/ are TEMPORARY. Apple and Google prefer
-real in-app UI. Capture from a release/staging build with polished sample data.
+Capture from a release/staging build with polished sample data using real in-app UI.
 
 --------------------------------------------------------------------------------
 Recommended shot list (5–8 frames, same story on iOS + Android)
@@ -53,5 +52,4 @@ Tools
 --------------------------------------------------------------------------------
 Until real shots exist
 --------------------------------------------------------------------------------
-Upload images/promotional/*-ios-6.7.png and *-android-phone.png only for
-internal draft listings. Replace before public review submission.
+Upload real screenshots only (taken from iOS Simulator / Android Emulator or physical devices).

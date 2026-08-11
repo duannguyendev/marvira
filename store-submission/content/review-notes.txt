@@ -1,7 +1,10 @@
 ================================================================================
 APP REVIEW NOTES — APPLE + GOOGLE (DEMO / TEST ACCOUNT)
 ================================================================================
-Updated: 2026-08-07
+Updated: 2026-08-11
+Purpose: Copy-paste for App Store Connect + Google Play review.
+Production API: https://api.marvira.com
+Marketing: https://www.marvira.com
 Dán vào:
   • App Store Connect → App Review Information → Notes
   • Google Play → App content / App access (if restricted)
@@ -24,24 +27,24 @@ unlock stops with GPS, answer challenges, and compete on leaderboards.
 Creators can publish hunts from the mobile app.
 
 DEMO ACCOUNT
-Email:    DEMO_EMAIL@marvira.com
-Password: DEMO_PASSWORD
+Email:    demo@marvira.com
+Password: DemoTest123!
 
 HOW TO TEST WITHOUT WALKING ACROSS THE CITY
 1. Sign in with the demo account above.
-2. Open the published hunt: “DEMO_HUNT_TITLE” (it should appear on Home / Events).
-3. If prompted for a hunt password, use: DEMO_HUNT_PASSWORD
+2. Open a published hunt, e.g. **"Mật thư phố cổ Hà Nội"** (Hà Nội) or any hunt on Home.
+3. If prompted for a hunt password, use: (none for seed hunts — password hunts show password in creator share link)
 4. For GPS unlock during review:
-   - iOS Simulator / Android emulator: set a custom location near the first place
-     (coordinates are listed under the hunt’s Place #1 in admin / notes below).
+   - iOS Simulator / Android emulator: set custom location near Place #1
+     (Hồ Hoàn Kiếm example: 21.028511, 105.852019)
    - Or use the Practice tab to answer practice questions without GPS.
 5. You can also create a short hunt from My Events → Create to verify creator flow
    (camera/photo permission is only needed for image questions / avatar).
 
-PLACE #1 TEST COORDINATES (fill before submit)
-Latitude:  DEMO_LAT
-Longitude: DEMO_LNG
-Suggested unlock radius: ~100 m
+PLACE #1 TEST COORDINATES (Hà Nội demo hunt — or replace with your reviewer hunt)
+Latitude:  21.028511
+Longitude: 105.852019
+Suggested unlock radius: ~120 m
 
 PERMISSIONS YOU MAY SEE
 • Location (When In Use): required to unlock hunt places with GPS.
@@ -69,13 +72,13 @@ Marvira là ứng dụng săn tìm kho báu theo vị trí: đi bộ tới đị
 mở khóa bằng GPS, trả lời thử thách và leo bảng xếp hạng.
 
 Tài khoản demo:
-Email: DEMO_EMAIL@marvira.com
-Mật khẩu: DEMO_PASSWORD
+Email: demo@marvira.com
+Mật khẩu: DemoTest123!
 
 Cách test nhanh:
 1. Đăng nhập tài khoản demo.
-2. Mở cuộc săn “DEMO_HUNT_TITLE”.
-3. Nếu có mật khẩu cuộc săn: DEMO_HUNT_PASSWORD
+2. Mở cuộc săn **"Mật thư phố cổ Hà Nội"** hoặc bất kỳ cuộc săn nào trên Home.
+3. Cuộc săn seed không cần mật khẩu.
 4. Giả lập GPS gần Place #1 (DEMO_LAT, DEMO_LNG) hoặc dùng tab Luyện tập.
 5. Có thể tạo cuộc săn ngắn trong “Sự kiện của tôi” để kiểm tra luồng creator.
 
@@ -88,11 +91,11 @@ C) Owner checklist before submit
 [ ] Production API + marketing live (privacy / terms / support URLs open in browser)
 [ ] Create DEMO reviewer account on production (not a real user PII dump)
 [ ] Publish at least 1 public hunt OR password hunt with password in notes
-[ ] Fill DEMO_LAT / DEMO_LNG for Place #1
+[ ] Fill DEMO_LAT / DEMO_LNG for Place #1 (Hồ Hoàn Kiếm: 21.028511, 105.852019 — done in notes above)
 [ ] Confirm Google / Apple / Facebook login work on release builds
 [ ] Confirm location permission strings match Info.plist / Play declarations
 [ ] Attach privacy labels (see repo root store_privacy_labels.txt)
-[ ] Replace promotional placeholder images with real screenshots
+[ ] Replace placeholder images with real screenshots
 [ ] Age rating questionnaire completed (see age-rating-and-categories.txt)
 [ ] Contact email in consoles: support@marvira.com
 

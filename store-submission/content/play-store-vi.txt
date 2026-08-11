@@ -78,8 +78,7 @@ Chính sách quyền riêng tư: https://www.marvira.com/privacy
 • Icon: images/icon/play-icon-512.png
 • Feature graphic: images/feature-graphic/play-feature-graphic-1024x500.png
 • Screenshot điện thoại: images/screenshots/android/
-  Frame tạm: images/promotional/*-android-phone.png
-  → Thay bằng screenshot máy thật trước khi submit cuối.
+  → Dùng screenshot máy thật (hoặc emulator) trước khi submit cuối.
 
 --------------------------------------------------------------------------------
 Có gì mới (v1.0)

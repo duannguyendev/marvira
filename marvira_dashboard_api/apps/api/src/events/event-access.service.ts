@@ -223,7 +223,7 @@ export class EventAccessService {
       giftCodes?: string[] | null;
       completionMessage?: string | null;
       giftTeaser?: string | null;
-      creator?: { name: string } | null;
+      creator?: { name: string; email?: string | null } | null;
       creatorName?: string | null;
     },
   >(
@@ -257,10 +257,18 @@ export class EventAccessService {
     const codes = giftCodes ?? [];
     const hasAccess = options?.hasAccess;
     const includeOwner = options?.includeOwnerGiftFields === true;
+    const creatorEmail = (creator?.email ?? '').toString().trim().toLowerCase();
+    const creatorDomain = creatorEmail.includes('@')
+      ? creatorEmail.split('@')[1] ?? ''
+      : creatorEmail;
+    const isMarviraEmail = creatorDomain.includes('marvira');
+
     const resolvedName =
-      (typeof creatorName === 'string' && creatorName.trim()) ||
-      (typeof creator?.name === 'string' && creator.name.trim()) ||
-      'Marvira';
+      isMarviraEmail
+        ? 'Marvira'
+        : (typeof creatorName === 'string' && creatorName.trim()) ||
+          (typeof creator?.name === 'string' && creator.name.trim()) ||
+          'Marvira';
 
     return {
       ...rest,

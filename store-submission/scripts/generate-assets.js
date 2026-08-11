@@ -1,5 +1,5 @@
 /**
- * Marvira store marketing assets — premium promotional series.
+ * Marvira store marketing assets — premium marketing series.
  * Run: node generate-assets.js
  */
 const fs = require('fs');
@@ -7,12 +7,16 @@ const path = require('path');
 const sharp = require('sharp');
 
 const ROOT = path.resolve(__dirname, '..');
-const ICON_SRC = path.resolve(ROOT, '../app-icon/marvira-icon-master.png');
-const FALLBACK_ICON = path.resolve(ROOT, '../app-icon/marvira-app-icon.png');
-const IOS_ICON = path.resolve(
-  ROOT,
-  '../marvira_mobile/ios/Marvira/Images.xcassets/AppIcon.appiconset/AppIcon-1024x1024@1x.png',
-);
+const REPO = path.resolve(ROOT, '..');
+const ICON_SOURCES = [
+  path.join(REPO, 'app-icon/marvira-icon-master.png'),
+  path.join(REPO, 'app-icon/marvira-app-icon.png'),
+  path.join(
+    REPO,
+    'marvira_mobile/ios/Marvira/Images.xcassets/AppIcon.appiconset/AppIcon-1024x1024@1x.png',
+  ),
+  path.join(REPO, 'marvira_dashboard_api/apps/marketing/public/icons/icon-512.png'),
+];
 
 function ensureDir(p) {
   fs.mkdirSync(p, { recursive: true });
@@ -27,23 +31,40 @@ function escapeXml(s) {
 }
 
 async function resolveIcon() {
-  for (const p of [ICON_SRC, FALLBACK_ICON, IOS_ICON]) {
+  for (const p of ICON_SOURCES) {
     if (fs.existsSync(p)) return p;
   }
-  throw new Error('No Marvira icon PNG found');
+  throw new Error('No Marvira icon PNG found — run: node app-icon/generate.js');
 }
 
 async function writeIcons(iconPath) {
   const out = path.join(ROOT, 'images', 'icon');
   ensureDir(out);
-  await sharp(iconPath).resize(1024, 1024, { fit: 'cover' }).png().toFile(path.join(out, 'app-icon-1024.png'));
-  await sharp(iconPath).resize(512, 512, { fit: 'cover' }).png().toFile(path.join(out, 'play-icon-512.png'));
+
+  // Master is already 1024 from app-icon/generate.js (scale 2 mark)
+  await sharp(iconPath)
+    .resize(1024, 1024, { fit: 'cover' })
+    .png()
+    .toFile(path.join(out, 'app-icon-1024.png'));
+
+  const play512 = path.join(REPO, 'marvira_dashboard_api/apps/marketing/public/icons/icon-512.png');
+  if (fs.existsSync(play512)) {
+    await fs.promises.copyFile(play512, path.join(out, 'play-icon-512.png'));
+  } else {
+    await sharp(iconPath)
+      .resize(512, 512, { fit: 'cover' })
+      .png()
+      .toFile(path.join(out, 'play-icon-512.png'));
+  }
+
+  // App Store marketing icon — opaque, no alpha channel
   await sharp(iconPath)
     .resize(1024, 1024, { fit: 'cover' })
     .flatten({ background: '#A5B4FC' })
     .png()
     .toFile(path.join(out, 'app-icon-1024-opaque.png'));
-  console.log('✓ icons');
+
+  console.log('✓ icons (source:', path.relative(REPO, iconPath), ')');
 }
 
 /* -------------------------------------------------------------------------- */
@@ -305,7 +326,7 @@ const SCENES = {
 };
 
 /* -------------------------------------------------------------------------- */
-/*  Full promotional canvas                                                    */
+/*  Full marketing canvas                                                        */
 /* -------------------------------------------------------------------------- */
 
 function promoCanvas({
@@ -455,11 +476,6 @@ async function main() {
   console.log('Using icon:', iconPath);
   await writeIcons(iconPath);
   await writeFeatureGraphic(iconPath);
-  // Premium promo series lives in generate-promotional.js
-  require('child_process').execFileSync(process.execPath, ['generate-promotional.js'], {
-    cwd: __dirname,
-    stdio: 'inherit',
-  });
   console.log('Done → store-submission/images/');
 }
 
