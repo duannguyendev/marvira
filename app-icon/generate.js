@@ -16,6 +16,7 @@
  *   - preview PNGs in this folder
  *   - marvira_mobile iOS AppIcon + Android mipmaps
  *   - marvira_dashboard_api marketing favicon / PWA / mark
+ *   - marvira_dashboard_api dashboard favicon / mark
  */
 const fs = require('fs');
 const path = require('path');
@@ -127,12 +128,16 @@ async function main() {
   }
 
   const mkt = path.join(root, 'marvira_dashboard_api/apps/marketing');
+  const dash = path.join(root, 'marvira_dashboard_api/apps/dashboard');
   // Rounded for browser tab / PWA / site mark (iOS/Android stay square — OS masks them)
   await resizeRoundedFrom(master1024, path.join(mkt, 'src/app/icon.png'), 48);
   await resizeRoundedFrom(master1024, path.join(mkt, 'src/app/apple-icon.png'), 180);
+  await resizeRoundedFrom(master1024, path.join(dash, 'src/app/icon.png'), 48);
+  await resizeRoundedFrom(master1024, path.join(dash, 'src/app/apple-icon.png'), 180);
   await resizeRoundedFrom(master1024, path.join(mkt, 'public/icons/icon-192.png'), 192);
   await resizeRoundedFrom(master1024, path.join(mkt, 'public/icons/icon-512.png'), 512);
   await resizeRoundedFrom(master1024, path.join(mkt, 'public/images/marvira-mark.png'), 256);
+  await resizeRoundedFrom(master1024, path.join(dash, 'public/images/marvira-mark.png'), 256);
 
   console.log('Done. Preview PNGs in app-icon/; platform icons updated.');
 }

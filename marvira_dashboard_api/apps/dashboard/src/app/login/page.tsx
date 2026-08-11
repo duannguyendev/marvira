@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { BrandLogo } from '@/components/brand-logo';
 import { useAuthStore } from '@/store/auth-store';
 
 const loginSchema = z.object({
@@ -62,8 +63,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#6A5AE0]/20 via-background to-[#8F7CFF]/10 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#6A5AE0] to-[#8F7CFF] text-xl font-bold text-white">
-            B
+          <div className="mx-auto mb-4 flex justify-center">
+            <BrandLogo size="lg" />
           </div>
           <CardTitle>Dashboard Login</CardTitle>
           <CardDescription>

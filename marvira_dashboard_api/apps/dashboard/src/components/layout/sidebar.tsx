@@ -24,6 +24,7 @@ import { useTheme } from 'next-themes';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { BrandLogo } from '@/components/brand-logo';
 import { useAuthStore } from '@/store/auth-store';
 import { UserRole } from '@marvira/shared-types';
 
@@ -65,9 +66,7 @@ export function Sidebar() {
   const NavContent = () => (
     <>
       <div className="flex h-16 items-center gap-2 border-b px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#6A5AE0] to-[#8F7CFF] text-white font-bold">
-          B
-        </div>
+        <BrandLogo size="sm" />
         <span className="font-semibold">Marvira Admin</span>
       </div>
       <nav className="flex-1 space-y-1 p-4">
