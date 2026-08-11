@@ -10,7 +10,8 @@ export const useFavoriteEvents = () => {
   return useQuery({
     queryKey: ['favorites', 'events'],
     queryFn: () => favoritesApi.getFavoriteEvents(),
-    staleTime: 15000,
+    // Toggles invalidate; longer stale cuts repeat list fetches.
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -18,7 +19,7 @@ export const useFavoriteQuestions = () => {
   return useQuery({
     queryKey: ['favorites', 'questions'],
     queryFn: () => favoritesApi.getFavoriteQuestions(),
-    staleTime: 15000,
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -27,7 +28,7 @@ export const useIsEventFavorite = (eventId: string) => {
     queryKey: ['favorites', 'event', eventId],
     queryFn: () => favoritesApi.isEventFavorite(eventId),
     enabled: !!eventId,
-    staleTime: 10000,
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -36,7 +37,7 @@ export const useIsQuestionFavorite = (questionId: string) => {
     queryKey: ['favorites', 'question', questionId],
     queryFn: () => favoritesApi.isQuestionFavorite(questionId),
     enabled: !!questionId,
-    staleTime: 10000,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

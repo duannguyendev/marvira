@@ -3,7 +3,7 @@ import { getApiBaseUrl } from '../config/apiEnvironment';
 import { storage } from '../utils/storage';
 import { ApiError } from '../types';
 import { authSession } from '../services/authSession';
-import { ApiLoginData } from '../types/api';
+import { ApiAuthTokens } from '../types/api';
 
 let isRefreshing = false;
 let refreshQueue: Array<{
@@ -31,17 +31,17 @@ async function refreshAccessToken(): Promise<string> {
     throw new Error('No refresh token');
   }
 
-  const response = await axios.post<{ success: boolean; data: ApiLoginData }>(
+  // API returns flat TokenPair (not { user, tokens } like login)
+  const response = await axios.post<{ success: boolean; data: ApiAuthTokens }>(
     `${getApiBaseUrl()}/auth/refresh`,
     { refreshToken },
     { headers: { 'Content-Type': 'application/json' } },
   );
 
-  const { tokens, user } = response.data.data;
-  await storage.setToken(tokens.accessToken);
-  await storage.setRefreshToken(tokens.refreshToken);
-  await storage.setUser(user);
-  return tokens.accessToken;
+  const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+  await storage.setToken(accessToken);
+  await storage.setRefreshToken(newRefreshToken);
+  return accessToken;
 }
 
 function processQueue(error: unknown, token: string | null) {

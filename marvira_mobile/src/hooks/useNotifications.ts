@@ -40,7 +40,8 @@ export const useNotificationPreferences = () => {
   return useQuery({
     queryKey: notificationKeys.preferences,
     queryFn: () => notificationsApi.getPreferences(),
-    staleTime: 60_000,
+    // Prefs change rarely; list/unread stay short above.
+    staleTime: 30 * 60 * 1000,
   });
 };
 

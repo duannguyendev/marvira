@@ -28,20 +28,6 @@ export const EventCard: React.FC<EventCardProps> = ({
   const { t } = useTranslation();
   const isIncoming = !!event.isIncoming;
 
-  const getStatusColor = () => {
-    if (isIncoming) {
-      return colors.info;
-    }
-    switch (event.status) {
-      case 'completed':
-        return colors.completed;
-      case 'in_progress':
-        return colors.inProgress;
-      default:
-        return colors.notStarted;
-    }
-  };
-
   const progress = event.totalPlaces
     ? (event.completedPlaces / event.totalPlaces) * 100
     : 0;
@@ -79,14 +65,14 @@ export const EventCard: React.FC<EventCardProps> = ({
               </View>
             ) : null}
           </View>
-          <View
-            style={[styles.statusBadge, { backgroundColor: getStatusColor() }]}>
-            <Text style={styles.statusText}>
-              {isIncoming
-                ? t('eventStatus.incoming')
-                : t(`eventStatus.${event.status}`)}
-            </Text>
-          </View>
+          {isIncoming ? (
+            <View
+              style={[styles.statusBadge, { backgroundColor: colors.info }]}>
+              <Text style={styles.statusText}>
+                {t('eventStatus.incoming')}
+              </Text>
+            </View>
+          ) : null}
         </View>
 
         {isIncoming && startWhen ? (
@@ -117,7 +103,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                     styles.progressFill,
                     {
                       width: `${progress}%`,
-                      backgroundColor: getStatusColor(),
+                      backgroundColor: colors.primary,
                     },
                   ]}
                 />

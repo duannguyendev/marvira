@@ -39,6 +39,7 @@
     "editAnswers": "回答を編集",
     "eventCreated": "イベント作成完了",
     "myEvents": "マイイベント",
+    "completedEvents": "完了したイベント",
     "practice": "練習",
     "favorites": "お気に入り",
     "myQuestions": "マイ問題",
@@ -231,7 +232,8 @@
     "not_started": "未開始",
     "in_progress": "進行中",
     "completed": "完了",
-    "incoming": "近日公開"
+    "incoming": "近日公開",
+    "open": "公開中"
   },
   "placeStatus": {
     "completed": "完了",
@@ -622,6 +624,11 @@
     "deleteMessage": "「{{question}}」を削除しますか？元に戻せません。",
     "deleteFailed": "問題の削除に失敗しました",
     "fromEvent": "イベント: {{event}}"
+  },
+  "completedEvents": {
+    "heading": "完了したイベント",
+    "subheading": "プレイして完了したイベント",
+    "loadFailed": "完了イベントの読み込みに失敗しました"
   },
   "finishers": {
     "loadFailed": "完走者の読み込みに失敗しました",

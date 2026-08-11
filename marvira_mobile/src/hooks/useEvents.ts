@@ -17,7 +17,8 @@ export const useEvents = (filters?: EventFilters, userLocation?: Location) => {
       showAllLanguages,
     ],
     queryFn: () => eventsApi.getEvents(filters, userLocation),
-    staleTime: 30000,
+    // Hunt catalog is relatively stable; mutations invalidate as needed.
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -26,7 +27,7 @@ export const useEventDetails = (eventId: string) => {
     queryKey: ['event', eventId],
     queryFn: () => eventsApi.getEventDetails(eventId),
     enabled: !!eventId,
-    staleTime: 30000,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

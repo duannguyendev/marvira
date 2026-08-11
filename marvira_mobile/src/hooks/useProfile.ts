@@ -5,6 +5,6 @@ export const useCompletedEvents = () => {
   return useQuery({
     queryKey: ['completed-events'],
     queryFn: () => profileApi.getCompletedEvents(),
-    staleTime: 60000,
+    staleTime: 5 * 60 * 1000,
   });
 };

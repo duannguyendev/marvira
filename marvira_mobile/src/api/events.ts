@@ -32,10 +32,10 @@ export const eventsApi = {
       await delay(600);
       let filteredEvents = [...mockEvents];
 
-      if (filters?.status) {
-        filteredEvents = filteredEvents.filter(
-          event => event.status === filters.status,
-        );
+      if (filters?.status === 'incoming') {
+        filteredEvents = filteredEvents.filter(event => !!event.isIncoming);
+      } else if (filters?.status === 'open') {
+        filteredEvents = filteredEvents.filter(event => !event.isIncoming);
       }
 
       if (filters?.searchQuery) {
@@ -74,20 +74,6 @@ export const eventsApi = {
 
     const completedIds = await getCompletedEventIds();
     const language = await getContentLanguageQuery();
-
-    if (filters?.status === 'completed') {
-      const completed = await profileApi.getCompletedEvents();
-      let events = completed.data;
-      if (filters.searchQuery) {
-        const q = filters.searchQuery.toLowerCase();
-        events = events.filter(
-          e =>
-            e.title.toLowerCase().includes(q) ||
-            e.description.toLowerCase().includes(q),
-        );
-      }
-      return { success: true, data: events };
-    }
 
     let apiEvents: ApiEvent[] = [];
 
@@ -132,10 +118,10 @@ export const eventsApi = {
       );
     }
 
-    if (filters?.status === 'in_progress') {
-      events = events.filter(e => !e.isIncoming && e.status === 'in_progress');
-    } else if (filters?.status === 'not_started') {
-      events = events.filter(e => !e.isIncoming && e.status === 'not_started');
+    if (filters?.status === 'incoming') {
+      events = events.filter(e => !!e.isIncoming);
+    } else if (filters?.status === 'open') {
+      events = events.filter(e => !e.isIncoming);
     }
 
     return { success: true, data: events };

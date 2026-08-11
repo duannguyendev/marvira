@@ -169,10 +169,14 @@ export interface ApiError {
 }
 
 // Filter Types
+/** Event lifecycle on the search list (not the player's hunt progress). */
+export type EventAvailabilityFilter = 'incoming' | 'open';
+
 export interface EventFilters {
   /** Meters. Omit / undefined = no radius filter (show all). */
   radius?: number;
-  status?: EventStatus;
+  /** Incoming (scheduled) vs open (already live). Omit = all. */
+  status?: EventAvailabilityFilter;
   searchQuery?: string;
 }
 

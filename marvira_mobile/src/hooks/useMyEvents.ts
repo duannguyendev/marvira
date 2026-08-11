@@ -11,7 +11,7 @@ export const useMyEvents = () => {
   return useQuery({
     queryKey: ['myEvents'],
     queryFn: () => eventCreationApi.getMyEvents(),
-    staleTime: 30000,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

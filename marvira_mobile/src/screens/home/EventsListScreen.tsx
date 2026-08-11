@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useEvents } from '../../hooks/useEvents';
 import { useLocation } from '../../hooks/useLocation';
@@ -24,10 +24,11 @@ import {
   fontWeight,
 } from '../../theme';
 import { HomeStackParamList } from '../../navigation/types';
-import { EventFilters, EventStatus } from '../../types';
+import { EventAvailabilityFilter, EventFilters } from '../../types';
 import { calculateDistance, hasUsableCoordinates } from '../../utils/distance';
 
 const SEARCH_DEBOUNCE_MS = 250;
+const AVAILABILITY_FILTERS: EventAvailabilityFilter[] = ['open', 'incoming'];
 
 type EventsListScreenNavigationProp = NativeStackNavigationProp<
   HomeStackParamList,
@@ -38,12 +39,21 @@ export const EventsListScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<EventsListScreenNavigationProp>();
   const { location } = useLocation();
+  const listRef = useRef<FlatList>(null);
+  const scrollToTopRef = useRef({
+    scrollToTop: () => {
+      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+    },
+  });
+  useScrollToTop(scrollToTopRef);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   /** meters; null = no radius filter */
   const [radius, setRadius] = useState<number | null>(25000);
-  const [statusFilter, setStatusFilter] = useState<EventStatus | undefined>();
+  const [statusFilter, setStatusFilter] = useState<
+    EventAvailabilityFilter | undefined
+  >();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -172,25 +182,23 @@ export const EventsListScreen: React.FC = () => {
                 {t('common.all')}
               </Text>
             </TouchableOpacity>
-            {(['not_started', 'in_progress', 'completed'] as EventStatus[]).map(
-              status => (
-                <TouchableOpacity
-                  key={status}
+            {AVAILABILITY_FILTERS.map(status => (
+              <TouchableOpacity
+                key={status}
+                style={[
+                  styles.statusButton,
+                  statusFilter === status && styles.statusButtonActive,
+                ]}
+                onPress={() => setStatusFilter(status)}>
+                <Text
                   style={[
-                    styles.statusButton,
-                    statusFilter === status && styles.statusButtonActive,
-                  ]}
-                  onPress={() => setStatusFilter(status)}>
-                  <Text
-                    style={[
-                      styles.statusButtonText,
-                      statusFilter === status && styles.statusButtonTextActive,
-                    ]}>
-                    {t(`eventStatus.${status}`)}
-                  </Text>
-                </TouchableOpacity>
-              ),
-            )}
+                    styles.statusButtonText,
+                    statusFilter === status && styles.statusButtonTextActive,
+                  ]}>
+                  {t(`eventStatus.${status}`)}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
       </View>
@@ -204,6 +212,7 @@ export const EventsListScreen: React.FC = () => {
         <EventListSkeleton />
       ) : (
         <FlatList
+          ref={listRef}
           data={sortedEvents}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (

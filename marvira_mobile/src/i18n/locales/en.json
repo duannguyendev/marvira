@@ -41,6 +41,7 @@
     "answerVerify": "Verify Answers",
     "eventCreated": "Event Created",
     "myEvents": "My Events",
+    "completedEvents": "Completed Events",
     "practice": "Practice",
     "favorites": "Favorites",
     "myQuestions": "My Questions",
@@ -231,7 +232,8 @@
     "not_started": "Not Started",
     "in_progress": "In Progress",
     "completed": "Completed",
-    "incoming": "Incoming"
+    "incoming": "Incoming",
+    "open": "Open"
   },
   "placeStatus": {
     "completed": "Completed",
@@ -629,5 +631,10 @@
     "deleteMessage": "Remove \"{{question}}\"? This cannot be undone.",
     "deleteFailed": "Failed to delete question",
     "fromEvent": "From event: {{event}}"
+  },
+  "completedEvents": {
+    "heading": "Completed Events",
+    "subheading": "Events you've finished playing",
+    "loadFailed": "Failed to load completed events"
   }
 }

@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
-import { CompositeNavigationProp } from '@react-navigation/native';
+import {
+  useNavigation,
+  useScrollToTop,
+  CompositeNavigationProp,
+} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import {
@@ -45,6 +48,20 @@ export const FavoritesScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const [tab, setTab] = useState<FavoriteTab>('events');
   const [refreshing, setRefreshing] = useState(false);
+  const eventsListRef = useRef<FlatList>(null);
+  const questionsListRef = useRef<FlatList>(null);
+  const tabRef = useRef(tab);
+  tabRef.current = tab;
+  const scrollToTopRef = useRef({
+    scrollToTop: () => {
+      const list =
+        tabRef.current === 'events'
+          ? eventsListRef.current
+          : questionsListRef.current;
+      list?.scrollToOffset({ offset: 0, animated: true });
+    },
+  });
+  useScrollToTop(scrollToTopRef);
 
   const eventsQuery = useFavoriteEvents();
   const questionsQuery = useFavoriteQuestions();
@@ -97,6 +114,7 @@ export const FavoritesScreen: React.FC = () => {
 
       {tab === 'events' ? (
         <FlatList
+          ref={eventsListRef}
           data={events}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.eventsList}
@@ -135,6 +153,7 @@ export const FavoritesScreen: React.FC = () => {
         />
       ) : (
         <FlatList
+          ref={questionsListRef}
           data={questions}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.questionsList}

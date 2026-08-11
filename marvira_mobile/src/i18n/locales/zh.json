@@ -39,6 +39,7 @@
     "editAnswers": "编辑答案",
     "eventCreated": "活动已创建",
     "myEvents": "我的活动",
+    "completedEvents": "已完成的活动",
     "practice": "练习",
     "favorites": "收藏",
     "myQuestions": "我的题目",
@@ -231,7 +232,8 @@
     "not_started": "未开始",
     "in_progress": "进行中",
     "completed": "已完成",
-    "incoming": "即将开始"
+    "incoming": "即将开始",
+    "open": "已开放"
   },
   "placeStatus": {
     "completed": "已完成",
@@ -622,6 +624,11 @@
     "deleteMessage": "删除「{{question}}」？此操作无法撤销。",
     "deleteFailed": "删除题目失败",
     "fromEvent": "来自活动：{{event}}"
+  },
+  "completedEvents": {
+    "heading": "已完成的活动",
+    "subheading": "你已完成的活动",
+    "loadFailed": "加载已完成活动失败"
   },
   "finishers": {
     "loadFailed": "加载完赛者失败",

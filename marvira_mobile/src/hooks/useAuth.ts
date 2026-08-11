@@ -64,7 +64,7 @@ export const useAuth = () => {
   const { data: user, isPending, isFetched } = useQuery({
     queryKey: ['user'],
     queryFn: () => authService.getCurrentUser(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
   });
 
   // Cold-start only: after forced logout user is explicitly null, not undefined

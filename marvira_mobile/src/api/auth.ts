@@ -9,7 +9,7 @@ import {
 import { USE_MOCK_DATA } from '../utils/constants';
 import { mockUser, delay } from './mockData';
 import { apiClient } from './client';
-import { ApiLoginData, ApiUser } from '../types/api';
+import { ApiAuthTokens, ApiLoginData, ApiUser } from '../types/api';
 import { storage } from '../utils/storage';
 
 function mapProvider(value?: string): AuthProvider | undefined {
@@ -119,11 +119,18 @@ export const authApi = {
       };
     }
 
+    // Refresh returns flat { accessToken, refreshToken }, unlike login
     const response = await apiClient.post<{
       success: boolean;
-      data: ApiLoginData;
+      data: ApiAuthTokens;
     }>('/auth/refresh', { refreshToken });
-    return mapAuthData(response.data.data);
+    const tokens = response.data.data;
+    const storedUser = await storage.getUser();
+    return {
+      token: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: storedUser ?? mockUser,
+    };
   },
 
   getCurrentUser: async (): Promise<ApiResponse<User>> => {

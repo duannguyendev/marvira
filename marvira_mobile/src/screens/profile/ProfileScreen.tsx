@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,11 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
-import { CompositeNavigationProp } from '@react-navigation/native';
+import {
+  useNavigation,
+  useScrollToTop,
+  CompositeNavigationProp,
+} from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
@@ -20,8 +23,6 @@ import { useAuth } from '../../hooks/useAuth';
 import { useCompletedEvents } from '../../hooks/useProfile';
 import { useUnreadNotificationCount } from '../../hooks/useNotifications';
 import { Button } from '../../components/Button';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
-import { EventCard } from '../../components/EventCard';
 import {
   colors,
   spacing,
@@ -46,11 +47,17 @@ type ProfileScreenNavigationProp = CompositeNavigationProp<
 export const ProfileScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
+  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollToTopRef = useRef({
+    scrollToTop: () => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    },
+  });
+  useScrollToTop(scrollToTopRef);
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   const { user, logout, isLoggingOut } = useAuth();
-  const { data: completedData, isLoading: eventsLoading } =
-    useCompletedEvents();
+  const { data: completedData } = useCompletedEvents();
   const { data: unreadData } = useUnreadNotificationCount(!!user);
   const unreadCount = unreadData?.unreadCount ?? 0;
 
@@ -79,6 +86,7 @@ export const ProfileScreen: React.FC = () => {
   };
 
   const completedEvents = completedData?.data || [];
+  const completedCount = completedEvents.length;
   const totalScore = completedEvents.reduce(
     (sum, event) => sum + (event.score ?? 0),
     0,
@@ -86,6 +94,7 @@ export const ProfileScreen: React.FC = () => {
 
   return (
     <ScrollView
+      ref={scrollViewRef}
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
       contentInsetAdjustmentBehavior="never"
@@ -165,6 +174,23 @@ export const ProfileScreen: React.FC = () => {
 
         <TouchableOpacity
           style={styles.settingsButton}
+          onPress={() => navigation.navigate('CompletedEvents')}>
+          <Text style={styles.settingsIcon}>✅</Text>
+          <Text style={styles.settingsText}>
+            {t('profile.completedEvents')}
+          </Text>
+          {completedCount > 0 ? (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {completedCount > 9 ? '9+' : String(completedCount)}
+              </Text>
+            </View>
+          ) : null}
+          <Text style={styles.settingsChevron}>›</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.settingsButton}
           onPress={() => navigation.navigate('MyQuestions')}>
           <Text style={styles.settingsIcon}>❓</Text>
           <Text style={styles.settingsText}>{t('profile.myQuestions')}</Text>
@@ -175,7 +201,7 @@ export const ProfileScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>{t('profile.statistics')}</Text>
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
-              <Text style={styles.statValue}>{completedEvents.length}</Text>
+              <Text style={styles.statValue}>{completedCount}</Text>
               <Text style={styles.statLabel}>
                 {t('profile.eventsCompleted')}
               </Text>
@@ -196,37 +222,6 @@ export const ProfileScreen: React.FC = () => {
             fullWidth
             style={styles.leaderboardButton}
           />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {t('profile.completedEvents')}
-          </Text>
-          {eventsLoading ? (
-            <LoadingSpinner />
-          ) : completedEvents.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                {t('profile.noCompletedEvents')}
-              </Text>
-              <Text style={styles.emptySubtext}>
-                {t('profile.startExploring')}
-              </Text>
-            </View>
-          ) : (
-            completedEvents.map(event => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onPress={() => {
-                  navigation.navigate('Home', {
-                    screen: 'EventDetails',
-                    params: { eventId: event.id },
-                  } as MainTabParamList['Home']);
-                }}
-              />
-            ))
-          )}
         </View>
 
         <TouchableOpacity
@@ -376,23 +371,6 @@ const styles = StyleSheet.create({
   },
   leaderboardButton: {
     marginTop: spacing.md,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    padding: spacing.xl,
-    backgroundColor: colors.background,
-    borderRadius: borderRadius.lg,
-  },
-  emptyText: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.semibold,
-    color: colors.textDark,
-    marginBottom: spacing.xs,
-  },
-  emptySubtext: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
-    textAlign: 'center',
   },
   logoutButton: {
     backgroundColor: colors.error,

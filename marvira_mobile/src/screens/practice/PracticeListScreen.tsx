@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { usePracticeQuestions } from '../../hooks/usePractice';
 import { useFavoriteQuestionToggle } from '../../hooks/useFavoriteQuestionToggle';
@@ -36,6 +36,13 @@ type NavigationProp = NativeStackNavigationProp<
 export const PracticeListScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
+  const listRef = useRef<FlatList>(null);
+  const scrollToTopRef = useRef({
+    scrollToTop: () => {
+      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+    },
+  });
+  useScrollToTop(scrollToTopRef);
   const [status, setStatus] = useState<PracticeQuestionStatus>('unfinished');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -78,6 +85,7 @@ export const PracticeListScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <FlatList
+        ref={listRef}
         data={questions}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}

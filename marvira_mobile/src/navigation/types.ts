@@ -14,6 +14,7 @@ export type ProfileStackParamList = {
   Notifications: undefined;
   NotificationDetail: { notificationId: string };
   MyEvents: undefined;
+  CompletedEvents: undefined;
   MyQuestions: undefined;
   AddQuestion: { questionId?: string } | undefined;
 };

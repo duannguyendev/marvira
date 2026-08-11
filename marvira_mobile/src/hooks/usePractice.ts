@@ -21,7 +21,8 @@ export const usePracticeQuestions = (status: PracticeQuestionStatus) => {
       showAllLanguages,
     ],
     queryFn: () => practiceApi.getQuestions(status),
-    staleTime: 15000,
+    // Catalog changes slowly; kill app / past this window refetches.
+    staleTime: 5 * 60 * 1000,
   });
 };
 
@@ -30,6 +31,7 @@ export const usePracticeQuestion = (questionId: string) => {
     queryKey: ['practice', 'question', questionId],
     queryFn: () => practiceApi.getQuestionForTraining(questionId),
     enabled: !!questionId,
+    staleTime: 30 * 60 * 1000,
   });
 };
 
@@ -38,6 +40,7 @@ export const usePracticeQuestionMeta = (questionId: string) => {
     queryKey: ['practice', 'question-meta', questionId],
     queryFn: () => practiceApi.getQuestion(questionId),
     enabled: !!questionId,
+    staleTime: 30 * 60 * 1000,
   });
 };
 
@@ -45,7 +48,7 @@ export const useMyQuestions = () => {
   return useQuery({
     queryKey: ['practice', 'my-questions'],
     queryFn: () => practiceApi.getMyQuestions(),
-    staleTime: 15000,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

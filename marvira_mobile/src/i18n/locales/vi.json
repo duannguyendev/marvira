@@ -41,6 +41,7 @@
     "reviewEvent": "Xem lại",
     "eventCreated": "Đã tạo sự kiện",
     "myEvents": "Sự kiện của tôi",
+    "completedEvents": "Đã hoàn thành",
     "practice": "Luyện tập",
     "favorites": "Yêu thích",
     "myQuestions": "Câu hỏi của tôi",
@@ -231,7 +232,8 @@
     "not_started": "Chưa bắt đầu",
     "in_progress": "Đang diễn ra",
     "completed": "Đã hoàn thành",
-    "incoming": "Sắp tới"
+    "incoming": "Sắp tới",
+    "open": "Đang mở"
   },
   "placeStatus": {
     "completed": "Đã hoàn thành",
@@ -629,5 +631,10 @@
     "deleteMessage": "Xóa \"{{question}}\"? Không thể hoàn tác.",
     "deleteFailed": "Không thể xóa câu hỏi",
     "fromEvent": "Từ sự kiện: {{event}}"
+  },
+  "completedEvents": {
+    "heading": "Sự kiện đã hoàn thành",
+    "subheading": "Các sự kiện bạn đã chơi xong",
+    "loadFailed": "Không thể tải sự kiện đã hoàn thành"
   }
 }

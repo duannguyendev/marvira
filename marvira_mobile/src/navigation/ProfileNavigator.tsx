@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { MyEventsScreen } from '../screens/profile/MyEventsScreen';
+import { CompletedEventsScreen } from '../screens/profile/CompletedEventsScreen';
 import { MyQuestionsScreen } from '../screens/profile/MyQuestionsScreen';
 import { AddQuestionScreen } from '../screens/practice/AddQuestionScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
@@ -90,6 +91,11 @@ export const ProfileNavigator: React.FC = () => {
         name="MyEvents"
         component={MyEventsScreen}
         options={{ title: t('nav.myEvents') }}
+      />
+      <Stack.Screen
+        name="CompletedEvents"
+        component={CompletedEventsScreen}
+        options={{ title: t('nav.completedEvents') }}
       />
       <Stack.Screen
         name="MyQuestions"
