@@ -77,7 +77,9 @@ async function resizeRoundedFrom(masterBuf, filePath, size, radiusRatio = 0.22) 
 }
 
 async function main() {
-  const master1024 = renderSvg(masterSvg, 1024);
+  // Higher master render for cleaner downscales into launcher/splash mipmaps.
+  const master2048 = renderSvg(masterSvg, 2048);
+  const master1024 = await sharp(master2048).resize(1024, 1024).png().toBuffer();
   await writePng(path.join(iconDir, 'marvira-app-icon.png'), master1024);
   await writePng(path.join(iconDir, 'marvira-icon-master.png'), master1024);
 
@@ -109,21 +111,23 @@ async function main() {
     await resizeFrom(master1024, path.join(iosDir, name), size);
   }
 
+  // 2x supersampled vs standard dp sizes so splash/launcher stay sharper when scaled.
   const android = {
-    mdpi: { launcher: 48, adaptive: 108 },
-    hdpi: { launcher: 72, adaptive: 162 },
-    xhdpi: { launcher: 96, adaptive: 216 },
-    xxhdpi: { launcher: 144, adaptive: 324 },
-    xxxhdpi: { launcher: 192, adaptive: 432 },
+    mdpi: { launcher: 96, adaptive: 216 },
+    hdpi: { launcher: 144, adaptive: 324 },
+    xhdpi: { launcher: 192, adaptive: 432 },
+    xxhdpi: { launcher: 288, adaptive: 648 },
+    xxxhdpi: { launcher: 384, adaptive: 864 },
   };
   const resRoot = path.join(root, 'marvira_mobile/android/app/src/main/res');
-  const fg1024 = renderSvg(fgSvg, 1024);
+  // Render large from SVG then downscale — keeps edges crisp.
+  const fg2048 = renderSvg(fgSvg, 2048);
 
   for (const [density, sizes] of Object.entries(android)) {
     const dir = path.join(resRoot, `mipmap-${density}`);
-    await resizeFrom(master1024, path.join(dir, 'ic_launcher.png'), sizes.launcher);
-    await resizeFrom(master1024, path.join(dir, 'ic_launcher_round.png'), sizes.launcher);
-    await resizeFrom(fg1024, path.join(dir, 'ic_launcher_foreground.png'), sizes.adaptive);
+    await resizeFrom(master2048, path.join(dir, 'ic_launcher.png'), sizes.launcher);
+    await resizeFrom(master2048, path.join(dir, 'ic_launcher_round.png'), sizes.launcher);
+    await resizeFrom(fg2048, path.join(dir, 'ic_launcher_foreground.png'), sizes.adaptive);
     await solidColorPng(path.join(dir, 'ic_launcher_background.png'), sizes.adaptive, '#818CF8');
   }
 

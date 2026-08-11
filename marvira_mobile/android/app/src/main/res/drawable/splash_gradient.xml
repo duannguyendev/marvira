@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Matches LoginScreen LinearGradient: colors.primary → colors.secondary -->
+<!-- Matches app icon master gradient: #A5B4FC → #818CF8 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <gradient
         android:type="linear"
         android:angle="270"
-        android:startColor="#6366F1"
-        android:endColor="#EC4899" />
+        android:startColor="@color/splash_background_end"
+        android:endColor="@color/splash_background" />
 </shape>

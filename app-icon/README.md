@@ -17,7 +17,7 @@ Source of truth for the launcher / marketing icon (Option 27 letter lockup, ligh
 - **Background:** `#A5B4FC` → `#818CF8`
 - **Mark size:** `scale(2)` on master (iOS / marketing); foreground `scale(1.1)` (Android adaptive)
 - **Stroke:** `64` (i-dot `r=32`, cy=`63`, cutout halo `r=40`)
-- **M:** no right vertical; yellow `i` stem fills that edge up to the cutout
+- **Android mipmaps:** generated at **2x** the usual pixel sizes (e.g. xxxhdpi adaptive foreground **864px**) so splash stays sharper when the system scales the launcher icon.
 
 ## Regenerate platform icons
 

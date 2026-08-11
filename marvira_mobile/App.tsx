@@ -60,6 +60,8 @@ const App: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // Match splash indigo so boot never flashes white under RN root
+    backgroundColor: '#818CF8',
   },
 });
 

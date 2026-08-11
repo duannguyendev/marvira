@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#4045CF</color>
-    <!-- Top of login gradient (colors.primary); Android 12+ splash API is solid-only -->
-    <color name="splash_background">#6366F1</color>
-    <color name="splash_background_end">#EC4899</color>
+    <!-- Matches adaptive launcher background (app-icon/generate.js) -->
+    <color name="ic_launcher_background">#818CF8</color>
+    <!-- Android 12+ splash is solid-only; use launcher icon background -->
+    <color name="splash_background">#818CF8</color>
+    <!-- Pre-12 window gradient end — same indigo family as icon master SVG -->
+    <color name="splash_background_end">#A5B4FC</color>
 </resources>
