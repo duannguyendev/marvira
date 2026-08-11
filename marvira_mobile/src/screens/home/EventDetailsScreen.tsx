@@ -263,6 +263,11 @@ export const EventDetailsScreen: React.FC = () => {
               ) : null}
             </View>
             {event.city ? <Text style={styles.city}>{event.city}</Text> : null}
+            {event.creatorName ? (
+              <Text style={styles.creatorLine}>
+                {t('events.createdBy', { name: event.creatorName })}
+              </Text>
+            ) : null}
             {!isLocked ? (
               <View style={styles.progressContainer}>
                 <View style={styles.progressBar}>
@@ -446,6 +451,11 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.semibold,
   },
   city: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+  },
+  creatorLine: {
     fontSize: fontSize.sm,
     color: colors.textSecondary,
     marginBottom: spacing.sm,

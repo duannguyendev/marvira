@@ -207,6 +207,7 @@
     "startsAt": "{{when}} に開始",
     "incomingHint": "まもなく公開 — まだ参加できません",
     "placesCount": "スポット（{{count}}）",
+    "createdBy": "{{name}} 作",
     "shareA11y": "このハントを共有",
     "shareMessage": "「{{title}}」に参加しよう — Marviraの宝探し！\n{{url}}",
     "passwordProtected": {

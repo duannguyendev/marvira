@@ -66,6 +66,8 @@ export interface Event {
   scheduledPublishAt?: string | null;
   /** Derived: scheduled for future go-live; shown in search but not tappable */
   isIncoming?: boolean;
+  /** Public display name of the hunt creator */
+  creatorName?: string;
 }
 
 export interface EventDetails extends Event {

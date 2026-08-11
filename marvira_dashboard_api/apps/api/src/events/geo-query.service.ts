@@ -14,11 +14,13 @@ interface NearbyEventRow {
   scheduled_publish_at: Date | null;
   language: string;
   created_by: string;
+  creator_name: string;
   created_at: Date;
   updated_at: Date;
   distance_meters: number;
   nearest_latitude: number;
   nearest_longitude: number;
+  places_count: number;
   join_password_hash: string | null;
   gift_teaser: string | null;
   gift_codes: string[];
@@ -85,6 +87,7 @@ export class GeoQueryService {
         e.gift_teaser,
         e.gift_codes,
         e.created_by,
+        MAX(u.name) AS creator_name,
         e.created_at,
         e.updated_at,
         MIN(
@@ -110,9 +113,11 @@ export class GeoQueryService {
               ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography
             )
           )
-        )[1]::float AS nearest_longitude
+        )[1]::float AS nearest_longitude,
+        COUNT(p.id)::int AS places_count
       FROM events e
       INNER JOIN places p ON p.event_id = e.id
+      INNER JOIN users u ON u.id = e.created_by
       WHERE (
         e.is_active = true
         OR (

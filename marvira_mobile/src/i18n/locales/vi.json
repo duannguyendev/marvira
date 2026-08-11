@@ -211,6 +211,7 @@
     "startsAt": "Bắt đầu {{when}}",
     "incomingHint": "Sắp mở — chưa tham gia được",
     "placesCount": "Địa điểm ({{count}})",
+    "createdBy": "bởi {{name}}",
     "shareA11y": "Chia sẻ cuộc săn này",
     "shareMessage": "Cùng chơi “{{title}}” — săn kho báu trên Marvira!\n{{url}}",
     "passwordProtected": {

@@ -676,10 +676,39 @@ export class ProgressService {
   }
 
   async getCompletedEvents(userId: string) {
-    return this.prisma.client.userEventProgress.findMany({
+    const rows = await this.prisma.client.userEventProgress.findMany({
       where: { userId, completed: true },
-      include: { event: true },
+      include: {
+        event: {
+          include: {
+            creator: { select: { name: true } },
+            _count: { select: { places: true } },
+          },
+        },
+      },
       orderBy: { completedAt: 'desc' },
+    });
+
+    return rows.map(row => {
+      const {
+        creator,
+        joinPasswordHash,
+        giftCodes,
+        completionMessage: _completionMessage,
+        ...event
+      } = row.event;
+      const codes = giftCodes ?? [];
+      return {
+        ...row,
+        event: {
+          ...event,
+          creatorName: creator?.name?.trim() || 'Marvira',
+          isPasswordProtected: joinPasswordHash != null,
+          hasGift: codes.length > 0,
+          giftCount: codes.length,
+          giftTeaser: event.giftTeaser ?? null,
+        },
+      };
     });
   }
 

@@ -30,6 +30,7 @@ export const mockEvents: Event[] = [
     status: 'in_progress',
     totalPlaces: 5,
     completedPlaces: 2,
+    creatorName: 'Marvira',
     location: {
       latitude: 37.78825,
       longitude: -122.4324,
@@ -46,6 +47,7 @@ export const mockEvents: Event[] = [
     status: 'not_started',
     totalPlaces: 8,
     completedPlaces: 0,
+    creatorName: 'Alex Rivera',
     location: {
       latitude: 37.7749,
       longitude: -122.4194,
@@ -62,6 +64,7 @@ export const mockEvents: Event[] = [
     status: 'completed',
     totalPlaces: 6,
     completedPlaces: 6,
+    creatorName: 'Marvira',
     location: {
       latitude: 37.7849,
       longitude: -122.4094,

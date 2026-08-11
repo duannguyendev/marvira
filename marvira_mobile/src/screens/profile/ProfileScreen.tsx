@@ -126,9 +126,7 @@ export const ProfileScreen: React.FC = () => {
             </Text>
           </View>
           <Text style={styles.name}>{user?.name || t('common.user')}</Text>
-          {user?.email ? (
-            <Text style={styles.email}>{user.email}</Text>
-          ) : null}
+          {user?.email ? <Text style={styles.email}>{user.email}</Text> : null}
         </View>
       </View>
 
@@ -179,13 +177,6 @@ export const ProfileScreen: React.FC = () => {
           <Text style={styles.settingsText}>
             {t('profile.completedEvents')}
           </Text>
-          {completedCount > 0 ? (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {completedCount > 9 ? '9+' : String(completedCount)}
-              </Text>
-            </View>
-          ) : null}
           <Text style={styles.settingsChevron}>›</Text>
         </TouchableOpacity>
 

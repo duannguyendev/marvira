@@ -211,6 +211,7 @@
     "startsAt": "Starts {{when}}",
     "incomingHint": "Opening soon — not joinable yet",
     "placesCount": "Places ({{count}})",
+    "createdBy": "by {{name}}",
     "shareA11y": "Share this hunt",
     "shareMessage": "Join me on \"{{title}}\" — a scavenger hunt on Marvira!\n{{url}}",
     "passwordProtected": {

@@ -3,7 +3,7 @@
  *
  * Edit:
  *   marvira-app-icon.svg              — full icon (iOS / marketing / Android legacy)
- *     - scale(...): mark size (currently 1.5)
+ *     - scale(...): mark size (currently 2)
  *     - stroke-width: letter weight (currently 64); i-dot r ~= half of that
  *   marvira-app-icon-foreground.svg   — Android adaptive foreground (transparent)
  *     - scale(...): currently 1.1 (smaller — circular adaptive masks crop more)
@@ -93,6 +93,15 @@ async function main() {
     ['AppIcon-40x40@3x.png', 120],
     ['AppIcon-60x60@2x.png', 120],
     ['AppIcon-60x60@3x.png', 180],
+    ['AppIcon-20x20@1x-ipad.png', 20],
+    ['AppIcon-20x20@2x-ipad.png', 40],
+    ['AppIcon-29x29@1x-ipad.png', 29],
+    ['AppIcon-29x29@2x-ipad.png', 58],
+    ['AppIcon-40x40@1x-ipad.png', 40],
+    ['AppIcon-40x40@2x-ipad.png', 80],
+    ['AppIcon-76x76@1x.png', 76],
+    ['AppIcon-76x76@2x.png', 152],
+    ['AppIcon-83.5x83.5@2x.png', 167],
     ['AppIcon-1024x1024@1x.png', 1024],
   ];
   for (const [name, size] of iosSizes) {

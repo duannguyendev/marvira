@@ -51,6 +51,8 @@ export interface ApiEvent {
   nearestLongitude?: number;
   places?: ApiPlace[];
   _count?: { places: number; eventQuestions?: number };
+  /** Public display name of the hunt creator */
+  creatorName?: string;
 }
 
 export interface ApiPlace {

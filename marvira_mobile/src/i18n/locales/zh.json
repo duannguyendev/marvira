@@ -207,6 +207,7 @@
     "startsAt": "{{when}} 开始",
     "incomingHint": "即将开放 — 暂时无法加入",
     "placesCount": "地点（{{count}}）",
+    "createdBy": "由 {{name}} 创建",
     "shareA11y": "分享此寻宝活动",
     "shareMessage": "一起来玩「{{title}}」—— Marvira 城市寻宝！\n{{url}}",
     "passwordProtected": {

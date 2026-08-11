@@ -76,12 +76,15 @@ export interface Event {
   /** Owner/admin or completion payload — omitted on public list/detail */
   completionMessage?: string | null;
   createdBy: string;
+  /** Display name of the hunt creator (never email) */
+  creatorName: string;
   createdAt: string;
   updatedAt: string;
   distanceMeters?: number;
   /** Populated by /events/nearby when full places[] is omitted */
   nearestLatitude?: number;
   nearestLongitude?: number;
+  _count?: { places: number; eventQuestions?: number };
 }
 
 export interface Place {

@@ -28,6 +28,11 @@ import {
   parseLanguageFilterQuery,
 } from '../common/content-language';
 import { NotificationsService } from '../notifications/notifications.service';
+
+/** Public attribution — name only, never email. */
+const CREATOR_PUBLIC_INCLUDE = {
+  creator: { select: { name: true } },
+} as const;
 import { isDashboardRole } from '../common/utils/roles';
 import {
   STAFF_REWARD_POINTS_MAX,
@@ -122,7 +127,10 @@ export class EventsService {
         skip,
         take,
         orderBy: { createdAt: 'desc' },
-        include: { _count: { select: { places: true, eventQuestions: true } } },
+        include: {
+          _count: { select: { places: true, eventQuestions: true } },
+          ...CREATOR_PUBLIC_INCLUDE,
+        },
       }),
       this.prisma.client.event.count({ where }),
     ]);
@@ -194,6 +202,8 @@ export class EventsService {
             distanceMeters: row.distance_meters,
             nearestLatitude: row.nearest_latitude,
             nearestLongitude: row.nearest_longitude,
+            _count: { places: row.places_count },
+            creatorName: row.creator_name,
           }),
         );
       } catch {
@@ -208,7 +218,11 @@ export class EventsService {
           this.buildLanguageOrExceptionFilter(languageQuery, exceptionIds),
         ].filter((part) => Object.keys(part).length > 0),
       },
-      include: { places: { select: { latitude: true, longitude: true } } },
+      include: {
+        places: { select: { latitude: true, longitude: true } },
+        _count: { select: { places: true, eventQuestions: true } },
+        ...CREATOR_PUBLIC_INCLUDE,
+      },
     });
 
     return events
@@ -223,12 +237,33 @@ export class EventsService {
       })
       .filter(row => row.distanceMeters <= radiusMeters)
       .sort((a, b) => a.distanceMeters - b.distanceMeters)
-      .map(({ event, distanceMeters }) =>
-        this.eventAccess.toPublicFields({
-          ...event,
+      .map(({ event, distanceMeters }) => {
+        const { places, ...rest } = event;
+        let nearestLatitude: number | undefined;
+        let nearestLongitude: number | undefined;
+        if (places.length > 0) {
+          let minDist = Infinity;
+          for (const p of places) {
+            const d = haversineDistanceMeters(
+              latitude,
+              longitude,
+              p.latitude,
+              p.longitude,
+            );
+            if (d < minDist) {
+              minDist = d;
+              nearestLatitude = p.latitude;
+              nearestLongitude = p.longitude;
+            }
+          }
+        }
+        return this.eventAccess.toPublicFields({
+          ...rest,
           distanceMeters,
-        }),
-      );
+          nearestLatitude,
+          nearestLongitude,
+        });
+      });
   }
 
   /**
@@ -286,6 +321,7 @@ export class EventsService {
             take: 1,
             select: { latitude: true, longitude: true },
           },
+          ...CREATOR_PUBLIC_INCLUDE,
         },
       }),
       this.prisma.client.event.count({ where }),
@@ -364,6 +400,7 @@ export class EventsService {
           },
         },
         _count: { select: { places: true, eventQuestions: true } },
+        ...CREATOR_PUBLIC_INCLUDE,
       },
     });
     if (!event) throw new NotFoundException('Event not found');
@@ -424,6 +461,7 @@ export class EventsService {
           include: { question: true },
         },
         _count: { select: { places: true, eventQuestions: true } },
+        ...CREATOR_PUBLIC_INCLUDE,
       },
     });
     if (!event) throw new NotFoundException('Event not found');
@@ -462,10 +500,12 @@ export class EventsService {
         ...createData,
         ...giftFields,
       },
+      include: CREATOR_PUBLIC_INCLUDE,
     });
-    let result = event;
+    let result: typeof event = event;
     if (event.isActive) {
-      result = await this.eventEnd.scheduleAutoEnd(event.id);
+      const scheduled = await this.eventEnd.scheduleAutoEnd(event.id);
+      result = { ...scheduled, creator: event.creator };
       await this.notifyWentLive(event.createdBy, event.id, event.title);
     }
     await this.invalidateCache();
@@ -546,14 +586,16 @@ export class EventsService {
         ...giftPatch,
         ...(data.isActive === true ? { scheduledPublishAt: null } : {}),
       },
+      include: CREATOR_PUBLIC_INCLUDE,
     });
 
-    let result = event;
+    let result: typeof event = event;
     if (data.isActive === true) {
       await this.scheduledPublish
         .cancelScheduleJobOnly(id)
         .catch(() => undefined);
-      result = await this.eventEnd.scheduleAutoEnd(id);
+      const scheduled = await this.eventEnd.scheduleAutoEnd(id);
+      result = { ...scheduled, creator: event.creator };
       if (!existing.isActive) {
         await this.notifyWentLive(result.createdBy, result.id, result.title);
       }

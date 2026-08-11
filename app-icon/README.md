@@ -15,7 +15,7 @@ Source of truth for the launcher / marketing icon (Option 27 letter lockup, ligh
 ## Current settings
 
 - **Background:** `#A5B4FC` → `#818CF8`
-- **Mark size:** `scale(1.5)` on master (iOS / marketing); foreground `scale(1.1)` (Android adaptive)
+- **Mark size:** `scale(2)` on master (iOS / marketing); foreground `scale(1.1)` (Android adaptive)
 - **Stroke:** `64` (i-dot `r=32`, cy=`63`, cutout halo `r=40`)
 - **M:** no right vertical; yellow `i` stem fills that edge up to the cutout
 

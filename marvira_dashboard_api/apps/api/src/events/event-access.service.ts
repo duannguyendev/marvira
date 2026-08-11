@@ -223,11 +223,20 @@ export class EventAccessService {
       giftCodes?: string[] | null;
       completionMessage?: string | null;
       giftTeaser?: string | null;
+      creator?: { name: string } | null;
+      creatorName?: string | null;
     },
   >(
     event: T,
     options?: { hasAccess?: boolean; includeOwnerGiftFields?: boolean },
-  ): Omit<T, 'joinPasswordHash' | 'giftCodes' | 'completionMessage'> & {
+  ): Omit<
+    T,
+    | 'joinPasswordHash'
+    | 'giftCodes'
+    | 'completionMessage'
+    | 'creator'
+    | 'creatorName'
+  > & {
     isPasswordProtected: boolean;
     hasAccess?: boolean;
     hasGift: boolean;
@@ -235,14 +244,27 @@ export class EventAccessService {
     giftTeaser: string | null;
     giftCodes?: string[];
     completionMessage?: string | null;
+    creatorName: string;
   } {
-    const { joinPasswordHash, giftCodes, completionMessage, ...rest } = event;
+    const {
+      joinPasswordHash,
+      giftCodes,
+      completionMessage,
+      creator,
+      creatorName,
+      ...rest
+    } = event;
     const codes = giftCodes ?? [];
     const hasAccess = options?.hasAccess;
     const includeOwner = options?.includeOwnerGiftFields === true;
+    const resolvedName =
+      (typeof creatorName === 'string' && creatorName.trim()) ||
+      (typeof creator?.name === 'string' && creator.name.trim()) ||
+      'Marvira';
 
     return {
       ...rest,
+      creatorName: resolvedName,
       isPasswordProtected: joinPasswordHash != null,
       hasGift: codes.length > 0,
       giftCount: codes.length,

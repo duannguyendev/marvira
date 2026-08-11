@@ -121,6 +121,7 @@ export function mapEvent(
     isActive,
     scheduledPublishAt,
     isIncoming,
+    creatorName: apiEvent.creatorName,
   };
 }
 
@@ -166,5 +167,6 @@ export function mapCompletedProgress(row: ApiCompletedEventProgress): Event {
     rewardPoints: row.event.rewardPoints,
     score: row.score,
     totalDurationMs: row.totalDurationMs,
+    creatorName: row.event.creatorName,
   };
 }

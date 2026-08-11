@@ -28,10 +28,6 @@ export const EventCard: React.FC<EventCardProps> = ({
   const { t } = useTranslation();
   const isIncoming = !!event.isIncoming;
 
-  const progress = event.totalPlaces
-    ? (event.completedPlaces / event.totalPlaces) * 100
-    : 0;
-
   const startWhen = event.scheduledPublishAt
     ? new Date(event.scheduledPublishAt).toLocaleString()
     : '';
@@ -95,25 +91,21 @@ export const EventCard: React.FC<EventCardProps> = ({
             </View>
           )}
 
-          {!isIncoming ? (
-            <View style={styles.progressContainer}>
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    {
-                      width: `${progress}%`,
-                      backgroundColor: colors.primary,
-                    },
-                  ]}
-                />
-              </View>
-              <Text style={styles.progressText}>
-                {event.completedPlaces}/{event.totalPlaces} {t('common.places')}
-              </Text>
-            </View>
-          ) : (
+          {isIncoming ? (
             <Text style={styles.incomingHint}>{t('events.incomingHint')}</Text>
+          ) : (
+            <View style={styles.metaEnd}>
+              {event.totalPlaces > 0 ? (
+                <Text style={styles.placesText}>
+                  {event.totalPlaces} {t('common.places')}
+                </Text>
+              ) : null}
+              {event.creatorName ? (
+                <Text style={styles.creatorText} numberOfLines={1}>
+                  {t('events.createdBy', { name: event.creatorName })}
+                </Text>
+              ) : null}
+            </View>
           )}
         </View>
       </View>
@@ -256,25 +248,21 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: fontWeight.medium,
   },
-  progressContainer: {
+  placesText: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    fontWeight: fontWeight.medium,
+    textAlign: 'right',
+  },
+  metaEnd: {
     flex: 1,
     marginLeft: spacing.md,
     alignItems: 'flex-end',
   },
-  progressBar: {
-    width: 100,
-    height: 4,
-    backgroundColor: colors.border,
-    borderRadius: borderRadius.sm,
-    marginBottom: spacing.xs,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: borderRadius.sm,
-  },
-  progressText: {
+  creatorText: {
+    marginTop: spacing.xs,
     fontSize: fontSize.xs,
     color: colors.textSecondary,
+    textAlign: 'right',
   },
 });

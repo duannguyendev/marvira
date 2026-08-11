@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Marvira app icon">
   <!--
     FINAL MASTER - light indigo bg, Option 27 letters.
-    scale 1.5 (iOS / marketing; Android adaptive stays 1.1), stroke 64
+    scale 2.0 (iOS / marketing; Android adaptive stays 1.1), stroke 64
     M no right vertical; i stem to cutout; i-dot cy=63 r=32 with mask halo r=40
     M purple | A pink | V orange | i yellow | r brown
   -->
@@ -20,7 +20,7 @@
   </defs>
   <rect width="1024" height="1024" fill="url(#bg)"/>
 
-  <g id="mark" transform="translate(512 512) scale(1.5) translate(-512 -512)">
+  <g id="mark" transform="translate(512 512) scale(2) translate(-512 -512)">
     <g transform="translate(312 312)">
       <g
         id="letters"
