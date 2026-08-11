@@ -16,8 +16,7 @@ import {
 } from './navigationRef';
 import { RootStackParamList } from './types';
 import { useAuth } from '../hooks/useAuth';
-import { Screen } from '../components/Screen';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { SplashScreen } from '../components/SplashScreen';
 import { authSession } from '../services/authSession';
 import { AnalyticsEvents } from '../services/analytics';
 import { pushNotifications } from '../services/pushNotifications';
@@ -179,11 +178,7 @@ export const RootNavigator: React.FC = () => {
 
   // Only gate cold start — never flash spinner when session expires mid-use
   if (isLoading) {
-    return (
-      <Screen edges={['top', 'bottom', 'left', 'right']}>
-        <LoadingSpinner fullScreen />
-      </Screen>
-    );
+    return <SplashScreen />;
   }
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useEvents } from '../../hooks/useEvents';
 import { useLocation } from '../../hooks/useLocation';
 import { EventCard } from '../../components/EventCard';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { EventListSkeleton } from '../../components/EventCardSkeleton';
 import { ErrorView } from '../../components/ErrorView';
 import {
   colors,
@@ -27,6 +27,8 @@ import { HomeStackParamList } from '../../navigation/types';
 import { EventFilters, EventStatus } from '../../types';
 import { calculateDistance, hasUsableCoordinates } from '../../utils/distance';
 
+const SEARCH_DEBOUNCE_MS = 250;
+
 type EventsListScreenNavigationProp = NativeStackNavigationProp<
   HomeStackParamList,
   'EventsList'
@@ -38,15 +40,23 @@ export const EventsListScreen: React.FC = () => {
   const { location } = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   /** meters; null = no radius filter */
   const [radius, setRadius] = useState<number | null>(25000);
   const [statusFilter, setStatusFilter] = useState<EventStatus | undefined>();
   const [refreshing, setRefreshing] = useState(false);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery.trim());
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const filters: EventFilters = {
     radius: radius ?? undefined,
     status: statusFilter,
-    searchQuery: searchQuery.trim() || undefined,
+    searchQuery: debouncedSearchQuery || undefined,
   };
 
   const { data, isLoading, error, refetch } = useEvents(
@@ -87,18 +97,7 @@ export const EventsListScreen: React.FC = () => {
     return 0;
   });
 
-  if (isLoading && !refreshing) {
-    return <LoadingSpinner fullScreen />;
-  }
-
-  if (error) {
-    return (
-      <ErrorView
-        message={(error as any).message || t('events.loadFailed')}
-        onRetry={() => refetch()}
-      />
-    );
-  }
+  const showResultsSkeleton = isLoading && !refreshing;
 
   return (
     <View style={styles.container}>
@@ -196,37 +195,48 @@ export const EventsListScreen: React.FC = () => {
         </View>
       </View>
 
-      <FlatList
-        data={sortedEvents}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <EventCard
-            event={item}
-            onPress={() => {
-              if (!item.isIncoming) {
-                handleEventPress(item.id);
-              }
-            }}
-          />
-        )}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor={colors.primary}
-          />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>{t('events.noEventsFound')}</Text>
-            <Text style={styles.emptySubtext}>{t('events.adjustFilters')}</Text>
-            <Text style={styles.emptySubtext}>
-              {t('events.emptyLanguageHint')}
-            </Text>
-          </View>
-        }
-      />
+      {error && !showResultsSkeleton ? (
+        <ErrorView
+          message={(error as any).message || t('events.loadFailed')}
+          onRetry={() => refetch()}
+        />
+      ) : showResultsSkeleton ? (
+        <EventListSkeleton />
+      ) : (
+        <FlatList
+          data={sortedEvents}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <EventCard
+              event={item}
+              onPress={() => {
+                if (!item.isIncoming) {
+                  handleEventPress(item.id);
+                }
+              }}
+            />
+          )}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.primary}
+            />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>{t('events.noEventsFound')}</Text>
+              <Text style={styles.emptySubtext}>
+                {t('events.adjustFilters')}
+              </Text>
+              <Text style={styles.emptySubtext}>
+                {t('events.emptyLanguageHint')}
+              </Text>
+            </View>
+          }
+        />
+      )}
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('CreateEventInfo')}

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#4045CF</color>
-    <color name="splash_background">#4045CF</color>
+    <!-- Top of login gradient (colors.primary); Android 12+ splash API is solid-only -->
+    <color name="splash_background">#6366F1</color>
+    <color name="splash_background_end">#EC4899</color>
 </resources>

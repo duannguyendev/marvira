@@ -14,8 +14,9 @@
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/splash_background</item>
         <item name="postSplashScreenTheme">@style/AppTheme</item>
-        <item name="android:windowBackground">@color/splash_background</item>
+        <!-- Pre-12 / window backdrop: same indigo→pink as LoginScreen -->
+        <item name="android:windowBackground">@drawable/splash_gradient</item>
         <item name="android:statusBarColor">@color/splash_background</item>
-        <item name="android:navigationBarColor">@color/splash_background</item>
+        <item name="android:navigationBarColor">@color/splash_background_end</item>
     </style>
 </resources>

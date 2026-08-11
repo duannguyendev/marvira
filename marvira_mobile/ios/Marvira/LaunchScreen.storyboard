@@ -16,6 +16,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SplashGradient" translatesAutoresizingMaskIntoConstraints="NO" id="grad-iv-1">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SplashLogo" translatesAutoresizingMaskIntoConstraints="NO" id="logo-iv-1">
                                 <rect key="frame" x="127.5" y="253.5" width="120" height="120"/>
                                 <constraints>
@@ -30,8 +33,12 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <color key="backgroundColor" red="0.25098039215686274" green="0.27058823529411763" blue="0.81176470588235294" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.38823529411764707" green="0.40000000000000002" blue="0.94509803921568625" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="grad-iv-1" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="grad-top"/>
+                            <constraint firstItem="grad-iv-1" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="grad-lead"/>
+                            <constraint firstItem="grad-iv-1" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" id="grad-trail"/>
+                            <constraint firstItem="grad-iv-1" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" id="grad-bot"/>
                             <constraint firstItem="logo-iv-1" firstAttribute="centerX" secondItem="Bcu-3y-fUS" secondAttribute="centerX" id="logo-cx"/>
                             <constraint firstItem="logo-iv-1" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-20" id="logo-cy"/>
                             <constraint firstItem="GJd-Yh-RWb" firstAttribute="top" secondItem="logo-iv-1" secondAttribute="bottom" constant="16" id="title-top"/>
@@ -48,6 +55,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="SplashGradient" width="9" height="1920"/>
         <image name="SplashLogo" width="120" height="120"/>
     </resources>
 </document>

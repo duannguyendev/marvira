@@ -3,10 +3,10 @@
  *
  * Edit:
  *   marvira-app-icon.svg              — full icon (iOS / marketing / Android legacy)
- *     - scale(...): mark size (currently 1.2)
+ *     - scale(...): mark size (currently 1.5)
  *     - stroke-width: letter weight (currently 64); i-dot r ~= half of that
  *   marvira-app-icon-foreground.svg   — Android adaptive foreground (transparent)
- *     - scale(...): currently 1.1
+ *     - scale(...): currently 1.1 (smaller — circular adaptive masks crop more)
  *
  * Run (from repo root or this folder):
  *   npm install --no-save @resvg/resvg-js sharp
@@ -59,6 +59,22 @@ async function resizeFrom(masterBuf, filePath, size) {
   await writePng(filePath, buf);
 }
 
+/** Web favicons need baked-in rounded corners (browsers don't CSS-radius tab icons). */
+async function resizeRoundedFrom(masterBuf, filePath, size, radiusRatio = 0.22) {
+  const r = Math.round(size * radiusRatio);
+  const mask = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
+      <rect width="${size}" height="${size}" rx="${r}" ry="${r}" fill="#fff"/>
+    </svg>`
+  );
+  const buf = await sharp(masterBuf)
+    .resize(size, size)
+    .composite([{ input: mask, blend: 'dest-in' }])
+    .png()
+    .toBuffer();
+  await writePng(filePath, buf);
+}
+
 async function main() {
   const master1024 = renderSvg(masterSvg, 1024);
   await writePng(path.join(iconDir, 'marvira-app-icon.png'), master1024);
@@ -102,11 +118,12 @@ async function main() {
   }
 
   const mkt = path.join(root, 'marvira_dashboard_api/apps/marketing');
-  await resizeFrom(master1024, path.join(mkt, 'src/app/icon.png'), 48);
-  await resizeFrom(master1024, path.join(mkt, 'src/app/apple-icon.png'), 180);
-  await resizeFrom(master1024, path.join(mkt, 'public/icons/icon-192.png'), 192);
-  await resizeFrom(master1024, path.join(mkt, 'public/icons/icon-512.png'), 512);
-  await resizeFrom(master1024, path.join(mkt, 'public/images/marvira-mark.png'), 256);
+  // Rounded for browser tab / PWA / site mark (iOS/Android stay square — OS masks them)
+  await resizeRoundedFrom(master1024, path.join(mkt, 'src/app/icon.png'), 48);
+  await resizeRoundedFrom(master1024, path.join(mkt, 'src/app/apple-icon.png'), 180);
+  await resizeRoundedFrom(master1024, path.join(mkt, 'public/icons/icon-192.png'), 192);
+  await resizeRoundedFrom(master1024, path.join(mkt, 'public/icons/icon-512.png'), 512);
+  await resizeRoundedFrom(master1024, path.join(mkt, 'public/images/marvira-mark.png'), 256);
 
   console.log('Done. Preview PNGs in app-icon/; platform icons updated.');
 }
