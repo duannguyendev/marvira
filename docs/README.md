@@ -8,9 +8,10 @@ Human reading map for the Marvira project. **Do not start with `requirement_all.
 |---|-------------|------|------|
 | 1 | New to Marvira | [PRODUCT_OVERVIEW.md](./PRODUCT_OVERVIEW.md) | ~10 min |
 | 2 | Engineering / onboarding | [ARCHITECTURE.md](./ARCHITECTURE.md) | ~10 min |
-| 3 | Setting up a machine | Repo READMEs below | — |
-| 4 | Shipping / stores | Launch & ops links below | — |
-| 5 | Recovering lost source | [`../requirement_all.txt`](../requirement_all.txt) §14–24 | deep |
+| 3 | Checking vendors / accounts | [SERVICES.md](./SERVICES.md) | ~2 min |
+| 4 | Setting up a machine | Repo READMEs below | — |
+| 5 | Shipping / stores | Launch & ops links below | — |
+| 6 | Recovering lost source | [`../requirement_all.txt`](../requirement_all.txt) §14–24 | deep |
 
 ## By role
 
@@ -33,6 +34,7 @@ Human reading map for the Marvira project. **Do not start with `requirement_all.
 - [`../marvira_dashboard_api/apps/marketing/README.md`](../marvira_dashboard_api/apps/marketing/README.md)
 - [`../marvira_dashboard_api/docs/deployment.md`](../marvira_dashboard_api/docs/deployment.md)
 - [`../marvira_dashboard_api/docs/backup-restore.md`](../marvira_dashboard_api/docs/backup-restore.md)
+- [SERVICES.md](./SERVICES.md) — Railway / Neon / Redis / Resend / Mapbox / …
 
 ### Launch / ops / legal
 - [`../go_live_update_checklist.txt`](../go_live_update_checklist.txt)
@@ -63,6 +65,7 @@ marvira/
 |------|----------|---------|
 | `docs/PRODUCT_OVERVIEW.md` | Humans | “What does the product do?” |
 | `docs/ARCHITECTURE.md` | Engineers | “How are the pieces connected?” |
+| `docs/SERVICES.md` | Engineers / ops | “Which vendors do we use?” |
 | `requirement_all.txt` | Agents / deep dive | Rebuild or precise acceptance criteria |
 | `growth_plan.txt` | Product | Metrics & growth backlog |
 | `go_live_update_checklist.txt` | Launch | Production / store gates |

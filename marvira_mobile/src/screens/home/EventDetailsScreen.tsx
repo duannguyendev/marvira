@@ -37,7 +37,14 @@ import {
 } from '../../theme';
 import { HomeStackParamList } from '../../navigation/types';
 import { calculateDistance } from '../../utils/distance';
-import { DEFAULT_MAP_REGION } from '../../utils/constants';
+import {
+  DEFAULT_MAP_REGION,
+  MAP_CAMERA_ANIMATION_MS,
+} from '../../utils/constants';
+import {
+  getDefaultCoordinate,
+  getEventMapCenter,
+} from '../../components/MapPicker';
 import { AnalyticsEvents } from '../../services/analytics';
 import { buildInviteWebUrl } from '../../utils/inviteLinks';
 
@@ -182,16 +189,9 @@ export const EventDetailsScreen: React.FC = () => {
     );
   }
 
-  const mapCenter =
-    event.places.length > 0
-      ? {
-          latitude: event.places[0].location.latitude,
-          longitude: event.places[0].location.longitude,
-        }
-      : {
-          latitude: DEFAULT_MAP_REGION.latitude,
-          longitude: DEFAULT_MAP_REGION.longitude,
-        };
+  // Target = first place (then GPS / Hà Nội). Start nearby so a fixed 500ms ease never flies from 0,0.
+  const mapTarget = getEventMapCenter(event.places, location);
+  const mapStart = getDefaultCoordinate(location);
   const mapZoom = zoomFromLatitudeDelta(
     event.places.length > 0 ? 0.05 : DEFAULT_MAP_REGION.latitudeDelta,
   );
@@ -216,9 +216,14 @@ export const EventDetailsScreen: React.FC = () => {
               logoEnabled={false}
               attributionEnabled={false}>
               <Mapbox.Camera
-                centerCoordinate={[mapCenter.longitude, mapCenter.latitude]}
+                defaultSettings={{
+                  centerCoordinate: [mapStart.longitude, mapStart.latitude],
+                  zoomLevel: mapZoom,
+                }}
+                centerCoordinate={[mapTarget.longitude, mapTarget.latitude]}
                 zoomLevel={mapZoom}
-                animationMode="none"
+                animationMode="easeTo"
+                animationDuration={MAP_CAMERA_ANIMATION_MS}
               />
               <Mapbox.UserLocation visible />
               {event.places.map(place => (

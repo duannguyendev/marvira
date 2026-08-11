@@ -44,13 +44,17 @@ export const DEFAULT_UNLOCK_RADIUS_METERS = 100;
 export const LOCATION_UPDATE_INTERVAL = 5000;
 export const LOCATION_ACCURACY_THRESHOLD = 50;
 
-// Map Configuration
+// Map Configuration — Hà Nội center (fallback when GPS not yet known).
+// Mapbox Camera without defaultSettings starts at 0,0; always seed near VN.
 export const DEFAULT_MAP_REGION = {
-  latitude: 37.78825,
-  longitude: -122.4324,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421,
+  latitude: 21.0285,
+  longitude: 105.8542,
+  latitudeDelta: 0.05,
+  longitudeDelta: 0.05,
 };
+
+/** Fixed camera move length — same for near/far hops (Mapbox ms). */
+export const MAP_CAMERA_ANIMATION_MS = 500;
 
 // Animation Durations
 export const ANIMATION_DURATION = {

@@ -44,12 +44,13 @@ import {
   formatDistance,
   calculateDistance,
 } from '../../utils/distance';
-import { LOCATION_ACCURACY_THRESHOLD } from '../../utils/constants';
+import { LOCATION_ACCURACY_THRESHOLD, MAP_CAMERA_ANIMATION_MS } from '../../utils/constants';
 import {
   buildLocationPayload,
   showLocationWarnings,
 } from '../../utils/anticheat';
 import { AnalyticsEvents, analytics } from '../../services/analytics';
+import { getDefaultCoordinate } from '../../components/MapPicker';
 
 const { height } = Dimensions.get('window');
 const MAP_HEIGHT = height * 0.35;
@@ -345,6 +346,7 @@ export const PlaceGameScreen: React.FC = () => {
   }
 
   const mapZoom = zoomFromLatitudeDelta(0.01);
+  const mapStart = getDefaultCoordinate(location);
   const radiusGeoJson = {
     type: 'Feature' as const,
     properties: {},
@@ -373,12 +375,17 @@ export const PlaceGameScreen: React.FC = () => {
             logoEnabled={false}
             attributionEnabled={false}>
             <Mapbox.Camera
+              defaultSettings={{
+                centerCoordinate: [mapStart.longitude, mapStart.latitude],
+                zoomLevel: mapZoom,
+              }}
               centerCoordinate={[
                 place.location.longitude,
                 place.location.latitude,
               ]}
               zoomLevel={mapZoom}
-              animationMode="none"
+              animationMode="easeTo"
+              animationDuration={MAP_CAMERA_ANIMATION_MS}
             />
             <Mapbox.UserLocation visible />
             <Mapbox.ShapeSource id="unlock-radius" shape={radiusGeoJson}>

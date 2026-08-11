@@ -11,7 +11,9 @@ import { useTranslation } from 'react-i18next';
 import { Location } from '../types';
 import { MapPin } from './MapPin';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
-import { DEFAULT_MAP_REGION } from '../utils/constants';
+import { locationService } from '../services/location.service';
+import { DEFAULT_MAP_REGION, MAP_CAMERA_ANIMATION_MS } from '../utils/constants';
+import { hasUsableCoordinates } from '../utils/distance';
 import { MAPBOX_STYLE, zoomFromLatitudeDelta } from '../utils/mapbox';
 
 const { height } = Dimensions.get('window');
@@ -40,7 +42,8 @@ export const MapPicker: React.FC<MapPickerProps> = ({
     cameraRef.current?.setCamera({
       centerCoordinate: [coordinate.longitude, coordinate.latitude],
       zoomLevel: zoomRef.current,
-      animationDuration: 400,
+      animationDuration: MAP_CAMERA_ANIMATION_MS,
+      animationMode: 'easeTo',
     });
   }, [coordinate.latitude, coordinate.longitude]);
 
@@ -121,14 +124,36 @@ export const MapPicker: React.FC<MapPickerProps> = ({
   );
 };
 
+/** Prefer live GPS → last known → Hà Nội (never 0,0 / SF). */
 export function getDefaultCoordinate(userLocation?: Location | null): Location {
-  if (userLocation) {
+  if (userLocation && hasUsableCoordinates(userLocation)) {
     return userLocation;
+  }
+  const lastKnown = locationService.getLastKnownLocation();
+  if (lastKnown && hasUsableCoordinates(lastKnown)) {
+    return lastKnown;
   }
   return {
     latitude: DEFAULT_MAP_REGION.latitude,
     longitude: DEFAULT_MAP_REGION.longitude,
   };
+}
+
+/**
+ * Event map center priority:
+ * 1) first place with usable coords
+ * 2) user / last known GPS
+ * 3) Hà Nội fallback
+ */
+export function getEventMapCenter(
+  places: Array<{ location: Location }> | undefined | null,
+  userLocation?: Location | null,
+): Location {
+  const first = places?.[0]?.location;
+  if (hasUsableCoordinates(first)) {
+    return { latitude: first!.latitude, longitude: first!.longitude };
+  }
+  return getDefaultCoordinate(userLocation);
 }
 
 const styles = StyleSheet.create({

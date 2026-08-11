@@ -13,6 +13,7 @@ Then:
 
 1. [docs/PRODUCT_OVERVIEW.md](./docs/PRODUCT_OVERVIEW.md) — what the product does  
 2. [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — how the pieces connect  
+3. [docs/SERVICES.md](./docs/SERVICES.md) — third-party stack (Railway, Neon, Mapbox, …)  
 
 ## Quick setup
 

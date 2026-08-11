@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -23,6 +23,7 @@ import { locationService } from '../../services/location.service';
 import { uploadsApi } from '../../api/uploads';
 import { HomeStackParamList } from '../../navigation/types';
 import { colors, spacing, fontSize, fontWeight } from '../../theme';
+import { DEFAULT_MAP_REGION } from '../../utils/constants';
 
 type CreateEventPlaceRouteProp = RouteProp<
   HomeStackParamList,
@@ -65,8 +66,31 @@ export const CreateEventPlaceScreen: React.FC = () => {
     useState<CreateQuestionInput>(DEFAULT_QUESTION);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [pinTouched, setPinTouched] = useState(false);
+
+  // When GPS arrives after mount, snap pin once if user hasn't moved it yet.
+  useEffect(() => {
+    if (!location || pinTouched) {
+      return;
+    }
+    const fallbackLat = DEFAULT_MAP_REGION.latitude;
+    const fallbackLng = DEFAULT_MAP_REGION.longitude;
+    const stillOnFallback =
+      Math.abs(coordinate.latitude - fallbackLat) < 1e-6 &&
+      Math.abs(coordinate.longitude - fallbackLng) < 1e-6;
+    if (!stillOnFallback) {
+      return;
+    }
+    setCoordinate(location);
+    setPlace(prev => ({
+      ...prev,
+      latitude: location.latitude,
+      longitude: location.longitude,
+    }));
+  }, [location, pinTouched, coordinate.latitude, coordinate.longitude]);
 
   const handleCoordinateChange = (next: Location) => {
+    setPinTouched(true);
     setCoordinate(next);
     setPlace(prev => ({
       ...prev,

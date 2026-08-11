@@ -34,7 +34,11 @@ import {
   fontSize,
   fontWeight,
 } from '../../theme';
-import { DEFAULT_MAP_REGION } from '../../utils/constants';
+import { DEFAULT_MAP_REGION, MAP_CAMERA_ANIMATION_MS } from '../../utils/constants';
+import {
+  getDefaultCoordinate,
+  getEventMapCenter,
+} from '../../components/MapPicker';
 import {
   MAPBOX_STYLE,
   zoomFromLatitudeDelta,
@@ -247,16 +251,8 @@ export const CreateEventReviewScreen: React.FC = () => {
   }
 
   const allPlacesHaveQuestions = event.places.length > 0;
-  const mapCenter =
-    event.places.length > 0
-      ? {
-          latitude: event.places[0].location.latitude,
-          longitude: event.places[0].location.longitude,
-        }
-      : {
-          latitude: DEFAULT_MAP_REGION.latitude,
-          longitude: DEFAULT_MAP_REGION.longitude,
-        };
+  const mapTarget = getEventMapCenter(event.places);
+  const mapStart = getDefaultCoordinate();
   const mapZoom = zoomFromLatitudeDelta(
     event.places.length > 0 ? 0.05 : DEFAULT_MAP_REGION.latitudeDelta,
   );
@@ -294,9 +290,14 @@ export const CreateEventReviewScreen: React.FC = () => {
           logoEnabled={false}
           attributionEnabled={false}>
           <Mapbox.Camera
-            centerCoordinate={[mapCenter.longitude, mapCenter.latitude]}
+            defaultSettings={{
+              centerCoordinate: [mapStart.longitude, mapStart.latitude],
+              zoomLevel: mapZoom,
+            }}
+            centerCoordinate={[mapTarget.longitude, mapTarget.latitude]}
             zoomLevel={mapZoom}
-            animationMode="none"
+            animationMode="easeTo"
+            animationDuration={MAP_CAMERA_ANIMATION_MS}
           />
           {event.places.map((place, index) => (
             <Mapbox.PointAnnotation
