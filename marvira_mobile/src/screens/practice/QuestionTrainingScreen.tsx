@@ -10,7 +10,9 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   usePracticeQuestion,
   useSubmitTrainingAnswer,
@@ -48,6 +50,8 @@ export const QuestionTrainingScreen: React.FC = () => {
   const { t } = useTranslation();
   const route = useRoute<TrainingRoute>();
   const navigation = useNavigation<TrainingNavigation>();
+  const headerHeight = useHeaderHeight();
+  const insets = useSafeAreaInsets();
   const { questionId } = route.params;
 
   const [answer, setAnswer] = useState('');
@@ -126,10 +130,13 @@ export const QuestionTrainingScreen: React.FC = () => {
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}>
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag">
         <View style={styles.header}>
           <View style={styles.headerText}>
             <Text style={styles.badge}>{t('practice.trainingMode')}</Text>
@@ -160,15 +167,22 @@ export const QuestionTrainingScreen: React.FC = () => {
             answer={answer}
             onChangeAnswer={setAnswer}
           />
-          <Button
-            title={t('practice.submitTraining')}
-            onPress={handleSubmit}
-            loading={submitMutation.isPending}
-            fullWidth
-            style={styles.submitButton}
-          />
         </View>
       </ScrollView>
+
+      <View
+        style={[
+          styles.submitFooter,
+          { paddingBottom: Math.max(insets.bottom, spacing.md) },
+        ]}>
+        <Button
+          title={t('practice.submitTraining')}
+          onPress={handleSubmit}
+          loading={submitMutation.isPending}
+          fullWidth
+          disabled={!answer.trim()}
+        />
+      </View>
 
       <UnfavoriteConfirmBottomSheet
         visible={pendingUnfavoriteId !== null}
@@ -191,7 +205,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.md,
-    paddingBottom: spacing.xxl,
+    paddingBottom: spacing.md,
   },
   header: {
     flexDirection: 'row',
@@ -229,7 +243,11 @@ const styles = StyleSheet.create({
     color: colors.textDark,
     marginBottom: spacing.md,
   },
-  submitButton: {
-    marginTop: spacing.lg,
+  submitFooter: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
   },
 });

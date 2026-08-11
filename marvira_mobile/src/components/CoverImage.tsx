@@ -7,8 +7,13 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import FastImage, {
+  type FastImageProps,
+  type ResizeMode,
+} from '@d11/react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors } from '../theme';
+import { isRemoteHttpUri } from '../utils/imageCache';
 
 interface CoverImageProps {
   uri?: string | null;
@@ -16,8 +21,25 @@ interface CoverImageProps {
   accessibilityLabel?: string;
 }
 
+function mapResizeMode(
+  mode: 'cover' | 'contain' | 'stretch' | 'center' | 'repeat',
+): ResizeMode {
+  switch (mode) {
+    case 'contain':
+      return FastImage.resizeMode.contain;
+    case 'stretch':
+      return FastImage.resizeMode.stretch;
+    case 'center':
+      return FastImage.resizeMode.center;
+    case 'cover':
+    default:
+      return FastImage.resizeMode.cover;
+  }
+}
+
 /**
  * Card cover: shows brand gradient when URI is missing or the image fails to load.
+ * Remote HTTP(S) URIs use FastImage (memory + disk cache).
  */
 export const CoverImage: React.FC<CoverImageProps> = ({
   uri,
@@ -30,7 +52,8 @@ export const CoverImage: React.FC<CoverImageProps> = ({
     setFailed(false);
   }, [uri]);
 
-  const showImage = Boolean(uri?.trim()) && !failed;
+  const trimmed = uri?.trim() ?? '';
+  const showImage = Boolean(trimmed) && !failed;
 
   if (!showImage) {
     return (
@@ -44,10 +67,28 @@ export const CoverImage: React.FC<CoverImageProps> = ({
     );
   }
 
+  const imageStyle = [styles.base, style as StyleProp<ImageStyle>];
+
+  if (isRemoteHttpUri(trimmed)) {
+    return (
+      <FastImage
+        source={{
+          uri: trimmed,
+          priority: FastImage.priority.normal,
+          cache: FastImage.cacheControl.immutable,
+        }}
+        style={imageStyle as FastImageProps['style']}
+        resizeMode={FastImage.resizeMode.cover}
+        accessibilityLabel={accessibilityLabel}
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+
   return (
     <Image
-      source={{ uri: uri!.trim() }}
-      style={[styles.base, style as StyleProp<ImageStyle>]}
+      source={{ uri: trimmed }}
+      style={imageStyle}
       accessibilityLabel={accessibilityLabel}
       onError={() => setFailed(true)}
     />
@@ -78,7 +119,8 @@ export const SafeRemoteImage: React.FC<SafeRemoteImageProps> = ({
     setFailed(false);
   }, [uri]);
 
-  const showImage = Boolean(uri?.trim()) && !failed;
+  const trimmed = uri?.trim() ?? '';
+  const showImage = Boolean(trimmed) && !failed;
 
   if (!showImage) {
     return (
@@ -89,11 +131,27 @@ export const SafeRemoteImage: React.FC<SafeRemoteImageProps> = ({
     );
   }
 
+  if (isRemoteHttpUri(trimmed)) {
+    return (
+      <FastImage
+        source={{
+          uri: trimmed,
+          priority: FastImage.priority.normal,
+          cache: FastImage.cacheControl.immutable,
+        }}
+        style={style as FastImageProps['style']}
+        resizeMode={mapResizeMode(resizeMode)}
+        accessibilityLabel={accessibilityLabel}
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+
   return (
     <Image
-      source={{ uri: uri!.trim() }}
+      source={{ uri: trimmed }}
       style={style}
-      resizeMode={resizeMode}
+      resizeMode={resizeMode === 'repeat' ? 'cover' : resizeMode}
       accessibilityLabel={accessibilityLabel}
       onError={() => setFailed(true)}
     />

@@ -8,11 +8,13 @@ import {
   Alert,
   ScrollView,
   Share,
+  StatusBar,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import LinearGradient from 'react-native-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useEventDetails } from '../../hooks/useEvents';
@@ -45,6 +47,7 @@ type EventCompletionScreenNavigationProp = NativeStackNavigationProp<
 
 export const EventCompletionScreen: React.FC = () => {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const route = useRoute<EventCompletionScreenRouteProp>();
   const navigation = useNavigation<EventCompletionScreenNavigationProp>();
   const {
@@ -146,8 +149,21 @@ export const EventCompletionScreen: React.FC = () => {
     <LinearGradient
       colors={[colors.primary, colors.secondary]}
       style={styles.container}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingTop: spacing.xl + insets.top,
+            paddingBottom: spacing.xxl + insets.bottom,
+            paddingLeft: spacing.xl + insets.left,
+            paddingRight: spacing.xl + insets.right,
+          },
+        ]}
         showsVerticalScrollIndicator={false}>
         <Animated.View
           style={[
@@ -342,8 +358,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.xl,
-    paddingVertical: spacing.xxl,
   },
   content: {
     alignItems: 'center',

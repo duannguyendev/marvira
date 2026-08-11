@@ -3,6 +3,7 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import FirebaseCore
+import SDWebImage
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   ) -> Bool {
     // Must configure before any RNFB module (messaging in index.js) touches FIRApp.
     FirebaseApp.configure()
+    configureImageCache()
 
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
@@ -34,6 +36,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
 
     return true
+  }
+
+  /// Memory 50MB, disk 75MB, max age 14 days (matches JS imageCache constants).
+  private func configureImageCache() {
+    let config = SDImageCache.shared.config
+    config.maxMemoryCost = 50 * 1024 * 1024
+    config.maxDiskSize = 75 * 1024 * 1024
+    config.maxDiskAge = 14 * 24 * 60 * 60
   }
 }
 

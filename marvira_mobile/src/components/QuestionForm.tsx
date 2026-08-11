@@ -142,9 +142,9 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
       {
         mediaType: 'photo',
         selectionLimit: 1,
-        quality: 0.8,
-        maxWidth: 1600,
-        maxHeight: 1600,
+        quality: 0.85,
+        maxWidth: 2048,
+        maxHeight: 2048,
       },
       handlePickerResult,
     );
@@ -156,9 +156,9 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
       {
         mediaType: 'photo',
         cameraType: 'back',
-        quality: 0.8,
-        maxWidth: 1600,
-        maxHeight: 1600,
+        quality: 0.85,
+        maxWidth: 2048,
+        maxHeight: 2048,
         saveToPhotos: false,
       },
       handlePickerResult,

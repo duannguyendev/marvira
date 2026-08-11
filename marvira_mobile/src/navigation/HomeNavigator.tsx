@@ -16,16 +16,10 @@ import { CreateEventSuccessScreen } from '../screens/create/CreateEventSuccessSc
 import { EditEventGiftsScreen } from '../screens/create/EditEventGiftsScreen';
 import { EditEventAnswersScreen } from '../screens/create/EditEventAnswersScreen';
 import { EventFinishersScreen } from '../screens/home/EventFinishersScreen';
-import { withScreenSafeArea } from '../components/Screen';
 import { HomeStackParamList } from './types';
 import { primaryStackScreenOptions } from './stackOptions';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
-const EventCompletionScreenSafe = withScreenSafeArea(EventCompletionScreen, [
-  'top',
-  'left',
-  'right',
-]);
 
 export const HomeNavigator: React.FC = () => {
   const { t } = useTranslation();
@@ -59,7 +53,7 @@ export const HomeNavigator: React.FC = () => {
       />
       <Stack.Screen
         name="EventCompletion"
-        component={EventCompletionScreenSafe}
+        component={EventCompletionScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

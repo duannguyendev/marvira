@@ -11,7 +11,9 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Mapbox from '@rnmapbox/maps';
 import {
   usePlaceQuestion,
@@ -69,6 +71,8 @@ export const PlaceGameScreen: React.FC = () => {
   const { t } = useTranslation();
   const route = useRoute<PlaceGameScreenRouteProp>();
   const navigation = useNavigation<PlaceGameScreenNavigationProp>();
+  const headerHeight = useHeaderHeight();
+  const insets = useSafeAreaInsets();
   const { eventId, placeId } = route.params;
 
   const {
@@ -361,11 +365,20 @@ export const PlaceGameScreen: React.FC = () => {
   const canSubmitAnswer =
     isUnlocked && isWithinAnswerRange && hasGoodGpsAccuracy && !!question;
 
+  const showSubmitFooter = isUnlocked;
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView style={styles.scrollView}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={
+          showSubmitFooter ? styles.scrollContentWithFooter : undefined
+        }
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag">
         <View style={styles.mapContainer}>
           <Mapbox.MapView
             style={styles.map}
@@ -510,15 +523,6 @@ export const PlaceGameScreen: React.FC = () => {
               ) : (
                 <ErrorView message={t('game.couldNotLoadQuestion')} />
               )}
-
-              <Button
-                title={t('game.submitAnswer')}
-                onPress={handleSubmitAnswer}
-                loading={submitAnswerMutation.isPending}
-                fullWidth
-                style={styles.submitButton}
-                disabled={!canSubmitAnswer || !answer.trim()}
-              />
             </View>
           ) : (
             <View style={styles.lockedContainer}>
@@ -539,6 +543,22 @@ export const PlaceGameScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
+
+      {showSubmitFooter ? (
+        <View
+          style={[
+            styles.submitFooter,
+            { paddingBottom: Math.max(insets.bottom, spacing.md) },
+          ]}>
+          <Button
+            title={t('game.submitAnswer')}
+            onPress={handleSubmitAnswer}
+            loading={submitAnswerMutation.isPending}
+            fullWidth
+            disabled={!canSubmitAnswer || !answer.trim()}
+          />
+        </View>
+      ) : null}
     </KeyboardAvoidingView>
   );
 };
@@ -550,6 +570,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContentWithFooter: {
+    paddingBottom: spacing.md,
   },
   mapContainer: {
     height: MAP_HEIGHT,
@@ -610,11 +633,15 @@ const styles = StyleSheet.create({
     color: colors.textDark,
     marginBottom: spacing.xs,
   },
-  submitButton: {
-    marginTop: spacing.sm,
+  submitFooter: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
   },
   reportButton: {
-    marginBottom: spacing.sm,
+    marginTop: spacing.sm,
   },
   updatedBanner: {
     backgroundColor: colors.infoLight,

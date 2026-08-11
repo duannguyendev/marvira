@@ -19,6 +19,7 @@ import type { Response } from 'express';
 import { UploadsService } from './uploads.service';
 import { Roles, Public } from '../common/decorators/roles.decorator';
 import { UPLOADS_DIR } from '../common/uploads-dir';
+import { UPLOAD_CACHE_CONTROL } from '../common/upload-cache';
 
 @ApiTags('uploads')
 @Controller('uploads')
@@ -36,13 +37,19 @@ export class UploadsController {
     if (!existsSync(filePath)) {
       throw new NotFoundException('File not found');
     }
-    return res.sendFile(filePath);
+    return res
+      .setHeader('Cache-Control', UPLOAD_CACHE_CONTROL)
+      .sendFile(filePath);
   }
 
   @Post()
   @Roles(UserRole.ADMIN, UserRole.STAFF, UserRole.USER)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Upload image file (jpeg/png/webp, max 5 MB)' })
+  @ApiOperation({
+    summary: 'Upload image file (jpeg/png/webp, max 5 MB)',
+    description:
+      'Images are oriented, resized to max 2048px on the longest edge (no upscale), and stored as JPEG for CDN-friendly size while staying sharp on retina tablets.',
+  })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {

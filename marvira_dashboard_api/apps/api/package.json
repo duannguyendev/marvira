@@ -12,7 +12,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node --transpile-only prisma/seed.ts",
     "db:reset": "prisma migrate reset --force",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "uploads:backfill-cache": "node scripts/backfill-upload-cache-control.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.750.0",
@@ -45,6 +46,7 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "sharp": "^0.35.3",
     "uuid": "^11.0.3"
   },
   "devDependencies": {

@@ -9,6 +9,7 @@ import { AppModule } from './app.module';
 import { UPLOADS_DIR } from './common/uploads-dir';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { validateProductionConfig } from './common/config/validate-production.config';
+import { UPLOAD_CACHE_CONTROL } from './common/upload-cache';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -39,7 +40,12 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  app.useStaticAssets(UPLOADS_DIR, { prefix: '/uploads/' });
+  app.useStaticAssets(UPLOADS_DIR, {
+    prefix: '/uploads/',
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', UPLOAD_CACHE_CONTROL);
+    },
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Marvira API')
