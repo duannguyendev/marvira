@@ -4,14 +4,13 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import LinearGradient from 'react-native-linear-gradient';
 import { Event } from '../types';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 import { formatDistance } from '../utils/distance';
 import { FavoriteButton } from './FavoriteButton';
+import { CoverImage } from './CoverImage';
 
 interface EventCardProps {
   event: Event;
@@ -53,16 +52,7 @@ export const EventCard: React.FC<EventCardProps> = ({
 
   const body = (
     <>
-      {event.imageUrl ? (
-        <Image source={{ uri: event.imageUrl }} style={styles.image} />
-      ) : (
-        <LinearGradient
-          colors={[colors.primary, colors.secondary]}
-          style={styles.image}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-      )}
+      <CoverImage uri={event.imageUrl} style={styles.image} />
       {!isIncoming && onFavoritePress ? (
         <FavoriteButton
           isFavorite={!!isFavorite}

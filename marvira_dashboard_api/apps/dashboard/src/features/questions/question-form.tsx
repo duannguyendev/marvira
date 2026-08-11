@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AdvancedFields } from '@/components/ui/advanced-fields';
+import { SafeImg } from '@/components/safe-img';
 import { QuestionType, type AdminQuestion } from '@marvira/shared-types';
 import {
   questionSchema,
@@ -254,10 +255,11 @@ export function QuestionForm({
           <Label>Question Image</Label>
           <div className="flex flex-wrap items-start gap-4">
             {previewSrc ? (
-              <img
+              <SafeImg
                 src={previewSrc}
                 alt="Question preview"
                 className="h-40 w-auto max-w-full rounded-md border object-contain bg-background"
+                placeholderClassName="flex h-40 w-56 items-center justify-center rounded-md border border-dashed bg-background"
               />
             ) : (
               <div className="flex h-40 w-56 items-center justify-center rounded-md border border-dashed bg-background text-muted-foreground text-sm">

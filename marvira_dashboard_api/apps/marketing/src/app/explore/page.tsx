@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { PageShell } from '@/components/page-shell';
 import { ExploreSearch } from '@/components/explore-search';
 import { loadMarketingContent, withLang } from '@/lib/content-loader';
+import { SafeImage } from '@/components/safe-image';
 import {
   fetchArticles,
   resolveArticleImage,
@@ -108,8 +109,7 @@ export default async function ExplorePage({
                     href={withLang(`/explore/${article.slug}`, locale)}
                     className="block">
                     <div className="relative aspect-[16/10] overflow-hidden rounded-none bg-ink/5">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <SafeImage
                         src={
                           resolveArticleImage(article.coverImage) ||
                           ARTICLE_PLACEHOLDER_IMAGE

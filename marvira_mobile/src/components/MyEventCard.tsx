@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import LinearGradient from 'react-native-linear-gradient';
 import { MyCreatedEvent } from '../types';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
+import { CoverImage } from './CoverImage';
 
 interface MyEventCardProps {
   event: MyCreatedEvent;
@@ -38,16 +38,7 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
       style={styles.container}
       onPress={onPress}
       activeOpacity={0.8}>
-      {event.imageUrl ? (
-        <Image source={{ uri: event.imageUrl }} style={styles.image} />
-      ) : (
-        <LinearGradient
-          colors={[colors.primary, colors.secondary]}
-          style={styles.image}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-      )}
+      <CoverImage uri={event.imageUrl} style={styles.image} />
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title} numberOfLines={2}>

@@ -20,6 +20,7 @@ type MailPayload = {
   subject: string;
   text: string;
   html: string;
+  replyTo?: string;
 };
 
 @Injectable()
@@ -285,6 +286,73 @@ export class EmailService implements OnModuleInit {
     );
   }
 
+  /**
+   * Notify the support inbox when a user submits feedback (web or app).
+   */
+  async sendSupportFeedbackNotification(input: {
+    id: string;
+    name: string;
+    email: string;
+    category: string;
+    subject?: string | null;
+    message: string;
+    source: string;
+  }): Promise<void> {
+    const to = this.supportEmail();
+    const topic = input.subject?.trim() || input.category;
+    const mailSubject = `[Marvira ${input.source}] ${input.category}: ${topic}`;
+    const text = [
+      'New support / feedback message',
+      '',
+      `ID: ${input.id}`,
+      `From: ${input.name} <${input.email}>`,
+      `Category: ${input.category}`,
+      `Source: ${input.source}`,
+      input.subject?.trim() ? `Subject: ${input.subject.trim()}` : null,
+      '',
+      'Message:',
+      input.message,
+    ]
+      .filter(line => line !== null)
+      .join('\n');
+
+    const bodyHtml = `
+      <p style="margin:0 0 16px;font-size:16px;line-height:1.5;color:${BRAND.ink};">
+        New support / feedback message
+      </p>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;font-size:14px;line-height:1.6;color:${BRAND.ink};">
+        <tr><td style="padding:2px 12px 2px 0;color:${BRAND.muted};">ID</td><td>${this.escapeHtml(input.id)}</td></tr>
+        <tr><td style="padding:2px 12px 2px 0;color:${BRAND.muted};">From</td><td>${this.escapeHtml(input.name)} &lt;${this.escapeHtml(input.email)}&gt;</td></tr>
+        <tr><td style="padding:2px 12px 2px 0;color:${BRAND.muted};">Category</td><td>${this.escapeHtml(input.category)}</td></tr>
+        <tr><td style="padding:2px 12px 2px 0;color:${BRAND.muted};">Source</td><td>${this.escapeHtml(input.source)}</td></tr>
+        ${
+          input.subject?.trim()
+            ? `<tr><td style="padding:2px 12px 2px 0;color:${BRAND.muted};">Subject</td><td>${this.escapeHtml(input.subject.trim())}</td></tr>`
+            : ''
+        }
+      </table>
+      <p style="margin:0 0 8px;font-size:13px;font-weight:600;color:${BRAND.muted};">Message</p>
+      <p style="margin:0;padding:16px;font-size:15px;line-height:1.6;color:${BRAND.ink};background:${BRAND.bg};border-radius:8px;white-space:pre-wrap;">
+${this.escapeHtml(input.message)}
+      </p>
+    `;
+
+    await this.dispatch(
+      {
+        to,
+        subject: mailSubject,
+        text,
+        html: this.wrapSystemMail({
+          preheader: `New ${input.category} from ${input.name}`,
+          bodyHtml,
+          footerNote: `Reply goes to the user when you use Reply in your mail client (${this.escapeHtml(input.email)}).`,
+        }),
+        replyTo: input.email,
+      },
+      { kind: 'support-feedback' },
+    );
+  }
+
   private supportEmail(): string {
     return (
       this.config.get<string>('SUPPORT_EMAIL')?.trim() || 'support@marvira.com'
@@ -362,6 +430,7 @@ export class EmailService implements OnModuleInit {
         subject: mail.subject,
         text: mail.text,
         html: mail.html,
+        ...(mail.replyTo ? { reply_to: mail.replyTo } : {}),
       }),
     });
 

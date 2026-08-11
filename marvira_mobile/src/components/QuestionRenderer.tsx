@@ -4,13 +4,13 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  Image,
   TouchableOpacity,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { PlaceQuestion } from '../types';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 import { getApiBaseUrl } from '../config/apiEnvironment';
+import { SafeRemoteImage } from './CoverImage';
 
 interface QuestionRendererProps {
   question: PlaceQuestion;
@@ -49,8 +49,8 @@ export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 
   return (
     <View>
-      {question.type === 'IMAGE' && imageUri ? (
-        <Image source={{ uri: imageUri }} style={styles.questionImage} />
+      {question.type === 'IMAGE' ? (
+        <SafeRemoteImage uri={imageUri} style={styles.questionImage} />
       ) : null}
 
       <Text style={styles.question}>{question.text}</Text>

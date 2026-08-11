@@ -14,6 +14,7 @@ import { buildPaginatedResponse, parsePagination } from '@marvira/shared-utils';
 import { SubmitFeedbackDto } from './dto/submit-feedback.dto';
 import { UpdateFeedbackDto } from './dto/admin-feedback.dto';
 import { RequestUser } from '../common/types/request-user';
+import { EmailService } from '../email/email.service';
 
 type FeedbackWithUser = Prisma.FeedbackGetPayload<{
   include: { user: { select: { id: true; name: true; email: true } } };
@@ -21,7 +22,10 @@ type FeedbackWithUser = Prisma.FeedbackGetPayload<{
 
 @Injectable()
 export class FeedbackService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService,
+  ) {}
 
   private toItem(row: FeedbackWithUser) {
     return {
@@ -73,6 +77,17 @@ export class FeedbackService {
       include: {
         user: { select: { id: true, name: true, email: true } },
       },
+    });
+
+    // Fire-and-forget — do not block the user on SMTP/Resend latency.
+    void this.emailService.sendSupportFeedbackNotification({
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      category: row.category,
+      subject: row.subject,
+      message: row.message,
+      source: row.source,
     });
 
     return this.toItem(row);

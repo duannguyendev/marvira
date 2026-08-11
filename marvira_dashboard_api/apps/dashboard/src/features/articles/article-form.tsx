@@ -10,6 +10,7 @@ import { api } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SafeImg } from '@/components/safe-img';
 import { resolveImageUrl } from '@/lib/resolve-image-url';
 import {
   articleSchema,
@@ -202,11 +203,11 @@ export function ArticleForm({
         <Label>Cover image</Label>
         <div className="flex flex-wrap items-start gap-4">
           {previewSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <SafeImg
               src={previewSrc}
               alt="Cover preview"
               className="h-40 w-auto max-w-full rounded-md border object-contain bg-background"
+              placeholderClassName="flex h-40 w-56 items-center justify-center rounded-md border border-dashed bg-background text-sm text-muted-foreground"
             />
           ) : (
             <div className="flex h-40 w-56 items-center justify-center rounded-md border border-dashed bg-background text-sm text-muted-foreground">

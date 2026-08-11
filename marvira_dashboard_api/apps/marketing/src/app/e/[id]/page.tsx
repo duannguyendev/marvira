@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/page-shell';
+import { SafeNextCover } from '@/components/safe-next-cover';
 import { getInviteEvent } from '@/lib/events';
 import { loadMarketingContent, withLang } from '@/lib/content-loader';
 import { SITE, STORE_READY } from '@/lib/site';
@@ -70,11 +70,10 @@ export default async function EventInvitePage({ params, searchParams }: Props) {
   return (
     <PageShell content={content} locale={locale}>
       <article>
-        <div className="relative min-h-[52vh] overflow-hidden">
-          <Image
+        <div className="relative min-h-[52vh] overflow-hidden bg-ink">
+          <SafeNextCover
             src={event.coverImage}
             alt={event.title}
-            fill
             priority
             unoptimized={unoptimized}
             className="object-cover"

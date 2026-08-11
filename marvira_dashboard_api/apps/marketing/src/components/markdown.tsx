@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { SafeImage } from '@/components/safe-image';
 
 /** Renders trusted Markdown (authored by Admin/Staff) to styled React elements. */
 export function Markdown({ children }: { children: string }) {
@@ -54,9 +55,12 @@ export function Markdown({ children }: { children: string }) {
               {...props}
             />
           ),
-          img: props => (
-            // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-            <img className="my-4 w-full rounded-lg object-cover" {...props} />
+          img: ({ src, alt }) => (
+            <SafeImage
+              src={typeof src === 'string' ? src : undefined}
+              alt={alt ?? ''}
+              className="my-4 w-full rounded-lg bg-ink/5 object-cover"
+            />
           ),
         }}>
         {children}

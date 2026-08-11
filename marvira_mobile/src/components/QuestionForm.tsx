@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Image,
   ActivityIndicator,
   Alert,
   Platform,
@@ -19,6 +18,7 @@ import {
 } from 'react-native-image-picker';
 import { CreateQuestionInput, QuestionType } from '../types';
 import { Input } from './Input';
+import { SafeRemoteImage } from './CoverImage';
 import { needsImageUpload, resolveUploadUrl } from '../api/uploads';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 
@@ -218,10 +218,10 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         <View style={styles.imageSection}>
           <Text style={styles.label}>{t('createEvent.questionImage')}</Text>
           {imagePreview ? (
-            <Image
-              source={{ uri: imagePreview }}
+            <SafeRemoteImage
+              uri={imagePreview}
               style={styles.preview}
-              resizeMode="cover"
+              placeholderStyle={styles.previewPlaceholder}
             />
           ) : (
             <View style={styles.previewPlaceholder}>

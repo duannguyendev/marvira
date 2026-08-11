@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/page-shell';
 import { Markdown } from '@/components/markdown';
+import { SafeImage } from '@/components/safe-image';
 import { loadMarketingContent, withLang } from '@/lib/content-loader';
 import {
   fetchArticleBySlug,
@@ -73,14 +74,11 @@ export default async function ExploreArticlePage({
     <PageShell content={content} locale={locale}>
       <article>
         <div className="relative min-h-[52vh] overflow-hidden bg-ink">
-          {coverImage && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={coverImage}
-              alt={article.title}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-          )}
+          <SafeImage
+            src={coverImage}
+            alt={article.title}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-ink/20" />
           <div className="relative z-10 mx-auto flex min-h-[52vh] max-w-4xl flex-col justify-end px-5 pb-12 pt-28 md:px-8">
             <p className="text-sm font-semibold uppercase tracking-wider text-sun">

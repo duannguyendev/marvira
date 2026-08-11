@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { QuestionForm } from '@/features/questions/question-form';
+import { SafeImg } from '@/components/safe-img';
 import { resolveImageUrl } from '@/lib/resolve-image-url';
 import { AddQuestionDialog } from '@/features/questions/add-question-dialog';
 import type {
@@ -139,11 +140,12 @@ export function PlaceQuestionEditor({
           <span>{q.points} pts</span>
           <span>Answer: {q.answer}</span>
         </div>
-        {q.type === 'IMAGE' && q.imageUrl && (
-          <img
-            src={resolveImageUrl(q.imageUrl)}
+        {q.type === 'IMAGE' && (
+          <SafeImg
+            src={q.imageUrl ? resolveImageUrl(q.imageUrl) : null}
             alt="Question"
             className="h-24 w-auto rounded border object-contain"
+            placeholderClassName="h-24 w-32 rounded border bg-muted"
           />
         )}
         {q.explanation && (

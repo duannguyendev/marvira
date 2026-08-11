@@ -88,11 +88,16 @@ const REMEMBERED_LOGIN_SERVICE = 'com.marvira.remembered_login';
 
 const getStorage = () => getStorageImpl();
 
+/** Prefer AFTER_FIRST_UNLOCK so tokens remain readable after backgrounding. */
+const TOKEN_ACCESSIBLE = Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK;
+
+let keychainMigrationDone = false;
+
 async function setSecureToken(key: 'access' | 'refresh', value: string) {
   const username = key === 'access' ? 'access_token' : 'refresh_token';
   await Keychain.setGenericPassword(username, value, {
     service: `${KEYCHAIN_SERVICE}.${key}`,
-    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+    accessible: TOKEN_ACCESSIBLE,
   });
 }
 
@@ -109,6 +114,29 @@ async function getSecureToken(
     return null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Re-write existing tokens so accessibility upgrades from WHEN_UNLOCKED
+ * (older builds) to AFTER_FIRST_UNLOCK. Runs once per process.
+ */
+async function migrateTokenAccessibility(): Promise<void> {
+  if (keychainMigrationDone) {
+    return;
+  }
+  keychainMigrationDone = true;
+  try {
+    const [access, refresh] = await Promise.all([
+      getSecureToken('access'),
+      getSecureToken('refresh'),
+    ]);
+    await Promise.all([
+      access ? setSecureToken('access', access) : Promise.resolve(),
+      refresh ? setSecureToken('refresh', refresh) : Promise.resolve(),
+    ]);
+  } catch {
+    // Leave tokens as-is; next login/refresh will rewrite them.
   }
 }
 
@@ -133,6 +161,7 @@ export const storage = {
 
   async getToken(): Promise<string | null> {
     try {
+      await migrateTokenAccessibility();
       return await getSecureToken('access');
     } catch (error) {
       console.error('Error getting token:', error);
@@ -154,6 +183,7 @@ export const storage = {
 
   async getRefreshToken(): Promise<string | null> {
     try {
+      await migrateTokenAccessibility();
       return await getSecureToken('refresh');
     } catch (error) {
       console.error('Error getting refresh token:', error);
@@ -200,7 +230,7 @@ export const storage = {
     try {
       await Keychain.setGenericPassword(email.trim(), password, {
         service: REMEMBERED_LOGIN_SERVICE,
-        accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+        accessible: Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK,
       });
       await getStorage().setItem(REMEMBER_ME_KEY, 'true');
     } catch (error) {

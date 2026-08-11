@@ -11,6 +11,20 @@ let refreshQueue: Array<{
   reject: (error: unknown) => void;
 }> = [];
 
+/** True when the server rejected the session — not for network/transient errors. */
+function isInvalidSessionError(error: unknown): boolean {
+  if (axios.isAxiosError(error)) {
+    const status = error.response?.status;
+    return status === 401 || status === 403;
+  }
+  return error instanceof Error && error.message === 'No refresh token';
+}
+
+async function forceLogout(): Promise<void> {
+  await storage.clearAll();
+  authSession.notifyLogout();
+}
+
 async function refreshAccessToken(): Promise<string> {
   const refreshToken = await storage.getRefreshToken();
   if (!refreshToken) {
@@ -78,15 +92,14 @@ class ApiClient {
           return Promise.reject(this.handleError(error));
         }
 
+        // Refresh endpoint itself returned 401 → session is dead
         if (originalRequest.url?.includes('/auth/refresh')) {
-          await storage.clearAll();
-          authSession.notifyLogout();
+          await forceLogout();
           return Promise.reject(this.handleError(error));
         }
 
         if (originalRequest._retry) {
-          await storage.clearAll();
-          authSession.notifyLogout();
+          await forceLogout();
           return Promise.reject(this.handleError(error));
         }
 
@@ -112,8 +125,11 @@ class ApiClient {
           return this.client(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
-          await storage.clearAll();
-          authSession.notifyLogout();
+          // Only clear session when refresh token is rejected — keep
+          // credentials on network blips when returning from background.
+          if (isInvalidSessionError(refreshError)) {
+            await forceLogout();
+          }
           return Promise.reject(this.handleError(error));
         } finally {
           isRefreshing = false;

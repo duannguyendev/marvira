@@ -27,6 +27,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { DataTablePagination } from '@/components/data-table/pagination';
+import { SafeImg } from '@/components/safe-img';
 import { useDebouncedValue } from '@/lib/use-debounced-value';
 import { buildQuery } from '@/lib/build-query';
 import { resolveImageUrl } from '@/lib/resolve-image-url';
@@ -178,16 +179,16 @@ export default function ArticlesPage() {
                   {articles.map(article => (
                     <TableRow key={article.id}>
                       <TableCell>
-                        {article.coverImage ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={resolveImageUrl(article.coverImage)}
-                            alt=""
-                            className="h-10 w-14 rounded object-cover"
-                          />
-                        ) : (
-                          <div className="h-10 w-14 rounded bg-muted" />
-                        )}
+                        <SafeImg
+                          src={
+                            article.coverImage
+                              ? resolveImageUrl(article.coverImage)
+                              : null
+                          }
+                          alt=""
+                          className="h-10 w-14 rounded object-cover"
+                          placeholderClassName="h-10 w-14 rounded bg-muted"
+                        />
                       </TableCell>
                       <TableCell>
                         <div className="max-w-xs">

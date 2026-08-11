@@ -175,22 +175,29 @@ class AuthService {
   }
 
   /**
-   * Refresh auth token
+   * Refresh auth token. Network errors leave the local session intact;
+   * only an invalid/expired refresh token clears credentials.
    */
   async refreshToken(): Promise<string | null> {
+    const refreshToken = await storage.getRefreshToken();
+    if (!refreshToken) {
+      await storage.clearAll();
+      this.currentUser = null;
+      return null;
+    }
+
     try {
-      const refreshToken = await storage.getRefreshToken();
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
-      }
       const response = await authApi.refreshToken(refreshToken);
       await storage.setToken(response.token);
       if (response.refreshToken) {
         await storage.setRefreshToken(response.refreshToken);
       }
       return response.token;
-    } catch (error) {
-      await this.logout();
+    } catch (error: any) {
+      const status = error?.status ?? error?.response?.status;
+      if (status === 401 || status === 403) {
+        await this.logout();
+      }
       return null;
     }
   }
