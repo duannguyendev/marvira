@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Text } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,7 +8,8 @@ import { PracticeNavigator } from './PracticeNavigator';
 import { FavoritesNavigator } from './FavoritesNavigator';
 import { ProfileNavigator } from './ProfileNavigator';
 import { MainTabParamList } from './types';
-import { colors } from '../theme';
+import { useUnreadNotificationCount } from '../hooks/useNotifications';
+import { colors, fontWeight } from '../theme';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -25,9 +26,27 @@ const TabIcon: React.FC<{ emoji: string }> = ({ emoji }) => (
   <Text style={tabIconStyle}>{emoji}</Text>
 );
 
+const TabIconWithBadge: React.FC<{ emoji: string; badgeCount: number }> = ({
+  emoji,
+  badgeCount,
+}) => (
+  <View style={tabBadgeStyles.wrapper}>
+    <Text style={tabIconStyle}>{emoji}</Text>
+    {badgeCount > 0 ? (
+      <View style={tabBadgeStyles.badge}>
+        <Text style={tabBadgeStyles.badgeText}>
+          {badgeCount > 9 ? '9+' : String(badgeCount)}
+        </Text>
+      </View>
+    ) : null}
+  </View>
+);
+
 export const MainNavigator: React.FC = () => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { data: unreadData } = useUnreadNotificationCount();
+  const unreadCount = unreadData?.unreadCount ?? 0;
   /**
    * Bottom padding for the tab bar:
    * - iOS: always reserve home-indicator space (min 8).
@@ -98,10 +117,40 @@ export const MainNavigator: React.FC = () => {
         name="Profile"
         component={ProfileNavigator}
         options={{
-          tabBarIcon: () => <TabIcon emoji="👤" />,
+          tabBarIcon: () => (
+            <TabIconWithBadge emoji="👤" badgeCount={unreadCount} />
+          ),
           tabBarLabel: t('nav.profile'),
         }}
       />
     </Tab.Navigator>
   );
 };
+
+const tabBadgeStyles = StyleSheet.create({
+  wrapper: {
+    width: 30,
+    height: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -6,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: colors.background,
+    fontSize: 9,
+    fontWeight: fontWeight.bold,
+    lineHeight: 12,
+    includeFontPadding: false,
+  },
+});

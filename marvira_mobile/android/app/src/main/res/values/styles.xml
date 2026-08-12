@@ -1,5 +1,4 @@
 <resources>
-    <!-- Base application theme (also used after system splash exits). -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
         <!-- Solid splash color so boot never flashes gradient/white under RN -->
@@ -8,18 +7,10 @@
         <item name="android:navigationBarColor">@color/splash_background</item>
     </style>
 
-    <!--
-      Android 12+ splash (and backport via AndroidX) is solid-only.
-      Same splash_logo asset as JS SplashScreen; IconBackground = 240dp circle.
-      Keep this splash until destination ready (SplashGate) so RN underlay is unseen.
-    -->
-    <style name="Theme.App.SplashScreen" parent="Theme.SplashScreen.IconBackground">
-        <item name="windowSplashScreenBackground">@color/splash_background</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo_safe</item>
-        <item name="windowSplashScreenIconBackgroundColor">@color/splash_background</item>
-        <item name="postSplashScreenTheme">@style/AppTheme</item>
-        <item name="android:windowBackground">@color/splash_background</item>
-        <item name="android:statusBarColor">@color/splash_background</item>
-        <item name="android:navigationBarColor">@color/splash_background</item>
+    <style name="BootTheme" parent="Theme.BootSplash">
+        <item name="bootSplashBackground">@color/bootsplash_background</item>
+        <item name="bootSplashLogo">@drawable/bootsplash_logo</item>
+        <item name="postBootSplashTheme">@style/AppTheme</item>
+        <item name="darkContentBarsStyle">false</item>
     </style>
 </resources>

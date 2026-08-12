@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Matches adaptive launcher background (app-icon/generate.js) -->
     <color name="ic_launcher_background">#818CF8</color>
-    <!-- Boot splash (native + JS) — Android 12+ cannot use a gradient -->
     <color name="splash_background">#6366F1</color>
+    <color name="bootsplash_background">#6366f1</color>
 </resources>

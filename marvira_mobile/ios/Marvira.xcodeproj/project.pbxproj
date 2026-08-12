@@ -12,6 +12,8 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		A1B2C3D45E6F708192A3B4C5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D45E6F708192A3B4C6 /* GoogleService-Info.plist */; };
+		12438629D1B946A686926730 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 370899114EE74DFD929F2D4E /* BootSplash.storyboard */; };
+		E05F91AB4D19493F85BAD3E7 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2F79FF7E183A4920ABB704D0 /* Colors.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Marvira/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Marvira/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		370899114EE74DFD929F2D4E /* BootSplash.storyboard */ = {isa = PBXFileReference; name = "BootSplash.storyboard"; path = "Marvira/BootSplash.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		2F79FF7E183A4920ABB704D0 /* Colors.xcassets */ = {isa = PBXFileReference; name = "Colors.xcassets"; path = "Marvira/Colors.xcassets"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = folder.assetcatalog; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +53,8 @@
 				A1B2C3D45E6F708192A3B4C6 /* GoogleService-Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				370899114EE74DFD929F2D4E /* BootSplash.storyboard */,
+				2F79FF7E183A4920ABB704D0 /* Colors.xcassets */,
 			);
 			name = Marvira;
 			sourceTree = "<group>";
@@ -163,6 +169,8 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				A1B2C3D45E6F708192A3B4C5 /* GoogleService-Info.plist in Resources */,
+				12438629D1B946A686926730 /* BootSplash.storyboard in Resources */,
+				E05F91AB4D19493F85BAD3E7 /* Colors.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
