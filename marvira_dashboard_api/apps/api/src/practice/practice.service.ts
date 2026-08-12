@@ -16,6 +16,7 @@ import {
   normalizeContentLanguage,
   parseLanguageFilterQuery,
 } from '../common/content-language';
+import { encodePublicAssetUrl } from '../common/encode-public-asset-url';
 
 type QuestionWithCreator = {
   id: string;
@@ -67,7 +68,7 @@ export class PracticeService {
       id: q.id,
       text: q.question,
       type: q.type,
-      imageUrl: q.imageUrl,
+      imageUrl: encodePublicAssetUrl(q.imageUrl) ?? null,
       options: (q.options as string[] | null) ?? undefined,
       points: q.points,
       language: q.language,

@@ -39,14 +39,14 @@ export class S3StorageService {
 
   async upload(
     buffer: Buffer,
-    originalName: string,
     contentType: string,
   ): Promise<{ key: string; url: string }> {
     if (!this.client || !this.bucket) {
       throw new Error('S3 storage is not configured');
     }
 
-    const key = `uploads/${uuidv4()}-${originalName}`;
+    // Random key only — never reuse client filenames (commas/spaces break RN image loaders).
+    const key = `uploads/${uuidv4()}.jpg`;
     await this.client.send(
       new PutObjectCommand({
         Bucket: this.bucket,

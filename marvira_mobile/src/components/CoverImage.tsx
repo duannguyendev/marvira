@@ -13,7 +13,7 @@ import FastImage, {
 } from '@d11/react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors } from '../theme';
-import { isRemoteHttpUri } from '../utils/imageCache';
+import { encodeRemoteImageUri, isRemoteHttpUri } from '../utils/imageCache';
 
 interface CoverImageProps {
   uri?: string | null;
@@ -54,6 +54,7 @@ export const CoverImage: React.FC<CoverImageProps> = ({
 
   const trimmed = uri?.trim() ?? '';
   const showImage = Boolean(trimmed) && !failed;
+  const loadUri = trimmed ? encodeRemoteImageUri(trimmed) : '';
 
   const frameStyle = [styles.base, style];
 
@@ -75,9 +76,9 @@ export const CoverImage: React.FC<CoverImageProps> = ({
       <View style={frameStyle} accessibilityLabel={accessibilityLabel}>
         <FastImage
           source={{
-            uri: trimmed,
+            uri: loadUri,
             priority: FastImage.priority.normal,
-            cache: FastImage.cacheControl.immutable,
+            cache: FastImage.cacheControl.web,
           }}
           style={StyleSheet.absoluteFillObject as FastImageProps['style']}
           resizeMode={FastImage.resizeMode.cover}
@@ -90,7 +91,7 @@ export const CoverImage: React.FC<CoverImageProps> = ({
   return (
     <View style={frameStyle} accessibilityLabel={accessibilityLabel}>
       <Image
-        source={{ uri: trimmed }}
+        source={{ uri: loadUri }}
         style={StyleSheet.absoluteFillObject}
         onError={() => setFailed(true)}
       />
@@ -124,6 +125,7 @@ export const SafeRemoteImage: React.FC<SafeRemoteImageProps> = ({
 
   const trimmed = uri?.trim() ?? '';
   const showImage = Boolean(trimmed) && !failed;
+  const loadUri = trimmed ? encodeRemoteImageUri(trimmed) : '';
 
   if (!showImage) {
     return (
@@ -138,9 +140,9 @@ export const SafeRemoteImage: React.FC<SafeRemoteImageProps> = ({
     return (
       <FastImage
         source={{
-          uri: trimmed,
+          uri: loadUri,
           priority: FastImage.priority.normal,
-          cache: FastImage.cacheControl.immutable,
+          cache: FastImage.cacheControl.web,
         }}
         style={style as FastImageProps['style']}
         resizeMode={mapResizeMode(resizeMode)}
@@ -152,7 +154,7 @@ export const SafeRemoteImage: React.FC<SafeRemoteImageProps> = ({
 
   return (
     <Image
-      source={{ uri: trimmed }}
+      source={{ uri: loadUri }}
       style={style}
       resizeMode={resizeMode === 'repeat' ? 'cover' : resizeMode}
       accessibilityLabel={accessibilityLabel}

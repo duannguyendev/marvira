@@ -13,6 +13,45 @@ export function isRemoteHttpUri(uri: string): boolean {
   return /^https?:\/\//i.test(uri.trim());
 }
 
+/**
+ * Percent-encode path segments for URLSession / SDWebImage / Glide (FastImage).
+ * Unencoded commas, parentheses, etc. in object keys fail on both iOS and Android.
+ */
+export function encodeRemoteImageUri(uri: string): string {
+  const trimmed = uri.trim();
+  if (!isRemoteHttpUri(trimmed) && !trimmed.startsWith('/')) {
+    return trimmed;
+  }
+
+  const encodeSegment = (segment: string): string => {
+    if (!segment) {
+      return segment;
+    }
+    let decoded = segment;
+    try {
+      decoded = decodeURIComponent(segment);
+    } catch {
+      // keep raw
+    }
+    return encodeURIComponent(decoded).replace(
+      /[!'()*]/g,
+      char => `%${char.charCodeAt(0).toString(16).toUpperCase()}`,
+    );
+  };
+
+  if (isRemoteHttpUri(trimmed)) {
+    try {
+      const parsed = new URL(trimmed);
+      const path = parsed.pathname.split('/').map(encodeSegment).join('/');
+      return `${parsed.origin}${path}${parsed.search}${parsed.hash}`;
+    } catch {
+      return trimmed;
+    }
+  }
+
+  return trimmed.split('/').map(encodeSegment).join('/');
+}
+
 export function clearImageMemoryCache(): Promise<void> {
   return FastImage.clearMemoryCache();
 }

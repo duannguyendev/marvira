@@ -11,6 +11,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
 import { RedisService } from '../common/redis/redis.service';
 import { UserModerationService } from '../anticheat/user-moderation.service';
+import { encodePublicAssetUrl } from '../common/encode-public-asset-url';
 
 const JOIN_RATE_LIMIT_MAX = 5;
 const JOIN_RATE_LIMIT_TTL_SECONDS = 900;
@@ -272,6 +273,13 @@ export class EventAccessService {
 
     return {
       ...rest,
+      ...('coverImage' in rest
+        ? {
+            coverImage: encodePublicAssetUrl(
+              (rest as { coverImage?: string | null }).coverImage,
+            ),
+          }
+        : {}),
       creatorName: resolvedName,
       isPasswordProtected: joinPasswordHash != null,
       hasGift: codes.length > 0,

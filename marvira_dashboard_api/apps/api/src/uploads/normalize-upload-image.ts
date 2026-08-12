@@ -49,9 +49,3 @@ export async function normalizeUploadImage(
     height: info.height,
   };
 }
-
-/** Replace any extension with .jpg for stored object keys / local filenames. */
-export function withJpegExtension(originalName: string): string {
-  const base = originalName.replace(/\.[^/.]+$/, '') || 'image';
-  return `${base}.jpg`;
-}

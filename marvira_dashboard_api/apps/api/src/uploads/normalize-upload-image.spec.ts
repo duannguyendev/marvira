@@ -1,4 +1,4 @@
-import { normalizeUploadImage, withJpegExtension } from './normalize-upload-image';
+import { normalizeUploadImage } from './normalize-upload-image';
 import sharp from 'sharp';
 
 describe('normalizeUploadImage', () => {
@@ -38,13 +38,5 @@ describe('normalizeUploadImage', () => {
 
     expect(result.width).toBe(800);
     expect(result.height).toBe(600);
-  });
-});
-
-describe('withJpegExtension', () => {
-  it('replaces extension with jpg', () => {
-    expect(withJpegExtension('photo.PNG')).toBe('photo.jpg');
-    expect(withJpegExtension('a.webp')).toBe('a.jpg');
-    expect(withJpegExtension('noext')).toBe('noext.jpg');
   });
 });
