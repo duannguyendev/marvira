@@ -23,5 +23,5 @@ export function notifyDestinationReady(): void {
   }
   destinationReady = true;
   listeners.forEach(l => l(true));
-  void BootSplash.hide({ fade: true });
+  void BootSplash.hide({ fade: false });
 }

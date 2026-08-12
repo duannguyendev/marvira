@@ -2,6 +2,6 @@
 <resources>
     <color name="ic_launcher_background">#818CF8</color>
     <color name="splash_background">#6366F1</color>
-    <color name="bootsplash_background">#6366f1</color>
+    <color name="bootsplash_background">#93a0fa</color>
     <color name="notification_color">#6366F1</color>
 </resources>
