@@ -1,39 +1,36 @@
-import React, { useCallback, useRef } from 'react';
+import React from 'react';
 import { Image, Platform, StatusBar, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { hideNativeSplash } from '../native/splashGate';
 import { colors, splashGradient } from '../theme';
 
 const splashIcon = require('../assets/splash-icon.png');
 
-/** Android 12+ splash icon is a 240dp circle; match that so JS does not jump. */
-const ANDROID_ICON = 240;
+/**
+ * Android 12 SplashScreen.IconBackground: 240dp circle, artwork in inner 160dp.
+ * Match that so a timeout fallback does not crop the mark.
+ */
+const ANDROID_ICON_BG = 240;
+const ANDROID_ICON = 160;
 const IOS_ICON = 120;
 
-/** Cold-start splash — iOS: gradient + icon; Android: solid + circular icon. */
+/**
+ * Cold-start splash underlay.
+ * Android: native SplashScreen stays up until Login/Events is ready; this view
+ * only shows if the system splash exits early (timeout).
+ * iOS: gradient + icon (LaunchScreen → first paint).
+ */
 export const SplashScreen: React.FC = () => {
-  const dismissed = useRef(false);
-
-  const onReady = useCallback(() => {
-    if (dismissed.current) {
-      return;
-    }
-    dismissed.current = true;
-    hideNativeSplash();
-  }, []);
-
   const icon = (
     <Image
       source={splashIcon}
       style={Platform.OS === 'android' ? styles.androidIcon : styles.iosIcon}
-      resizeMode="cover"
+      resizeMode="contain"
       accessibilityIgnoresInvertColors
-      onLoadEnd={onReady}
     />
   );
 
   return (
-    <View style={styles.container} onLayout={onReady}>
+    <View style={styles.container}>
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
@@ -41,7 +38,7 @@ export const SplashScreen: React.FC = () => {
       />
       {Platform.OS === 'android' ? (
         <View style={styles.center}>
-          <View style={styles.androidIconClip}>{icon}</View>
+          <View style={styles.androidIconBg}>{icon}</View>
         </View>
       ) : (
         <LinearGradient colors={[...splashGradient]} style={styles.center}>
@@ -66,12 +63,14 @@ const styles = StyleSheet.create({
     width: IOS_ICON,
     height: IOS_ICON,
   },
-  androidIconClip: {
-    width: ANDROID_ICON,
-    height: ANDROID_ICON,
-    borderRadius: ANDROID_ICON / 2,
+  androidIconBg: {
+    width: ANDROID_ICON_BG,
+    height: ANDROID_ICON_BG,
+    borderRadius: ANDROID_ICON_BG / 2,
     overflow: 'hidden',
     backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   androidIcon: {
     width: ANDROID_ICON,

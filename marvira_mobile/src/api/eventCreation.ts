@@ -221,6 +221,17 @@ export const eventCreationApi = {
     }>(`/events/${eventId}`, input);
     return response.data.data;
   },
+
+  updateEventCover: async (
+    eventId: string,
+    coverImage: string | null,
+  ): Promise<ApiEvent> => {
+    const response = await apiClient.patch<{
+      success: boolean;
+      data: ApiEvent;
+    }>(`/events/${eventId}`, { coverImage });
+    return response.data.data;
+  },
 };
 
 export type { QuestionType };

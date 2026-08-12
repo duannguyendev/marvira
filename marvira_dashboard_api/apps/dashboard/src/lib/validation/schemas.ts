@@ -17,6 +17,7 @@ export const eventSchema = z
     title: trimmed(3, 'Title'),
     description: trimmed(10, 'Description'),
     city: trimmed(2, 'City'),
+    coverImage: z.string().optional().nullable().or(z.literal('')),
     difficulty: z.nativeEnum(EventDifficulty, {
       errorMap: () => ({ message: 'Select a difficulty' }),
     }),

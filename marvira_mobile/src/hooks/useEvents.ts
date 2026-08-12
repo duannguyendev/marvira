@@ -10,7 +10,11 @@ import { EventFilters, Location } from '../types';
 import { toLocationQueryKey } from '../utils/distance';
 import { useShowAllLanguages } from './useContentLanguage';
 
-export const useEvents = (filters?: EventFilters, userLocation?: Location) => {
+export const useEvents = (
+  filters?: EventFilters,
+  userLocation?: Location,
+  options?: { enabled?: boolean },
+) => {
   const { i18n } = useTranslation();
   const { showAllLanguages } = useShowAllLanguages();
   const radius = filters?.radius;
@@ -31,6 +35,7 @@ export const useEvents = (filters?: EventFilters, userLocation?: Location) => {
       showAllLanguages,
     ],
     queryFn: () => eventsApi.getEvents(filters, userLocation),
+    enabled: options?.enabled ?? true,
     // Hunt catalog is relatively stable; mutations invalidate as needed.
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,

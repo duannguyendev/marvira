@@ -43,7 +43,7 @@ export interface CreateEventInput {
   title: string;
   description: string;
   city: string;
-  coverImage?: string;
+  coverImage?: string | null;
   difficulty: EventDifficulty;
   rewardPoints: number;
   isActive?: boolean;
@@ -481,6 +481,7 @@ export class EventsService {
       giftCodes,
       giftTeaser,
       completionMessage,
+      coverImage,
       ...rest
     } = data;
     const createData = await this.applyJoinPasswordFields(
@@ -496,6 +497,7 @@ export class EventsService {
     const event = await this.prisma.client.event.create({
       data: {
         ...rest,
+        coverImage: coverImage?.trim() || null,
         language: normalizeContentLanguage(rest.language),
         ...createData,
         ...giftFields,
@@ -557,6 +559,7 @@ export class EventsService {
       giftCodes,
       giftTeaser,
       completionMessage,
+      coverImage,
       publishReviewConfirmed: _publishReviewConfirmed,
       ...rest
     } = data;
@@ -579,6 +582,9 @@ export class EventsService {
       where: { id },
       data: {
         ...rest,
+        ...(coverImage !== undefined
+          ? { coverImage: coverImage?.trim() || null }
+          : {}),
         ...(rest.language !== undefined
           ? { language: normalizeContentLanguage(rest.language) }
           : {}),

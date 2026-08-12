@@ -14,6 +14,7 @@ import { CreateEventReviewScreen } from '../screens/create/CreateEventReviewScre
 import { AnswerVerifyScreen } from '../screens/create/AnswerVerifyScreen';
 import { CreateEventSuccessScreen } from '../screens/create/CreateEventSuccessScreen';
 import { EditEventGiftsScreen } from '../screens/create/EditEventGiftsScreen';
+import { EditEventCoverScreen } from '../screens/create/EditEventCoverScreen';
 import { EditEventAnswersScreen } from '../screens/create/EditEventAnswersScreen';
 import { EventFinishersScreen } from '../screens/home/EventFinishersScreen';
 import { HomeStackParamList } from './types';
@@ -100,6 +101,11 @@ export const HomeNavigator: React.FC = () => {
         name="EditEventGifts"
         component={EditEventGiftsScreen}
         options={{ title: t('nav.editGifts') }}
+      />
+      <Stack.Screen
+        name="EditEventCover"
+        component={EditEventCoverScreen}
+        options={{ title: t('nav.editCover') }}
       />
       <Stack.Screen
         name="EditEventAnswers"

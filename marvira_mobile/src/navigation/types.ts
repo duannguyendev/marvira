@@ -97,5 +97,6 @@ export type HomeStackParamList = {
     joinPassword?: string;
   };
   EditEventGifts: { eventId: string };
+  EditEventCover: { eventId: string };
   EditEventAnswers: { eventId: string; returnToVerify?: boolean };
 };

@@ -206,6 +206,7 @@ export interface CreateEventInput {
   difficulty: EventDifficulty;
   rewardPoints: number;
   language?: string;
+  coverImage?: string | null;
   completionMessage?: string | null;
   giftTeaser?: string | null;
   giftCodes?: string[];

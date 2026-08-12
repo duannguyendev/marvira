@@ -10,11 +10,12 @@
 
     <!--
       Android 12+ splash (and backport via AndroidX) is solid-only.
-      JS SplashScreen uses the same solid + circular icon until Login/Events.
+      Same splash_logo asset as JS SplashScreen; IconBackground = 240dp circle.
+      Keep this splash until destination ready (SplashGate) so RN underlay is unseen.
     -->
-    <style name="Theme.App.SplashScreen" parent="Theme.SplashScreen">
+    <style name="Theme.App.SplashScreen" parent="Theme.SplashScreen.IconBackground">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo_safe</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/splash_background</item>
         <item name="postSplashScreenTheme">@style/AppTheme</item>
         <item name="android:windowBackground">@color/splash_background</item>

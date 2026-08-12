@@ -9,6 +9,7 @@ interface MyEventCardProps {
   event: MyCreatedEvent;
   onPress: () => void;
   onFinishersPress?: () => void;
+  onEditCoverPress?: () => void;
   onEditGiftsPress?: () => void;
   onEditAnswersPress?: () => void;
   onCancelSchedulePress?: () => void;
@@ -22,6 +23,7 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
   event,
   onPress,
   onFinishersPress,
+  onEditCoverPress,
   onEditGiftsPress,
   onEditAnswersPress,
   onCancelSchedulePress,
@@ -129,6 +131,19 @@ export const MyEventCard: React.FC<MyEventCardProps> = ({
               accessibilityRole="button">
               <Text style={styles.actionLinkText}>
                 {t('myEvents.cancelSchedule')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {status !== 'done' && onEditCoverPress ? (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onEditCoverPress();
+              }}
+              style={styles.actionLink}
+              accessibilityRole="button">
+              <Text style={styles.actionLinkText}>
+                {t('myEvents.editCover')}
               </Text>
             </TouchableOpacity>
           ) : null}

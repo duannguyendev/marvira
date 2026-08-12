@@ -27,6 +27,11 @@ import { HomeStackParamList } from '../../navigation/types';
 import { EventAvailabilityFilter, EventFilters } from '../../types';
 import { calculateDistance, hasUsableCoordinates } from '../../utils/distance';
 import { notifyDestinationReady } from '../../native/bootSplash';
+import {
+  DEFAULT_EVENT_LIST_RADIUS_METERS,
+  getEventListFilters,
+  setEventListFilters,
+} from '../../services/eventFiltersStorage';
 
 const SEARCH_DEBOUNCE_MS = 250;
 const AVAILABILITY_FILTERS: EventAvailabilityFilter[] = ['open', 'incoming'];
@@ -41,6 +46,7 @@ export const EventsListScreen: React.FC = () => {
   const navigation = useNavigation<EventsListScreenNavigationProp>();
   const { location } = useLocation();
   const listRef = useRef<FlatList>(null);
+  const filtersHydratedRef = useRef(false);
   const scrollToTopRef = useRef({
     scrollToTop: () => {
       listRef.current?.scrollToOffset({ offset: 0, animated: true });
@@ -51,11 +57,39 @@ export const EventsListScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   /** meters; null = no radius filter */
-  const [radius, setRadius] = useState<number | null>(25000);
+  const [radius, setRadius] = useState<number | null>(
+    DEFAULT_EVENT_LIST_RADIUS_METERS,
+  );
   const [statusFilter, setStatusFilter] = useState<
     EventAvailabilityFilter | undefined
   >();
+  const [filtersReady, setFiltersReady] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getEventListFilters().then(stored => {
+      if (cancelled) {
+        return;
+      }
+      if (stored) {
+        setRadius(stored.radius);
+        setStatusFilter(stored.status);
+      }
+      filtersHydratedRef.current = true;
+      setFiltersReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!filtersHydratedRef.current) {
+      return;
+    }
+    void setEventListFilters({ radius, status: statusFilter });
+  }, [radius, statusFilter]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -76,6 +110,7 @@ export const EventsListScreen: React.FC = () => {
   const { data, isLoading, isFetching, error, refetch } = useEvents(
     filters,
     location || undefined,
+    { enabled: filtersReady },
   );
 
   const handleRefresh = async () => {
@@ -117,7 +152,7 @@ export const EventsListScreen: React.FC = () => {
   // Keep the existing FlatList mounted while a filter refetch is in flight.
   // Swapping to a skeleton remounts the list and snaps scroll to top.
   const showResultsSkeleton =
-    (isLoading || (isFetching && !data)) &&
+    (!filtersReady || isLoading || (isFetching && !data)) &&
     !refreshing &&
     !events?.length;
 

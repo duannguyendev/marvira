@@ -1,7 +1,8 @@
 import { NativeModules, Platform } from 'react-native';
 
 /**
- * Dismiss Android system splash once React splash UI is on screen.
+ * Dismiss Android system splash once Login / Events has painted.
+ * Kept until then so users never see a handoff to the React splash underlay.
  * No-op on iOS (UILaunchStoryboard covers until first paint).
  */
 export function hideNativeSplash(): void {

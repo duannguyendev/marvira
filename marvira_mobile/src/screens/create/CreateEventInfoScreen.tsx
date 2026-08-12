@@ -13,11 +13,13 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StepIndicator } from '../../components/StepIndicator';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
+import { EventCoverImageField } from '../../components/EventCoverImageField';
 import { useCreateEvent } from '../../hooks/useMyEvents';
 import { CreateEventInput, EventDifficulty } from '../../types';
 import { HomeStackParamList } from '../../navigation/types';
 import { AnalyticsEvents, analytics } from '../../services/analytics';
 import { getAppContentLanguage } from '../../services/contentLanguage';
+import { uploadsApi } from '../../api/uploads';
 import {
   colors,
   spacing,
@@ -47,8 +49,10 @@ export const CreateEventInfoScreen: React.FC = () => {
     difficulty: 'MEDIUM',
     rewardPoints: 100,
     language: getAppContentLanguage(),
+    coverImage: undefined,
   });
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState<
     Partial<Record<keyof CreateEventInput, string>>
   >({});
@@ -81,11 +85,21 @@ export const CreateEventInfoScreen: React.FC = () => {
     }
 
     try {
+      setUploading(true);
+      let coverImage = form.coverImage;
+      if (coverImage) {
+        coverImage = await uploadsApi.ensureRemoteImageUrl(coverImage);
+        if (!coverImage) {
+          throw new Error(t('createEvent.imageUploadFailed'));
+        }
+      }
+
       const result = await createEvent.mutateAsync({
         ...form,
         title: form.title.trim(),
         description: form.description.trim(),
         city: form.city.trim(),
+        coverImage: coverImage || null,
       });
       void AnalyticsEvents.eventDraftCreated(result.data.id);
       navigation.navigate('CreateEventPlace', {
@@ -100,6 +114,8 @@ export const CreateEventInfoScreen: React.FC = () => {
           error.message ||
           t('createEvent.createFailed'),
       );
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -140,6 +156,12 @@ export const CreateEventInfoScreen: React.FC = () => {
           onChangeText={city => setForm(prev => ({ ...prev, city }))}
           placeholder={t('createEvent.cityPlaceholder')}
           error={errors.city}
+        />
+
+        <EventCoverImageField
+          value={form.coverImage}
+          onChange={coverImage => setForm(prev => ({ ...prev, coverImage }))}
+          error={errors.coverImage}
         />
 
         <TouchableOpacity
@@ -197,7 +219,7 @@ export const CreateEventInfoScreen: React.FC = () => {
         <Button
           title={t('createEvent.continueToPlaces')}
           onPress={handleNext}
-          loading={createEvent.isPending}
+          loading={createEvent.isPending || uploading}
           fullWidth
           style={styles.submitButton}
         />

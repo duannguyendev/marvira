@@ -50,7 +50,8 @@
     "notificationDetail": "通知",
     "questionTraining": "训练",
     "finishers": "完赛者",
-    "editGifts": "编辑礼物"
+    "editGifts": "编辑礼物",
+    "editCover": "编辑封面"
   },
   "auth": {
     "welcomeBack": "欢迎回来",
@@ -339,6 +340,15 @@
     "descriptionPlaceholder": "描述玩家将探索的内容...",
     "city": "城市",
     "cityPlaceholder": "上海",
+    "coverImage": "活动封面图",
+    "coverImageHint": "可选。显示在活动卡片上。JPEG、PNG 或 WebP，最大 5 MB。保存时上传。",
+    "cover": {
+      "heading": "编辑封面图",
+      "subheading": "更新玩家在活动卡片上看到的图片。",
+      "save": "保存封面",
+      "saved": "封面已更新",
+      "saveFailed": "更新封面失败"
+    },
     "showAdvanced": "显示高级选项",
     "hideAdvanced": "隐藏高级选项",
     "difficulty": "难度",
@@ -524,6 +534,7 @@
     "draft": "草稿",
     "viewFinishers": "查看完赛者",
     "editGifts": "编辑礼物",
+    "editCover": "编辑封面",
     "editAnswers": "编辑答案",
     "scheduled": "已安排",
     "goesLive": "{{when}} 上线",

@@ -50,7 +50,8 @@
     "notificationDetail": "通知",
     "questionTraining": "トレーニング",
     "finishers": "完走者",
-    "editGifts": "ギフトを編集"
+    "editGifts": "ギフトを編集",
+    "editCover": "カバーを編集"
   },
   "auth": {
     "welcomeBack": "おかえりなさい",
@@ -339,6 +340,15 @@
     "descriptionPlaceholder": "プレイヤーが探索する内容を説明...",
     "city": "都市",
     "cityPlaceholder": "東京",
+    "coverImage": "イベントカバー画像",
+    "coverImageHint": "任意。イベントカードに表示されます。JPEG、PNG、WebP（最大5MB）。保存時にアップロードします。",
+    "cover": {
+      "heading": "カバー画像を編集",
+      "subheading": "プレイヤーがイベントカードで見る写真を更新します。",
+      "save": "カバーを保存",
+      "saved": "カバー画像を更新しました",
+      "saveFailed": "カバー画像の更新に失敗しました"
+    },
     "showAdvanced": "詳細オプションを表示",
     "hideAdvanced": "詳細オプションを非表示",
     "difficulty": "難易度",
@@ -524,6 +534,7 @@
     "draft": "下書き",
     "viewFinishers": "完走者を見る",
     "editGifts": "ギフトを編集",
+    "editCover": "カバーを編集",
     "editAnswers": "回答を編集",
     "scheduled": "予約済み",
     "goesLive": "{{when}} に公開",

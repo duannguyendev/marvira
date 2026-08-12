@@ -11,13 +11,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdvancedFields } from '@/components/ui/advanced-fields';
+import { EventCoverImageField } from '@/features/events/event-cover-image-field';
 import { EventDifficulty } from '@marvira/shared-types';
 import type { Event } from '@marvira/shared-types';
 import { newEventSchema, type EventFormValues } from '@/lib/validation/schemas';
 
-function normalizeGiftFields(data: EventFormValues): EventFormValues {
+function normalizeEventFields(data: EventFormValues): EventFormValues {
   return {
     ...data,
+    coverImage: data.coverImage?.trim() || null,
     completionMessage: data.completionMessage?.trim() || null,
     giftTeaser: data.giftTeaser?.trim() || null,
     giftCodes: (data.giftCodes ?? []).map(c => c.trim()).filter(Boolean),
@@ -29,6 +31,7 @@ export default function NewEventPage() {
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     setValue,
@@ -40,6 +43,7 @@ export default function NewEventPage() {
       rewardPoints: 100,
       isActive: false,
       language: 'vi',
+      coverImage: '',
       completionMessage: '',
       giftTeaser: '',
       giftCodes: [],
@@ -51,7 +55,7 @@ export default function NewEventPage() {
   const mutation = useMutation({
     mutationFn: (data: EventFormValues) =>
       api.post<Event>('/events', {
-        ...normalizeGiftFields(data),
+        ...normalizeEventFields(data),
         isActive: false,
       }),
     onSuccess: event => {
@@ -138,6 +142,12 @@ export default function NewEventPage() {
                 )}
               </div>
             </div>
+
+            <EventCoverImageField
+              control={control}
+              setValue={setValue}
+              register={register}
+            />
 
             <AdvancedFields>
               <div className="grid gap-4 sm:grid-cols-2">

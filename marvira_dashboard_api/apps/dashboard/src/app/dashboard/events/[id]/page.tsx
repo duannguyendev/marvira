@@ -17,6 +17,7 @@ import { MapPicker } from '@/features/events/map-picker';
 import { PlaceEditor } from '@/features/events/place-editor';
 import { AddPlaceForm } from '@/features/events/add-place-form';
 import { PublishReviewDialog } from '@/features/events/publish-review-dialog';
+import { EventCoverImageField } from '@/features/events/event-cover-image-field';
 import { EventDifficulty, type AdminEvent } from '@marvira/shared-types';
 import {
   createEditEventSchema,
@@ -24,9 +25,10 @@ import {
   type EventFormValues,
 } from '@/lib/validation/schemas';
 
-function normalizeGiftFields(data: EventFormValues): EventFormValues {
+function normalizeEventFields(data: EventFormValues): EventFormValues {
   return {
     ...data,
+    coverImage: data.coverImage?.trim() || null,
     completionMessage: data.completionMessage?.trim() || null,
     giftTeaser: data.giftTeaser?.trim() || null,
     giftCodes: (data.giftCodes ?? []).map(c => c.trim()).filter(Boolean),
@@ -71,6 +73,7 @@ export default function EditEventPage() {
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     setError,
@@ -83,6 +86,7 @@ export default function EditEventPage() {
       title: '',
       description: '',
       city: '',
+      coverImage: '',
       difficulty: EventDifficulty.MEDIUM,
       rewardPoints: 0,
       isActive: false,
@@ -99,6 +103,7 @@ export default function EditEventPage() {
       title: event.title,
       description: event.description,
       city: event.city,
+      coverImage: event.coverImage ?? '',
       difficulty: event.difficulty as EventDifficulty,
       rewardPoints: event.rewardPoints,
       isActive: event.isActive,
@@ -120,7 +125,7 @@ export default function EditEventPage() {
   const updateMutation = useMutation({
     mutationFn: (data: EventFormValues & { publishReviewConfirmed?: boolean }) =>
       api.patch(`/events/${id}`, {
-        ...normalizeGiftFields(data),
+        ...normalizeEventFields(data),
         ...(data.publishReviewConfirmed
           ? { publishReviewConfirmed: true }
           : {}),
@@ -283,6 +288,13 @@ export default function EditEventPage() {
                 </div>
               </div>
             </div>
+
+            <EventCoverImageField
+              control={control}
+              setValue={setValue}
+              register={register}
+            />
+
             {event.scheduledPublishAt && !event.isActive ? (
               <div className="space-y-2 rounded-md border border-border p-3">
                 <p className="text-sm text-muted-foreground">
@@ -299,6 +311,7 @@ export default function EditEventPage() {
                         title: event.title,
                         description: event.description,
                         city: event.city,
+                        coverImage: event.coverImage ?? '',
                         difficulty: event.difficulty as EventFormValues['difficulty'],
                         rewardPoints: event.rewardPoints,
                         isActive: false,
@@ -551,7 +564,7 @@ export default function EditEventPage() {
         onConfirmSchedule={async scheduledPublishAt => {
           if (!pendingPublish) return;
           try {
-            await api.patch(`/events/${id}`, normalizeGiftFields(pendingPublish));
+            await api.patch(`/events/${id}`, normalizeEventFields(pendingPublish));
             await api.post(`/events/${id}/schedule`, {
               scheduledPublishAt,
               publishReviewConfirmed: true,

@@ -140,3 +140,21 @@ export const useUpdateEventGifts = () => {
     },
   });
 };
+
+export const useUpdateEventCover = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      eventId,
+      coverImage,
+    }: {
+      eventId: string;
+      coverImage: string | null;
+    }) => eventCreationApi.updateEventCover(eventId, coverImage),
+    onSuccess: (_data, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ['myEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+    },
+  });
+};

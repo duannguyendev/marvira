@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12 SplashScreen.IconBackground masks to a circle and only keeps the
+  inner ~2/3 (160dp of 240dp). splash_logo is full-bleed, so inset ~16.7% on
+  each side so the whole mark stays inside the visible safe zone.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/splash_logo"
+    android:insetLeft="16.67%"
+    android:insetTop="16.67%"
+    android:insetRight="16.67%"
+    android:insetBottom="16.67%" />

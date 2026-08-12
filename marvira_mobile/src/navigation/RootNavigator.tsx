@@ -18,6 +18,7 @@ import { RootStackParamList } from './types';
 import { useAuth } from '../hooks/useAuth';
 import { SplashScreen } from '../components/SplashScreen';
 import { subscribeDestinationReady } from '../native/bootSplash';
+import { hideNativeSplash } from '../native/splashGate';
 import { colors } from '../theme';
 import { authSession } from '../services/authSession';
 import { AnalyticsEvents } from '../services/analytics';
@@ -182,6 +183,14 @@ export const RootNavigator: React.FC = () => {
   useEffect(() => subscribeDestinationReady(setDestinationReady), []);
 
   const showLaunchSplash = isLoading || !destinationReady;
+
+  // Drop Android system splash only when Login/Events is ready — avoids a
+  // visible handoff to the React splash (different icon mask / scale).
+  useEffect(() => {
+    if (!showLaunchSplash) {
+      hideNativeSplash();
+    }
+  }, [showLaunchSplash]);
 
   return (
     <View style={styles.root}>
