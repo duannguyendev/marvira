@@ -44,7 +44,9 @@ type EventsListScreenNavigationProp = NativeStackNavigationProp<
 export const EventsListScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<EventsListScreenNavigationProp>();
-  const { location } = useLocation();
+  const { location, hasPermission, requestPermission, isLoading: isLocationLoading } =
+    useLocation();
+  const canFilterByRadius = hasPermission || !!location;
   const listRef = useRef<FlatList>(null);
   const filtersHydratedRef = useRef(false);
   const scrollToTopRef = useRef({
@@ -90,6 +92,27 @@ export const EventsListScreen: React.FC = () => {
     }
     void setEventListFilters({ radius, status: statusFilter });
   }, [radius, statusFilter]);
+
+  useEffect(() => {
+    if (!filtersReady || radius == null) {
+      return;
+    }
+    // Wait until permission check finishes before clearing a saved radius.
+    if (canFilterByRadius || isLocationLoading) {
+      return;
+    }
+    setRadius(null);
+  }, [filtersReady, canFilterByRadius, isLocationLoading, radius]);
+
+  const handleRadiusKmPress = async (km: number) => {
+    if (!canFilterByRadius) {
+      const granted = await requestPermission();
+      if (!granted) {
+        return;
+      }
+    }
+    setRadius(km * 1000);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -191,24 +214,30 @@ export const EventsListScreen: React.FC = () => {
                 {t('common.all')}
               </Text>
             </TouchableOpacity>
-            {[1, 5, 10, 25].map(km => (
-              <TouchableOpacity
-                key={km}
-                style={[
-                  styles.radiusButton,
-                  radius === km * 1000 && styles.radiusButtonActive,
-                ]}
-                onPress={() => setRadius(km * 1000)}>
-                <Text
+            {[1, 5, 10, 25].map(km => {
+              const isActive = radius === km * 1000;
+              const isDisabled = !canFilterByRadius && !isLocationLoading;
+              return (
+                <TouchableOpacity
+                  key={km}
                   style={[
-                    styles.radiusButtonText,
-                    radius === km * 1000 && styles.radiusButtonTextActive,
-                  ]}>
-                  {km}
-                  {t('common.km')}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                    styles.radiusButton,
+                    isActive && styles.radiusButtonActive,
+                    isDisabled && styles.radiusButtonDisabled,
+                  ]}
+                  onPress={() => void handleRadiusKmPress(km)}>
+                  <Text
+                    style={[
+                      styles.radiusButtonText,
+                      isActive && styles.radiusButtonTextActive,
+                      isDisabled && styles.radiusButtonTextDisabled,
+                    ]}>
+                    {km}
+                    {t('common.km')}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -355,6 +384,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
+  radiusButtonDisabled: {
+    opacity: 0.45,
+  },
   radiusButtonText: {
     fontSize: fontSize.sm,
     color: colors.textSecondary,
@@ -362,6 +394,9 @@ const styles = StyleSheet.create({
   },
   radiusButtonTextActive: {
     color: colors.background,
+  },
+  radiusButtonTextDisabled: {
+    color: colors.textLight,
   },
   statusContainer: {
     marginTop: spacing.sm,

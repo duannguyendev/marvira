@@ -87,7 +87,11 @@ export const EventCard: React.FC<EventCardProps> = ({
           {isIncoming ? (
             <Text style={styles.incomingHint}>{t('events.incomingHint')}</Text>
           ) : (
-            <View style={styles.metaRow}>
+            <View
+              style={[
+                styles.metaRow,
+                event.distance !== undefined && styles.metaRowWithDistance,
+              ]}>
               <View style={styles.metaLeft}>
                 {event.totalPlaces > 0 ? (
                   <Text style={styles.placesText} numberOfLines={1}>
@@ -259,8 +263,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  metaRowWithDistance: {
     marginLeft: spacing.md,
-    marginTop: spacing.xs,
   },
   metaLeft: {
     flex: 1,

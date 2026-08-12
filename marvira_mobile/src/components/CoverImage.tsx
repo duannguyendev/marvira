@@ -37,32 +37,32 @@ function mapResizeMode(
   }
 }
 
+type LoadMode = 'fast' | 'native' | 'failed';
+
 /**
- * Card cover: shows brand gradient when URI is missing or the image fails to load.
- * Remote HTTP(S) URIs use FastImage (memory + disk cache).
+ * Card cover: brand gradient when URI is missing or every loader fails.
+ * Prefers FastImage; falls back to RN Image (helps when Glide/SDWebImage choke).
  */
 export const CoverImage: React.FC<CoverImageProps> = ({
   uri,
   style,
   accessibilityLabel,
 }) => {
-  const [failed, setFailed] = useState(false);
+  const [mode, setMode] = useState<LoadMode>('fast');
 
   useEffect(() => {
-    setFailed(false);
+    setMode('fast');
   }, [uri]);
 
   const trimmed = uri?.trim() ?? '';
-  const showImage = Boolean(trimmed) && !failed;
   const loadUri = trimmed ? encodeRemoteImageUri(trimmed) : '';
+  const imageStyle = [styles.base, style] as StyleProp<ImageStyle>;
 
-  const frameStyle = [styles.base, style];
-
-  if (!showImage) {
+  if (!trimmed || mode === 'failed') {
     return (
       <LinearGradient
         colors={[colors.primary, colors.secondary]}
-        style={frameStyle}
+        style={[styles.base, style]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         accessibilityLabel={accessibilityLabel}
@@ -70,32 +70,30 @@ export const CoverImage: React.FC<CoverImageProps> = ({
     );
   }
 
-  // Size comes from the wrapper so FastImage load/error cannot resize the row.
-  if (isRemoteHttpUri(trimmed)) {
+  if (isRemoteHttpUri(trimmed) && mode === 'fast') {
     return (
-      <View style={frameStyle} accessibilityLabel={accessibilityLabel}>
-        <FastImage
-          source={{
-            uri: loadUri,
-            priority: FastImage.priority.normal,
-            cache: FastImage.cacheControl.web,
-          }}
-          style={StyleSheet.absoluteFillObject as FastImageProps['style']}
-          resizeMode={FastImage.resizeMode.cover}
-          onError={() => setFailed(true)}
-        />
-      </View>
+      <FastImage
+        source={{
+          uri: loadUri,
+          priority: FastImage.priority.normal,
+          cache: FastImage.cacheControl.immutable,
+        }}
+        style={imageStyle as FastImageProps['style']}
+        resizeMode={FastImage.resizeMode.cover}
+        accessibilityLabel={accessibilityLabel}
+        onError={() => setMode('native')}
+      />
     );
   }
 
   return (
-    <View style={frameStyle} accessibilityLabel={accessibilityLabel}>
-      <Image
-        source={{ uri: loadUri }}
-        style={StyleSheet.absoluteFillObject}
-        onError={() => setFailed(true)}
-      />
-    </View>
+    <Image
+      source={{ uri: loadUri }}
+      style={imageStyle}
+      resizeMode="cover"
+      accessibilityLabel={accessibilityLabel}
+      onError={() => setMode('failed')}
+    />
   );
 };
 
@@ -117,17 +115,16 @@ export const SafeRemoteImage: React.FC<SafeRemoteImageProps> = ({
   accessibilityLabel,
   resizeMode = 'cover',
 }) => {
-  const [failed, setFailed] = useState(false);
+  const [mode, setMode] = useState<LoadMode>('fast');
 
   useEffect(() => {
-    setFailed(false);
+    setMode('fast');
   }, [uri]);
 
   const trimmed = uri?.trim() ?? '';
-  const showImage = Boolean(trimmed) && !failed;
   const loadUri = trimmed ? encodeRemoteImageUri(trimmed) : '';
 
-  if (!showImage) {
+  if (!trimmed || mode === 'failed') {
     return (
       <View
         style={[styles.placeholder, style, placeholderStyle]}
@@ -136,18 +133,18 @@ export const SafeRemoteImage: React.FC<SafeRemoteImageProps> = ({
     );
   }
 
-  if (isRemoteHttpUri(trimmed)) {
+  if (isRemoteHttpUri(trimmed) && mode === 'fast') {
     return (
       <FastImage
         source={{
           uri: loadUri,
           priority: FastImage.priority.normal,
-          cache: FastImage.cacheControl.web,
+          cache: FastImage.cacheControl.immutable,
         }}
         style={style as FastImageProps['style']}
         resizeMode={mapResizeMode(resizeMode)}
         accessibilityLabel={accessibilityLabel}
-        onError={() => setFailed(true)}
+        onError={() => setMode('native')}
       />
     );
   }
@@ -158,7 +155,7 @@ export const SafeRemoteImage: React.FC<SafeRemoteImageProps> = ({
       style={style}
       resizeMode={resizeMode === 'repeat' ? 'cover' : resizeMode}
       accessibilityLabel={accessibilityLabel}
-      onError={() => setFailed(true)}
+      onError={() => setMode('failed')}
     />
   );
 };

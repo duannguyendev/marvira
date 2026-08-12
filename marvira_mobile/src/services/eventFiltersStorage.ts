@@ -3,7 +3,8 @@ import { EventAvailabilityFilter } from '../types';
 
 export const EVENT_LIST_FILTERS_STORAGE_KEY = '@marvira/event_list_filters';
 
-export const DEFAULT_EVENT_LIST_RADIUS_METERS = 25000;
+/** null = show all events; radius filters require location permission. */
+export const DEFAULT_EVENT_LIST_RADIUS_METERS: number | null = null;
 
 const AVAILABILITY_FILTERS: EventAvailabilityFilter[] = ['open', 'incoming'];
 
