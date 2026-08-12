@@ -19,7 +19,7 @@ import {
 } from '../../hooks/usePractice';
 import { useFavoriteQuestionToggle } from '../../hooks/useFavoriteQuestionToggle';
 import { PracticeQuestionCard } from '../../components/PracticeQuestionCard';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { PracticeQuestionListSkeleton } from '../../components/skeleton/PracticeQuestionCardSkeleton';
 import { ErrorView } from '../../components/ErrorView';
 import { Button } from '../../components/Button';
 import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
@@ -89,11 +89,7 @@ export const MyQuestionsScreen: React.FC = () => {
     );
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullScreen />;
-  }
-
-  if (error) {
+  if (error && !data) {
     return (
       <ErrorView
         message={(error as Error)?.message || t('myQuestions.loadFailed')}
@@ -101,6 +97,8 @@ export const MyQuestionsScreen: React.FC = () => {
       />
     );
   }
+
+  const showSkeleton = isLoading && !data;
 
   return (
     <View style={styles.container}>
@@ -127,18 +125,22 @@ export const MyQuestionsScreen: React.FC = () => {
           </View>
         }
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>{t('myQuestions.emptyTitle')}</Text>
-            <Text style={styles.emptyText}>
-              {t('myQuestions.emptyMessage')}
-            </Text>
-            <Button
-              title={t('myQuestions.addFirst')}
-              onPress={() => navigation.navigate('AddQuestion')}
-              fullWidth
-              style={styles.addButton}
-            />
-          </View>
+          showSkeleton ? (
+            <PracticeQuestionListSkeleton />
+          ) : (
+            <View style={styles.empty}>
+              <Text style={styles.emptyTitle}>{t('myQuestions.emptyTitle')}</Text>
+              <Text style={styles.emptyText}>
+                {t('myQuestions.emptyMessage')}
+              </Text>
+              <Button
+                title={t('myQuestions.addFirst')}
+                onPress={() => navigation.navigate('AddQuestion')}
+                fullWidth
+                style={styles.addButton}
+              />
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <View style={styles.itemWrap}>

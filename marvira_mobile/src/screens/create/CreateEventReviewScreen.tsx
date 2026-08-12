@@ -19,7 +19,7 @@ import {
   ScheduleDateTimeField,
   defaultScheduleDate,
 } from '../../components/ScheduleDateTimeField';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { CreateEventReviewSkeleton } from '../../components/skeleton/ScreenSkeletons';
 import { ErrorView } from '../../components/ErrorView';
 import { MapPin } from '../../components/MapPin';
 import { useEventDetails } from '../../hooks/useEvents';
@@ -237,8 +237,17 @@ export const CreateEventReviewScreen: React.FC = () => {
     navigation.navigate('CreateEventSuccess', { eventId, published: false });
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullScreen />;
+  if (isLoading && !data) {
+    return (
+      <View style={styles.container}>
+        <StepIndicator
+          currentStep={3}
+          totalSteps={4}
+          labels={STEP_LABELS.map(key => t(`createEvent.steps.${key}`))}
+        />
+        <CreateEventReviewSkeleton />
+      </View>
+    );
   }
 
   if (error || !event) {

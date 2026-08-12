@@ -20,7 +20,7 @@ import { useFavoriteEventToggle } from '../../hooks/useFavoriteEventToggle';
 import { PlaceCard } from '../../components/PlaceCard';
 import { Button } from '../../components/Button';
 import { FavoriteButton } from '../../components/FavoriteButton';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { EventDetailsSkeleton } from '../../components/skeleton/ScreenSkeletons';
 import { ErrorView } from '../../components/ErrorView';
 import { isNotFoundError } from '../../utils/apiErrors';
 import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
@@ -185,8 +185,8 @@ export const EventDetailsScreen: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullScreen />;
+  if (isLoading && !data) {
+    return <EventDetailsSkeleton />;
   }
 
   if (error || !event) {

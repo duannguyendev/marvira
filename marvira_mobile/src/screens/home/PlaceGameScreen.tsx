@@ -24,7 +24,10 @@ import { useLocation } from '../../hooks/useLocation';
 import { useEventDetails } from '../../hooks/useEvents';
 import { placesApi } from '../../api/places';
 import { Button } from '../../components/Button';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
+import {
+  PlaceGameSkeleton,
+  QuestionBlockSkeleton,
+} from '../../components/skeleton/ScreenSkeletons';
 import { ErrorView } from '../../components/ErrorView';
 import { QuestionRenderer } from '../../components/QuestionRenderer';
 import { MapPin } from '../../components/MapPin';
@@ -377,7 +380,7 @@ export const PlaceGameScreen: React.FC = () => {
   };
 
   if (eventLoading || !event || !place) {
-    return <LoadingSpinner fullScreen />;
+    return <PlaceGameSkeleton />;
   }
 
   if (place.isCompleted) {
@@ -535,7 +538,7 @@ export const PlaceGameScreen: React.FC = () => {
             <View style={styles.questionContainer}>
               <Text style={styles.questionLabel}>{t('game.question')}</Text>
               {questionLoading ? (
-                <LoadingSpinner />
+                <QuestionBlockSkeleton />
               ) : question ? (
                 <>
                   {question.answerUpdatedAt ? (

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { eventsApi } from '../../api/events';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { EventFinishersSkeleton } from '../../components/skeleton/ListRowSkeletons';
 import { ErrorView } from '../../components/ErrorView';
 import { HomeStackParamList } from '../../navigation/types';
 import {
@@ -28,8 +28,12 @@ export const EventFinishersScreen: React.FC = () => {
     queryFn: () => eventsApi.getEventFinishers(eventId),
   });
 
-  if (isLoading) {
-    return <LoadingSpinner fullScreen />;
+  if (isLoading && !data) {
+    return (
+      <View style={styles.container}>
+        <EventFinishersSkeleton />
+      </View>
+    );
   }
 
   if (error || !data?.data) {

@@ -18,7 +18,7 @@ import {
   invalidateNotificationQueries,
 } from '../../hooks/useNotifications';
 import { useQueryClient } from '@tanstack/react-query';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { NotificationListSkeleton } from '../../components/skeleton/ListRowSkeletons';
 import { Button } from '../../components/Button';
 import {
   colors,
@@ -88,8 +88,12 @@ export const NotificationListScreen: React.FC = () => {
     );
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullScreen />;
+  if (isLoading && !data) {
+    return (
+      <View style={styles.container}>
+        <NotificationListSkeleton />
+      </View>
+    );
   }
 
   return (

@@ -15,9 +15,10 @@ import {
 import { useFavoriteQuestionToggle } from '../../hooks/useFavoriteQuestionToggle';
 import { useFavoriteEventToggle } from '../../hooks/useFavoriteEventToggle';
 import { EventCard } from '../../components/EventCard';
+import { EventListSkeleton } from '../../components/EventCardSkeleton';
 import { PracticeQuestionCard } from '../../components/PracticeQuestionCard';
+import { PracticeQuestionListSkeleton } from '../../components/skeleton/PracticeQuestionCardSkeleton';
 import { SegmentedControl } from '../../components/SegmentedControl';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorView } from '../../components/ErrorView';
 import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
 import {
@@ -79,11 +80,7 @@ export const FavoritesScreen: React.FC = () => {
     }
   };
 
-  if (activeQuery.isLoading) {
-    return <LoadingSpinner fullScreen />;
-  }
-
-  if (activeQuery.error) {
+  if (activeQuery.error && !activeQuery.data) {
     return (
       <ErrorView
         message={
@@ -96,6 +93,9 @@ export const FavoritesScreen: React.FC = () => {
 
   const events = eventsQuery.data?.data ?? [];
   const questions = questionsQuery.data?.data ?? [];
+  const showEventsSkeleton = eventsQuery.isLoading && !eventsQuery.data;
+  const showQuestionsSkeleton =
+    questionsQuery.isLoading && !questionsQuery.data;
 
   return (
     <View style={styles.container}>
@@ -113,44 +113,52 @@ export const FavoritesScreen: React.FC = () => {
       </View>
 
       {tab === 'events' ? (
-        <FlatList
-          ref={eventsListRef}
-          data={events}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.eventsList}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-            />
-          }
-          ListEmptyComponent={
-            <View style={[styles.empty, styles.eventsEmpty]}>
-              <Text style={styles.emptyIcon}>⭐</Text>
-              <Text style={styles.emptyTitle}>
-                {t('favorites.emptyEventsTitle')}
-              </Text>
-              <Text style={styles.emptyText}>
-                {t('favorites.emptyEventsMessage')}
-              </Text>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <EventCard
-              event={item}
-              isFavorite
-              onFavoritePress={() =>
-                eventFavorite.onFavoritePress(item.id, true)
-              }
-              onPress={() =>
-                navigation.navigate('Home', {
-                  screen: 'EventDetails',
-                  params: { eventId: item.id },
-                } as MainTabParamList['Home'])
-              }
-            />
-          )}
-        />
+        showEventsSkeleton ? (
+          <EventListSkeleton />
+        ) : (
+          <FlatList
+            ref={eventsListRef}
+            data={events}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.eventsList}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+              />
+            }
+            ListEmptyComponent={
+              <View style={[styles.empty, styles.eventsEmpty]}>
+                <Text style={styles.emptyIcon}>⭐</Text>
+                <Text style={styles.emptyTitle}>
+                  {t('favorites.emptyEventsTitle')}
+                </Text>
+                <Text style={styles.emptyText}>
+                  {t('favorites.emptyEventsMessage')}
+                </Text>
+              </View>
+            }
+            renderItem={({ item }) => (
+              <EventCard
+                event={item}
+                isFavorite
+                onFavoritePress={() =>
+                  eventFavorite.onFavoritePress(item.id, true)
+                }
+                onPress={() =>
+                  navigation.navigate('Home', {
+                    screen: 'EventDetails',
+                    params: { eventId: item.id },
+                  } as MainTabParamList['Home'])
+                }
+              />
+            )}
+          />
+        )
+      ) : showQuestionsSkeleton ? (
+        <View style={styles.questionsList}>
+          <PracticeQuestionListSkeleton />
+        </View>
       ) : (
         <FlatList
           ref={questionsListRef}

@@ -19,8 +19,8 @@ import {
   useEndEvent,
 } from '../../hooks/useMyEvents';
 import { MyEventCard } from '../../components/MyEventCard';
+import { EventListSkeleton } from '../../components/EventCardSkeleton';
 import { SegmentedControl } from '../../components/SegmentedControl';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorView } from '../../components/ErrorView';
 import { Button } from '../../components/Button';
 import {
@@ -144,11 +144,7 @@ export const MyEventsScreen: React.FC = () => {
     );
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullScreen />;
-  }
-
-  if (error) {
+  if (error && !data) {
     return (
       <ErrorView
         message={(error as any)?.message || t('myEvents.loadFailed')}
@@ -156,6 +152,8 @@ export const MyEventsScreen: React.FC = () => {
       />
     );
   }
+
+  const showSkeleton = isLoading && !data;
 
   return (
     <View style={styles.container}>
@@ -190,22 +188,26 @@ export const MyEventsScreen: React.FC = () => {
           </View>
         }
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>
-              {t(`myEvents.empty.${statusTab}Title`)}
-            </Text>
-            <Text style={styles.emptyText}>
-              {t(`myEvents.empty.${statusTab}Message`)}
-            </Text>
-            {statusTab === 'draft' ? (
-              <Button
-                title={t('myEvents.createFirst')}
-                onPress={handleCreate}
-                fullWidth
-                style={styles.createButton}
-              />
-            ) : null}
-          </View>
+          showSkeleton ? (
+            <EventListSkeleton layout="compact" />
+          ) : (
+            <View style={styles.empty}>
+              <Text style={styles.emptyTitle}>
+                {t(`myEvents.empty.${statusTab}Title`)}
+              </Text>
+              <Text style={styles.emptyText}>
+                {t(`myEvents.empty.${statusTab}Message`)}
+              </Text>
+              {statusTab === 'draft' ? (
+                <Button
+                  title={t('myEvents.createFirst')}
+                  onPress={handleCreate}
+                  fullWidth
+                  style={styles.createButton}
+                />
+              ) : null}
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <MyEventCard

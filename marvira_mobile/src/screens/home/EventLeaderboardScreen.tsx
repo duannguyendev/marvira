@@ -5,6 +5,7 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import { useEventLeaderboard } from '../../hooks/useLeaderboard';
 import { useAuth } from '../../hooks/useAuth';
 import { LeaderboardList } from '../../components/LeaderboardList';
+import { LeaderboardHeaderSkeleton } from '../../components/skeleton/ListRowSkeletons';
 import { ErrorView } from '../../components/ErrorView';
 import { colors, spacing, fontSize, fontWeight } from '../../theme';
 import { HomeStackParamList } from '../../navigation/types';
@@ -39,6 +40,8 @@ export const EventLeaderboardScreen: React.FC = () => {
           ) : null}
           <Text style={styles.hint}>{t('leaderboard.rankedByScore')}</Text>
         </View>
+      ) : isLoading ? (
+        <LeaderboardHeaderSkeleton />
       ) : null}
 
       <LeaderboardList

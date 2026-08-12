@@ -23,7 +23,7 @@ import { useFavoriteQuestionToggle } from '../../hooks/useFavoriteQuestionToggle
 import { QuestionRenderer } from '../../components/QuestionRenderer';
 import { FavoriteButton } from '../../components/FavoriteButton';
 import { Button } from '../../components/Button';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { QuestionTrainingSkeleton } from '../../components/skeleton/ScreenSkeletons';
 import { ErrorView } from '../../components/ErrorView';
 import { isNotFoundError } from '../../utils/apiErrors';
 import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
@@ -125,8 +125,8 @@ export const QuestionTrainingScreen: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullScreen />;
+  if (isLoading && !data) {
+    return <QuestionTrainingSkeleton />;
   }
 
   if (error || !question) {

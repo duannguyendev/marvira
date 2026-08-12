@@ -1,65 +1,71 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
-import { colors, spacing, borderRadius } from '../theme';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { borderRadius, colors, spacing } from '../theme';
+import { SkeletonBone, SkeletonPulse } from './skeleton/Skeleton';
 
-export const EventCardSkeleton: React.FC = () => {
-  const opacity = useRef(new Animated.Value(0.45)).current;
+type EventCardLayout = 'card' | 'compact';
 
-  useEffect(() => {
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 0.45,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-    animation.start();
-    return () => animation.stop();
-  }, [opacity]);
+type EventCardSkeletonProps = {
+  /** `card` matches EventCard; `compact` matches MyEventCard. */
+  layout?: EventCardLayout;
+};
+
+export const EventCardSkeleton: React.FC<EventCardSkeletonProps> = ({
+  layout = 'card',
+}) => {
+  const compact = layout === 'compact';
 
   return (
-    <Animated.View style={[styles.container, { opacity }]}>
-      <View style={styles.image} />
+    <View style={[styles.container, compact && styles.containerCompact]}>
+      <SkeletonBone
+        height={compact ? 120 : 180}
+        radius={0}
+        style={styles.image}
+      />
       <View style={styles.content}>
         <View style={styles.header}>
-          <View style={styles.title} />
-          <View style={styles.badge} />
+          <SkeletonBone height={20} style={styles.title} />
+          <SkeletonBone width={72} height={22} radius={borderRadius.md} />
         </View>
-        <View style={styles.line} />
-        <View style={[styles.line, styles.lineShort]} />
+        <SkeletonBone style={styles.line} />
+        <SkeletonBone width="65%" style={styles.lineShort} />
         <View style={styles.footer}>
-          <View style={styles.meta} />
-          <View style={styles.metaWide} />
+          <SkeletonBone width={64} height={12} />
+          <SkeletonBone width={100} height={12} />
         </View>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
-export const EventListSkeleton: React.FC<{ count?: number }> = ({
-  count = 3,
-}) => (
-  <View style={styles.list}>
-    {Array.from({ length: count }, (_, index) => (
-      <EventCardSkeleton key={index} />
-    ))}
-  </View>
-);
-
-const bone = {
-  backgroundColor: colors.border,
+type EventListSkeletonProps = {
+  count?: number;
+  layout?: EventCardLayout;
+  /** Extra vertical padding. Turn off when nested in an already-padded list. */
+  padded?: boolean;
 };
+
+export const EventListSkeleton: React.FC<EventListSkeletonProps> = ({
+  count = 3,
+  layout = 'card',
+  padded = layout === 'card',
+}) => (
+  <SkeletonPulse
+    style={
+      padded ? styles.list : layout === 'compact' ? styles.listCompact : undefined
+    }>
+    {Array.from({ length: count }, (_, index) => (
+      <EventCardSkeleton key={index} layout={layout} />
+    ))}
+  </SkeletonPulse>
+);
 
 const styles = StyleSheet.create({
   list: {
     paddingVertical: spacing.md,
+  },
+  listCompact: {
+    paddingTop: spacing.xs,
   },
   container: {
     marginHorizontal: spacing.lg,
@@ -68,10 +74,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     overflow: 'hidden',
   },
+  containerCompact: {
+    marginHorizontal: 0,
+    borderRadius: borderRadius.lg,
+  },
   image: {
     width: '100%',
-    height: 180,
-    ...bone,
   },
   content: {
     padding: spacing.md,
@@ -84,42 +92,17 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    height: 20,
-    borderRadius: borderRadius.sm,
     marginRight: spacing.sm,
-    ...bone,
-  },
-  badge: {
-    width: 72,
-    height: 22,
-    borderRadius: borderRadius.md,
-    ...bone,
   },
   line: {
-    height: 14,
-    borderRadius: borderRadius.sm,
     marginBottom: spacing.sm,
-    ...bone,
   },
   lineShort: {
-    width: '65%',
     marginBottom: spacing.md,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  meta: {
-    width: 64,
-    height: 12,
-    borderRadius: borderRadius.sm,
-    ...bone,
-  },
-  metaWide: {
-    width: 100,
-    height: 12,
-    borderRadius: borderRadius.sm,
-    ...bone,
   },
 });

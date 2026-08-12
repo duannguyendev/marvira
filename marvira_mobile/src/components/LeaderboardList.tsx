@@ -8,7 +8,7 @@ import {
   ListRenderItem,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { LoadingSpinner } from './LoadingSpinner';
+import { LeaderboardListSkeleton } from './skeleton/ListRowSkeletons';
 import { colors, spacing, borderRadius, fontSize, fontWeight } from '../theme';
 import { formatDuration } from '../utils/formatDuration';
 import {
@@ -54,7 +54,7 @@ export const LeaderboardList: React.FC<LeaderboardListProps> = props => {
   const { entries, currentUserId, isLoading, isRefetching, onRefresh } = props;
 
   if (isLoading && entries.length === 0) {
-    return <LoadingSpinner fullScreen />;
+    return <LeaderboardListSkeleton />;
   }
 
   const renderEventRow: ListRenderItem<ApiEventLeaderboardEntry> = ({

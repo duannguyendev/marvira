@@ -13,8 +13,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { usePracticeQuestions } from '../../hooks/usePractice';
 import { useFavoriteQuestionToggle } from '../../hooks/useFavoriteQuestionToggle';
 import { PracticeQuestionCard } from '../../components/PracticeQuestionCard';
+import { PracticeQuestionListSkeleton } from '../../components/skeleton/PracticeQuestionCardSkeleton';
 import { SegmentedControl } from '../../components/SegmentedControl';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorView } from '../../components/ErrorView';
 import { UnfavoriteConfirmBottomSheet } from '../../components/UnfavoriteConfirmBottomSheet';
 import { PracticeStackParamList } from '../../navigation/types';
@@ -69,11 +69,7 @@ export const PracticeListScreen: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullScreen />;
-  }
-
-  if (error) {
+  if (error && !data) {
     return (
       <ErrorView
         message={(error as Error)?.message || t('practice.loadFailed')}
@@ -81,6 +77,8 @@ export const PracticeListScreen: React.FC = () => {
       />
     );
   }
+
+  const showSkeleton = isLoading && !data;
 
   return (
     <View style={styles.container}>
@@ -110,24 +108,28 @@ export const PracticeListScreen: React.FC = () => {
           </View>
         }
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>
-              {status === 'unfinished' ? '📚' : '✅'}
-            </Text>
-            <Text style={styles.emptyTitle}>
-              {status === 'unfinished'
-                ? t('practice.emptyToPracticeTitle')
-                : t('practice.emptyCompletedTitle')}
-            </Text>
-            <Text style={styles.emptyText}>
-              {status === 'unfinished'
-                ? t('practice.emptyToPracticeMessage')
-                : t('practice.emptyCompletedMessage')}
-            </Text>
-            <Text style={styles.emptyHint}>
-              {t('practice.emptyLanguageHint')}
-            </Text>
-          </View>
+          showSkeleton ? (
+            <PracticeQuestionListSkeleton />
+          ) : (
+            <View style={styles.empty}>
+              <Text style={styles.emptyIcon}>
+                {status === 'unfinished' ? '📚' : '✅'}
+              </Text>
+              <Text style={styles.emptyTitle}>
+                {status === 'unfinished'
+                  ? t('practice.emptyToPracticeTitle')
+                  : t('practice.emptyCompletedTitle')}
+              </Text>
+              <Text style={styles.emptyText}>
+                {status === 'unfinished'
+                  ? t('practice.emptyToPracticeMessage')
+                  : t('practice.emptyCompletedMessage')}
+              </Text>
+              <Text style={styles.emptyHint}>
+                {t('practice.emptyLanguageHint')}
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <PracticeQuestionCard

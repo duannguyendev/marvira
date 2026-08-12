@@ -13,7 +13,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useCompletedEvents } from '../../hooks/useProfile';
 import { EventCard } from '../../components/EventCard';
-import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { EventListSkeleton } from '../../components/EventCardSkeleton';
 import { ErrorView } from '../../components/ErrorView';
 import {
   HomeStackParamList,
@@ -53,11 +53,7 @@ export const CompletedEventsScreen: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullScreen />;
-  }
-
-  if (error) {
+  if (error && !data) {
     return (
       <ErrorView
         message={(error as Error)?.message || t('completedEvents.loadFailed')}
@@ -65,6 +61,8 @@ export const CompletedEventsScreen: React.FC = () => {
       />
     );
   }
+
+  const showSkeleton = isLoading && !data;
 
   return (
     <View style={styles.container}>
@@ -84,14 +82,18 @@ export const CompletedEventsScreen: React.FC = () => {
           </View>
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>
-              {t('profile.noCompletedEvents')}
-            </Text>
-            <Text style={styles.emptyMessage}>
-              {t('profile.startExploring')}
-            </Text>
-          </View>
+          showSkeleton ? (
+            <EventListSkeleton padded={false} />
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyTitle}>
+                {t('profile.noCompletedEvents')}
+              </Text>
+              <Text style={styles.emptyMessage}>
+                {t('profile.startExploring')}
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <EventCard
