@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { locationService } from '../services/location.service';
 import { Location } from '../types';
+import { hasSignificantLocationChange } from '../utils/distance';
 
 export const useLocation = () => {
   const [location, setLocation] = useState<Location | null>(
@@ -26,7 +27,9 @@ export const useLocation = () => {
       if (!mountedRef.current) {
         return;
       }
-      setLocation(newLocation);
+      setLocation(prev =>
+        hasSignificantLocationChange(prev, newLocation) ? newLocation : prev,
+      );
       setError(null);
       setIsLoading(false);
     });
@@ -69,7 +72,11 @@ export const useLocation = () => {
       if (!mountedRef.current) {
         return true;
       }
-      setLocation(currentLocation);
+      setLocation(prev =>
+        hasSignificantLocationChange(prev, currentLocation)
+          ? currentLocation
+          : prev,
+      );
       setError(null);
       setIsLoading(false);
     } catch (err) {

@@ -55,11 +55,13 @@ export const CoverImage: React.FC<CoverImageProps> = ({
   const trimmed = uri?.trim() ?? '';
   const showImage = Boolean(trimmed) && !failed;
 
+  const frameStyle = [styles.base, style];
+
   if (!showImage) {
     return (
       <LinearGradient
         colors={[colors.primary, colors.secondary]}
-        style={[styles.base, style]}
+        style={frameStyle}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         accessibilityLabel={accessibilityLabel}
@@ -67,31 +69,32 @@ export const CoverImage: React.FC<CoverImageProps> = ({
     );
   }
 
-  const imageStyle = [styles.base, style as StyleProp<ImageStyle>];
-
+  // Size comes from the wrapper so FastImage load/error cannot resize the row.
   if (isRemoteHttpUri(trimmed)) {
     return (
-      <FastImage
-        source={{
-          uri: trimmed,
-          priority: FastImage.priority.normal,
-          cache: FastImage.cacheControl.immutable,
-        }}
-        style={imageStyle as FastImageProps['style']}
-        resizeMode={FastImage.resizeMode.cover}
-        accessibilityLabel={accessibilityLabel}
-        onError={() => setFailed(true)}
-      />
+      <View style={frameStyle} accessibilityLabel={accessibilityLabel}>
+        <FastImage
+          source={{
+            uri: trimmed,
+            priority: FastImage.priority.normal,
+            cache: FastImage.cacheControl.immutable,
+          }}
+          style={StyleSheet.absoluteFillObject as FastImageProps['style']}
+          resizeMode={FastImage.resizeMode.cover}
+          onError={() => setFailed(true)}
+        />
+      </View>
     );
   }
 
   return (
-    <Image
-      source={{ uri: trimmed }}
-      style={imageStyle}
-      accessibilityLabel={accessibilityLabel}
-      onError={() => setFailed(true)}
-    />
+    <View style={frameStyle} accessibilityLabel={accessibilityLabel}>
+      <Image
+        source={{ uri: trimmed }}
+        style={StyleSheet.absoluteFillObject}
+        onError={() => setFailed(true)}
+      />
+    </View>
   );
 };
 

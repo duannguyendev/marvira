@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, Linking } from 'react-native';
+import { AppState, Linking, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +17,8 @@ import {
 import { RootStackParamList } from './types';
 import { useAuth } from '../hooks/useAuth';
 import { SplashScreen } from '../components/SplashScreen';
+import { subscribeDestinationReady } from '../native/bootSplash';
+import { colors } from '../theme';
 import { authSession } from '../services/authSession';
 import { AnalyticsEvents } from '../services/analytics';
 import { pushNotifications } from '../services/pushNotifications';
@@ -89,6 +91,7 @@ export const RootNavigator: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const queryClient = useQueryClient();
   const [sessionKey, setSessionKey] = useState(0);
+  const [destinationReady, setDestinationReady] = useState(false);
   const canNavigateRef = useRef(false);
   canNavigateRef.current = isAuthenticated && !isLoading;
 
@@ -176,23 +179,38 @@ export const RootNavigator: React.FC = () => {
     }
   }, [isAuthenticated, isLoading]);
 
-  // Only gate cold start — never flash spinner when session expires mid-use
-  if (isLoading) {
-    return <SplashScreen />;
-  }
+  useEffect(() => subscribeDestinationReady(setDestinationReady), []);
+
+  const showLaunchSplash = isLoading || !destinationReady;
 
   return (
-    <NavigationContainer
-      key={`${sessionKey}-${i18n.language}`}
-      ref={navigationRef}
-      onReady={handleNavigationReady}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
-          <Stack.Screen name="Main" component={MainNavigator} />
-        ) : (
-          <Stack.Screen name="Auth" component={AuthNavigator} />
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={styles.root}>
+      {!isLoading ? (
+        <NavigationContainer
+          key={`${sessionKey}-${i18n.language}`}
+          ref={navigationRef}
+          onReady={handleNavigationReady}>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {isAuthenticated ? (
+              <Stack.Screen name="Main" component={MainNavigator} />
+            ) : (
+              <Stack.Screen name="Auth" component={AuthNavigator} />
+            )}
+          </Stack.Navigator>
+        </NavigationContainer>
+      ) : null}
+      {showLaunchSplash ? (
+        <View style={StyleSheet.absoluteFill} pointerEvents="auto">
+          <SplashScreen />
+        </View>
+      ) : null}
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: colors.primary,
+  },
+});

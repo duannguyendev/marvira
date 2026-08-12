@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import './src/i18n';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { colors } from './src/theme';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootNavigator } from './src/navigation/RootNavigator';
@@ -11,6 +12,7 @@ import { I18nProvider } from './src/components/I18nProvider';
 import { AlertProvider } from './src/components/AlertBottomSheet';
 import { analytics } from './src/services/analytics';
 import { initMapbox } from './src/utils/mapbox';
+import { subscribeDestinationReady } from './src/native/bootSplash';
 
 initMapbox();
 
@@ -27,6 +29,15 @@ const queryClient = new QueryClient({
   },
 });
 
+const OfflineBannerAfterBoot: React.FC = () => {
+  const [ready, setReady] = useState(false);
+  useEffect(() => subscribeDestinationReady(setReady), []);
+  if (!ready) {
+    return null;
+  }
+  return <OfflineBanner />;
+};
+
 const App: React.FC = () => {
   useEffect(() => {
     return analytics.startAppOpenTracking();
@@ -40,7 +51,7 @@ const App: React.FC = () => {
             <ErrorBoundary>
               <QueryClientProvider client={queryClient}>
                 <View style={styles.container}>
-                  <OfflineBanner />
+                  <OfflineBannerAfterBoot />
                   <StatusBar
                     barStyle="light-content"
                     backgroundColor="transparent"
@@ -60,8 +71,7 @@ const App: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // Match splash indigo so boot never flashes white under RN root
-    backgroundColor: '#818CF8',
+    backgroundColor: colors.primary,
   },
 });
 

@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Matches app icon master gradient: #A5B4FC → #818CF8 -->
+<!-- Solid; Android boot splash cannot use a gradient (12+ SplashScreen API). -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient
-        android:type="linear"
-        android:angle="270"
-        android:startColor="@color/splash_background_end"
-        android:endColor="@color/splash_background" />
+    <solid android:color="@color/splash_background" />
 </shape>

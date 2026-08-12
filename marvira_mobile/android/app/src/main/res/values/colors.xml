@@ -2,8 +2,6 @@
 <resources>
     <!-- Matches adaptive launcher background (app-icon/generate.js) -->
     <color name="ic_launcher_background">#818CF8</color>
-    <!-- Android 12+ splash is solid-only; use launcher icon background -->
-    <color name="splash_background">#818CF8</color>
-    <!-- Pre-12 window gradient end — same indigo family as icon master SVG -->
-    <color name="splash_background_end">#A5B4FC</color>
+    <!-- Boot splash (native + JS) — Android 12+ cannot use a gradient -->
+    <color name="splash_background">#6366F1</color>
 </resources>

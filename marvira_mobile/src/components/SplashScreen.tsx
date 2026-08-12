@@ -1,12 +1,16 @@
 import React, { useCallback, useRef } from 'react';
-import { Image, StatusBar, StyleSheet, View } from 'react-native';
+import { Image, Platform, StatusBar, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { hideNativeSplash } from '../native/splashGate';
+import { colors, splashGradient } from '../theme';
 
-/** Matches native Android/iOS splash (#A5B4FC → #818CF8). */
-const SPLASH_GRADIENT = ['#A5B4FC', '#818CF8'] as const;
+const splashIcon = require('../assets/splash-icon.png');
 
-/** Cold-start / auth-boot splash — same look as native splash (icon, no spinner). */
+/** Android 12+ splash icon is a 240dp circle; match that so JS does not jump. */
+const ANDROID_ICON = 240;
+const IOS_ICON = 120;
+
+/** Cold-start splash — iOS: gradient + icon; Android: solid + circular icon. */
 export const SplashScreen: React.FC = () => {
   const dismissed = useRef(false);
 
@@ -18,6 +22,16 @@ export const SplashScreen: React.FC = () => {
     hideNativeSplash();
   }, []);
 
+  const icon = (
+    <Image
+      source={splashIcon}
+      style={Platform.OS === 'android' ? styles.androidIcon : styles.iosIcon}
+      resizeMode="cover"
+      accessibilityIgnoresInvertColors
+      onLoadEnd={onReady}
+    />
+  );
+
   return (
     <View style={styles.container} onLayout={onReady}>
       <StatusBar
@@ -25,15 +39,15 @@ export const SplashScreen: React.FC = () => {
         backgroundColor="transparent"
         translucent
       />
-      <LinearGradient colors={[...SPLASH_GRADIENT]} style={styles.gradient}>
-        <Image
-          source={require('../assets/splash-icon.png')}
-          style={styles.icon}
-          resizeMode="contain"
-          accessibilityIgnoresInvertColors
-          onLoadEnd={onReady}
-        />
-      </LinearGradient>
+      {Platform.OS === 'android' ? (
+        <View style={styles.center}>
+          <View style={styles.androidIconClip}>{icon}</View>
+        </View>
+      ) : (
+        <LinearGradient colors={[...splashGradient]} style={styles.center}>
+          {icon}
+        </LinearGradient>
+      )}
     </View>
   );
 };
@@ -41,16 +55,26 @@ export const SplashScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: SPLASH_GRADIENT[1],
+    backgroundColor: colors.primary,
   },
-  gradient: {
+  center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  icon: {
-    width: 120,
-    height: 120,
-    borderRadius: 24,
+  iosIcon: {
+    width: IOS_ICON,
+    height: IOS_ICON,
+  },
+  androidIconClip: {
+    width: ANDROID_ICON,
+    height: ANDROID_ICON,
+    borderRadius: ANDROID_ICON / 2,
+    overflow: 'hidden',
+    backgroundColor: colors.primary,
+  },
+  androidIcon: {
+    width: ANDROID_ICON,
+    height: ANDROID_ICON,
   },
 });

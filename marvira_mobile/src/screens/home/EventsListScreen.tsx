@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -26,6 +26,7 @@ import {
 import { HomeStackParamList } from '../../navigation/types';
 import { EventAvailabilityFilter, EventFilters } from '../../types';
 import { calculateDistance, hasUsableCoordinates } from '../../utils/distance';
+import { notifyDestinationReady } from '../../native/bootSplash';
 
 const SEARCH_DEBOUNCE_MS = 250;
 const AVAILABILITY_FILTERS: EventAvailabilityFilter[] = ['open', 'incoming'];
@@ -63,13 +64,16 @@ export const EventsListScreen: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const filters: EventFilters = {
-    radius: radius ?? undefined,
-    status: statusFilter,
-    searchQuery: debouncedSearchQuery || undefined,
-  };
+  const filters: EventFilters = useMemo(
+    () => ({
+      radius: radius ?? undefined,
+      status: statusFilter,
+      searchQuery: debouncedSearchQuery || undefined,
+    }),
+    [radius, statusFilter, debouncedSearchQuery],
+  );
 
-  const { data, isLoading, error, refetch } = useEvents(
+  const { data, isLoading, isFetching, error, refetch } = useEvents(
     filters,
     location || undefined,
   );
@@ -84,33 +88,41 @@ export const EventsListScreen: React.FC = () => {
     navigation.navigate('EventDetails', { eventId });
   };
 
-  const events = data?.data || [];
+  const events = data?.data;
   // Nearby API already provides distanceMeters. Recalculating from
   // event.location is wrong when the list payload omits places (mapper
   // falls back to 0,0 → ~12,000km from Vietnam).
-  const eventsWithDistance = location
-    ? events.map(event => {
-        if (!hasUsableCoordinates(event.location)) {
-          return event;
-        }
-        return {
-          ...event,
-          distance: calculateDistance(location, event.location),
-        };
-      })
-    : events;
+  const sortedEvents = useMemo(() => {
+    const list = events ?? [];
+    const eventsWithDistance = location
+      ? list.map(event => {
+          if (!hasUsableCoordinates(event.location)) {
+            return event;
+          }
+          return {
+            ...event,
+            distance: calculateDistance(location, event.location),
+          };
+        })
+      : list;
 
-  const sortedEvents = [...eventsWithDistance].sort((a, b) => {
-    if (a.distance !== undefined && b.distance !== undefined) {
-      return a.distance - b.distance;
-    }
-    return 0;
-  });
+    return [...eventsWithDistance].sort((a, b) => {
+      if (a.distance !== undefined && b.distance !== undefined) {
+        return a.distance - b.distance;
+      }
+      return 0;
+    });
+  }, [events, location]);
 
-  const showResultsSkeleton = isLoading && !refreshing;
+  // Keep the existing FlatList mounted while a filter refetch is in flight.
+  // Swapping to a skeleton remounts the list and snaps scroll to top.
+  const showResultsSkeleton =
+    (isLoading || (isFetching && !data)) &&
+    !refreshing &&
+    !events?.length;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onLayout={notifyDestinationReady}>
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -226,6 +238,7 @@ export const EventsListScreen: React.FC = () => {
             />
           )}
           contentContainerStyle={styles.listContent}
+          removeClippedSubviews={false}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

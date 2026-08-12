@@ -23,6 +23,7 @@ import {
   borderRadius,
   fontSize,
   fontWeight,
+  splashGradient,
 } from '../../theme';
 import { AuthStackParamList } from '../../navigation/types';
 
@@ -106,9 +107,7 @@ export const RegisterScreen: React.FC = () => {
         backgroundColor="transparent"
         translucent
       />
-      <LinearGradient
-        colors={[colors.secondary, colors.primary]}
-        style={styles.gradient}>
+      <LinearGradient colors={[...splashGradient]} style={styles.gradient}>
         <ScrollView
           contentContainerStyle={[
             styles.scrollContent,
@@ -199,6 +198,7 @@ export const RegisterScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.primary,
   },
   gradient: {
     flex: 1,

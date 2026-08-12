@@ -23,6 +23,7 @@ import {
   borderRadius,
   fontSize,
   fontWeight,
+  splashGradient,
 } from '../../theme';
 import { AuthStackParamList } from '../../navigation/types';
 
@@ -87,9 +88,7 @@ export const ResetPasswordScreen: React.FC = () => {
         backgroundColor="transparent"
         translucent
       />
-      <LinearGradient
-        colors={[colors.primary, colors.secondary]}
-        style={styles.gradient}>
+      <LinearGradient colors={[...splashGradient]} style={styles.gradient}>
         <ScrollView
           contentContainerStyle={[
             styles.scrollContent,
@@ -139,7 +138,7 @@ export const ResetPasswordScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: colors.primary },
   gradient: { flex: 1 },
   scrollContent: { flexGrow: 1, justifyContent: 'center' },
   content: {

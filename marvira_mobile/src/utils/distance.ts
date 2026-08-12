@@ -54,6 +54,33 @@ export function hasUsableCoordinates(
   return !(latitude === 0 && longitude === 0);
 }
 
+/** ~11m — GPS timestamp/accuracy must not live in React Query keys. */
+function roundCoord(value: number): number {
+  return Math.round(value * 1e4) / 1e4;
+}
+
+export function toLocationQueryKey(
+  location?: Location | null,
+): [number, number] | null {
+  if (!location || !hasUsableCoordinates(location)) {
+    return null;
+  }
+  return [roundCoord(location.latitude), roundCoord(location.longitude)];
+}
+
+export function hasSignificantLocationChange(
+  prev: Location | null | undefined,
+  next: Location,
+): boolean {
+  if (!prev) {
+    return true;
+  }
+  return (
+    roundCoord(prev.latitude) !== roundCoord(next.latitude) ||
+    roundCoord(prev.longitude) !== roundCoord(next.longitude)
+  );
+}
+
 /**
  * Check if user is within range of a location
  */

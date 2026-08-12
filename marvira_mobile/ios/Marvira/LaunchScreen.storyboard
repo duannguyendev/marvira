@@ -20,18 +20,12 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SplashLogo" translatesAutoresizingMaskIntoConstraints="NO" id="logo-iv-1">
-                                <rect key="frame" x="127.5" y="253.5" width="120" height="120"/>
+                                <rect key="frame" x="127.5" y="273.5" width="120" height="120"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="120" id="logo-w"/>
                                     <constraint firstAttribute="height" constant="120" id="logo-h"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Marvira" textAlignment="center" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" minimumFontSize="18" translatesAutoresizingMaskIntoConstraints="NO" id="GJd-Yh-RWb">
-                                <rect key="frame" x="0.0" y="389.5" width="375" height="43"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="28"/>
-                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <color key="backgroundColor" red="0.38823529411764707" green="0.40000000000000002" blue="0.94509803921568625" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -40,11 +34,7 @@
                             <constraint firstItem="grad-iv-1" firstAttribute="trailing" secondItem="Ze5-6b-2t3" secondAttribute="trailing" id="grad-trail"/>
                             <constraint firstItem="grad-iv-1" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" id="grad-bot"/>
                             <constraint firstItem="logo-iv-1" firstAttribute="centerX" secondItem="Bcu-3y-fUS" secondAttribute="centerX" id="logo-cx"/>
-                            <constraint firstItem="logo-iv-1" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-20" id="logo-cy"/>
-                            <constraint firstItem="GJd-Yh-RWb" firstAttribute="top" secondItem="logo-iv-1" secondAttribute="bottom" constant="16" id="title-top"/>
-                            <constraint firstItem="GJd-Yh-RWb" firstAttribute="centerX" secondItem="Bcu-3y-fUS" secondAttribute="centerX" id="title-cx"/>
-                            <constraint firstItem="GJd-Yh-RWb" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" id="title-lead"/>
-                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="GJd-Yh-RWb" secondAttribute="trailing" id="title-trail"/>
+                            <constraint firstItem="logo-iv-1" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="logo-cy"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                     </view>
