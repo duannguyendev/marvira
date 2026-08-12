@@ -3,6 +3,7 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import FirebaseCore
+import FirebaseMessaging
 import SDWebImage
 import RNBootSplash
 
@@ -19,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   ) -> Bool {
     // Must configure before any RNFB module (messaging in index.js) touches FIRApp.
     FirebaseApp.configure()
+    application.registerForRemoteNotifications()
     configureImageCache()
 
     let delegate = ReactNativeDelegate()
@@ -37,6 +39,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
 
     return true
+  }
+
+  func application(
+    _ application: UIApplication,
+    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+  ) {
+    Messaging.messaging().apnsToken = deviceToken
   }
 
   /// Memory 50MB, disk 75MB, max age 14 days (matches JS imageCache constants).

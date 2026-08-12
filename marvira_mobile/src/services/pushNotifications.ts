@@ -8,6 +8,7 @@ const TOKEN_STORAGE_KEY = 'fcm_device_token';
 type MessagingModule = {
   default: () => {
     requestPermission: () => Promise<number>;
+    registerDeviceForRemoteMessages: () => Promise<void>;
     getToken: () => Promise<string>;
     onTokenRefresh: (cb: (token: string) => void) => () => void;
     onMessage: (cb: (msg: unknown) => void) => () => void;
@@ -69,6 +70,9 @@ export const pushNotifications = {
     if (!allowed) return null;
 
     try {
+      if (Platform.OS === 'ios') {
+        await mod.default().registerDeviceForRemoteMessages();
+      }
       const fcmToken = await mod.default().getToken();
       if (!fcmToken) return null;
 
