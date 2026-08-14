@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   ) -> Bool {
     // Must configure before any RNFB module (messaging in index.js) touches FIRApp.
     FirebaseApp.configure()
-    application.registerForRemoteNotifications()
+    // RNFB registers for APNs after didFinishLaunching (swizzling is not ready yet).
     configureImageCache()
 
     let delegate = ReactNativeDelegate()
@@ -45,7 +45,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
-    Messaging.messaging().apnsToken = deviceToken
+    // Debug builds use APNs sandbox; `apnsToken =` (type unknown) can mark them as production.
+#if DEBUG
+    Messaging.messaging().setAPNSToken(deviceToken, type: .sandbox)
+#else
+    Messaging.messaging().setAPNSToken(deviceToken, type: .prod)
+#endif
+  }
+
+  func application(
+    _ application: UIApplication,
+    didFailToRegisterForRemoteNotificationsWithError error: Error
+  ) {
+    NSLog("APNs registration failed: \(error.localizedDescription)")
   }
 
   /// Memory 50MB, disk 75MB, max age 14 days (matches JS imageCache constants).

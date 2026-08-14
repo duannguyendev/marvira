@@ -96,8 +96,16 @@ export class FcmSenderService implements OnModuleInit {
         },
       },
       apns: {
+        headers: {
+          'apns-priority': '10',
+          'apns-push-type': 'alert',
+        },
         payload: {
           aps: {
+            alert: {
+              title: payload.title,
+              body: payload.body,
+            },
             sound: 'default',
           },
         },
