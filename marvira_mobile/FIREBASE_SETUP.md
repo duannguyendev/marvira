@@ -39,8 +39,16 @@ Placeholder files ship so the app can compile; they will **not** send real telem
 1. Apple Developer → Keys → create **APNs Auth Key** (`.p8`).
 2. Upload in Firebase → Project settings → Cloud Messaging → Apple app.
 3. Xcode: Push Notifications capability + Background Modes → Remote notifications
-   (entitlements / Info.plist already wired in repo; set `aps-environment` to
-   `production` for App Store builds).
+   (already wired). AppDelegate only calls `FirebaseApp.configure()`; Firebase
+   swizzles APNs like the working sport-social app — do not set the APNs token
+   by hand.
+4. `aps-environment` is split by build:
+   - Debug (`Marvira.debug.entitlements`) → `development` (Xcode sandbox)
+   - Release (`Marvira.entitlements`) → `production` (TestFlight / App Store)
+
+   After switching Debug ↔ Release, delete the app (or log in again) so FCM
+   issues a token for the new APNs environment. A sandbox token sent via
+   production APNs is accepted by Firebase Console but never shown on device.
 
 ## 5. Native rebuild
 

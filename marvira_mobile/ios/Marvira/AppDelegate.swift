@@ -3,7 +3,6 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import FirebaseCore
-import FirebaseMessaging
 import SDWebImage
 import RNBootSplash
 
@@ -18,9 +17,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    // Must configure before any RNFB module (messaging in index.js) touches FIRApp.
+    // Same as sport-social: configure Firebase and let the SDK swizzle APNs.
+    // Must run before any RNFB module (messaging in index.js) touches FIRApp.
     FirebaseApp.configure()
-    // RNFB registers for APNs after didFinishLaunching (swizzling is not ready yet).
     configureImageCache()
 
     let delegate = ReactNativeDelegate()
@@ -39,25 +38,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
 
     return true
-  }
-
-  func application(
-    _ application: UIApplication,
-    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
-  ) {
-    // Debug builds use APNs sandbox; `apnsToken =` (type unknown) can mark them as production.
-#if DEBUG
-    Messaging.messaging().setAPNSToken(deviceToken, type: .sandbox)
-#else
-    Messaging.messaging().setAPNSToken(deviceToken, type: .prod)
-#endif
-  }
-
-  func application(
-    _ application: UIApplication,
-    didFailToRegisterForRemoteNotificationsWithError error: Error
-  ) {
-    NSLog("APNs registration failed: \(error.localizedDescription)")
   }
 
   /// Memory 50MB, disk 75MB, max age 14 days (matches JS imageCache constants).
