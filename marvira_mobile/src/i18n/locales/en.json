@@ -175,21 +175,7 @@
       "en": "English",
       "zh": "中文",
       "ja": "日本語"
-    },
-    "pushDiagnostics": "Push diagnostics",
-    "pushDiagnosticsHint": "Use this FCM token in Firebase Console test messages. APNs must be linked (not empty) for iOS delivery.",
-    "pushPermission": "Permission",
-    "pushApnsEnv": "APNs environment",
-    "pushApnsToken": "APNs token",
-    "pushFcmToken": "FCM token",
-    "pushCopyFcmToken": "Copy FCM token",
-    "pushRefreshToken": "Refresh push registration",
-    "pushCopied": "FCM token copied",
-    "pushGranted": "Granted",
-    "pushDenied": "Denied",
-    "pushMissing": "Missing",
-    "pushPresent": "Linked",
-    "pushRefreshDone": "Push registration refreshed"
+    }
   },
   "feedback": {
     "title": "Send feedback",

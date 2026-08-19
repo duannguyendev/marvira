@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { SUPPORTED_LANGUAGES, LanguageCode, setAppLanguage } from '../../i18n';
 import { useAuth } from '../../hooks/useAuth';
 import { useShowAllLanguages } from '../../hooks/useContentLanguage';
@@ -21,11 +19,6 @@ import {
 } from '../../hooks/useNotifications';
 import { ProfileStackParamList } from '../../navigation/types';
 import { AuthProvider } from '../../types';
-import {
-  pushNotifications,
-  PushDiagnostics,
-} from '../../services/pushNotifications';
-import { appAlert } from '../../utils/appAlert';
 import {
   colors,
   spacing,
@@ -60,34 +53,6 @@ export const SettingsScreen: React.FC = () => {
   const { showAllLanguages, setShowAllLanguages } = useShowAllLanguages();
   const { data: prefs } = useNotificationPreferences();
   const updatePrefs = useUpdateNotificationPreferences();
-  const [pushDiagnostics, setPushDiagnostics] = useState<PushDiagnostics | null>(
-    null,
-  );
-
-  const loadPushDiagnostics = useCallback(async () => {
-    if (Platform.OS !== 'ios') return;
-    const diagnostics = await pushNotifications.getDiagnostics();
-    setPushDiagnostics(diagnostics);
-  }, []);
-
-  useEffect(() => {
-    void loadPushDiagnostics();
-  }, [loadPushDiagnostics]);
-
-  const handleCopyFcmToken = () => {
-    const token = pushDiagnostics?.fcmToken;
-    if (!token) return;
-    Clipboard.setString(token);
-    appAlert.alert(t('settings.pushCopied'));
-  };
-
-  const handleRefreshPushRegistration = async () => {
-    const token = await pushNotifications.registerIfAuthenticated();
-    await loadPushDiagnostics();
-    if (token) {
-      appAlert.alert(t('settings.pushRefreshDone'));
-    }
-  };
 
   const isSocialProvider =
     !!user?.provider && user.provider !== 'LOCAL';
@@ -197,48 +162,6 @@ export const SettingsScreen: React.FC = () => {
           />
         </View>
       </View>
-
-      {Platform.OS === 'ios' ? (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('settings.pushDiagnostics')}</Text>
-          <Text style={styles.sectionDescription}>
-            {t('settings.pushDiagnosticsHint')}
-          </Text>
-          <View style={styles.infoCard}>
-            <Text style={styles.diagRow}>
-              {t('settings.pushPermission')}:{' '}
-              {pushDiagnostics?.permissionGranted
-                ? t('settings.pushGranted')
-                : t('settings.pushDenied')}
-            </Text>
-            <Text style={styles.diagRow}>
-              {t('settings.pushApnsEnv')}: {pushDiagnostics?.apnsEnv ?? '—'}
-            </Text>
-            <Text style={styles.diagRow}>
-              {t('settings.pushApnsToken')}:{' '}
-              {pushDiagnostics?.apnsToken
-                ? t('settings.pushPresent')
-                : t('settings.pushMissing')}
-            </Text>
-            <Text style={styles.diagMono} numberOfLines={3}>
-              {t('settings.pushFcmToken')}: {pushDiagnostics?.fcmToken ?? '—'}
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={handleCopyFcmToken}
-            disabled={!pushDiagnostics?.fcmToken}
-            activeOpacity={0.7}>
-            <Text style={styles.menuLabel}>{t('settings.pushCopyFcmToken')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => void handleRefreshPushRegistration()}
-            activeOpacity={0.7}>
-            <Text style={styles.menuLabel}>{t('settings.pushRefreshToken')}</Text>
-          </TouchableOpacity>
-        </View>
-      ) : null}
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
@@ -361,16 +284,6 @@ const styles = StyleSheet.create({
   infoHint: {
     fontSize: fontSize.sm,
     color: colors.textSecondary,
-  },
-  diagRow: {
-    fontSize: fontSize.sm,
-    color: colors.textDark,
-    marginBottom: spacing.xs,
-  },
-  diagMono: {
-    fontSize: fontSize.xs,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
   },
   languageOption: {
     flexDirection: 'row',
