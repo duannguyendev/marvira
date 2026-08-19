@@ -8,6 +8,9 @@ const TOKEN_ENV_KEY = 'fcm_apns_env';
 
 type MessagingInstance = {
   requestPermission: () => Promise<number>;
+  hasPermission?: () => Promise<number>;
+  registerDeviceForRemoteMessages: () => Promise<void>;
+  getAPNSToken?: () => Promise<string | null>;
   getToken: () => Promise<string>;
   deleteToken?: () => Promise<void>;
   onTokenRefresh: (cb: (token: string) => void) => () => void;
@@ -26,6 +29,14 @@ type MessagingModule = {
   };
 };
 
+export type PushDiagnostics = {
+  permissionGranted: boolean;
+  apnsToken: string | null;
+  fcmToken: string | null;
+  apnsEnv: string;
+  storedLocally: boolean;
+};
+
 function getMessaging(): MessagingModule | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -37,7 +48,11 @@ function getMessaging(): MessagingModule | null {
 
 function currentApnsEnv(): string {
   if (Platform.OS !== 'ios') return 'android';
-  return __DEV__ ? 'sandbox' : 'prod';
+  return __DEV__ ? 'sandbox' : 'production';
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function ensureAndroidPermission(): Promise<boolean> {
@@ -65,10 +80,50 @@ async function requestPermission(): Promise<boolean> {
   );
 }
 
+async function hasPermission(): Promise<boolean> {
+  const mod = getMessaging();
+  if (!mod) return false;
+
+  if (Platform.OS === 'android') {
+    if (Platform.Version < 33) return true;
+    const granted = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
+    return granted;
+  }
+
+  if (!mod.default().hasPermission) return false;
+  const authStatus = await mod.default().hasPermission!();
+  return (
+    authStatus === mod.AuthorizationStatus.AUTHORIZED ||
+    authStatus === mod.AuthorizationStatus.PROVISIONAL
+  );
+}
+
 /**
- * Debug iOS uses APNs sandbox; Release uses production. A cached FCM token from
- * the other environment is accepted by Firebase Console but never delivered.
+ * iOS must link an APNs device token before FCM can deliver tray notifications.
+ * getToken() alone can return a value that Firebase accepts but Apple never shows.
  */
+async function ensureIosApnsLinked(
+  messaging: MessagingInstance,
+): Promise<string | null> {
+  await messaging.registerDeviceForRemoteMessages();
+
+  if (!messaging.getAPNSToken) {
+    return null;
+  }
+
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const apnsToken = await messaging.getAPNSToken();
+    if (apnsToken) {
+      return apnsToken;
+    }
+    await sleep(500);
+  }
+
+  return null;
+}
+
 async function refreshTokenIfApnsEnvChanged(
   messaging: MessagingInstance,
 ): Promise<void> {
@@ -78,7 +133,7 @@ async function refreshTokenIfApnsEnvChanged(
   try {
     await messaging.deleteToken?.();
   } catch {
-    // best-effort — getToken below still runs
+    // best-effort
   }
   await storage.removeItem(TOKEN_STORAGE_KEY);
   await storage.setItem(TOKEN_ENV_KEY, env);
@@ -94,6 +149,22 @@ async function registerTokenWithApi(fcmToken: string): Promise<void> {
   await storage.setItem(TOKEN_ENV_KEY, currentApnsEnv());
 }
 
+async function obtainFcmToken(messaging: MessagingInstance): Promise<string | null> {
+  if (Platform.OS === 'ios') {
+    const apnsToken = await ensureIosApnsLinked(messaging);
+    if (!apnsToken) {
+      console.warn(
+        'FCM register skipped: APNs token not available (push will not deliver on iOS)',
+      );
+      return null;
+    }
+  }
+
+  await refreshTokenIfApnsEnvChanged(messaging);
+  const fcmToken = await messaging.getToken();
+  return fcmToken || null;
+}
+
 export const pushNotifications = {
   async registerIfAuthenticated(): Promise<string | null> {
     const token = await storage.getToken();
@@ -107,8 +178,7 @@ export const pushNotifications = {
 
     try {
       const messaging = mod.default();
-      await refreshTokenIfApnsEnvChanged(messaging);
-      const fcmToken = await messaging.getToken();
+      const fcmToken = await obtainFcmToken(messaging);
       if (!fcmToken) return null;
 
       await registerTokenWithApi(fcmToken);
@@ -119,16 +189,56 @@ export const pushNotifications = {
     }
   },
 
+  async getDiagnostics(): Promise<PushDiagnostics | null> {
+    const mod = getMessaging();
+    if (!mod) return null;
+
+    const messaging = mod.default();
+    const permissionGranted = await hasPermission();
+    let apnsToken: string | null = null;
+    let fcmToken: string | null = null;
+
+    if (Platform.OS === 'ios' && permissionGranted) {
+      try {
+        await messaging.registerDeviceForRemoteMessages();
+        apnsToken = (await messaging.getAPNSToken?.()) ?? null;
+      } catch {
+        apnsToken = null;
+      }
+    }
+
+    if (permissionGranted) {
+      try {
+        if (Platform.OS !== 'ios' || apnsToken) {
+          fcmToken = await messaging.getToken();
+        }
+      } catch {
+        fcmToken = null;
+      }
+    }
+
+    const stored = await storage.getItem(TOKEN_STORAGE_KEY);
+
+    return {
+      permissionGranted,
+      apnsToken,
+      fcmToken: fcmToken ?? stored,
+      apnsEnv: currentApnsEnv(),
+      storedLocally: !!stored,
+    };
+  },
+
   async unregister(): Promise<void> {
     const fcmToken = await storage.getItem(TOKEN_STORAGE_KEY);
-    if (!fcmToken) return;
-    try {
-      await notificationsApi.unregisterDevice(fcmToken);
-    } catch {
-      // best-effort
-    } finally {
-      await storage.removeItem(TOKEN_STORAGE_KEY);
+    if (fcmToken) {
+      try {
+        await notificationsApi.unregisterDevice(fcmToken);
+      } catch {
+        // best-effort
+      }
     }
+    await storage.removeItem(TOKEN_STORAGE_KEY);
+    await storage.removeItem(TOKEN_ENV_KEY);
   },
 
   subscribeTokenRefresh(onRefresh?: (token: string) => void): () => void {
